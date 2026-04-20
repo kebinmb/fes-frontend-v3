@@ -1,0 +1,31 @@
+<div class="toast-container position-fixed top-0 end-0 p-3">
+
+  @if (toasts$ | async; as toasts) {
+
+    @for (toast of toasts; track toast.id) {
+
+      <div 
+        class="toast show custom-toast"
+        [ngClass]="{
+          'bg-success text-white': toast.toastType === 'success',
+          'bg-danger text-white': toast.toastType === 'error'
+        }"
+      >
+        <div class="toast-content">
+          <span class="toast-message">
+            {{ toast.message }}
+          </span>
+
+          <button
+            type="button"
+            class="btn-close btn-close-white"
+            (click)="remove(toast.id)">
+          </button>
+        </div>
+      </div>
+
+    }
+
+  }
+
+</div>
