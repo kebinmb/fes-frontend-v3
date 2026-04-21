@@ -75,7 +75,7 @@ export class AuthEffects {
             return AuthActions.studentLoginSuccess({
               evaluatorId: response.evaluatorId,
               accessCode: response.accessCode,
-              role: response.role,
+              role: 'ROLE_STUDENT',
             });
           }),
           catchError((error) => {
@@ -98,6 +98,7 @@ export class AuthEffects {
         tap(({ evaluatorId, role, accessCode }) => {
           this.toastFacade.showToast(`Login successful`, 'success');
           this.spinnerFacade.hideSpinner();
+          this.router.navigate(['/student-dashboard'])
         }),
       ),
     { dispatch: false },

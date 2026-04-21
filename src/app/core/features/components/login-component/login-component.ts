@@ -16,7 +16,7 @@ export class LoginComponent {
   role: 'student' | 'supervisor' = 'student';
   step: number = 0;
   accessCode$ = this.authFacade.accessCode$;
-
+  
   constructor() {
     this.authFacade.error$.pipe(takeUntilDestroyed()).subscribe((error) => {
       if (error) {

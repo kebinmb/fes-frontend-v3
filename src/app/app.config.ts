@@ -18,8 +18,6 @@ import { provideEffects } from '@ngrx/effects';
 import { AuthEffects } from './core/store/auth/auth.effects';
 import { ToastEffect } from './core/store/toast/toast.effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
-import { initializeAuth } from './utilities/initializer/auth.initializer';
-import { AuthFacade } from './core/store/auth/auth.facade';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -31,10 +29,10 @@ export const appConfig: ApplicationConfig = {
       spinner: spinnerReducer,
     }),
     provideEffects([AuthEffects, ToastEffect]),
-    provideAppInitializer(() => {
-      const authFacade = inject(AuthFacade);
-      authFacade.checkLoggedInUserAuthentication();
-    }),
+    // provideAppInitializer(() => {
+    //   const authFacade = inject(AuthFacade);
+    //   authFacade.checkLoggedInUserAuthentication();
+    // }),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],
 };

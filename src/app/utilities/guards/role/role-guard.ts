@@ -2,33 +2,26 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { selectAuthenticationState } from '../../../core/store/auth/auth.selector';
-import { filter, map, take } from 'rxjs';
+import { filter, map } from 'rxjs';
 
-export const roleGuard: CanActivateFn = (route, state) => {
+export const roleGuard: CanActivateFn = (route) => {
   const store = inject(Store);
   const router = inject(Router);
   const expectedRole = route.data?.['role'];
 
   return store.select(selectAuthenticationState).pipe(
-    filter((state) => !state.isLoading),
-    take(1),
+    filter((state) => state.isAuthChecked && !state.isLoading),
+
     map((state) => {
-      if (!state?.role) {
+      if (!state.isAuthenticated || !state.role) {
         return router.createUrlTree(['/login']);
       }
 
-      if (!expectedRole) {
-        return true;
+      if (expectedRole && state.role !== expectedRole) {
+        return router.createUrlTree(['/login']);
       }
 
-      if (state.role === 'ROLE_STUDENT') {
-        return router.createUrlTree(['/dashboard/student']);
-      } else if (state.role === 'ROLE_DEAN') {
-        return router.createUrlTree(['/dashboard/supervisor']);
-      } else if (state.role === 'ROLE_ADMIN') {
-        return router.createUrlTree(['/dashboard/admin']);
-      }
-      return router.createUrlTree(['/login']);
+      return true;
     }),
   );
 };

@@ -31,7 +31,9 @@ export const authReducer = createReducer(
         role,
         accessCode,
         isLoading: false,
-        isAuthenticated: true
+        isAuthenticated: true,
+        isAuthChecked:true,
+        error:null
     })),
     on(AuthActions.studentLoginFailure, (state, { error }) => ({
         ...state,
@@ -59,19 +61,20 @@ export const authReducer = createReducer(
     })),
     on(AuthActions.checkLoggedInUserAuthentication, (state) => ({
         ...state,
-        isAuthenticated: false,
         isLoading: true
     })),
     on(AuthActions.checkLoggedInUserAuthenticationSuccess, (state, { evaluatorId, role }) => ({
         ...state,
         isAuthenticated: true,
         isLoading: false,
+        isAuthChecked:true,
         evaluatorId,
         role
     })),
     on(AuthActions.checkLoggedInUserAuthenticationFailure, (state, { error }) => ({
         ...state,
         isLoading: false,
+        isAuthChecked:true,
         isAuthenticated: false,
         error
     })),
