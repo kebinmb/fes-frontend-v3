@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { SpinnerFacade } from '../core/store/spinner/spinner.facade';
+import { SpinnerFacade } from '../../../core/store/spinner/spinner.facade';
 
 @Component({
   selector: 'app-spinner-component',

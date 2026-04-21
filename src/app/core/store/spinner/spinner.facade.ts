@@ -9,11 +9,10 @@ import * as SpinnerActions from "./spinner.action";
 export class SpinnerFacade {
     private store = inject(Store);
 
-    loading$ = this.store.select(selectLoading).pipe(
-        debounceTime(1000)
-    );
+    loading$ = this.store.select(selectLoading);
 
     showSpinner() {
+        console.log("Show spinner")
         this.store.dispatch(SpinnerActions.showSpinner());
     }
 

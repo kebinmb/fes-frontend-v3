@@ -1,1 +1,18 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --chmsu-primary: #186443;
+  --chmsu-accent: #e5d413;
+  --chmsu-secondary: #6a9d8a;
+  --chmsu-warning: #cf6a33;
+  --chmsu-text: #000101;
+
+  /* ===== DERIVED COLORS ===== */
+  --chmsu-primary-light: #2f7d5a;
+  --chmsu-primary-dark: #134d35;
+
+  --chmsu-bg: #f8f9fa;
+  --chmsu-bg-soft: #eef3f1;
+  --chmsu-surface: #ffffff;
+
+  --chmsu-border: #e9ecef;
+  --chmsu-muted: #6c757d;
+}

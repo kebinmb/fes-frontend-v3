@@ -1,0 +1,158 @@
+.login-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+.login-brand-display {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--chmsu-primary);
+  color: white;
+  min-height: 100vh;
+}
+.brand-panel {
+  margin: auto;
+}
+.brand-content {
+  text-align: center;
+}
+.logo-container {
+  margin: auto;
+  background-color: white;
+  padding: 1rem;
+  border-radius: 15px;
+
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.brand-logo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.brand-title {
+  margin-top: 0.5rem;
+  font-size: 2rem;
+  font-family:
+    'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana,
+    sans-serif;
+  font-weight: 600;
+}
+.brand-subtitle {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+@media (max-width: 992px) {
+  .login-brand-display {
+    display: none;
+  }
+  .login-card-display {
+    flex: 1 100%;
+  }
+}
+.login-card-display {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+
+  background-image: url('/assets/login-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+.login-card-display::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45); /* 🔥 dark overlay */
+}
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 2rem;
+  border-radius: 15px 15px 25px 25px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+  animation: fadeInUp 0.5s ease;
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.login-card-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.login-card-header h2 {
+  margin: 0;
+  font-weight: 600;
+}
+.login-card-header p {
+  font-size: 0.9rem;
+  color: var(--chmsu-muted);
+}
+.role-toggle-btn {
+  display: flex;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.role-toggle-btn button {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  background: #eee;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.role-toggle-btn button.active {
+  background: var(--chmsu-primary);
+  color: white;
+  font-weight: 600;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+.form-group input {
+  padding: 0.65rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.login-btn {
+  width: 100%;
+  padding: 0.7rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--chmsu-primary);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.login-btn:hover {
+  background: var(--chmsu-secondary);
+  transform: translateY(-1px);
+}

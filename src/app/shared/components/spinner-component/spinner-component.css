@@ -1,0 +1,29 @@
+
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px); 
+
+  z-index: 9999;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.35em;
+
+  animation: spinner-grow-smooth 0.8s linear infinite;
+}
+
+/* Optional: smoother animation */
+@keyframes spinner-grow-smooth {
+  to {
+    transform: rotate(360deg);
+  }
+}
