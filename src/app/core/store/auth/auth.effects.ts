@@ -69,11 +69,13 @@ export class AuthEffects {
       ofType(AuthActions.studentLogin),
       exhaustMap(({ evaluatorId, accessCode }) => {
         this.spinnerFacade.showSpinner();
+        console.log('Login Student');
         return this.authService.studentLogin(evaluatorId, accessCode).pipe(
+          tap((res) => console.log('LOGIN RESPONSE:', res)),
           map((response: any) => {
             this.spinnerFacade.hideSpinner();
             return AuthActions.studentLoginSuccess({
-              evaluatorId: response.evaluatorId,
+              evaluatorId: response.studentId,
               accessCode: response.accessCode,
               role: 'ROLE_STUDENT',
             });
@@ -98,7 +100,7 @@ export class AuthEffects {
         tap(({ evaluatorId, role, accessCode }) => {
           this.toastFacade.showToast(`Login successful`, 'success');
           this.spinnerFacade.hideSpinner();
-          this.router.navigate(['/student-dashboard'])
+          this.router.navigate(['/student-dashboard']);
         }),
       ),
     { dispatch: false },
@@ -163,22 +165,32 @@ export class AuthEffects {
   );
 
   checkLoggedInUserAuthentication$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AuthActions.checkLoggedInUserAuthentication),
-      filter(() => !this.router.url.includes('/login')),
-      exhaustMap(() =>
-        this.authService.getCurrentUser().pipe(
-          map((response: any) =>
-            AuthActions.checkLoggedInUserAuthenticationSuccess({
-              evaluatorId: response.evaluatorId,
-              role: response.role,
-            }),
-          ),
-          catchError((error) => of(AuthActions.checkLoggedInUserAuthenticationFailure({ error }))),
+  this.actions$.pipe(
+    ofType(AuthActions.checkLoggedInUserAuthentication),
+
+    filter(() => !this.router.url.includes('/login')),
+
+    exhaustMap(() =>
+      this.authService.getCurrentUser().pipe(
+
+        tap((res) =>
+          console.log('CHECK AUTHENTICATION RESPONSE:', res)
         ),
-      ),
-    ),
-  );
+
+        map((response: any) =>
+          AuthActions.checkLoggedInUserAuthenticationSuccess({
+            evaluatorId: response.userId, // 🔥 verify this field
+            role: response.role,
+          })
+        ),
+
+        catchError((error) =>
+          of(AuthActions.checkLoggedInUserAuthenticationFailure({ error }))
+        )
+      )
+    )
+  )
+);
 
   checkLoggedInUserAuthenticationFailure$ = createEffect(
     () =>

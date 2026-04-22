@@ -1,0 +1,495 @@
+/* ========== ROOT TWEAKS ========== */
+:root {
+    --radius: 14px;
+    --radius-lg: 18px;
+    --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ========== NAVBAR ========== */
+.navbar {
+    background: var(--chmsu-primary);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand-logo-small img {
+    width: 38px;
+    height: 38px;
+
+}
+
+.university-name {
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+.system-name {
+    color: rgb(218, 218, 218);
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+/* USER BADGE - MODERN GLASS STYLE */
+.user-info-badge {
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 6px 14px;
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+    transition: all 0.25s ease;
+}
+
+/* subtle hover interaction */
+.user-info-badge:hover {
+    background: rgba(249, 245, 245, 0.16);
+    transform: translateY(-1px);
+}
+
+/* ICON */
+.user-icon {
+    font-size: 1.25rem;
+    opacity: 0.9;
+}
+
+/* TEXT WRAPPER */
+.user-details {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+
+/* LABEL (small top text) */
+.user-label {
+    font-size: 10px;
+    opacity: 0.6;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+
+/* VALUE (main ID) */
+.user-id-value {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+/* OPTIONAL: tighter spacing on small screens */
+@media (max-width: 768px) {
+    .user-info-badge {
+        padding: 5px 10px;
+        gap: 8px;
+    }
+
+    .user-id-value {
+        font-size: 12px;
+    }
+}
+
+/* ========== STAT CARDS ========== */
+.stat-card-dashboard {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border-radius: var(--radius);
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+    transition: var(--transition);
+}
+
+.stat-card-dashboard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+    font-size: 18px;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Softer modern colors */
+.bg-primary-soft {
+    background: rgba(24, 100, 67, 0.08);
+    color: var(--chmsu-primary);
+}
+
+.bg-success-soft {
+    background: rgba(106, 157, 138, 0.12);
+    color: var(--chmsu-secondary);
+}
+
+.bg-warning-soft {
+    background: rgba(207, 106, 51, 0.12);
+    color: var(--chmsu-warning);
+}
+
+.stat-value-dashboard {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.stat-label-dashboard {
+    font-size: 12px;
+    opacity: 0.6;
+}
+
+/* ========== CLASS CARD ========== */
+.class-card {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* subtle gradient hover effect */
+.class-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg,
+            transparent,
+            rgba(0, 0, 0, 0.03),
+            transparent);
+    opacity: 0;
+    transition: var(--transition);
+    pointer-events: none;
+}
+
+.class-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+}
+
+.class-card:hover::after {
+    opacity: 1;
+}
+
+/* HEADER */
+.class-subject {
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.2px;
+}
+
+.badge.bg-secondary-soft {
+    background: rgba(106, 157, 138, 0.15);
+    color: var(--chmsu-primary);
+    font-size: 10px;
+    border-radius: 6px;
+}
+
+/* STATUS */
+.status-badge {
+    font-size: 18px;
+}
+
+.status-completed {
+    color: var(--chmsu-primary);
+}
+
+.status-pending {
+    color: var(--chmsu-warning);
+}
+
+/* BODY */
+.class-card-body {
+    margin-top: 12px;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    margin-bottom: 6px;
+    opacity: 0.75;
+}
+
+/* FOOTER */
+.class-card-footer {
+    margin-top: 14px;
+}
+
+/* BUTTON IMPROVEMENT */
+.btn-primary {
+    background: var(--chmsu-primary);
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.btn-primary:hover {
+    background: #145237;
+    transform: translateY(-1px);
+}
+
+/* OUTLINE BUTTON */
+.btn-outline-light {
+    border-radius: 999px;
+    padding: 6px 14px;
+}
+
+/* ========== EMPTY STATE ========== */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 48px;
+    opacity: 0.6;
+    margin-bottom: 10px;
+}
+
+/* ========== LOADER ========== */
+.spinner-lg {
+    width: 2.8rem;
+    height: 2.8rem;
+}
+
+/* ========== PAGE ANIMATION ========== */
+.dashboard-page {
+    animation: fadeIn 0.35s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== MOBILE ========== */
+@media (max-width: 768px) {
+    .stat-card-dashboard {
+        padding: 14px;
+    }
+
+    .stat-value-dashboard {
+        font-size: 18px;
+    }
+
+    .class-card {
+        padding: 14px;
+    }
+
+    .class-subject {
+        font-size: 14px;
+    }
+
+    .info-item {
+        font-size: 12px;
+    }
+
+    .btn {
+        font-size: 13px;
+        padding: 8px;
+    }
+}
+
+/* ============================= */
+/* 🌟 PREMIUM TOKENS */
+/* ============================= */
+:root {
+  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 20px 50px rgba(0, 0, 0, 0.10);
+  --shadow-glow: 0 0 0 3px rgba(24, 100, 67, 0.12);
+
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+}
+
+/* ============================= */
+/* 🌌 NAVBAR PREMIUM */
+/* ============================= */
+.navbar {
+  background: linear-gradient(
+    135deg,
+    var(--chmsu-primary),
+    #1f7a55
+  );
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.08), transparent);
+  pointer-events: none;
+}
+
+/* ============================= */
+/* 👤 USER BADGE PREMIUM */
+/* ============================= */
+.user-info-badge {
+  box-shadow: var(--shadow-soft);
+}
+
+.user-info-badge:hover {
+  box-shadow: var(--shadow-medium);
+}
+
+/* ============================= */
+/* 📊 STAT CARDS PREMIUM */
+/* ============================= */
+.stat-card-dashboard {
+  box-shadow: var(--shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card-dashboard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.4),
+    transparent
+  );
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.stat-card-dashboard:hover::before {
+  opacity: 1;
+}
+
+.stat-value-dashboard {
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+
+/* ============================= */
+/* 🧾 CLASS CARD PREMIUM */
+/* ============================= */
+.class-card {
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+.class-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.5),
+    transparent
+  );
+  pointer-events: none;
+}
+
+.class-card:hover {
+  box-shadow: var(--shadow-medium);
+}
+
+/* ============================= */
+/* 🧾 TYPOGRAPHY */
+/* ============================= */
+.class-subject {
+  color: var(--text-primary);
+}
+
+.info-item {
+  color: var(--text-secondary);
+}
+
+/* ============================= */
+/* 🔘 BUTTON PREMIUM */
+/* ============================= */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255,255,255,0.3),
+    transparent
+  );
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.btn-primary:hover::after {
+  opacity: 1;
+}
+
+.btn-primary:focus {
+  box-shadow: var(--shadow-glow);
+}
+
+/* ============================= */
+/* 📦 EMPTY STATE PREMIUM */
+/* ============================= */
+.empty-icon {
+  background: linear-gradient(
+    135deg,
+    rgba(24, 100, 67, 0.1),
+    rgba(24, 100, 67, 0.2)
+  );
+  padding: 20px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+/* ============================= */
+/* ⏳ LOADER PREMIUM */
+/* ============================= */
+.spinner-border {
+  filter: drop-shadow(0 0 6px rgba(24, 100, 67, 0.4));
+}
+
+/* ============================= */
+/* ✨ GLOBAL MICRO INTERACTIONS */
+/* ============================= */
+.stat-card-dashboard,
+.class-card,
+.btn,
+.user-info-badge {
+  will-change: transform, box-shadow;
+}
+
+/* smoother overall feel */
+* {
+  transition-property: transform, box-shadow, background, color;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}

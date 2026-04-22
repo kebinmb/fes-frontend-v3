@@ -18,6 +18,8 @@ import { provideEffects } from '@ngrx/effects';
 import { AuthEffects } from './core/store/auth/auth.effects';
 import { ToastEffect } from './core/store/toast/toast.effects';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { studentLoadReducer } from './core/store/student-data/student-data.reducer';
+import { StudentDataEffects } from './core/store/student-data/student-data.effects';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -27,8 +29,9 @@ export const appConfig: ApplicationConfig = {
       auth: authReducer,
       toast: toastReducer,
       spinner: spinnerReducer,
+      studentData: studentLoadReducer,
     }),
-    provideEffects([AuthEffects, ToastEffect]),
+    provideEffects([AuthEffects, ToastEffect, StudentDataEffects]),
     // provideAppInitializer(() => {
     //   const authFacade = inject(AuthFacade);
     //   authFacade.checkLoggedInUserAuthentication();
