@@ -17,7 +17,9 @@
       <div class="container-fluid px-4">
         <div class="d-flex align-items-center">
           <div class="brand-logo-small me-3">
-            <img src="chmsu-logo.png" class="logo-image-small" />
+            <div class="logo-container">
+              <img src="chmsu-logo.png" class="logo-image-small" />
+            </div>
           </div>
 
           <div class="brand-text">
@@ -42,7 +44,7 @@
         </div>
       </div>
     </nav>
-
+    @let loads = studentLoads$ | async;
     <!-- CONTENT -->
     <div class="container-fluid px-4 py-4">
       <!-- STATS -->
@@ -53,7 +55,7 @@
               <i class="bi bi-journal-text"></i>
             </div>
             <div>
-              <div class="stat-value-dashboard">{{ (studentLoads$ | async)?.length }}</div>
+              <div class="stat-value-dashboard">{{ loads?.length }}</div>
               <div class="stat-label-dashboard">Total Classes</div>
             </div>
           </div>
@@ -66,7 +68,7 @@
             </div>
             <div>
               <div class="stat-value-dashboard">
-                {{ (studentLoads$ | async)?.filter((load) => load.isEvaluated)?.length }}
+                {{ evaluatedCount$ | async }}
               </div>
               <div class="stat-label-dashboard">Completed</div>
             </div>
@@ -97,7 +99,7 @@
       }
 
       <!-- EMPTY -->
-      @else if ((studentLoads$ | async)?.length === 0) {
+      @else if (loads?.length === 0) {
         <div class="empty-state">
           <i class="bi bi-inbox empty-icon"></i>
           <h3>No Classes Found</h3>
@@ -108,7 +110,7 @@
       <!-- DATA -->
       @else {
         <div class="row g-4">
-          @for (class of studentLoads$ | async; track class.classCode) {
+          @for (class of loads; track class.classCode; let i =$index) {
             <div class="col-lg-6">
               <div class="class-card">
                 <!-- HEADER -->
@@ -159,7 +161,7 @@
                   <button
                     class="btn btn-primary w-100"
                     [disabled]="class.isEvaluated"
-                    (click)="$event.stopPropagation(); startEvaluation(class, $event)"
+                    (click)="onEvaluateClick(class, $event)"
                   >
                     <i
                       class="bi me-2"

@@ -6,7 +6,7 @@ import { filter, map, take } from 'rxjs';
 
 @Component({
   selector: 'app-student-dashboard-component',
-  imports: [AsyncPipe, JsonPipe, CommonModule],
+  imports: [AsyncPipe, CommonModule],
   templateUrl: './student-dashboard-component.html',
   styleUrl: './student-dashboard-component.css',
 })
@@ -18,7 +18,9 @@ export class StudentDashboardComponent {
   isLoading$ = this.studentDataFacade.isLoading$;
   studentLoads$ = this.studentDataFacade.studentLoads$;
   evaluatorId$ = this.authFacade.evaluatorId$;
-
+  evaluatedCount$ = this.studentLoads$.pipe(
+    map((loads) => loads?.filter((load) => load.isEvaluated)?.length ?? 0),
+  );
   ngOnInit() {
     this.evaluatorId$
       .pipe(
@@ -33,10 +35,14 @@ export class StudentDashboardComponent {
   unevaluatedCount$ = this.studentLoads$.pipe(
     map((loads) => (loads?.length ?? 0) - (loads?.filter((l) => l.isEvaluated)?.length ?? 0)),
   );
-  startEvaluation(_t55: any, $event: PointerEvent) {
+  startEvaluation(_t55: any, $event: Event) {
     throw new Error('Method not implemented.');
   }
+  onEvaluateClick(cls: any, event: Event) {
+    event.stopPropagation();
+    this.startEvaluation(cls, event);
+  }
   logout() {
-    throw new Error('Method not implemented.');
+    this.authFacade.logout();
   }
 }

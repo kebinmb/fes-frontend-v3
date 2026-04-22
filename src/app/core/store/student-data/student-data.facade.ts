@@ -15,4 +15,8 @@ export class StudentDataFacade {
   loadStudentLoads(studentId: string, page: number, size: number, sort: string) {
     this.store.dispatch(StudentDataActions.loadStudentLoads({ studentId, page, size, sort }));
   }
+  
+  loadEvaluationStatus(classes: any[], studentId: string): void {
+    this.store.dispatch(StudentDataActions.loadEvaluationStatus({ classes, studentId }));
+  }
 }

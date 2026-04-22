@@ -165,32 +165,27 @@ export class AuthEffects {
   );
 
   checkLoggedInUserAuthentication$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(AuthActions.checkLoggedInUserAuthentication),
+    this.actions$.pipe(
+      ofType(AuthActions.checkLoggedInUserAuthentication),
 
-    filter(() => !this.router.url.includes('/login')),
+      filter(() => !this.router.url.includes('/login')),
 
-    exhaustMap(() =>
-      this.authService.getCurrentUser().pipe(
+      exhaustMap(() =>
+        this.authService.getCurrentUser().pipe(
+          tap((res) => console.log('CHECK AUTHENTICATION RESPONSE:', res)),
 
-        tap((res) =>
-          console.log('CHECK AUTHENTICATION RESPONSE:', res)
+          map((response: any) =>
+            AuthActions.checkLoggedInUserAuthenticationSuccess({
+              evaluatorId: response.userId, // 🔥 verify this field
+              role: response.role,
+            }),
+          ),
+
+          catchError((error) => of(AuthActions.checkLoggedInUserAuthenticationFailure({ error }))),
         ),
-
-        map((response: any) =>
-          AuthActions.checkLoggedInUserAuthenticationSuccess({
-            evaluatorId: response.userId, // 🔥 verify this field
-            role: response.role,
-          })
-        ),
-
-        catchError((error) =>
-          of(AuthActions.checkLoggedInUserAuthenticationFailure({ error }))
-        )
-      )
-    )
-  )
-);
+      ),
+    ),
+  );
 
   checkLoggedInUserAuthenticationFailure$ = createEffect(
     () =>
@@ -199,6 +194,19 @@ export class AuthEffects {
         filter(() => !this.router.url.includes('/login')), // 🔥 condition here
         tap(() => {
           this.toastFacade.showToast(`Authentication failed, contact administrator.`, 'error');
+        }),
+      ),
+    { dispatch: false },
+  );
+
+  logout$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.logout),
+        tap(() => {
+          this.authService.logout();
+          this.toastFacade.showToast(`Logged out successfully`, 'success');
+          this.router.navigate(['/login']);
         }),
       ),
     { dispatch: false },

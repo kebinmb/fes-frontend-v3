@@ -282,8 +282,8 @@ export class EvaluationService {
 
     const url =
       role === 'ROLE_STUDENT' ? `${this.STUDENT_BASE_URL}/check` : `${this.FACULTY_BASE_URL}/check`;
-
-    return this.http.get<EvaluationCheckResponse>(url, { params });
+    
+    return this.http.get<EvaluationCheckResponse>(url, { params, withCredentials: true });
   }
 
   getSubjectSummary(
@@ -298,7 +298,7 @@ export class EvaluationService {
       .set('semester', semester)
       .set('schoolYear', schoolYear.toString());
 
-    return this.http.get<SubjectEvaluationSummary>(`${this.STUDENT_BASE_URL}/summary`, { params });
+    return this.http.get<SubjectEvaluationSummary>(`${this.STUDENT_BASE_URL}/summary`, { params, withCredentials:true });
   }
 
   getEvaluations(
@@ -313,7 +313,7 @@ export class EvaluationService {
       .set('semester', semester)
       .set('schoolYear', schoolYear.toString());
 
-    return this.http.get<FacultyEvaluationScore[]>(`${this.STUDENT_BASE_URL}/list`, { params });
+    return this.http.get<FacultyEvaluationScore[]>(`${this.STUDENT_BASE_URL}/list`, { params, withCredentials:true });
   }
 
   getRatingDistribution(
@@ -327,7 +327,7 @@ export class EvaluationService {
       .set('schoolYear', schoolYear.toString());
 
     return this.http.get<Record<string, number>>(`${this.STUDENT_BASE_URL}/distribution`, {
-      params,
+      params, withCredentials:true
     });
   }
 }
