@@ -24,6 +24,7 @@ import { extractErrorMessage } from '../../../utilities/extract-error.util';
 import { SpinnerFacade } from '../spinner/spinner.facade';
 import { ToastFacade } from '../toast/toast.facade';
 import { selectRole } from '../auth/auth.selector';
+import { Router } from '@angular/router';
 @Injectable({
   providedIn: 'root',
 })
@@ -34,7 +35,7 @@ export class StudentDataEffects {
   private evaluationService = inject(EvaluationService);
   private spinnerFacade = inject(SpinnerFacade);
   private toastFacade = inject(ToastFacade);
-
+  private router = inject(Router);
   loadStudentLoads$ = createEffect(() =>
     this.actions$.pipe(
       ofType(StudentDataActions.loadStudentLoads),
@@ -149,5 +150,17 @@ export class StudentDataEffects {
         );
       }),
     ),
+  );
+
+  selectStudentClassForEvaluation$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(StudentDataActions.selectClassForEvaluation),
+        tap(({ selectedClassKey }) => {
+          console.log('Selected class key:', selectedClassKey);
+          this.router.navigate(['/evaluation-form']);
+        }),
+      ),
+    { dispatch: false },
   );
 }

@@ -51,9 +51,9 @@ export const studentLoadReducer = createReducer(
     error,
   })),
 
-  on(StudentDataActions.selectClassForEvaluation, (state, { selectedClass }) => ({
+  on(StudentDataActions.selectClassForEvaluation, (state, { selectedClassKey }) => ({
     ...state,
-    selectedClass,
+    selectedClassKey: selectedClassKey,
   })),
 
   on(StudentDataActions.updateStudentEvaluatedClass, (state, payload) => {

@@ -7,7 +7,7 @@ export interface StudentDataState {
     loading: boolean;
     error: any;
     evaluationMap: Record<string, boolean | null>;
-    selectedClass: StudentClassLoadDTO | null;
+    selectedClassKey: string | null;
     ready: boolean;
 }
 
@@ -16,6 +16,6 @@ export const initialStudentDataState: StudentDataState = {
     loading: false,
     error: null,
     evaluationMap: {},
-    selectedClass: null,
+    selectedClassKey: null,
     ready: false,
 }

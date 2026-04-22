@@ -36,7 +36,7 @@ export const loadEvaluationStatusFailure = createAction(
 
 export const selectClassForEvaluation = createAction(
     '[Student Evaluation] Select Class For Evaluation',
-    props<{ selectedClass: StudentClassLoadDTO }>()
+    props<{ selectedClassKey: string }>()
 );
 
 export const updateStudentEvaluatedClass = createAction(

@@ -5,6 +5,7 @@ import { StudentDashboardComponent } from './core/features/components/dashboards
 import { roleGuard } from './utilities/guards/role/role-guard';
 import { SupervisorDashboardComponent } from './core/features/components/dashboards/supervisor-dashboard-component/supervisor-dashboard-component';
 import { AdminDashboardComponent } from './core/features/components/dashboards/admin-dashboard-component/admin-dashboard-component';
+import { EvaluationFormComponent } from './core/features/components/evaluation-form-component/evaluation-form-component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -19,6 +20,11 @@ export const routes: Routes = [
     component: SupervisorDashboardComponent,
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_DEAN' },
+  },
+  {
+    path: 'evaluation-form',
+    component: EvaluationFormComponent,
+    canActivate: [authGuard],
   },
   {
     path: 'admin-dashboard',
@@ -36,4 +42,10 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'login',
   },
+  {
+    path: 'evaluation-form',
+    component: EvaluationFormComponent,
+    canActivate: [authGuard],
+  },
+
 ];
