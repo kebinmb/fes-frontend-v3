@@ -1,1 +1,27 @@
-<p>supervisor-dashboard-component works!</p>
+<p>{{faculties$ | async | json}}</p>
+<div *ngIf="loading$ | async" class="text-center">
+    <p>Loading faculties...</p>
+</div>
+
+<div *ngIf="error$ | async as error" class="text-danger">
+    <p>Error: {{ error }}</p>
+</div>
+
+<table *ngIf="faculties$ | async as faculties" class="table">
+    <thead>
+        <tr>
+            <th>Faculty ID</th>
+            <th>Name</th>
+            <th>College</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let faculty of faculties">
+            <td>{{ faculty.facultyId }}</td>
+            <td>{{ faculty.firstname }} {{ faculty.lastname }}</td>
+            <td>{{ faculty.college }}</td>
+            <td>{{ faculty.status }}</td>
+        </tr>
+    </tbody>
+</table>

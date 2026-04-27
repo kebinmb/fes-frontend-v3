@@ -46,30 +46,34 @@ export const authReducer = createReducer(
     isLoading: true,
     isAuthenticated: false,
   })),
-  on(AuthActions.supervisorLoginSuccess, (state, { evaluatorId, role }) => ({
+  on(AuthActions.supervisorLoginSuccess, (state, { evaluatorId, role, college }) => ({
     ...state,
     evaluatorId,
     role,
     isLoading: false,
     isAuthenticated: true,
+    isAuthChecked:true,
+    college:college,
   })),
   on(AuthActions.supervisorLoginFailure, (state, { error }) => ({
     ...state,
     error,
     isLoading: false,
     isAuthenticated: false,
+    isAuthChecked:false
   })),
   on(AuthActions.checkLoggedInUserAuthentication, (state) => ({
     ...state,
     isLoading: true,
   })),
-  on(AuthActions.checkLoggedInUserAuthenticationSuccess, (state, { evaluatorId, role }) => ({
+  on(AuthActions.checkLoggedInUserAuthenticationSuccess, (state, { evaluatorId, role,college }) => ({
     ...state,
     isAuthenticated: true,
     isLoading: false,
     isAuthChecked: true,
     evaluatorId,
     role,
+    college
   })),
   on(AuthActions.checkLoggedInUserAuthenticationFailure, (state, { error }) => ({
     ...state,

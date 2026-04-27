@@ -5,6 +5,7 @@ import {
   selectAccessCode,
   selectAuthenticationError,
   selectAuthenticationState,
+  selectCollege,
   selectEvaluatorId,
   selectRole,
 } from './auth.selector';
@@ -20,7 +21,7 @@ export class AuthFacade {
   isLoading$ = this.store.select(selectLoading);
   accessCode$ = this.store.select(selectAccessCode);
   error$ = this.store.select(selectAuthenticationError);
-
+  college$ = this.store.select(selectCollege);
   loginSupervisor(username: string, password: string) {
     this.store.dispatch(
       AuthActions.supervisorLogin({

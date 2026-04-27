@@ -37,7 +37,7 @@ export const supervisorLogin = createAction(
 
 export const supervisorLoginSuccess = createAction(
     '[Supervisor Authentication] Supervisor Login Successful',
-    props<{ evaluatorId: string, role: 'ROLE_DEAN' }>()
+    props<{ evaluatorId: string, role: 'ROLE_DEAN', college:string }>()
 )
 
 export const supervisorLoginFailure = createAction(
@@ -51,7 +51,7 @@ export const checkLoggedInUserAuthentication = createAction(
 
 export const checkLoggedInUserAuthenticationSuccess = createAction(
     '[Authentication Check] Authentication Check Success',
-    props<{ evaluatorId: string, role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN' }>()
+    props<{ evaluatorId: string, role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN', college:string }>()
 )
 
 export const checkLoggedInUserAuthenticationFailure = createAction(

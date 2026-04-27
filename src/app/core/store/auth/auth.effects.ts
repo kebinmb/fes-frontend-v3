@@ -123,11 +123,15 @@ export class AuthEffects {
       exhaustMap(({ username, password }) => {
         this.spinnerFacade.showSpinner();
         return this.authService.supervisorLogin(username, password).pipe(
+          tap((response: any) => {
+            sessionStorage.setItem('college', response.college);
+          }),
           map((response: any) => {
             this.spinnerFacade.hideSpinner();
             return AuthActions.supervisorLoginSuccess({
               evaluatorId: response.evaluatorId,
-              role: response.role,
+              role: 'ROLE_DEAN',
+              college: response.college
             });
           }),
           catchError((error) => {
@@ -148,6 +152,7 @@ export class AuthEffects {
         ofType(AuthActions.supervisorLoginSuccess),
         tap(({ evaluatorId }) => {
           this.toastFacade.showToast(`Login successful`, 'success');
+          this.router.navigate(['/supervisor-dashboard']);
         }),
       ),
     { dispatch: false },
@@ -178,6 +183,7 @@ export class AuthEffects {
             AuthActions.checkLoggedInUserAuthenticationSuccess({
               evaluatorId: response.userId, // 🔥 verify this field
               role: response.role,
+              college: response.college
             }),
           ),
 

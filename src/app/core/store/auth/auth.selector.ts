@@ -9,7 +9,7 @@ export const selectEvaluatorId = createSelector(
 );
 
 export const selectRole = createSelector(selectAuthenticationState, (state) => state.role);
-
+export const selectCollege = createSelector(selectAuthenticationState,(state) => state.college);
 export const selectAccessCode = createSelector(
   selectAuthenticationState,
   (state) => state.accessCode,

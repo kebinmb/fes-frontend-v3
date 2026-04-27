@@ -6,6 +6,7 @@ export interface AuthState {
     isAuthChecked:boolean;
     error: string | null;
     accessCode: string | null;
+    college:string | null;
     // isLoaded: boolean;
 }
 export const initialAuthState: AuthState = {
@@ -15,6 +16,7 @@ export const initialAuthState: AuthState = {
     isLoading: false,
     isAuthChecked:false,
     error: null,
-    accessCode: null
+    accessCode: null,
+    college:null
     // isLoaded: false
 }
