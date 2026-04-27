@@ -26,14 +26,11 @@ export class SupervisorDataEffects {
     private store = inject(Store);
     private evaluationDataService = inject(EvaluationService);
     loadFaculties$ = createEffect(() =>
-
         this.actions$.pipe(
             ofType(SupervisorDataActions.loadFaculties),
-
             withLatestFrom(
                 this.store.select(state => state.supervisorData.faculties)
             ),
-
             filter(([{ key }, faculties]) => {
                 const cached = faculties[key];
                 return !cached || cached.data.length === 0;
@@ -61,16 +58,24 @@ export class SupervisorDataEffects {
         this.actions$.pipe(
             ofType(SupervisorDataActions.loadFacultyClasses),
 
+            tap(() => console.log("faculty classes triggered")),
+
             withLatestFrom(
                 this.store.select(state => state.supervisorData.facultyClasses)
             ),
-
+            tap(([action, state]) => {
+                console.log("ACTION:", action);
+                console.log("CACHED STATE:", state[action.key]);
+            }),
             filter(([{ key }, state]) => {
                 const cached = state[key];
-                return !cached || (!cached.loading && cached.classes.length === 0);
+
+                return !cached || !cached.classes || cached.classes.length === 0;
             }),
 
             switchMap(([{ key, facultyId }]) => {
+                console.log("facultyId:", facultyId);
+
                 this.spinnerFacade.showSpinner();
 
                 return this.supervisorDataService.loadFacultyClasses(facultyId).pipe(
@@ -82,10 +87,15 @@ export class SupervisorDataEffects {
                     ),
 
                     catchError(error => {
-                        this.toastFacade.showToast("Failed to load faculty classes", "error");
+                        this.toastFacade.showToast(
+                            "Failed to load faculty classes",
+                            "error"
+                        );
+
                         return of(
                             SupervisorDataActions.loadFacultyClassesFailure({
                                 key,
+                                facultyId, // ✅ ADD THIS
                                 error: error.message || "Failed to load classes"
                             })
                         );

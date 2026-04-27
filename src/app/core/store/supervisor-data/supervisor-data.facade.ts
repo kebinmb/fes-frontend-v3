@@ -2,90 +2,97 @@ import { Injectable, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import * as SupervisorActions from './supervisor-data.actions';
 import * as SupervisorSelectors from './supervisor-data.selectors';
-import { FacultyClass } from '../../services/supervisor-data/supervisor-data-service';
+import { FacultyClass, FacultyDTO } from '../../services/supervisor-data/supervisor-data-service';
+import { combineLatest, map, Observable } from 'rxjs';
+
+/* =========================
+   VIEW MODEL TYPE
+========================= */
+
+export type FacultyDashboardVM = {
+  faculty: FacultyDTO;
+  classes: (FacultyClass & { isEvaluated: boolean })[];
+};
 
 @Injectable({ providedIn: 'root' })
 export class SupervisorDataFacade {
   private store = inject(Store);
-
-  /* =====================================================
-     FACULTIES
-  ===================================================== */
-
-  faculties$(key: string) {
+  faculties$(key: string): Observable<FacultyDTO[]> {
     return this.store.select(
       SupervisorSelectors.selectFacultyDataByKey(key)
     );
   }
 
-  facultiesLoading$(key: string) {
+  facultiesLoading$(key: string): Observable<boolean> {
     return this.store.select(
       SupervisorSelectors.selectFacultyDataLoading(key)
     );
   }
-
-  facultiesError$(key: string) {
+  facultiesError$(key: string): Observable<any> {
     return this.store.select(
       SupervisorSelectors.selectFacultyDataError(key)
     );
   }
-
-  loadFaculties(key: string, college: string, status: string) {
+  loadFaculties(key: string, college: string, status: string): void {
     this.store.dispatch(
       SupervisorActions.loadFaculties({ key, college, status })
     );
   }
-
-  /* =====================================================
-     FACULTY CLASSES
-  ===================================================== */
-
   facultyClasses$(key: string) {
     return this.store.select(
-      SupervisorSelectors.selectFaucltyClassesDataByKey(key)
+      SupervisorSelectors.selectFacultyClassesDataByKey(key)
     );
   }
-
   facultyClassesLoading$(key: string) {
     return this.store.select(
       SupervisorSelectors.selectFacultyClassesDataLoading(key)
     );
   }
-
-  loadFacultyClasses(key: string, facultyId: string) {
+  facultyDashboard$(key: string): Observable<FacultyDashboardVM[]> {
+    return combineLatest([
+      this.faculties$(key),
+      this.store.select(
+        SupervisorSelectors.selectFacultyClassesDataByKey(key)
+      )
+    ]).pipe(
+      map(([faculties, classMap]) =>
+        faculties.map(faculty => ({
+          faculty,
+          classes: (classMap?.[faculty.facultyId]?.classes || []).map(
+            (c): FacultyClass & { isEvaluated: boolean } => ({
+              ...c,
+              isEvaluated: false // 🔥 later connect evaluation store
+            })
+          )
+        }))
+      )
+    );
+  }
+  loadFacultyClasses(key: string, facultyId: string): void {
     this.store.dispatch(
       SupervisorActions.loadFacultyClasses({ key, facultyId })
     );
   }
-
-  /* =====================================================
-     EVALUATION STATUS
-  ===================================================== */
-
   evaluationForClass$(key: string, classCode: string) {
     return this.store.select(
       SupervisorSelectors.selectEvaluationForClass(key, classCode)
     );
   }
-
   isEvaluated$(key: string, classCode: string) {
     return this.store.select(
       SupervisorSelectors.selectIsEvaluated(key, classCode)
     );
   }
-
   evaluationLoading$(key: string, classCode: string) {
     return this.store.select(
       SupervisorSelectors.selectEvaluationLoading(key, classCode)
     );
   }
-
   evaluationError$(key: string, classCode: string) {
     return this.store.select(
       SupervisorSelectors.selectEvaluationError(key, classCode)
     );
   }
-
   loadEvaluationStatus(
     key: string,
     role: 'ROLE_STUDENT' | 'ROLE_DEAN' | null,
@@ -96,12 +103,11 @@ export class SupervisorDataFacade {
       semester: string;
       schoolYear: number;
     }
-  ) {
+  ): void {
     this.store.dispatch(
       SupervisorActions.loadEvaluationStatus({ key, role, context })
     );
   }
-
   updateEvaluatedClass(
     key: string,
     classCode: string,
@@ -109,7 +115,7 @@ export class SupervisorDataFacade {
     evaluatorId: string,
     semester: string,
     schoolYear: number
-  ) {
+  ): void {
     this.store.dispatch(
       SupervisorActions.updateEvaluatedClass({
         key,
@@ -121,16 +127,11 @@ export class SupervisorDataFacade {
       })
     );
   }
-
-  /* =====================================================
-     SELECTED CLASS
-  ===================================================== */
-
   selectedClass$ = this.store.select(
     SupervisorSelectors.selectSelectedClass
   );
 
-  selectClass(selectedClass: FacultyClass) {
+  selectClass(selectedClass: FacultyClass): void {
     this.store.dispatch(
       SupervisorActions.selectClassForEvaluation({ selectedClass })
     );

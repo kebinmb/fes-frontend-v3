@@ -42,10 +42,12 @@ export const supervisorDataReducer = createReducer(
         facultyClasses: {
             ...state.facultyClasses,
             [key]: {
-                facultyId,
-                classes: [],
-                loading: true,
-                error: null
+                ...state.facultyClasses[key],
+                [facultyId]: {
+                    classes: state.facultyClasses[key]?.[facultyId]?.classes || [],
+                    loading: true,
+                    error: null
+                }
             }
         }
     })),
@@ -54,22 +56,26 @@ export const supervisorDataReducer = createReducer(
         facultyClasses: {
             ...state.facultyClasses,
             [key]: {
-                facultyId: data.facultyId,
-                classes: data.classes,
-                loading: false,
-                error: null
+                ...state.facultyClasses[key] || {},
+                [data.facultyId]: {
+                    classes: data.classes,
+                    loading: false,
+                    error: null
+                }
             }
         }
     })),
-    on(SupervisorActions.loadFacultyClassesFailure, (state, { key, error }) => ({
+    on(SupervisorActions.loadFacultyClassesFailure, (state, { key, facultyId, error }) => ({
         ...state,
         facultyClasses: {
             ...state.facultyClasses,
             [key]: {
-                facultyId: '',
-                classes: [],
-                loading: false,
-                error
+                ...state.facultyClasses[key] || {},
+                [facultyId]: {
+                    classes: [],
+                    loading: false,
+                    error
+                }
             }
         }
     })),

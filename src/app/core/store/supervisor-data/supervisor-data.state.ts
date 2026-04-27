@@ -8,16 +8,15 @@ export interface SupervisorDataState {
             error: any;
         };
     };
-
     facultyClasses: {
         [key: string]: {
-            facultyId: string;
-            classes: FacultyClass[];
-            loading: boolean;
-            error: string | null;
-        };
-    };
-
+            [facultyId: string]: {
+                classes: FacultyClass[],
+                loading: boolean,
+                error: string | null
+            }
+        }
+    }
     evaluationStatus: {
         [key: string]: {
             facultyId: string;
@@ -37,7 +36,6 @@ export interface SupervisorDataState {
 
     selectedClass: FacultyClass | null;
 }
-
 export const supervisorDataInitialState: SupervisorDataState = {
     faculties: {},
     facultyClasses: {},

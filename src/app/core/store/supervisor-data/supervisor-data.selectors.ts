@@ -31,15 +31,20 @@ export const selectFacultyClassesDataState = createSelector(
     state => state.facultyClasses
 );
 
-export const selectFaucltyClassesDataByKey = (key: string) =>
+export const selectFacultyClassesDataByKey = (key: string) =>
     createSelector(
-        selectFacultyClassesDataState,
-        state => state[key]?.classes || []
+        selectSupervisorDataState,
+        state => state.facultyClasses[key] || {}
     );
 export const selectFacultyClassesDataLoading = (key: string) =>
     createSelector(
         selectFacultyClassesDataState,
-        state => state[key]?.loading || false
+        state => {
+            const facultyMap = state[key];
+            if (!facultyMap) return false;
+
+            return Object.values(facultyMap).some(f => f.loading);
+        }
     );
 export const selectEvaluationStatusState = createSelector(
     selectSupervisorDataState,

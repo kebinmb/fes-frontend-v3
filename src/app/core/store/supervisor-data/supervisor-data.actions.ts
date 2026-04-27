@@ -58,6 +58,7 @@ export const loadFacultyClassesFailure = createAction(
   '[Faculty Classes Data] Load Faculty Classes Failure',
   props<{
     key: string;
+    facultyId: string; // ✅ ADD THIS
     error: string;
   }>()
 );
