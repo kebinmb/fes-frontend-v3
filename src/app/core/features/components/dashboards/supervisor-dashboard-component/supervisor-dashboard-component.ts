@@ -19,7 +19,7 @@ export class SupervisorDashboardComponent {
   key = `${this.college}-${this.status}`;
   faculties$ = this.facade.faculties$(this.key);
   facultiesLoading$ = this.facade.facultiesLoading$(this.key);
-
+  evaluatorId$ = this.authFacade.evaluatorId$;
   facultyDashboard$: Observable<FacultyDashboardVM[]> =
     this.facade.facultyDashboard$(this.key);
   loadClasses$ = this.faculties$.pipe(
@@ -59,14 +59,9 @@ export class SupervisorDashboardComponent {
     this.facade.loadFaculties(this.key, this.college, this.status);
     this.loadClasses$.subscribe();
   }
-  supervisorId() {
-    return '1'; 
-  }
-
   schoolYear() {
     return new Date().getFullYear();
   }
-
   semester() {
     return '1st';
   }
