@@ -39,12 +39,20 @@ export class StudentDataEffects {
   loadStudentLoads$ = createEffect(() =>
     this.actions$.pipe(
       ofType(StudentDataActions.loadStudentLoads),
-      withLatestFrom(this.store.select(selectStudentDataCache)),
-      filter(([action, cache]) => {
+
+      // ✅ ADD ROLE CHECK
+      withLatestFrom(this.store.select(selectStudentDataCache), this.store.select(selectRole)),
+
+      filter(([action, cache, role]) => {
+        if (role !== 'ROLE_STUDENT') return false; // 🔥 KEY FIX
+
         const key = createStudentLoadsKey(action.studentId, action.page, action.size, action.sort);
+
         return !cache[key];
       }),
+
       tap(() => this.spinnerFacade.showSpinner()),
+
       exhaustMap(([action]) => {
         const key = createStudentLoadsKey(action.studentId, action.page, action.size, action.sort);
 
@@ -62,6 +70,8 @@ export class StudentDataEffects {
                   key,
                   response,
                 }),
+
+                // ✅ This will now ONLY fire for students
                 StudentDataActions.loadEvaluationStatus({
                   classes,
                   studentId: action.studentId,
@@ -91,7 +101,7 @@ export class StudentDataEffects {
     this.actions$.pipe(
       ofType(StudentDataActions.loadEvaluationStatus),
       withLatestFrom(this.store.select(selectRole)),
-      filter(([_, role]) => !!role),
+      filter(([_, role]) => role === 'ROLE_STUDENT'),
       tap(() => this.spinnerFacade.showSpinner()),
       exhaustMap(([{ classes, studentId }, role]) => {
         if (!classes?.length) {

@@ -114,8 +114,7 @@ export class SupervisorDataEffects {
 
       filter(([{ key, context }, state]) => {
         const cached = state[key]?.classes?.[context.classCode];
-
-        return !cached || (!cached.loading && cached.evaluated === null);
+        return !cached || cached.evaluated === null;
       }),
 
       switchMap(([{ key, context, role }]) =>
