@@ -159,7 +159,7 @@
                     <div class="class-card-footer" (click)="$event.stopPropagation()">
                         @for (cls of fwc.classes; track cls.classCode) {
                         <button class="btn btn-primary w-100 mb-1" [disabled]="cls.isEvaluated"
-                            (click)="onEvaluateClick(cls, fwc.faculty, $event)">
+                            (click)="startEvaluation(cls, fwc.faculty, $event)">
                             <i class="bi me-2"
                                 [ngClass]="cls.isEvaluated ? 'bi-check-circle-fill' : 'bi-clipboard-check'">
                             </i>

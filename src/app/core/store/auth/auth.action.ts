@@ -51,7 +51,7 @@ export const checkLoggedInUserAuthentication = createAction(
 
 export const checkLoggedInUserAuthenticationSuccess = createAction(
     '[Authentication Check] Authentication Check Success',
-    props<{ evaluatorId: string, role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN', college:string }>()
+    props<{ evaluatorId: string, role: 'ROLE_STUDENT' | 'ROLE_DEAN' , college:string }>()
 )
 
 export const checkLoggedInUserAuthenticationFailure = createAction(

@@ -24,7 +24,7 @@ export const routes: Routes = [
   {
     path: 'evaluation-form',
     component: EvaluationFormComponent,
-    canActivate: [authGuard],
+    // canActivate: [authGuard],
   },
   {
     path: 'admin-dashboard',
@@ -41,11 +41,6 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'login',
-  },
-  {
-    path: 'evaluation-form',
-    component: EvaluationFormComponent,
-    canActivate: [authGuard],
   },
 
 ];

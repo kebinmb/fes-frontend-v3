@@ -10,6 +10,13 @@ import {
   FacultyDTO,
   FacultyClass,
 } from '../../../../services/supervisor-data/supervisor-data-service';
+type ClassVM = {
+  subjectCode?: string;
+  programCode?: string;
+  yearLevel?: number;
+  sectionCode?: string;
+  isEvaluated: boolean;
+};
 @Component({
   selector: 'app-supervisor-dashboard-component',
   standalone: true,
@@ -18,15 +25,17 @@ import {
   styleUrl: './supervisor-dashboard-component.css',
 })
 export class SupervisorDashboardComponent {
-  private facade = inject(SupervisorDataFacade);
+  private supervisorDataFacade = inject(SupervisorDataFacade);
   private authFacade = inject(AuthFacade);
   college = sessionStorage.getItem('college') ?? '';
   status = 'ACTIVE';
   key = `${this.college}-${this.status}`;
-  faculties$ = this.facade.faculties$(this.key);
-  facultiesLoading$ = this.facade.facultiesLoading$(this.key);
+  faculties$ = this.supervisorDataFacade.faculties$(this.key);
+  facultiesLoading$ = this.supervisorDataFacade.facultiesLoading$(this.key);
   evaluatorId$ = this.authFacade.evaluatorId$;
-  facultyDashboard$: Observable<FacultyDashboardVM[]> = this.facade.facultyDashboard$(this.key);
+  facultyDashboard$: Observable<FacultyDashboardVM[]> = this.supervisorDataFacade.facultyDashboard$(
+    this.key,
+  );
   loaded$ = combineLatest([this.faculties$, this.facultiesLoading$]).pipe(
     map(([faculties, loading]) => !loading && faculties.length > 0),
   );
@@ -42,7 +51,7 @@ export class SupervisorDashboardComponent {
     map(([total = 0, completed = 0]) => total - completed),
   );
   ngOnInit(): void {
-    this.facade.loadFaculties(this.key, this.college, this.status);
+    this.supervisorDataFacade.loadFaculties(this.key, this.college, this.status);
   }
   schoolYear() {
     return new Date().getFullYear();
@@ -53,14 +62,28 @@ export class SupervisorDashboardComponent {
   onFacultyClick(faculty: any) {
     console.log('Faculty clicked:', faculty);
   }
-  onEvaluateClick(cls: any, faculty: any, event: Event) {
+  startEvaluation(cls: FacultyClass, faculty: FacultyDTO, event: Event) {
     event.stopPropagation();
-    console.log('Evaluate:', cls, faculty);
+
+    const buildKey = (c: FacultyClass, f: FacultyDTO) =>
+      `${f.facultyId}-${c.classCode}-${c.semester}-${c.schoolYear}`;
+    const key = buildKey(cls, faculty);
+    this.supervisorDataFacade.selectClass({
+      ...cls,
+      facultyId: faculty.facultyId,
+    });
+    sessionStorage.setItem('selectedClassKey', key);
+
+    console.log('Evaluate:', { key, cls, faculty });
   }
-  getButtonLabel(cls: any) {
-    return cls.isEvaluated
-      ? 'Done'
-      : `${cls.subjectCode} ${cls.programCode} ${cls.yearLevel} ${cls.sectionCode} - Evaluate`;
+  getButtonLabel(cls: ClassVM): string {
+    if (cls.isEvaluated) return 'Done';
+
+    const parts = [cls.subjectCode, cls.programCode, cls.yearLevel, cls.sectionCode].filter(
+      Boolean,
+    );
+
+    return `${parts.join(' ')} - Evaluate`;
   }
   logout() {
     this.authFacade.logout();

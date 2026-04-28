@@ -17,6 +17,7 @@ import {
   mergeMap,
 } from 'rxjs';
 import { EvaluationService } from '../../services/evaluation/evaluation-service';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class SupervisorDataEffects {
@@ -26,6 +27,7 @@ export class SupervisorDataEffects {
   private spinnerFacade = inject(SpinnerFacade);
   private store = inject(Store);
   private evaluationDataService = inject(EvaluationService);
+  private router = inject(Router);
   loadFaculties$ = createEffect(() =>
     this.actions$.pipe(
       ofType(SupervisorDataActions.loadFaculties),
@@ -146,5 +148,31 @@ export class SupervisorDataEffects {
           ),
       ),
     ),
+  );
+
+  selectClassForEvaluation$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(SupervisorDataActions.selectClassForEvaluation),
+        withLatestFrom(this.store.select((state) => state.auth)),
+        tap(([{ selectedClass }, auth]) => {
+          console.log('Selected supervisor class:', selectedClass);
+          this.store.dispatch(
+            SupervisorDataActions.loadEvaluationStatus({
+              key: `${auth.college}-ACTIVE`,
+              role: auth.role,
+              context: {
+                facultyId: selectedClass.facultyId,
+                evaluatorId: auth.evaluatorId,
+                classCode: selectedClass.classCode,
+                semester: selectedClass.semester,
+                schoolYear: selectedClass.schoolYear,
+              },
+            }),
+          );
+          this.router.navigate(['/evaluation-form']);
+        }),
+      ),
+    { dispatch: false },
   );
 }
