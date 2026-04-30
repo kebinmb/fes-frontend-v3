@@ -47,7 +47,6 @@ export class StudentDashboardComponent {
     this.studentDataFacade.selectClassForEvaluation(selectedClass);
 
     const key = `${cls.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
-    sessionStorage.setItem('selectedClassKey', key);
   }
   onEvaluateClick(cls: any, event: Event) {
     event.stopPropagation();
