@@ -79,7 +79,7 @@ export class SupervisorDataFacade {
       schoolYear: number;
       subjectCode:string;
       college:string;
-      yearLevel:number;
+      yearLevel:number
     },
   ): void {
     this.store.dispatch(SupervisorActions.loadEvaluationStatus({ key, role, context }));

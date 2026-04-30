@@ -1,35 +1,27 @@
 :root {
-    --primary-gradient: linear-gradient(135deg, var(--chmsu-primary), #134d35);
-
     --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.06);
     --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.12);
 }
 
-/* ===== PAGE ===== */
 .evaluation-page {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    background: var(--chmsu-bg);
 }
 
-/* =========================================================
-   NAVBAR (SCOPED FIX)
-   ========================================================= */
 .evaluation-page .navbar {
-    background: var(--primary-gradient);
+    background: var(--chmsu-primary);
     box-shadow: var(--shadow-sm);
 }
-
-/* (original rule preserved behavior via scoping) */
 .navbar {
-    background: linear-gradient(135deg, var(--chmsu-primary), #134d35);
+    background: var(--chmsu-primary);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .brand-logo-small {
     width: 50px;
     height: 50px;
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--chmsu-surface);
     border-radius: 12px;
     display: flex;
     align-items: center;
@@ -46,23 +38,19 @@
 .university-name {
     font-size: 1.1rem;
     font-weight: 700;
-    color: white;
+    color: var(--chmsu-surface);
 }
 
 .system-name {
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--chmsu-bg-soft);
 }
 
-/* =========================================================
-   ALERT / LOADING (SCOPED FIX)
-   ========================================================= */
 .evaluation-page .spinner-border {
     border-color: var(--chmsu-primary);
     border-right-color: transparent;
 }
 
-/* original kept */
 .spinner-border {
     border-color: var(--chmsu-primary);
     border-right-color: transparent;
@@ -71,37 +59,31 @@
 .alert {
     border-radius: 16px;
     padding: 2rem;
-    background: white;
+    background: var(--chmsu-surface);
 }
 
 .alert-warning {
     border-left: 4px solid var(--chmsu-warning);
 }
 
-/* =========================================================
-   CARD BASE (ENHANCED - GLASS STYLE)
-   ========================================================= */
 .class-info-card,
 .category-card,
 .comments-card,
 .submit-section,
 .rating-guide-card {
-    background: rgba(255, 255, 255, 0.9); /* improved */
-    backdrop-filter: blur(8px);           /* added */
+    background: var(--chmsu-surface);
     border-radius: 16px;
     box-shadow: var(--shadow-sm);
+    border: 1px solid var(--chmsu-border);
 }
 
-/* =========================================================
-   CLASS INFO
-   ========================================================= */
 .class-info-header {
-    background: var(--primary-gradient);
+    background: var(--chmsu-primary);
     padding: 1.5rem 2rem;
 }
 
 .page-title {
-    color: white;
+    color: var(--chmsu-surface);
     font-size: 1.5rem;
     font-weight: 700;
 }
@@ -124,7 +106,7 @@
     padding: 14px 16px;
 
     border-radius: 12px;
-    background: #ffffff;
+    background: var(--chmsu-surface);
 
     box-shadow: var(--shadow-sm);
     transition: all 0.25s ease;
@@ -135,7 +117,6 @@
     box-shadow: var(--shadow-md);
 }
 
-/* FIXED: theme consistency */
 .icon {
     font-size: 20px;
     color: var(--chmsu-primary);
@@ -144,25 +125,22 @@
 .label {
     display: block;
     font-size: 12px;
-    color: #6c757d;
+    color: var(--chmsu-muted);
 }
 
 .value {
     font-size: 14px;
     font-weight: 600;
-    color: #212529;
+    color: var(--chmsu-text);
 }
 
-/* =========================================================
-   RATING GUIDE
-   ========================================================= */
 .rating-guide-card {
     padding: 2rem;
 }
 
 .rating-guide-item {
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
+    background: var(--chmsu-bg);
+    border: 2px solid var(--chmsu-border);
     border-radius: 12px;
     padding: 1rem;
     text-align: center;
@@ -180,7 +158,7 @@
     height: 48px;
     border-radius: 50%;
     background: var(--chmsu-primary);
-    color: white;
+    color: var(--chmsu-surface);
 
     font-weight: 700;
     display: flex;
@@ -196,16 +174,16 @@
 
 .rating-desc {
     font-size: 0.75rem;
-    color: #6c757d;
+    color: var(--chmsu-muted);
 }
 
 /* =========================================================
    CATEGORY
    ========================================================= */
 .category-card-header {
-    background: var(--primary-gradient);
+    background: var(--chmsu-primary);
     padding: 1.25rem;
-    color: white;
+    color: var(--chmsu-surface);
 }
 
 .category-card-body {
@@ -217,11 +195,10 @@
    ========================================================= */
 .criteria-item {
     margin-bottom: 1.5rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--chmsu-border);
     padding-bottom: 1rem;
 }
 
-/* FIX: remove last border */
 .criteria-item:last-child {
     border-bottom: none;
 }
@@ -232,7 +209,7 @@
 }
 
 /* =========================================================
-   RATING OPTIONS (ACCESSIBILITY FIX)
+   RATING OPTIONS
    ========================================================= */
 .rating-options {
     display: grid;
@@ -240,7 +217,6 @@
     gap: 0.75rem;
 }
 
-/* improved accessibility */
 .rating-input {
     position: absolute;
     opacity: 0;
@@ -251,12 +227,12 @@
 }
 
 .rating-content {
-    border: 2px solid #e9ecef;
+    border: 2px solid var(--chmsu-border);
     border-radius: 12px;
     padding: 0.75rem;
 
     text-align: center;
-    background: #f8f9fa;
+    background: var(--chmsu-bg);
 
     transition: all 0.2s ease;
 }
@@ -266,10 +242,9 @@
     transform: translateY(-2px);
 }
 
-/* SELECTED */
 .rating-option.selected .rating-content {
     background: var(--chmsu-primary);
-    color: white;
+    color: var(--chmsu-surface);
     border-color: var(--chmsu-primary);
     box-shadow: var(--shadow-md);
 }
@@ -282,12 +257,12 @@
 
 .rating-option.selected .rating-value,
 .rating-option.selected .rating-text {
-    color: white;
+    color: var(--chmsu-surface);
 }
 
 .rating-text {
     font-size: 0.85rem;
-    color: #6c757d;
+    color: var(--chmsu-muted);
 }
 
 .rating-option:focus-within .rating-content {
@@ -300,7 +275,7 @@
    ========================================================= */
 .comments-card-header {
     background: var(--chmsu-secondary);
-    color: white;
+    color: var(--chmsu-surface);
     padding: 1.25rem;
 }
 
@@ -309,7 +284,7 @@
 }
 
 .form-control {
-    border: 2px solid #e9ecef;
+    border: 2px solid var(--chmsu-border);
     border-radius: 12px;
     padding: 0.75rem;
     transition: all 0.2s ease;
@@ -324,8 +299,8 @@
    BUTTONS
    ========================================================= */
 .btn-primary {
-    background: var(--primary-gradient);
-    color: white;
+    background: var(--chmsu-primary);
+    color: var(--chmsu-surface);
 
     padding: 1rem 2.5rem;
     border-radius: 12px;
@@ -335,6 +310,7 @@
 }
 
 .btn-primary:hover {
+    background: var(--chmsu-primary-dark);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -345,7 +321,7 @@
 .submit-section {
     padding: 2rem;
     text-align: center;
-    border-top: 1px solid #eee; /* added */
+    border-top: 1px solid var(--chmsu-border);
 }
 
 /* =========================================================

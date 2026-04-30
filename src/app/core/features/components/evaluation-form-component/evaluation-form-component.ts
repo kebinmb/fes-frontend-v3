@@ -11,11 +11,12 @@ import { EvaluationDataFacade } from '../../../store/evaluation-data/evaluation.
 import {
   EvaluationCategory,
   EvaluationCriteria,
+  SubjectEvaluationDTO,
 } from '../../../services/evaluation/evaluation-service';
 export type UserRole = 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN';
 @Component({
   selector: 'app-evaluation-form-component',
-  imports: [AsyncPipe, CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './evaluation-form-component.html',
   styleUrl: './evaluation-form-component.css',
 })
@@ -50,13 +51,18 @@ export class EvaluationFormComponent {
   isLoading = toSignal(this.evaluationDataFacade.isLoading$);
   hasAlreadyEvaluated = toSignal(this.evaluationDataFacade.hasEvaluated$);
   isSubmitting = toSignal(this.evaluationDataFacade.submitting$);
-
+  role = toSignal(this.authFacade.role$);
+  evaluatorId = toSignal(this.authFacade.evaluatorId$);
+  accessCode = toSignal(this.authFacade.accessCode$);
+  facultyId = computed(() => this.selectedClass()?.facultyId || '');
   facultyName = computed(() => this.selectedClass()?.facultyName ?? '');
-  semester = computed(() => this.selectedClass()?.semester ?? '');
-  schoolYear = computed(() => this.selectedClass()?.schoolYear ?? '');
+  classCode = computed(() => this.selectedClass()?.classCode ?? '');
   subjectCode = computed(() => this.selectedClass()?.classCode ?? '');
-  college = computed(() => this.selectedClass()?.college ?? '');
   yearLevel = computed(() => this.selectedClass()?.yearLevel ?? '');
+  subjectTitle = computed(() => this.selectedClass()?.subjectDescription ?? '');
+  semester = computed(() => this.selectedClass()?.semester ?? '');
+  schoolYear = computed(() => this.selectedClass()?.schoolYear ?? 0);
+  college = computed(() => this.selectedClass()?.college ?? '');
 
   ratingOptions = computed(() => this.template()?.ratingOptions ?? []);
   categories = computed(() => this.template()?.categories ?? []);
@@ -110,8 +116,50 @@ export class EvaluationFormComponent {
         }
       });
   }
-  onSubmit() {}
-  cancel() {}
+  onSubmit() {
+    if (this.evaluationForm.invalid || this.hasAlreadyEvaluated()) {
+      this.markFormGroupTouched();
+      return;
+    }
+    const dto = this.mapFormToDTO(this.evaluationForm.value);
+    this.evaluationDataFacade.submit(dto);
+  }
+  private mapFormToDTO(formValue: any): SubjectEvaluationDTO {
+    const ratings: Record<string, string> = {};
+    console.log('Access Code', this.accessCode());
+    this.categories()?.forEach((category) => {
+      category.criteria.forEach((crit) => {
+        ratings[crit.name] = formValue[crit.name];
+      });
+    });
+
+    return {
+      facultyId: this.facultyId(),
+      evaluatorId: this.evaluatorId() || '',
+      subjectCode: this.subjectCode(),
+      classCode: this.classCode(),
+      semester: this.semester(),
+      schoolYear: this.schoolYear(),
+      accessCode: this.accessCode() || '',
+      ratings,
+      commentsOrFeedbacks: formValue.comments || undefined,
+    };
+  }
+  cancel() {
+    console.log('Cancel CLicked redirecting to student dashboard...');
+    if (confirm('Are you sure you want to cancel? Your progress will be lost.')) {
+      const role = this.role();
+
+      if (role === 'ROLE_DEAN') {
+        this.router.navigate(['/supervisor-dashboard']);
+      } else if (role === 'ROLE_STUDENT') {
+        console.log('Cancel CLicked redirecting to student dashboard...');
+        this.router.navigate(['/student-dashboard']);
+      } else {
+        this.router.navigate(['/login']);
+      }
+    }
+  }
   isFieldInvalid(fieldName: string): boolean {
     const field = this.evaluationForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
