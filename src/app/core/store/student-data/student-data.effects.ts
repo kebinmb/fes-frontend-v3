@@ -165,9 +165,9 @@ export class StudentDataEffects {
   selectStudentClassForEvaluation$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(StudentDataActions.selectClassForEvaluation),
-        tap(({ selectedClassKey }) => {
-          console.log('Selected class key:', selectedClassKey);
+        ofType(StudentDataActions.selectStudentClassForEvaluation),
+        tap(({ selectedClass }) => {
+          console.log('Selected class key:', selectedClass);
           this.router.navigate(['/evaluation-form']);
         }),
       ),

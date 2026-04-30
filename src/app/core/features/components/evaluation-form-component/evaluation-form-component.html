@@ -1,1 +1,21 @@
-<div>{{ selectedClass$ | async | json }}</div>
+@if (selectedStudentClass$ | async; as selectedClass) {
+  <h2>Class Information</h2>
+
+  <p><strong>Class Code:</strong> {{ selectedClass.classCode }}</p>
+  <p><strong>Faculty:</strong> {{ selectedClass.facultyName }}</p>
+  <p><strong>Semester:</strong> {{ selectedClass.semester }}</p>
+  <p><strong>School Year:</strong> {{ selectedClass.schoolYear }}</p>
+} @else {
+  <p>No class selected.</p>
+}
+
+@if (selectedFacultyClass$ | async; as selectedClass) {
+  <h2>Class Information</h2>
+
+  <p><strong>Class Code:</strong> {{ selectedClass.classCode }}</p>
+  <p><strong>Faculty:</strong> {{ selectedClass.facultyName }}</p>
+  <p><strong>Semester:</strong> {{ selectedClass.semester }}</p>
+  <p><strong>School Year:</strong> {{ selectedClass.schoolYear }}</p>
+} @else {
+  <p>No class selected.</p>
+}

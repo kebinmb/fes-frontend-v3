@@ -8,7 +8,7 @@ import { SupervisorDataFacade } from '../../../store/supervisor-data/supervisor-
 export type UserRole = 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN';
 @Component({
   selector: 'app-evaluation-form-component',
-  imports: [AsyncPipe, JsonPipe],
+  imports: [AsyncPipe],
   templateUrl: './evaluation-form-component.html',
   styleUrl: './evaluation-form-component.css',
 })
@@ -17,71 +17,45 @@ export class EvaluationFormComponent {
   private router = inject(Router);
   private authFacade = inject(AuthFacade);
   private supervisorDataFacade = inject(SupervisorDataFacade);
-  selectedClass$ = this.studentDataFacade.selectedClass$;
+  selectedStudentClass$ = this.studentDataFacade.selectedClass$;
+  selectedFacultyClass$ = this.supervisorDataFacade.selectedClass$;
   studentLoads$ = this.studentDataFacade.studentLoads$;
   role$ = this.authFacade.role$;
-  selectedSupervisorClass = this.supervisorDataFacade.selectedClass$;
   ngOnInit() {
-  const key = sessionStorage.getItem('selectedClassKey');
+    const key = sessionStorage.getItem('selectedClassKey');
 
-  if (!key) {
-    this.router.navigate(['/dashboard']);
-    return;
-  }
+    if (!key) {
+      this.router.navigate(['/dashboard']);
+      return;
+    }
 
-  combineLatest([
-    this.authFacade.role$,
-    this.authFacade.evaluatorId$
-  ])
-    .pipe(
-      filter(([role, evaluatorId]) => !!role && !!evaluatorId),
-      take(1)
-    )
-    .subscribe(([role, evaluatorId]) => {
-      if (role === 'ROLE_STUDENT') {
-
-        this.studentDataFacade.selectClassForEvaluation(key);
-        combineLatest([
-          this.selectedClass$,
-          this.studentLoads$
-        ])
-          .pipe(take(1))
-          .subscribe(([selectedClass, loads]) => {
-            const isCacheEmpty = !loads || loads.length === 0;
-            if (isCacheEmpty) {
-              this.studentDataFacade.loadStudentLoads(
-                evaluatorId!,
-                0,
-                10,
-                'desc'
-              );
-              return;
-            }
-            if (!selectedClass) {
-             alert(selectedClass);
-            }
-          });
-      }
-      else {
-        const stored = sessionStorage.getItem('selectedClass');
-        if (!stored) {
-          this.router.navigate(['/dashboard']);
-          return;
-        }
-        const selectedClass = JSON.parse(stored);
-        this.supervisorDataFacade.selectClass(selectedClass);
-        this.supervisorDataFacade.loadEvaluationStatus(
-          `${selectedClass.college || 'CAS'}-ACTIVE`,
-          role,
-          {
-            facultyId: selectedClass.facultyId,
-            evaluatorId: evaluatorId!,
-            classCode: selectedClass.classCode,
-            semester: selectedClass.semester,
-            schoolYear: selectedClass.schoolYear
+    combineLatest([
+      this.authFacade.role$,
+      this.authFacade.evaluatorId$,
+      this.studentDataFacade.selectedClass$,
+      this.supervisorDataFacade.selectedClassForEvaluation$,
+      this.studentDataFacade.studentLoads$,
+    ])
+      .pipe(
+        filter(([role, evaluatorId]) => !!role && !!evaluatorId),
+        take(1),
+      )
+      .subscribe(([role, evaluatorId, studentClass, supervisorClass, loads]) => {
+        if (role === 'ROLE_STUDENT') {
+          if (!studentClass) {
+            this.router.navigate(['/dashboard']);
+            return;
           }
-        );
-      }
-    });
-}
+          if (!loads || loads.length === 0) {
+            this.studentDataFacade.loadStudentLoads(evaluatorId!, 0, 10, 'desc');
+          }
+        } else if (role === 'ROLE_DEAN') {
+          if (!supervisorClass) {
+            this.router.navigate(['/dashboard']);
+            return;
+          }
+          this.supervisorDataFacade.selectClass(supervisorClass);
+        }
+      });
+  }
 }

@@ -152,23 +152,30 @@ export class SupervisorDataEffects {
   selectClassForEvaluation$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(SupervisorDataActions.selectClassForEvaluation),
+        ofType(SupervisorDataActions.selectFacultyClassForEvaluation),
+
+        // ✅ filter null early
+        filter(({ selectedClass }) => !!selectedClass),
+
         withLatestFrom(this.store.select((state) => state.auth)),
+
         tap(([{ selectedClass }, auth]) => {
           console.log('Selected supervisor class:', selectedClass);
+
           this.store.dispatch(
             SupervisorDataActions.loadEvaluationStatus({
               key: `${auth.college}-ACTIVE`,
               role: auth.role,
               context: {
-                facultyId: selectedClass.facultyId,
+                facultyId: selectedClass!.facultyId,
                 evaluatorId: auth.evaluatorId,
-                classCode: selectedClass.classCode,
-                semester: selectedClass.semester,
-                schoolYear: selectedClass.schoolYear,
+                classCode: selectedClass!.classCode,
+                semester: selectedClass!.semester,
+                schoolYear: selectedClass!.schoolYear,
               },
             }),
           );
+
           this.router.navigate(['/evaluation-form']);
         }),
       ),

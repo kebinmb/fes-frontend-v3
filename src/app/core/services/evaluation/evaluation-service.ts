@@ -2,7 +2,17 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment.development';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+export interface EvaluationClass {
+  facultyId: string;
+  classCode: string;
+  subjectCode: string;
+  semester: string;
+  schoolYear: number;
+  facultyName: string;
+  subjectDescription?: string;
+  college: string;
+  yearLevel?: number;
+}
 export interface SubjectEvaluationDTO {
   facultyId: string;
   evaluatorId: string;
@@ -255,14 +265,12 @@ export class EvaluationService {
   submitEvaluation(role: string, dto: SubjectEvaluationDTO): Observable<EvaluationResponse> {
     const payload = {
       ...dto,
-      evaluationType: role // 🔥 VERY IMPORTANT
+      evaluationType: role, // 🔥 VERY IMPORTANT
     };
 
-    return this.http.post<EvaluationResponse>(
-      `${this.EVALUATION_BASE_URL}/submit`,
-      payload,
-      { withCredentials: true }
-    );
+    return this.http.post<EvaluationResponse>(`${this.EVALUATION_BASE_URL}/submit`, payload, {
+      withCredentials: true,
+    });
   }
 
   checkEvaluationStatus(
@@ -282,7 +290,7 @@ export class EvaluationService {
 
     const url =
       role === 'ROLE_STUDENT' ? `${this.STUDENT_BASE_URL}/check` : `${this.FACULTY_BASE_URL}/check`;
-    
+
     return this.http.get<EvaluationCheckResponse>(url, { params, withCredentials: true });
   }
 
@@ -298,7 +306,10 @@ export class EvaluationService {
       .set('semester', semester)
       .set('schoolYear', schoolYear.toString());
 
-    return this.http.get<SubjectEvaluationSummary>(`${this.STUDENT_BASE_URL}/summary`, { params, withCredentials:true });
+    return this.http.get<SubjectEvaluationSummary>(`${this.STUDENT_BASE_URL}/summary`, {
+      params,
+      withCredentials: true,
+    });
   }
 
   getEvaluations(
@@ -313,7 +324,10 @@ export class EvaluationService {
       .set('semester', semester)
       .set('schoolYear', schoolYear.toString());
 
-    return this.http.get<FacultyEvaluationScore[]>(`${this.STUDENT_BASE_URL}/list`, { params, withCredentials:true });
+    return this.http.get<FacultyEvaluationScore[]>(`${this.STUDENT_BASE_URL}/list`, {
+      params,
+      withCredentials: true,
+    });
   }
 
   getRatingDistribution(
@@ -327,7 +341,8 @@ export class EvaluationService {
       .set('schoolYear', schoolYear.toString());
 
     return this.http.get<Record<string, number>>(`${this.STUDENT_BASE_URL}/distribution`, {
-      params, withCredentials:true
+      params,
+      withCredentials: true,
     });
   }
 }

@@ -23,7 +23,7 @@ export const selectEvaluationMap = createSelector(
 
 export const selectSelectedClass = createSelector(
   selectStudentDataState,
-  (state) => state.selectedClassKey,
+  (state) => state.selectedClass,
 );
 
 export const selectEvaluationMapSize = createSelector(

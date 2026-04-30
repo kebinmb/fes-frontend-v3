@@ -178,7 +178,7 @@ export const supervisorDataReducer = createReducer(
             }
         };
     }),
-    on(SupervisorActions.selectClassForEvaluation, (state, { selectedClass }) => ({
+    on(SupervisorActions.selectFacultyClassForEvaluation, (state, { selectedClass }) => ({
         ...state,
         selectedClass
     }))

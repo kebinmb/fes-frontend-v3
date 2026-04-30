@@ -1,3 +1,4 @@
+import { EvaluationClass } from "../../services/evaluation/evaluation-service";
 import { PageResponse, StudentClassLoadDTO } from "../../services/student-data/student-data-service"
 
 export interface StudentDataState {
@@ -7,7 +8,7 @@ export interface StudentDataState {
     loading: boolean;
     error: any;
     evaluationMap: Record<string, boolean | null>;
-    selectedClassKey: string | null;
+    selectedClass: EvaluationClass | null;
     ready: boolean;
 }
 
@@ -16,6 +17,6 @@ export const initialStudentDataState: StudentDataState = {
     loading: false,
     error: null,
     evaluationMap: {},
-    selectedClassKey: null,
+    selectedClass: null,
     ready: false,
 }

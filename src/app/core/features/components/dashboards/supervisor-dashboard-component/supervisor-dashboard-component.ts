@@ -65,14 +65,15 @@ export class SupervisorDashboardComponent {
   startEvaluation(cls: FacultyClass, faculty: FacultyDTO, event: Event) {
     event.stopPropagation();
 
-    const buildKey = (c: FacultyClass, f: FacultyDTO) =>
-      `${f.facultyId}-${c.classCode}-${c.semester}-${c.schoolYear}`;
-    const key = buildKey(cls, faculty);
+    const key = `${faculty.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
+
+    const facultyName = `${faculty.firstname} ${faculty.lastname}`;
+
     this.supervisorDataFacade.selectClass({
       ...cls,
       facultyId: faculty.facultyId,
+      facultyName,
     });
-    sessionStorage.setItem('selectedClassKey', key);
 
     console.log('Evaluate:', { key, cls, faculty });
   }

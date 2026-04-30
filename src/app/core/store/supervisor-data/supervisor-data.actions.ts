@@ -1,5 +1,6 @@
 import { createAction, props } from "@ngrx/store";
 import { FacultyDTO, FacultyClass } from "../../services/supervisor-data/supervisor-data-service";
+import { EvaluationClass } from "../../services/evaluation/evaluation-service";
 
 /* =====================================================
    FACULTY LIST
@@ -125,9 +126,9 @@ export const updateEvaluatedClass = createAction(
   }>()
 );
 
-export const selectClassForEvaluation = createAction(
+export const selectFacultyClassForEvaluation = createAction(
   '[Faculty Evaluation] Select Class For Evaluation',
   props<{
-    selectedClass: FacultyClass;
+    selectedClass: EvaluationClass | null;
   }>()
 );

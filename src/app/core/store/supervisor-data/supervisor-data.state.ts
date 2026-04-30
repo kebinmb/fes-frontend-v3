@@ -1,3 +1,4 @@
+import { EvaluationClass } from "../../services/evaluation/evaluation-service";
 import { FacultyClass, FacultyDTO } from "../../services/supervisor-data/supervisor-data-service"
 
 export interface SupervisorDataState {
@@ -34,7 +35,7 @@ export interface SupervisorDataState {
         };
     };
 
-    selectedClass: FacultyClass | null;
+    selectedClass: EvaluationClass | null;
 }
 export const supervisorDataInitialState: SupervisorDataState = {
     faculties: {},

@@ -4,6 +4,7 @@ import { AsyncPipe, CommonModule, JsonPipe } from '@angular/common';
 import { AuthFacade } from '../../../../store/auth/auth.facade';
 import { filter, map, take } from 'rxjs';
 import { StudentClassLoadDTO } from '../../../../services/student-data/student-data-service';
+import { EvaluationClass } from '../../../../services/evaluation/evaluation-service';
 
 @Component({
   selector: 'app-student-dashboard-component',
@@ -36,11 +37,16 @@ export class StudentDashboardComponent {
   unevaluatedCount$ = this.studentLoads$.pipe(
     map((loads) => (loads?.length ?? 0) - (loads?.filter((l) => l.isEvaluated)?.length ?? 0)),
   );
-  startEvaluation(cls: StudentClassLoadDTO, $event: Event) {
-    const buildKey = (c: StudentClassLoadDTO) =>
-      `${c.facultyId}-${c.classCode}-${c.semester}-${c.schoolYear}`;
-    const key = buildKey(cls);
-    this.studentDataFacade.selectClassForEvaluation(key);
+  startEvaluation(cls: StudentClassLoadDTO, event: Event) {
+    event.stopPropagation();
+
+    const selectedClass: EvaluationClass = {
+      ...cls,
+    };
+
+    this.studentDataFacade.selectClassForEvaluation(selectedClass);
+
+    const key = `${cls.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
     sessionStorage.setItem('selectedClassKey', key);
   }
   onEvaluateClick(cls: any, event: Event) {

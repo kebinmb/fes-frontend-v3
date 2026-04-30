@@ -4,24 +4,19 @@ import * as SupervisorActions from './supervisor-data.actions';
 import * as SupervisorSelectors from './supervisor-data.selectors';
 import { FacultyClass, FacultyDTO } from '../../services/supervisor-data/supervisor-data-service';
 import { combineLatest, map, Observable } from 'rxjs';
-
-/* =========================
-   VIEW MODEL TYPE
-========================= */
-
+import { EvaluationClass } from '../../services/evaluation/evaluation-service';
 export type FacultyDashboardVM = {
   faculty: FacultyDTO;
   classes: (FacultyClass & { isEvaluated: boolean })[];
   loading: boolean;
 };
-
 @Injectable({ providedIn: 'root' })
 export class SupervisorDataFacade {
   private store = inject(Store);
+  selectedClassForEvaluation$ = this.store.select(SupervisorSelectors.selectSelectedClass);
   faculties$(key: string): Observable<FacultyDTO[]> {
     return this.store.select(SupervisorSelectors.selectFacultyDataByKey(key));
   }
-
   facultiesLoading$(key: string): Observable<boolean> {
     return this.store.select(SupervisorSelectors.selectFacultyDataLoading(key));
   }
@@ -107,7 +102,7 @@ export class SupervisorDataFacade {
   }
   selectedClass$ = this.store.select(SupervisorSelectors.selectSelectedClass);
 
-  selectClass(selectedClass: FacultyClass): void {
-    this.store.dispatch(SupervisorActions.selectClassForEvaluation({ selectedClass }));
+  selectClass(selectedClass: EvaluationClass): void {
+    this.store.dispatch(SupervisorActions.selectFacultyClassForEvaluation({ selectedClass }));
   }
 }

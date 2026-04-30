@@ -3,6 +3,9 @@ import { Store } from '@ngrx/store';
 import { AuthFacade } from '../auth/auth.facade';
 import * as StudentDataActions from './student-data.action';
 import { selectSelectedClass, selectStudentLoads } from './student-data.selectors';
+import { StudentClassLoadDTO } from '../../services/student-data/student-data-service';
+import { FacultyClass } from '../../services/supervisor-data/supervisor-data-service';
+import { EvaluationClass } from '../../services/evaluation/evaluation-service';
 @Injectable({
   providedIn: 'root',
 })
@@ -19,7 +22,7 @@ export class StudentDataFacade {
   loadEvaluationStatus(classes: any[], studentId: string): void {
     this.store.dispatch(StudentDataActions.loadEvaluationStatus({ classes, studentId }));
   }
-  selectClassForEvaluation(selectedClassKey: string) {
-    this.store.dispatch(StudentDataActions.selectClassForEvaluation({ selectedClassKey }));
+  selectClassForEvaluation(selectedClass: EvaluationClass) {
+    this.store.dispatch(StudentDataActions.selectStudentClassForEvaluation({ selectedClass }));
   }
 }

@@ -1,5 +1,6 @@
 import { createAction, props } from "@ngrx/store";
 import { PageResponse, StudentClassLoadDTO } from "../../services/student-data/student-data-service";
+import { EvaluationClass } from "../../services/evaluation/evaluation-service";
 
 export const loadStudentLoads = createAction(
     '[Student Load] Load Student Loads',
@@ -34,9 +35,9 @@ export const loadEvaluationStatusFailure = createAction(
     props<{ error: string }>()
 );
 
-export const selectClassForEvaluation = createAction(
+export const selectStudentClassForEvaluation = createAction(
     '[Student Evaluation] Select Class For Evaluation',
-    props<{ selectedClassKey: string }>()
+    props<{ selectedClass: EvaluationClass | null }>()
 );
 
 export const updateStudentEvaluatedClass = createAction(
