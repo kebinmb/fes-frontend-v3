@@ -7,8 +7,8 @@ export const setEvaluationContext = createAction(
     props<{ evaluationDataContext: EvaluationDataContext }>()
 );
 
-export const checkEvaluationState = createAction(
-    '[Evaluation] Check Evaluation State'
+export const checkEvaluationStatus = createAction(
+    '[Evaluation] Check Evaluation Status'
 );
 
 export const checkEvaluationStatusSuccess = createAction(

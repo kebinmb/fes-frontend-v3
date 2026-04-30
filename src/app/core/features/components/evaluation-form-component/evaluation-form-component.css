@@ -1,0 +1,388 @@
+:root {
+    --primary-gradient: linear-gradient(135deg, var(--chmsu-primary), #134d35);
+
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== PAGE ===== */
+.evaluation-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+/* =========================================================
+   NAVBAR (SCOPED FIX)
+   ========================================================= */
+.evaluation-page .navbar {
+    background: var(--primary-gradient);
+    box-shadow: var(--shadow-sm);
+}
+
+/* (original rule preserved behavior via scoping) */
+.navbar {
+    background: linear-gradient(135deg, var(--chmsu-primary), #134d35);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.brand-logo-small {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.4rem;
+}
+
+.logo-image-small {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.university-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: white;
+}
+
+.system-name {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* =========================================================
+   ALERT / LOADING (SCOPED FIX)
+   ========================================================= */
+.evaluation-page .spinner-border {
+    border-color: var(--chmsu-primary);
+    border-right-color: transparent;
+}
+
+/* original kept */
+.spinner-border {
+    border-color: var(--chmsu-primary);
+    border-right-color: transparent;
+}
+
+.alert {
+    border-radius: 16px;
+    padding: 2rem;
+    background: white;
+}
+
+.alert-warning {
+    border-left: 4px solid var(--chmsu-warning);
+}
+
+/* =========================================================
+   CARD BASE (ENHANCED - GLASS STYLE)
+   ========================================================= */
+.class-info-card,
+.category-card,
+.comments-card,
+.submit-section,
+.rating-guide-card {
+    background: rgba(255, 255, 255, 0.9); /* improved */
+    backdrop-filter: blur(8px);           /* added */
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* =========================================================
+   CLASS INFO
+   ========================================================= */
+.class-info-header {
+    background: var(--primary-gradient);
+    padding: 1.5rem 2rem;
+}
+
+.page-title {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.class-info-body {
+    padding: 2rem;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+
+    border-radius: 12px;
+    background: #ffffff;
+
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s ease;
+}
+
+.info-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* FIXED: theme consistency */
+.icon {
+    font-size: 20px;
+    color: var(--chmsu-primary);
+}
+
+.label {
+    display: block;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.value {
+    font-size: 14px;
+    font-weight: 600;
+    color: #212529;
+}
+
+/* =========================================================
+   RATING GUIDE
+   ========================================================= */
+.rating-guide-card {
+    padding: 2rem;
+}
+
+.rating-guide-item {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+
+    transition: all 0.25s ease;
+}
+
+.rating-guide-item:hover {
+    transform: translateY(-4px);
+    border-color: var(--chmsu-primary);
+}
+
+.rating-score {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--chmsu-primary);
+    color: white;
+
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+}
+
+.rating-label {
+    font-weight: 600;
+    color: var(--chmsu-text);
+}
+
+.rating-desc {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+/* =========================================================
+   CATEGORY
+   ========================================================= */
+.category-card-header {
+    background: var(--primary-gradient);
+    padding: 1.25rem;
+    color: white;
+}
+
+.category-card-body {
+    padding: 2rem;
+}
+
+/* =========================================================
+   CRITERIA
+   ========================================================= */
+.criteria-item {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}
+
+/* FIX: remove last border */
+.criteria-item:last-child {
+    border-bottom: none;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--chmsu-text);
+}
+
+/* =========================================================
+   RATING OPTIONS (ACCESSIBILITY FIX)
+   ========================================================= */
+.rating-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+}
+
+/* improved accessibility */
+.rating-input {
+    position: absolute;
+    opacity: 0;
+}
+
+.rating-option {
+    cursor: pointer;
+}
+
+.rating-content {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.75rem;
+
+    text-align: center;
+    background: #f8f9fa;
+
+    transition: all 0.2s ease;
+}
+
+.rating-option:hover .rating-content {
+    border-color: var(--chmsu-primary);
+    transform: translateY(-2px);
+}
+
+/* SELECTED */
+.rating-option.selected .rating-content {
+    background: var(--chmsu-primary);
+    color: white;
+    border-color: var(--chmsu-primary);
+    box-shadow: var(--shadow-md);
+}
+
+.rating-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--chmsu-primary);
+}
+
+.rating-option.selected .rating-value,
+.rating-option.selected .rating-text {
+    color: white;
+}
+
+.rating-text {
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.rating-option:focus-within .rating-content {
+    outline: 2px solid var(--chmsu-accent);
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   COMMENTS
+   ========================================================= */
+.comments-card-header {
+    background: var(--chmsu-secondary);
+    color: white;
+    padding: 1.25rem;
+}
+
+.comments-card-body {
+    padding: 2rem;
+}
+
+.form-control {
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus {
+    border-color: var(--chmsu-primary);
+    box-shadow: 0 0 0 0.2rem rgba(24, 100, 67, 0.2);
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+
+    padding: 1rem 2.5rem;
+    border-radius: 12px;
+    border: none;
+
+    transition: all 0.25s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* =========================================================
+   SUBMIT
+   ========================================================= */
+.submit-section {
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid #eee; /* added */
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width: 768px) {
+    .rating-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .btn-primary {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .rating-options {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.class-info-card,
+.category-card,
+.comments-card {
+    animation: fadeInUp 0.3s ease;
+}

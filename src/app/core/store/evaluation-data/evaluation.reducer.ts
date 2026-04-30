@@ -10,7 +10,7 @@ export const evaluationReducer = createReducer(
         evaluationDataContext
     })),
 
-    on(EvaluationActions.checkEvaluationState, (state) => ({
+    on(EvaluationActions.checkEvaluationStatus, (state) => ({
         ...state,
         loading: true
     })),

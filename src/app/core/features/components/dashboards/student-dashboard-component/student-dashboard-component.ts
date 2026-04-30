@@ -37,7 +37,7 @@ export class StudentDashboardComponent {
   unevaluatedCount$ = this.studentLoads$.pipe(
     map((loads) => (loads?.length ?? 0) - (loads?.filter((l) => l.isEvaluated)?.length ?? 0)),
   );
-  startEvaluation(cls: StudentClassLoadDTO, event: Event) {
+  startEvaluation(cls: EvaluationClass, event: Event) {
     event.stopPropagation();
 
     const selectedClass: EvaluationClass = {

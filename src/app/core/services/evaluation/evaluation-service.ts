@@ -11,7 +11,7 @@ export interface EvaluationClass {
   facultyName: string;
   subjectDescription?: string;
   college: string;
-  yearLevel?: number;
+  yearLevel: number;
 }
 export interface SubjectEvaluationDTO {
   facultyId: string;

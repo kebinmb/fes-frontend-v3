@@ -22,24 +22,18 @@ import { studentLoadReducer } from './core/store/student-data/student-data.reduc
 import { StudentDataEffects } from './core/store/student-data/student-data.effects';
 import { supervisorDataReducer } from './core/store/supervisor-data/supervisor-data.reducer';
 import { SupervisorDataEffects } from './core/store/supervisor-data/supervisor-data.effects';
+import { metaReducers } from './core/store/meta-reducers/meta-reducers';
+import { reducers } from './core/store';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([])),
-    provideStore({
-      auth: authReducer,
-      toast: toastReducer,
-      spinner: spinnerReducer,
-      studentData: studentLoadReducer,
-      supervisorData: supervisorDataReducer
+    provideStore(reducers, {
+      metaReducers,
     }),
     provideEffects([AuthEffects, ToastEffect, StudentDataEffects, SupervisorDataEffects]),
-    // provideAppInitializer(() => {
-    //   const authFacade = inject(AuthFacade);
-    //   authFacade.checkLoggedInUserAuthentication();
-    // }),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],
 };

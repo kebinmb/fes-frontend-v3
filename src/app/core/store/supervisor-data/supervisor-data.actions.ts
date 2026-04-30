@@ -75,6 +75,9 @@ export interface EvaluationContext {
   classCode: string;
   semester: string;
   schoolYear: number;
+  subjectCode:string;
+  college:string;
+  yearLevel:number;
 }
 
 export interface EvaluationStatus {

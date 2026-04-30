@@ -172,6 +172,9 @@ export class SupervisorDataEffects {
                 classCode: selectedClass!.classCode,
                 semester: selectedClass!.semester,
                 schoolYear: selectedClass!.schoolYear,
+                subjectCode:selectedClass!.subjectCode,
+                college:selectedClass!.college,
+                yearLevel:selectedClass!.yearLevel
               },
             }),
           );
