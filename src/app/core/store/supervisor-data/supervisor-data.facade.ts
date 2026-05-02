@@ -107,7 +107,7 @@ export class SupervisorDataFacade {
       schoolYear: number;
       subjectCode: string;
       college: string;
-      yearLevel: number;
+      yearLevel: string;
     }
   ): void {
     this.store.dispatch(

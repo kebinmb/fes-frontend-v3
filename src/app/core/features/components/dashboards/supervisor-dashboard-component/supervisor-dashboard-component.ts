@@ -13,7 +13,7 @@ import {
 type ClassVM = {
   subjectCode?: string;
   programCode?: string;
-  yearLevel?: number;
+  yearLevel?: string;
   sectionCode?: string;
   isEvaluated: boolean;
 };

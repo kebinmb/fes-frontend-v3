@@ -7,7 +7,7 @@ export interface EvaluationDataContext {
     facultyName?: string;
     subjectDescription?: string;
     college: string;
-    yearLevel: number;
+    yearLevel: string;
 }
 
 export interface EvaluationDataState {

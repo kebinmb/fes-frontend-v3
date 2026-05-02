@@ -26,7 +26,7 @@ export interface FacultyWithClasses {
 }
 export interface FacultyClass {
   subjectCode: string;
-  yearLevel: number;
+  yearLevel: string;
   facultyId: string;
   schoolYear: number;
   semester: string;

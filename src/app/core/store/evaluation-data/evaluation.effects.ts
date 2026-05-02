@@ -60,7 +60,7 @@ export class EvaluationEffects {
             facultyName: cls.facultyName,
             subjectDescription: cls.subjectDescription ?? '',
             college: cls.college,
-            yearLevel: 'yearLevel' in cls ? cls.yearLevel ?? 0 : 0,
+            yearLevel: 'yearLevel' in cls ? cls.yearLevel ?? '': '',
           },
         });
       }),
@@ -84,6 +84,7 @@ export class EvaluationEffects {
           facultyId: context!.facultyId,
           classCode: context!.classCode,
           subjectCode: context!.subjectCode,
+          yearLevel:context!.yearLevel,
           semester: context!.semester,
           schoolYear: context!.schoolYear,
         };

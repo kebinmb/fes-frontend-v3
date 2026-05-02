@@ -102,6 +102,8 @@ export class SupervisorDataEffects {
             context.facultyId,
             context.evaluatorId,
             context.classCode,
+            context.yearLevel,
+            context.subjectCode,
             context.semester,
             context.schoolYear
           )
@@ -167,6 +169,8 @@ export class SupervisorDataEffects {
           r.classes.map(cls => ({
             facultyId: r.facultyId,
             classCode: cls.classCode,
+            subjectCode: cls.subjectCode,
+            yearLevel:cls.yearLevel,
             semester: cls.semester,
             schoolYear: cls.schoolYear
           }))
@@ -195,6 +199,8 @@ export class SupervisorDataEffects {
                 item.facultyId,
                 evaluatorId,
                 item.classCode,
+                item.subjectCode,
+                item.yearLevel,
                 item.semester,
                 item.schoolYear
               )

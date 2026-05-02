@@ -161,6 +161,7 @@ export class EvaluationFormComponent {
       subjectCode: this.subjectCode(),
       classCode: this.classCode(),
       semester: this.semester(),
+      yearLevel:this.yearLevel(),
       schoolYear: this.schoolYear(),
       accessCode: this.accessCode() || '',
       ratings,

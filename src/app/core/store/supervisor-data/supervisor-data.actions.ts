@@ -46,7 +46,7 @@ export interface EvaluationContext {
   schoolYear: number;
   subjectCode: string;
   college: string;
-  yearLevel: number;
+  yearLevel: string;
 }
 
 export const loadEvaluationStatus = createAction(
@@ -87,6 +87,8 @@ export const loadEvaluationStatusBatch = createAction(
     payload: {
       facultyId: string;
       classCode: string;
+      subjectCode:string;
+      yearLevel:string;
       semester: string;
       schoolYear: number;
     }[];

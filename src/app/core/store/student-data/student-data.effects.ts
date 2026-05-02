@@ -121,6 +121,8 @@ export class StudentDataEffects {
               cls.facultyId,
               studentId,
               cls.classCode,
+              cls.subjectCode,
+              cls.yearLevel,
               cls.semester,
               cls.schoolYear,
             )

@@ -7,6 +7,7 @@ export interface StudentClassLoadDTO {
   facultyId: string;
   subjectCode: string;
   sectionId: number;
+  yearLevel:string;
   semester: string;
   schoolYear: number;
   studentId: string;
