@@ -5,7 +5,7 @@ export const selectEvaluationDataState =
   createFeatureSelector<EvaluationDataState>('evaluationData');
 export const selectEvaluationDataContext = createSelector(
   selectEvaluationDataState,
-  (s) => s.context,
+  (s) => s.evaluationDataContext,
 );
 export const selectHasEvaluated = createSelector(selectEvaluationDataState, (s) => s.hasEvaluated);
 export const selectEvaluationLoading = createSelector(selectEvaluationDataState, (s) => s.loading);

@@ -11,7 +11,7 @@ export interface EvaluationDataContext {
 }
 
 export interface EvaluationDataState {
-    context: EvaluationDataContext | null;
+    evaluationDataContext: EvaluationDataContext | null;
     loading: boolean;
     submitting: boolean;
     hasEvaluated: boolean;
@@ -19,7 +19,7 @@ export interface EvaluationDataState {
 }
 
 export const initialEvaluationDataState: EvaluationDataState = {
-    context: null,
+    evaluationDataContext: null,
     loading: false,
     submitting: false,
     hasEvaluated: false,

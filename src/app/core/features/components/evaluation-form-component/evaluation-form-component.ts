@@ -87,6 +87,7 @@ export class EvaluationFormComponent {
     });
   }
   ngOnInit() {
+    this.evaluationDataFacade.initialize(); 
     combineLatest([
       this.authFacade.role$,
       this.authFacade.evaluatorId$,
@@ -128,6 +129,7 @@ export class EvaluationFormComponent {
     const ratings: Record<string, string> = {};
     console.log('Access Code', this.accessCode());
     this.categories()?.forEach((category) => {
+      console.log('Trigger Map');
       category.criteria.forEach((crit) => {
         ratings[crit.name] = formValue[crit.name];
       });

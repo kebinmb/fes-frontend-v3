@@ -6,12 +6,13 @@ import { Router } from '@angular/router';
 import { ToastFacade } from '../toast/toast.facade';
 import { SpinnerFacade } from '../spinner/spinner.facade';
 import * as EvaluationActions from './evaluation.action';
-import { filter, map, withLatestFrom } from 'rxjs';
+import { catchError, filter, map, of, switchMap, tap, withLatestFrom } from 'rxjs';
 import { AuthFacade } from '../auth/auth.facade';
 import { StudentDataFacade } from '../student-data/student-data.facade';
 import { selectRole } from '../auth/auth.selector';
 import * as StudentDataSelectors from './../../store/student-data/student-data.selectors';
 import * as SupervisorDataSelectors from './../../store/supervisor-data/supervisor-data.selectors';
+import { selectEvaluationDataContext } from './evaluation.selector';
 @Injectable()
 export class EvaluationEffects {
   private actions$ = inject(Actions);
@@ -64,5 +65,73 @@ export class EvaluationEffects {
         });
       }),
     ),
+  );
+
+  submitEvaluation$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(EvaluationActions.submitEvaluation),
+
+      withLatestFrom(
+        this.store.select(selectRole),
+        this.store.select(selectEvaluationDataContext)
+      ),
+
+      filter(([{ payload }, role, context]) => !!payload && !!role && !!context),
+
+      map(([{ payload }, role, context]) => {
+        const finalPayload = {
+          ...payload,
+          facultyId: context!.facultyId,
+          classCode: context!.classCode,
+          subjectCode: context!.subjectCode,
+          semester: context!.semester,
+          schoolYear: context!.schoolYear,
+        };
+
+        return { role, finalPayload };
+      }),
+
+      switchMap(({ role, finalPayload }) => {
+        this.spinnerFacade.showSpinner();
+
+        return this.evaluationService.submitEvaluation(role!, finalPayload).pipe(
+          map((response) =>
+            EvaluationActions.submitEvaluationSuccess({ response })
+          ),
+
+          catchError((err) =>
+            of(
+              EvaluationActions.submitEvaluationFailure({
+                error: err?.error?.message || 'Submission failed',
+              })
+            )
+          )
+        );
+      })
+    )
+  );
+  submitSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(EvaluationActions.submitEvaluationSuccess),
+        tap(() => {
+          this.spinnerFacade.hideSpinner();
+          this.toastFacade.showToast('Evaluation submitted successfully', 'success');
+          this.router.navigate(['/dashboard']); // optional
+        })
+      ),
+    { dispatch: false }
+  );
+
+  submitFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(EvaluationActions.submitEvaluationFailure),
+        tap(({ error }) => {
+          this.spinnerFacade.hideSpinner();
+          this.toastFacade.showToast(error, 'error');
+        })
+      ),
+    { dispatch: false }
   );
 }

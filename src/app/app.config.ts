@@ -24,6 +24,7 @@ import { supervisorDataReducer } from './core/store/supervisor-data/supervisor-d
 import { SupervisorDataEffects } from './core/store/supervisor-data/supervisor-data.effects';
 import { metaReducers } from './core/store/meta-reducers/meta-reducers';
 import { reducers } from './core/store';
+import { EvaluationEffects } from './core/store/evaluation-data/evaluation.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -33,7 +34,7 @@ export const appConfig: ApplicationConfig = {
     provideStore(reducers, {
       metaReducers,
     }),
-    provideEffects([AuthEffects, ToastEffect, StudentDataEffects, SupervisorDataEffects]),
+    provideEffects([AuthEffects, ToastEffect, StudentDataEffects, SupervisorDataEffects, EvaluationEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],
 };
