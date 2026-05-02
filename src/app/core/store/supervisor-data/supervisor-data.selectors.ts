@@ -37,15 +37,10 @@ export const selectFacultyClassesDataByKey = (key: string) =>
         state => state.facultyClasses[key] || {}
     );
 export const selectFacultyClassesDataLoading = (key: string) =>
-    createSelector(
-        selectFacultyClassesDataState,
-        state => {
-            const facultyMap = state[key];
-            if (!facultyMap) return false;
-
-            return Object.values(facultyMap).some(f => f.loading);
-        }
-    );
+  createSelector(
+    selectFacultyClassesDataState,
+    state => Object.values(state[key] || {}).some(f => f.loading)
+  );
 export const selectEvaluationStatusState = createSelector(
     selectSupervisorDataState,
     state => state.evaluationStatus

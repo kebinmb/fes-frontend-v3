@@ -1,85 +1,57 @@
 import { createReducer, on } from '@ngrx/store';
-import * as SupervisorActions from './supervisor-data.actions';
-import { SupervisorDataState, supervisorDataInitialState } from './supervisor-data.state';
+import * as Actions from './supervisor-data.actions';
+import { supervisorDataInitialState } from './supervisor-data.state';
 
 export const supervisorDataReducer = createReducer(
     supervisorDataInitialState,
-    on(SupervisorActions.loadFaculties, (state, { key }) => ({
+
+    // FACULTIES
+    on(Actions.loadFaculties, (state, { key }) => ({
         ...state,
         faculties: {
             ...state.faculties,
-            [key]: {
-                data: [],
-                loading: true,
-                error: null
-            }
+            [key]: { data: [], loading: true, error: null }
         }
     })),
-    on(SupervisorActions.loadFacultiesSuccess, (state, { key, response }) => ({
+
+    on(Actions.loadFacultiesSuccess, (state, { key, response }) => ({
         ...state,
         faculties: {
             ...state.faculties,
-            [key]: {
-                data: response,
+            [key]: { data: response, loading: false, error: null }
+        }
+    })),
+
+    on(Actions.loadFacultiesFailure, (state, { key, error }) => ({
+        ...state,
+        faculties: {
+            ...state.faculties,
+            [key]: { data: [], loading: false, error }
+        }
+    })),
+
+    // CLASSES (BATCH)
+    on(Actions.loadAllFacultyClassesSuccess, (state, { key, results }) => {
+        const map = results.reduce((acc, r) => {
+            acc[r.facultyId] = {
+                classes: r.classes,
                 loading: false,
                 error: null
+            };
+            return acc;
+        }, {} as any);
+
+        return {
+            ...state,
+            facultyClasses: {
+                ...state.facultyClasses,
+                [key]: map
             }
-        }
-    })),
-    on(SupervisorActions.loadFacultiesFailure, (state, { key, error }) => ({
-        ...state,
-        faculties: {
-            ...state.faculties,
-            [key]: {
-                data: [],
-                loading: false,
-                error
-            }
-        }
-    })),
-    on(SupervisorActions.loadFacultyClasses, (state, { key, facultyId }) => ({
-        ...state,
-        facultyClasses: {
-            ...state.facultyClasses,
-            [key]: {
-                ...state.facultyClasses[key],
-                [facultyId]: {
-                    classes: state.facultyClasses[key]?.[facultyId]?.classes || [],
-                    loading: true,
-                    error: null
-                }
-            }
-        }
-    })),
-    on(SupervisorActions.loadFacultyClassesSuccess, (state, { key, data }) => ({
-        ...state,
-        facultyClasses: {
-            ...state.facultyClasses,
-            [key]: {
-                ...state.facultyClasses[key] || {},
-                [data.facultyId]: {
-                    classes: data.classes,
-                    loading: false,
-                    error: null
-                }
-            }
-        }
-    })),
-    on(SupervisorActions.loadFacultyClassesFailure, (state, { key, facultyId, error }) => ({
-        ...state,
-        facultyClasses: {
-            ...state.facultyClasses,
-            [key]: {
-                ...state.facultyClasses[key] || {},
-                [facultyId]: {
-                    classes: [],
-                    loading: false,
-                    error
-                }
-            }
-        }
-    })),
-    on(SupervisorActions.loadEvaluationStatus, (state, { key, context }) => {
+        };
+    }),
+
+    // EVALUATION
+    on(Actions.loadEvaluationStatus, (state, { key, context }) => {
         const existing = state.evaluationStatus[key] || {
             facultyId: context.facultyId,
             evaluatorId: context.evaluatorId,
@@ -107,79 +79,106 @@ export const supervisorDataReducer = createReducer(
         };
     }),
 
-    on(SupervisorActions.loadEvaluationStatusSuccess, (state, { key, classCode, evaluated }) => {
-        const existing = state.evaluationStatus[key];
-        if (!existing) return state;
+    on(Actions.loadEvaluationStatusSuccess, (state, { key, classCode, evaluated }) => ({
+        ...state,
+        evaluationStatus: {
+            ...state.evaluationStatus,
+            [key]: {
+                ...state.evaluationStatus[key],
+                classes: {
+                    ...state.evaluationStatus[key].classes,
+                    [classCode]: { evaluated, loading: false, error: null }
+                }
+            }
+        }
+    })),
 
-        return {
-            ...state,
-            evaluationStatus: {
-                ...state.evaluationStatus,
-                [key]: {
-                    ...existing,
-                    classes: {
-                        ...existing.classes,
-                        [classCode]: {
-                            evaluated,
-                            loading: false,
-                            error: null
-                        }
+    on(Actions.loadEvaluationStatusFailure, (state, { key, classCode, error }) => ({
+        ...state,
+        evaluationStatus: {
+            ...state.evaluationStatus,
+            [key]: {
+                ...state.evaluationStatus[key],
+                classes: {
+                    ...state.evaluationStatus[key].classes,
+                    [classCode]: { evaluated: null, loading: false, error }
+                }
+            }
+        }
+    })),
+
+    on(Actions.updateEvaluatedClass, (state, { key, classCode }) => ({
+        ...state,
+        evaluationStatus: {
+            ...state.evaluationStatus,
+            [key]: {
+                ...state.evaluationStatus[key],
+                classes: {
+                    ...state.evaluationStatus[key].classes,
+                    [classCode]: {
+                        ...state.evaluationStatus[key].classes[classCode],
+                        evaluated: true
                     }
                 }
             }
-        };
-    }),
+        }
+    })),
 
-    on(SupervisorActions.loadEvaluationStatusFailure, (state, { key, classCode, error }) => {
-        const existing = state.evaluationStatus[key];
-        if (!existing) return state;
-
-        return {
-            ...state,
-            evaluationStatus: {
-                ...state.evaluationStatus,
-                [key]: {
-                    ...existing,
-                    classes: {
-                        ...existing.classes,
-                        [classCode]: {
-                            evaluated: null,
-                            loading: false,
-                            error
-                        }
-                    }
-                }
-            }
-        };
-    }),
-    on(SupervisorActions.updateEvaluatedClass, (state, { key, classCode }) => {
-        const existing = state.evaluationStatus[key];
-        if (!existing) return state;
-
-        const classEntry = existing.classes[classCode];
-        if (!classEntry) return state;
-
-        return {
-            ...state,
-            evaluationStatus: {
-                ...state.evaluationStatus,
-                [key]: {
-                    ...existing,
-                    classes: {
-                        ...existing.classes,
-                        [classCode]: {
-                            ...classEntry,
-                            evaluated: true,
-                            loading: false,
-                            error: null
-                        }
-                    }
-                }
-            }
-        };
-    }),
-    on(SupervisorActions.selectFacultyClassForEvaluation, (state, { selectedClass }) => ({
+    on(Actions.selectFacultyClassForEvaluation, (state, { selectedClass }) => ({
         ...state,
         selectedClass
-    }))
+    })),
+    // 🔥 ADD THIS (batch success)
+    on(Actions.loadEvaluationStatusBatchSuccess, (state, { key, results }) => {
+        const existing = state.evaluationStatus[key] || {
+            facultyId: '',
+            evaluatorId: '',
+            semester: '',
+            schoolYear: 0,
+            classes: {}
+        };
+
+        const updatedClasses = results.reduce((acc, r) => {
+            acc[r.classCode] = {
+                evaluated: r.evaluated,
+                loading: false,
+                error: null
+            };
+            return acc;
+        }, { ...existing.classes });
+
+        return {
+            ...state,
+            evaluationStatus: {
+                ...state.evaluationStatus,
+                [key]: {
+                    ...existing,
+                    classes: updatedClasses
+                }
+            }
+        };
+    }),
+    on(Actions.loadEvaluationStatusSuccess, (state, { key, classCode, evaluated }) => {
+        const existing = state.evaluationStatus[key] || {
+            facultyId: '',
+            evaluatorId: '',
+            semester: '',
+            schoolYear: 0,
+            classes: {}
+        };
+        return {
+            ...state,
+            evaluationStatus: {
+                ...state.evaluationStatus,
+                [key]: {
+                    ...existing,
+                    classes: {
+                        ...existing.classes,
+                        [classCode]: { evaluated, loading: false, error: null }
+                    }
+                }
+            }
+        };
+    }),
 );
+

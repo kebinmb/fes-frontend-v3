@@ -79,11 +79,9 @@ export class SupervisorDashboardComponent {
   }
   getButtonLabel(cls: ClassVM): string {
     if (cls.isEvaluated) return 'Done';
-
     const parts = [cls.subjectCode, cls.programCode, cls.yearLevel, cls.sectionCode].filter(
       Boolean,
     );
-
     return `${parts.join(' ')} - Evaluate`;
   }
   logout() {

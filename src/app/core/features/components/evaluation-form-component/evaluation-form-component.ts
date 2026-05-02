@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject } from '@angular/core';
 import { StudentDataFacade } from '../../../store/student-data/student-data.facade';
-import { AsyncPipe, CommonModule, JsonPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { combineLatest, filter, map, take } from 'rxjs';
 import { AuthFacade } from '../../../store/auth/auth.facade';
@@ -13,7 +13,9 @@ import {
   EvaluationCriteria,
   SubjectEvaluationDTO,
 } from '../../../services/evaluation/evaluation-service';
+
 export type UserRole = 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN';
+
 @Component({
   selector: 'app-evaluation-form-component',
   imports: [CommonModule, ReactiveFormsModule],
@@ -22,42 +24,44 @@ export type UserRole = 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN';
 })
 export class EvaluationFormComponent {
   private studentDataFacade = inject(StudentDataFacade);
-  private router = inject(Router);
-  private authFacade = inject(AuthFacade);
   private supervisorDataFacade = inject(SupervisorDataFacade);
   private evaluationDataFacade = inject(EvaluationDataFacade);
+  private authFacade = inject(AuthFacade);
+  private router = inject(Router);
   private fb = inject(FormBuilder);
-  selectedStudentClass$ = this.studentDataFacade.selectedClass$;
-  selectedFacultyClass$ = this.supervisorDataFacade.selectedClass$;
-  studentLoads$ = this.studentDataFacade.studentLoads$;
+
+  /* ================= STATE ================= */
+
   role$ = this.authFacade.role$;
+  evaluatorId$ = this.authFacade.evaluatorId$;
+
   selectedClass$ = combineLatest([
-    this.authFacade.role$,
+    this.role$,
     this.studentDataFacade.selectedClass$,
-    this.supervisorDataFacade.selectedClassForEvaluation$,
+    this.supervisorDataFacade.selectedClass$,
   ]).pipe(
-    map(([role, studentClass, supervisorClass]) => {
-      if (role === 'ROLE_STUDENT') return studentClass;
-      if (role === 'ROLE_DEAN') return supervisorClass;
-      return null;
-    }),
+    map(([role, studentClass, supervisorClass]) =>
+      role === 'ROLE_DEAN' ? supervisorClass : studentClass
+    )
   );
-  selectedClass = toSignal(this.selectedClass$, {
-    initialValue: null,
-  });
-  template = toSignal(this.evaluationDataFacade.template$, {
-    initialValue: null,
-  });
+
+  selectedClass = toSignal(this.selectedClass$, { initialValue: null });
+
+  template = toSignal(this.evaluationDataFacade.template$, { initialValue: null });
   isLoading = toSignal(this.evaluationDataFacade.isLoading$);
   hasAlreadyEvaluated = toSignal(this.evaluationDataFacade.hasEvaluated$);
   isSubmitting = toSignal(this.evaluationDataFacade.submitting$);
-  role = toSignal(this.authFacade.role$);
-  evaluatorId = toSignal(this.authFacade.evaluatorId$);
+
+  role = toSignal(this.role$);
+  evaluatorId = toSignal(this.evaluatorId$);
   accessCode = toSignal(this.authFacade.accessCode$);
+
+  /* ================= COMPUTED ================= */
+
   facultyId = computed(() => this.selectedClass()?.facultyId || '');
   facultyName = computed(() => this.selectedClass()?.facultyName ?? '');
   classCode = computed(() => this.selectedClass()?.classCode ?? '');
-  subjectCode = computed(() => this.selectedClass()?.classCode ?? '');
+  subjectCode = computed(() => this.selectedClass()?.subjectCode ?? '');
   yearLevel = computed(() => this.selectedClass()?.yearLevel ?? '');
   subjectTitle = computed(() => this.selectedClass()?.subjectDescription ?? '');
   semester = computed(() => this.selectedClass()?.semester ?? '');
@@ -66,6 +70,8 @@ export class EvaluationFormComponent {
 
   ratingOptions = computed(() => this.template()?.ratingOptions ?? []);
   categories = computed(() => this.template()?.categories ?? []);
+
+  /* ================= FORM ================= */
 
   evaluationForm: FormGroup = this.fb.group({});
 
@@ -79,57 +85,71 @@ export class EvaluationFormComponent {
 
   private buildForm(categories: EvaluationCategory[]) {
     const dynamicControls = categories.flatMap((cat) =>
-      cat.criteria.map((crit: EvaluationCriteria) => [crit.name, ['', Validators.required]]),
+      cat.criteria.map((crit: EvaluationCriteria) => [
+        crit.name,
+        ['', Validators.required],
+      ])
     );
+
     this.evaluationForm = this.fb.group({
       ...Object.fromEntries(dynamicControls),
       comments: ['', Validators.required],
     });
   }
+
+  /* ================= INIT ================= */
+
   ngOnInit() {
-    this.evaluationDataFacade.initialize(); 
+    this.evaluationDataFacade.initialize();
+
     combineLatest([
-      this.authFacade.role$,
-      this.authFacade.evaluatorId$,
-      this.studentDataFacade.selectedClass$,
-      this.supervisorDataFacade.selectedClassForEvaluation$,
+      this.role$,
+      this.evaluatorId$,
+      this.selectedClass$,
       this.studentDataFacade.studentLoads$,
     ])
       .pipe(
         filter(([role, evaluatorId]) => !!role && !!evaluatorId),
-        take(1),
+        take(1)
       )
-      .subscribe(([role, evaluatorId, studentClass, supervisorClass, loads]) => {
-        if (role === 'ROLE_STUDENT') {
-          if (!studentClass) {
-            this.router.navigate(['/dashboard']);
-            return;
-          }
-          if (!loads || loads.length === 0) {
-            this.studentDataFacade.loadStudentLoads(evaluatorId!, 0, 10, 'desc');
-          }
-        } else if (role === 'ROLE_DEAN') {
-          if (!supervisorClass) {
-            this.router.navigate(['/dashboard']);
-            return;
-          }
-          this.supervisorDataFacade.selectClass(supervisorClass);
+      .subscribe(([role, evaluatorId, selectedClass, loads]) => {
+
+        if (!selectedClass) {
+          this.router.navigate(['/dashboard']);
+          return;
         }
+
+        if (role === 'ROLE_STUDENT') {
+          if (!loads || loads.length === 0) {
+            this.studentDataFacade.loadStudentLoads(
+              evaluatorId!,
+              0,
+              10,
+              'desc'
+            );
+          }
+        }
+
+        // ✅ NO redundant supervisor select
       });
   }
+
+  /* ================= SUBMIT ================= */
+
   onSubmit() {
     if (this.evaluationForm.invalid || this.hasAlreadyEvaluated()) {
       this.markFormGroupTouched();
       return;
     }
+
     const dto = this.mapFormToDTO(this.evaluationForm.value);
     this.evaluationDataFacade.submit(dto);
   }
+
   private mapFormToDTO(formValue: any): SubjectEvaluationDTO {
     const ratings: Record<string, string> = {};
-    console.log('Access Code', this.accessCode());
+
     this.categories()?.forEach((category) => {
-      console.log('Trigger Map');
       category.criteria.forEach((crit) => {
         ratings[crit.name] = formValue[crit.name];
       });
@@ -147,25 +167,28 @@ export class EvaluationFormComponent {
       commentsOrFeedbacks: formValue.comments || undefined,
     };
   }
+
+  /* ================= UI ================= */
+
   cancel() {
-    console.log('Cancel CLicked redirecting to student dashboard...');
     if (confirm('Are you sure you want to cancel? Your progress will be lost.')) {
       const role = this.role();
 
       if (role === 'ROLE_DEAN') {
         this.router.navigate(['/supervisor-dashboard']);
       } else if (role === 'ROLE_STUDENT') {
-        console.log('Cancel CLicked redirecting to student dashboard...');
         this.router.navigate(['/student-dashboard']);
       } else {
         this.router.navigate(['/login']);
       }
     }
   }
+
   isFieldInvalid(fieldName: string): boolean {
     const field = this.evaluationForm.get(fieldName);
     return !!(field && field.invalid && field.touched);
   }
+
   private markFormGroupTouched() {
     Object.values(this.evaluationForm.controls).forEach((control) => {
       control.markAsTouched();

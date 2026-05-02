@@ -1,116 +1,94 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
+import * as ActionsSet from './supervisor-data.actions';
 import { SupervisorDataService } from '../../services/supervisor-data/supervisor-data-service';
-import { ToastFacade } from '../toast/toast.facade';
-import { SpinnerFacade } from '../spinner/spinner.facade';
+import { EvaluationService } from '../../services/evaluation/evaluation-service';
 import { Store } from '@ngrx/store';
-import * as SupervisorDataActions from './supervisor-data.actions';
+import { Router } from '@angular/router';
+import { SpinnerFacade } from '../spinner/spinner.facade';
+import { ToastFacade } from '../toast/toast.facade';
 import {
   catchError,
   filter,
+  forkJoin,
   map,
   of,
   switchMap,
-  tap,
   withLatestFrom,
   finalize,
-  mergeMap,
+  tap
 } from 'rxjs';
-import { EvaluationService } from '../../services/evaluation/evaluation-service';
-import { Router } from '@angular/router';
-
+import * as SupervisorDataActions from './supervisor-data.actions';
 @Injectable({ providedIn: 'root' })
 export class SupervisorDataEffects {
   private actions$ = inject(Actions);
-  private supervisorDataService = inject(SupervisorDataService);
-  private toastFacade = inject(ToastFacade);
-  private spinnerFacade = inject(SpinnerFacade);
-  private store = inject(Store);
+  private api = inject(SupervisorDataService);
   private evaluationDataService = inject(EvaluationService);
+  private store = inject(Store);
   private router = inject(Router);
+  private spinner = inject(SpinnerFacade);
+  private toast = inject(ToastFacade);
+
+  // FACULTIES
   loadFaculties$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(SupervisorDataActions.loadFaculties),
-      withLatestFrom(this.store.select((state) => state.supervisorData.faculties)),
-      filter(([{ key }, faculties]) => {
-        const cached = faculties[key];
-        return !cached || cached.data.length === 0;
-      }),
+      ofType(ActionsSet.loadFaculties),
+      withLatestFrom(this.store.select(s => s.supervisorData.faculties)),
+      filter(([{ key }, state]) => !state[key] || state[key].data.length === 0),
       switchMap(([{ key, college, status }]) => {
-        this.spinnerFacade.showSpinner();
-        return this.supervisorDataService.getFaculties(college, status).pipe(
-          tap((response) => console.log('Faculties:', response)),
-          map((response) => SupervisorDataActions.loadFacultiesSuccess({ key, response })),
-          tap(() => this.spinnerFacade.hideSpinner()),
-          catchError((error) => {
-            this.toastFacade.showToast('Failed to load faculties', 'error');
-            return of(SupervisorDataActions.loadFacultiesFailure({ key, error }));
+        this.spinner.showSpinner();
+
+        return this.api.getFaculties(college, status).pipe(
+          switchMap(res => [
+            ActionsSet.loadFacultiesSuccess({ key, response: res }),
+            ActionsSet.loadAllFacultyClasses({ key, faculties: res })
+          ]),
+          catchError(err => {
+            this.toast.showToast('Failed to load faculties', 'error');
+            return of(ActionsSet.loadFacultiesFailure({ key, error: err }));
           }),
-
-          finalize(() => this.spinnerFacade.hideSpinner()),
+          finalize(() => this.spinner.hideSpinner())
         );
-      }),
-    ),
+      })
+    )
   );
-  loadFacultyClasses$ = createEffect(() =>
+
+  // CLASSES (BATCH)
+  loadAllFacultyClasses$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(SupervisorDataActions.loadFacultyClasses),
+      ofType(ActionsSet.loadAllFacultyClasses),
+      switchMap(({ key, faculties }) => {
+        this.spinner.showSpinner();
 
-      tap(() => console.log('faculty classes triggered')),
-
-      withLatestFrom(this.store.select((state) => state.supervisorData.facultyClasses)),
-      tap(([action, state]) => {
-        console.log('ACTION:', action);
-        console.log('CACHED STATE:', state[action.key]);
-      }),
-      filter(([{ key, facultyId }, state]) => {
-        const cached = state[key]?.[facultyId];
-
-        return !cached || !cached.classes || cached.classes.length === 0;
-      }),
-
-      mergeMap(([{ key, facultyId }]) => {
-        this.spinnerFacade.showSpinner();
-
-        return this.supervisorDataService.loadFacultyClasses(facultyId).pipe(
-          map((classes) =>
-            SupervisorDataActions.loadFacultyClassesSuccess({
-              key,
-              data: { facultyId, classes },
-            }),
+        return forkJoin(
+          faculties.map(f =>
+            this.api.loadFacultyClasses(f.facultyId).pipe(
+              map(classes => ({ facultyId: f.facultyId, classes })),
+              catchError(() => of({ facultyId: f.facultyId, classes: [] }))
+            )
+          )
+        ).pipe(
+          map(results => ActionsSet.loadAllFacultyClassesSuccess({ key, results })),
+          catchError(err =>
+            of(ActionsSet.loadAllFacultyClassesFailure({ key, error: err }))
           ),
-          catchError((error) =>
-            of(
-              SupervisorDataActions.loadFacultyClassesFailure({
-                key,
-                facultyId,
-                error: error.message || 'Failed to load classes',
-              }),
-            ),
-          ),
-          finalize(() => this.spinnerFacade.hideSpinner()),
+          finalize(() => this.spinner.hideSpinner())
         );
-      }),
-    ),
+      })
+    )
   );
-  loadFacultyClassesAfterFaculties$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(SupervisorDataActions.loadFacultiesSuccess),
-      mergeMap(({ key, response }) =>
-        response.map((faculty) =>
-          SupervisorDataActions.loadFacultyClasses({
-            key,
-            facultyId: faculty.facultyId,
-          }),
-        ),
-      ),
-    ),
-  );
+
+  // EVALUATION
   loadEvaluationStatus$ = createEffect(() =>
     this.actions$.pipe(
       ofType(SupervisorDataActions.loadEvaluationStatus),
 
-      withLatestFrom(this.store.select((state) => state.supervisorData.evaluationStatus)),
+      // ✅ prevent null role
+      filter(({ role }) => !!role),
+
+      withLatestFrom(
+        this.store.select((state) => state.supervisorData.evaluationStatus)
+      ),
 
       filter(([{ key, context }, state]) => {
         const cached = state[key]?.classes?.[context.classCode];
@@ -120,12 +98,12 @@ export class SupervisorDataEffects {
       switchMap(([{ key, context, role }]) =>
         this.evaluationDataService
           .checkEvaluationStatus(
-            role!,
+            role!, // now SAFE
             context.facultyId,
             context.evaluatorId,
             context.classCode,
             context.semester,
-            context.schoolYear,
+            context.schoolYear
           )
           .pipe(
             map((res) =>
@@ -133,55 +111,115 @@ export class SupervisorDataEffects {
                 key,
                 classCode: context.classCode,
                 evaluated: res.hasEvaluated,
-              }),
+              })
             ),
             catchError((err) =>
               of(
                 SupervisorDataActions.loadEvaluationStatusFailure({
                   key,
                   classCode: context.classCode,
-                  error: err.message,
-                }),
-              ),
-            ),
-          ),
-      ),
-    ),
+                  error: err.message || 'Evaluation status failed',
+                })
+              )
+            )
+          )
+      )
+    )
   );
 
-  selectClassForEvaluation$ = createEffect(
+  // NAVIGATION
+  selectClass$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(SupervisorDataActions.selectFacultyClassForEvaluation),
-
-        // ✅ filter null early
-        filter(({ selectedClass }) => !!selectedClass),
-
-        withLatestFrom(this.store.select((state) => state.auth)),
-
+        ofType(ActionsSet.selectFacultyClassForEvaluation),
+        filter(a => !!a.selectedClass),
+        withLatestFrom(this.store.select(s => s.auth)),
         tap(([{ selectedClass }, auth]) => {
-          console.log('Selected supervisor class:', selectedClass);
-
-          this.store.dispatch(
-            SupervisorDataActions.loadEvaluationStatus({
-              key: `${auth.college}-ACTIVE`,
-              role: auth.role,
-              context: {
-                facultyId: selectedClass!.facultyId,
-                evaluatorId: auth.evaluatorId,
-                classCode: selectedClass!.classCode,
-                semester: selectedClass!.semester,
-                schoolYear: selectedClass!.schoolYear,
-                subjectCode:selectedClass!.subjectCode,
-                college:selectedClass!.college,
-                yearLevel:selectedClass!.yearLevel
-              },
-            }),
-          );
+          this.store.dispatch(ActionsSet.loadEvaluationStatus({
+            key: `${auth.college}-ACTIVE`,
+            role: auth.role,
+            context: {
+              facultyId: selectedClass!.facultyId,
+              evaluatorId: auth.evaluatorId,
+              classCode: selectedClass!.classCode,
+              semester: selectedClass!.semester,
+              schoolYear: selectedClass!.schoolYear,
+              subjectCode: selectedClass!.subjectCode,
+              college: selectedClass!.college,
+              yearLevel: selectedClass!.yearLevel
+            }
+          }));
 
           this.router.navigate(['/evaluation-form']);
-        }),
+        })
       ),
-    { dispatch: false },
+    { dispatch: false }
+  );
+
+  loadEvaluationStatusBatchTrigger$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ActionsSet.loadAllFacultyClassesSuccess),
+      withLatestFrom(this.store.select(s => s.auth)),
+      filter(([_, auth]) => !!auth.role && !!auth.evaluatorId),
+
+      map(([{ key, results }, auth]) => {
+        const payload = results.flatMap(r =>
+          r.classes.map(cls => ({
+            facultyId: r.facultyId,
+            classCode: cls.classCode,
+            semester: cls.semester,
+            schoolYear: cls.schoolYear
+          }))
+        );
+
+        return ActionsSet.loadEvaluationStatusBatch({
+          key,
+          role: auth.role!,
+          evaluatorId: auth.evaluatorId!,
+          payload
+        });
+      })
+    )
+  );
+
+  loadEvaluationStatusBatch$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ActionsSet.loadEvaluationStatusBatch),
+
+      switchMap(({ key, role, evaluatorId, payload }) =>
+        forkJoin(
+          payload.map(item =>
+            this.evaluationDataService
+              .checkEvaluationStatus(
+                role,
+                item.facultyId,
+                evaluatorId,
+                item.classCode,
+                item.semester,
+                item.schoolYear
+              )
+              .pipe(
+                map(res => ({
+                  classCode: item.classCode,
+                  evaluated: res.hasEvaluated
+                })),
+                catchError(() =>
+                  of({
+                    classCode: item.classCode,
+                    evaluated: false
+                  })
+                )
+              )
+          )
+        ).pipe(
+          map(results =>
+            ActionsSet.loadEvaluationStatusBatchSuccess({ key, results })
+          ),
+          catchError(err =>
+            of(ActionsSet.loadEvaluationStatusBatchFailure({ key, error: err }))
+          )
+        )
+      )
+    )
   );
 }
