@@ -55,7 +55,7 @@ export class EvaluationFormComponent {
   role = toSignal(this.role$);
   evaluatorId = toSignal(this.evaluatorId$);
   accessCode = toSignal(this.authFacade.accessCode$);
-
+  
   /* ================= COMPUTED ================= */
 
   facultyId = computed(() => this.selectedClass()?.facultyId || '');
@@ -141,7 +141,7 @@ export class EvaluationFormComponent {
       this.markFormGroupTouched();
       return;
     }
-
+    console.log("Access Code", this.accessCode());
     const dto = this.mapFormToDTO(this.evaluationForm.value);
     this.evaluationDataFacade.submit(dto);
   }
