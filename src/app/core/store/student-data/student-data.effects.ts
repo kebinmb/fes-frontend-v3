@@ -18,7 +18,7 @@ import {
   tap,
   withLatestFrom,
 } from 'rxjs';
-import { selectStudentDataCache } from './student-data.selectors';
+import { selectEvaluationMap, selectStudentDataCache } from './student-data.selectors';
 import { createStudentLoadsKey } from './student-data.reducer';
 import { extractErrorMessage } from '../../../utilities/extract-error.util';
 import { SpinnerFacade } from '../spinner/spinner.facade';
@@ -39,29 +39,59 @@ export class StudentDataEffects {
   loadStudentLoads$ = createEffect(() =>
     this.actions$.pipe(
       ofType(StudentDataActions.loadStudentLoads),
+      withLatestFrom(
+        this.store.select(selectStudentDataCache),
+        this.store.select(selectEvaluationMap),
+        this.store.select(selectRole)
+      ),
 
-      // ✅ ADD ROLE CHECK
-      withLatestFrom(this.store.select(selectStudentDataCache), this.store.select(selectRole)),
+      filter(([action, cache, evaluationMap, role]) => {
+        if (role !== 'ROLE_STUDENT') return false;
 
-      filter(([action, cache, role]) => {
-        if (role !== 'ROLE_STUDENT') return false; // 🔥 KEY FIX
+        const key = createStudentLoadsKey(
+          action.studentId,
+          action.page,
+          action.size,
+          action.sort
+        );
 
-        const key = createStudentLoadsKey(action.studentId, action.page, action.size, action.sort);
+        const hasCache = !!cache[key];
+        const hasEvaluation = Object.keys(evaluationMap).length > 0;
 
-        return !cache[key];
+        // 🔥 KEY FIX
+        return !hasCache || !hasEvaluation;
       }),
 
       tap(() => this.spinnerFacade.showSpinner()),
 
-      exhaustMap(([action]) => {
-        const key = createStudentLoadsKey(action.studentId, action.page, action.size, action.sort);
+      exhaustMap(([action, cache]) => {
+        const key = createStudentLoadsKey(
+          action.studentId,
+          action.page,
+          action.size,
+          action.sort
+        );
 
+        const cached = cache[key];
+
+        // ✅ If cached → reuse but still trigger evaluation if missing
+        if (cached) {
+          this.spinnerFacade.hideSpinner();
+
+          return of(
+            StudentDataActions.loadEvaluationStatus({
+              classes: cached.content,
+              studentId: action.studentId,
+            })
+          );
+        }
+
+        // ✅ Otherwise fetch normally
         return this.studentDataService
           .getStudentLoads(action.studentId, action.page, action.size, action.sort)
           .pipe(
             switchMap((response) => {
               this.spinnerFacade.hideSpinner();
-              this.toastFacade.showToast('Classes Loaded.', 'success');
 
               const classes = response.content;
 
@@ -71,30 +101,24 @@ export class StudentDataEffects {
                   response,
                 }),
 
-                // ✅ This will now ONLY fire for students
                 StudentDataActions.loadEvaluationStatus({
                   classes,
                   studentId: action.studentId,
                 }),
               ];
             }),
-
             catchError((error) => {
               this.spinnerFacade.hideSpinner();
-              this.toastFacade.showToast(
-                'Error in fetching class, please contact administrator.',
-                'error',
-              );
 
               return of(
                 StudentDataActions.loadStudentLoadsFailure({
                   error: extractErrorMessage(error),
-                }),
+                })
               );
-            }),
+            })
           );
-      }),
-    ),
+      })
+    )
   );
 
   loadEvaluationStatus$ = createEffect(() =>
@@ -106,11 +130,7 @@ export class StudentDataEffects {
       exhaustMap(([{ classes, studentId }, role]) => {
         if (!classes?.length) {
           this.spinnerFacade.hideSpinner();
-          return of(
-            StudentDataActions.loadEvaluationStatusSuccess({
-              evaluationMap: {},
-            }),
-          );
+          return of(); // 🔥 do NOTHING instead of overwriting
         }
         const buildKey = (cls: any) =>
           `${cls.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;

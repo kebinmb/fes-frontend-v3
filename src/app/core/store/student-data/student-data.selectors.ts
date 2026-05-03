@@ -37,3 +37,17 @@ export const selectStudentLoads = createSelector(
   (cache) =>
     Object.values(cache).flatMap((entry: any) => entry.content || [])
 );
+
+export const selectStudentLoadsWithEvaluation = createSelector(
+  selectStudentLoads,
+  selectEvaluationMap,
+  (loads, map) =>
+    loads.map((load) => {
+      const key = `${load.facultyId}-${load.classCode}-${load.semester}-${load.schoolYear}`;
+
+      return {
+        ...load,
+        isEvaluated: map[key] ?? null,
+      };
+    })
+);

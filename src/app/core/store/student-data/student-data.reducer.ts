@@ -5,9 +5,18 @@ import { initialStudentDataState } from './student-data.state';
 export const studentLoadReducer = createReducer(
   initialStudentDataState,
 
+  // =========================
+  // LOAD STUDENT LOADS
+  // =========================
   on(StudentDataActions.loadStudentLoads, (state, action) => {
-    const key = createStudentLoadsKey(action.studentId, action.page, action.size, action.sort);
+    const key = createStudentLoadsKey(
+      action.studentId,
+      action.page,
+      action.size,
+      action.sort
+    );
 
+    // ✅ Cache hit → DO NOT TOUCH evaluationMap
     if (state.cache[key]) {
       return {
         ...state,
@@ -24,6 +33,9 @@ export const studentLoadReducer = createReducer(
     };
   }),
 
+  // =========================
+  // LOAD SUCCESS
+  // =========================
   on(StudentDataActions.loadStudentLoadsSuccess, (state, { key, response }) => ({
     ...state,
     loading: false,
@@ -32,8 +44,12 @@ export const studentLoadReducer = createReducer(
       ...state.cache,
       [key]: response,
     },
+    // ❌ DO NOT manually reassign evaluationMap
   })),
 
+  // =========================
+  // LOAD FAILURE
+  // =========================
   on(StudentDataActions.loadStudentLoadsFailure, (state, { error }) => ({
     ...state,
     loading: false,
@@ -41,23 +57,43 @@ export const studentLoadReducer = createReducer(
     ready: false,
   })),
 
-  on(StudentDataActions.loadEvaluationStatusSuccess, (state, { evaluationMap }) => ({
-    ...state,
-    evaluationMap,
-  })),
+  // =========================
+  // EVALUATION SUCCESS
+  // =========================
+  on(StudentDataActions.loadEvaluationStatusSuccess, (state, { evaluationMap }) => {
+    // 🔥 Guard: prevent overwriting with empty map
+    if (!evaluationMap || Object.keys(evaluationMap).length === 0) {
+      return state;
+    }
 
+    return {
+      ...state,
+      evaluationMap,
+    };
+  }),
+
+  // =========================
+  // EVALUATION FAILURE
+  // =========================
   on(StudentDataActions.loadEvaluationStatusFailure, (state, { error }) => ({
     ...state,
     error,
   })),
 
+  // =========================
+  // SELECT CLASS
+  // =========================
   on(StudentDataActions.selectStudentClassForEvaluation, (state, { selectedClass }) => ({
     ...state,
-    selectedClass: selectedClass,
+    selectedClass,
   })),
 
+  // =========================
+  // UPDATE SINGLE CLASS
+  // =========================
   on(StudentDataActions.updateStudentEvaluatedClass, (state, payload) => {
     const key = `${payload.facultyId}-${payload.classCode}-${payload.semester}-${payload.schoolYear}`;
+
     return {
       ...state,
       evaluationMap: {
@@ -66,11 +102,6 @@ export const studentLoadReducer = createReducer(
       },
     };
   }),
-
-  on(StudentDataActions.resetEvaluationMap, (state) => ({
-    ...state,
-    evaluationMap: {},
-  })),
 );
 
 export const createStudentLoadsKey = (
