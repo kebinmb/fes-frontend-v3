@@ -35,3 +35,18 @@ export const selectStudentLoadsWithEvaluation = createSelector(
     });
   },
 );
+
+export const selectSelectedClassWithEvaluation = createSelector(
+  selectSelectedClass,
+  selectEvaluationMap,
+  (cls, map) => {
+    if (!cls) return null;
+
+    const key = `${cls.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
+
+    return {
+      ...cls,
+      isEvaluated: map[key] === true,
+    };
+  }
+);

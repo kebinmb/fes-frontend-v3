@@ -110,14 +110,14 @@
       <!-- DATA -->
       @else {
         <div class="row g-4">
-          @for (class of loads; track class.classCode; let i =$index) {
+          @for (cls of loads; track cls.classCode; let i = $index) {
             <div class="col-lg-6">
               <div class="class-card">
                 <!-- HEADER -->
                 <div class="class-card-header">
                   <div class="d-flex justify-content-between">
                     <div>
-                      <h5 class="class-subject">{{ class.subjectCode }}</h5>
+                      <h5 class="class-subject">{{ cls.subjectCode }}</h5>
 
                       <span class="badge bg-secondary-soft">
                         <!-- Section {{ class.sectionId }} -->
@@ -126,13 +126,11 @@
 
                     <div
                       class="status-badge"
-                      [ngClass]="class.isEvaluated ? 'status-completed' : 'status-pending'"
+                      [ngClass]="cls.isEvaluated ? 'status-completed' : 'status-pending'"
                     >
                       <i
                         class="bi"
-                        [ngClass]="
-                          class.isEvaluated ? 'bi-check-circle-fill' : 'bi-hourglass-split'
-                        "
+                        [ngClass]="cls.isEvaluated ? 'bi-check-circle-fill' : 'bi-hourglass-split'"
                       >
                       </i>
                     </div>
@@ -143,16 +141,16 @@
                 <div class="class-card-body">
                   <div class="info-item">
                     <i class="bi bi-person-badge"></i>
-                    <span>{{ class.facultyId }}</span>
+                    <span>{{ cls.facultyId }}</span>
                   </div>
 
                   <div class="info-item">
                     <i class="bi bi-calendar-event"></i>
-                    <span>{{ class.semester }} Semester</span>
+                    <span>{{ cls.semester }} Semester</span>
                   </div>
                   <div class="info-item">
                     <i class="bi bi-calendar"></i>
-                    <span>{{ class.schoolYear }} - {{ class.schoolYear + 1 }}</span>
+                    <span>{{ cls.schoolYear }} - {{ cls.schoolYear + 1 }}</span>
                   </div>
                 </div>
 
@@ -160,16 +158,16 @@
                 <div class="class-card-footer">
                   <button
                     class="btn btn-primary w-100"
-                    [disabled]="class.isEvaluated"
-                    (click)="onEvaluateClick(class, $event)"
+                    [disabled]="cls.isEvaluated"
+                    (click)="onEvaluateClick(cls, $event)"
                   >
                     <i
                       class="bi me-2"
-                      [ngClass]="class.isEvaluated ? 'bi-check-circle-fill' : 'bi-clipboard-check'"
+                      [ngClass]="cls.isEvaluated ? 'bi-check-circle-fill' : 'bi-clipboard-check'"
                     >
                     </i>
 
-                    {{ class.isEvaluated ? 'Done' : 'Evaluate' }}
+                    {{ cls.isEvaluated ? 'Done' : 'Evaluate' }}
                   </button>
                 </div>
               </div>
