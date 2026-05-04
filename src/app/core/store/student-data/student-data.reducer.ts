@@ -1,6 +1,21 @@
 import { createReducer, on } from '@ngrx/store';
-import * as StudentDataActions from './student-data.action';
+import * as Actions from './student-data.action';
 import { initialStudentDataState } from './student-data.state';
+
+export const createStudentLoadsKey = (
+  studentId: string,
+  page: number,
+  size: number,
+  sort: string,
+): string => `${studentId}-${page}-${size}-${sort}`;
+
+export const buildEvalKey = (payload: {
+  facultyId: string;
+  classCode: string;
+  semester: string;
+  schoolYear: number;
+}) =>
+  `${payload.facultyId}-${payload.classCode}-${payload.semester}-${payload.schoolYear}`;
 
 export const studentLoadReducer = createReducer(
   initialStudentDataState,
@@ -8,15 +23,13 @@ export const studentLoadReducer = createReducer(
   // =========================
   // LOAD STUDENT LOADS
   // =========================
-  on(StudentDataActions.loadStudentLoads, (state, action) => {
-    const key = createStudentLoadsKey(action.studentId, action.page, action.size, action.sort);
+  on(Actions.loadStudentLoads, (state, { studentId, page, size, sort }) => {
+    const key = createStudentLoadsKey(studentId, page, size, sort);
 
-    // ✅ Cache hit → DO NOT TOUCH evaluationMap
     if (state.cache[key]) {
       return {
         ...state,
-        ready: true,
-        loading: false,
+        loadsReady: true,
       };
     }
 
@@ -24,39 +37,36 @@ export const studentLoadReducer = createReducer(
       ...state,
       loading: true,
       error: null,
-      ready: false,
+      loadsReady: false,
+      evaluationReady: false, // 🔥 reset properly
     };
   }),
 
   // =========================
   // LOAD SUCCESS
   // =========================
-  on(StudentDataActions.loadStudentLoadsSuccess, (state, { key, response }) => ({
+  on(Actions.loadStudentLoadsSuccess, (state, { key, response }) => ({
     ...state,
     loading: false,
-    ready: true,
     cache: {
       ...state.cache,
       [key]: response,
     },
-    // ❌ DO NOT manually reassign evaluationMap
+    loadsReady: true,
   })),
 
   // =========================
-  // LOAD FAILURE
-  // =========================
-  on(StudentDataActions.loadStudentLoadsFailure, (state, { error }) => ({
+  on(Actions.loadStudentLoadsFailure, (state, { error }) => ({
     ...state,
     loading: false,
     error,
-    ready: false,
+    loadsReady: false,
   })),
 
   // =========================
   // EVALUATION SUCCESS
   // =========================
-  on(StudentDataActions.loadEvaluationStatusSuccess, (state, { evaluationMap }) => {
-    // 🔥 Guard: prevent overwriting with empty map
+  on(Actions.loadEvaluationStatusSuccess, (state, { evaluationMap }) => {
     if (!evaluationMap || Object.keys(evaluationMap).length === 0) {
       return state;
     }
@@ -67,30 +77,26 @@ export const studentLoadReducer = createReducer(
         ...state.evaluationMap,
         ...evaluationMap,
       },
+      evaluationReady: true, // 🔥 CRITICAL FIX
     };
   }),
 
   // =========================
-  // EVALUATION FAILURE
-  // =========================
-  on(StudentDataActions.loadEvaluationStatusFailure, (state, { error }) => ({
+  on(Actions.loadEvaluationStatusFailure, (state, { error }) => ({
     ...state,
     error,
+    evaluationReady: false,
   })),
 
   // =========================
-  // SELECT CLASS
-  // =========================
-  on(StudentDataActions.selectStudentClassForEvaluation, (state, { selectedClass }) => ({
+  on(Actions.selectStudentClassForEvaluation, (state, { selectedClass }) => ({
     ...state,
     selectedClass,
   })),
 
   // =========================
-  // UPDATE SINGLE CLASS
-  // =========================
-  on(StudentDataActions.updateStudentEvaluatedClass, (state, payload) => {
-    const key = `${payload.facultyId}-${payload.classCode}-${payload.semester}-${payload.schoolYear}`;
+  on(Actions.updateStudentEvaluatedClass, (state, payload) => {
+    const key = buildEvalKey(payload);
 
     return {
       ...state,
@@ -100,11 +106,10 @@ export const studentLoadReducer = createReducer(
       },
     };
   }),
-);
 
-export const createStudentLoadsKey = (
-  studentId: string,
-  page: number,
-  size: number,
-  sort: string,
-): string => `${studentId}-${page}-${size}-${sort}`;
+  on(Actions.resetEvaluationMap, (state) => ({
+    ...state,
+    evaluationMap: {},
+    evaluationReady: false,
+  }))
+);

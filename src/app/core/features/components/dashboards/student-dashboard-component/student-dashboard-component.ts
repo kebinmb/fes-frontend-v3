@@ -21,15 +21,11 @@ export class StudentDashboardComponent {
   studentLoads$ = this.studentDataFacade.studentLoads$;
   evaluatorId$ = this.authFacade.evaluatorId$;
   evaluatedCount$ = this.studentLoads$.pipe(
-    map((loads) =>
-      loads?.filter((load) => load.isEvaluated === true).length ?? 0
-    )
+    map((loads) => loads?.filter((load) => load.isEvaluated === true).length ?? 0),
   );
 
   unevaluatedCount$ = this.studentLoads$.pipe(
-    map((loads) =>
-      loads?.filter((load) => load.isEvaluated !== true).length ?? 0
-    )
+    map((loads) => loads?.filter((load) => load.isEvaluated === false).length ?? 0),
   );
   ngOnInit() {
     this.evaluatorId$
@@ -44,14 +40,10 @@ export class StudentDashboardComponent {
 
   startEvaluation(cls: EvaluationClass, event: Event) {
     event.stopPropagation();
-
     const selectedClass: EvaluationClass = {
       ...cls,
     };
-
     this.studentDataFacade.selectClassForEvaluation(selectedClass);
-
-    const key = `${cls.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
   }
   onEvaluateClick(cls: any, event: Event) {
     event.stopPropagation();
