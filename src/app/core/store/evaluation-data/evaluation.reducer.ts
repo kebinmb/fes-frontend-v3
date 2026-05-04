@@ -47,4 +47,5 @@ export const evaluationReducer = createReducer(
     submitting: false,
     error,
   })),
+  on(EvaluationActions.resetEvaluationState, () => initialEvaluationDataState),
 );

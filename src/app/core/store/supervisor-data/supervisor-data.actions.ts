@@ -107,3 +107,4 @@ export const loadEvaluationStatusBatchFailure = createAction(
   '[Evaluation] Load Evaluation Status Batch Failure',
   props<{ key: string; error: any }>()
 );
+export const resetSupervisorState = createAction('[Supervisor] Reset State');

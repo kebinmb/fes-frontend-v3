@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store';
-import * as Actions from './student-data.action';
+import * as StudentDataActions from './student-data.action';
 import { initialStudentDataState } from './student-data.state';
 
 export const createStudentLoadsKey = (
@@ -19,33 +19,23 @@ export const buildEvalKey = (payload: {
 
 export const studentLoadReducer = createReducer(
   initialStudentDataState,
-
-  // =========================
-  // LOAD STUDENT LOADS
-  // =========================
-  on(Actions.loadStudentLoads, (state, { studentId, page, size, sort }) => {
+  on(StudentDataActions.loadStudentLoads, (state, { studentId, page, size, sort }) => {
     const key = createStudentLoadsKey(studentId, page, size, sort);
-
     if (state.cache[key]) {
       return {
         ...state,
         loadsReady: true,
       };
     }
-
     return {
       ...state,
       loading: true,
       error: null,
       loadsReady: false,
-      evaluationReady: false, // 🔥 reset properly
+      evaluationReady: false,
     };
   }),
-
-  // =========================
-  // LOAD SUCCESS
-  // =========================
-  on(Actions.loadStudentLoadsSuccess, (state, { key, response }) => ({
+  on(StudentDataActions.loadStudentLoadsSuccess, (state, { key, response }) => ({
     ...state,
     loading: false,
     cache: {
@@ -54,50 +44,36 @@ export const studentLoadReducer = createReducer(
     },
     loadsReady: true,
   })),
-
-  // =========================
-  on(Actions.loadStudentLoadsFailure, (state, { error }) => ({
+  on(StudentDataActions.loadStudentLoadsFailure, (state, { error }) => ({
     ...state,
     loading: false,
     error,
     loadsReady: false,
   })),
-
-  // =========================
-  // EVALUATION SUCCESS
-  // =========================
-  on(Actions.loadEvaluationStatusSuccess, (state, { evaluationMap }) => {
+  on(StudentDataActions.loadEvaluationStatusSuccess, (state, { evaluationMap }) => {
     if (!evaluationMap || Object.keys(evaluationMap).length === 0) {
       return state;
     }
-
     return {
       ...state,
       evaluationMap: {
         ...state.evaluationMap,
         ...evaluationMap,
       },
-      evaluationReady: true, // 🔥 CRITICAL FIX
+      evaluationReady: true,
     };
   }),
-
-  // =========================
-  on(Actions.loadEvaluationStatusFailure, (state, { error }) => ({
+  on(StudentDataActions.loadEvaluationStatusFailure, (state, { error }) => ({
     ...state,
     error,
     evaluationReady: false,
   })),
-
-  // =========================
-  on(Actions.selectStudentClassForEvaluation, (state, { selectedClass }) => ({
+  on(StudentDataActions.selectStudentClassForEvaluation, (state, { selectedClass }) => ({
     ...state,
     selectedClass,
   })),
-
-  // =========================
-  on(Actions.updateStudentEvaluatedClass, (state, payload) => {
+  on(StudentDataActions.updateStudentEvaluatedClass, (state, payload) => {
     const key = buildEvalKey(payload);
-
     return {
       ...state,
       evaluationMap: {
@@ -106,10 +82,10 @@ export const studentLoadReducer = createReducer(
       },
     };
   }),
-
-  on(Actions.resetEvaluationMap, (state) => ({
+  on(StudentDataActions.resetEvaluationMap, (state) => ({
     ...state,
     evaluationMap: {},
     evaluationReady: false,
-  }))
+  })),
+  on(StudentDataActions.resetStudentState, () => initialStudentDataState),
 );

@@ -50,3 +50,5 @@ export const updateStudentEvaluatedClass = createAction(
 export const resetEvaluationMap = createAction(
   '[Student] Reset Evaluation Map'
 );
+
+export const resetStudentState = createAction('[Student] Reset State');

@@ -39,5 +39,5 @@ export const submitEvaluationFailure = createAction(
 export const initializeEvaluation = createAction(
     '[Evaluation] Initialize Evaluation Data'
 );
-
+export const resetEvaluationState = createAction('[Evaluation] Reset State');
 

@@ -1,37 +1,31 @@
 import { createReducer, on } from '@ngrx/store';
-import * as Actions from './supervisor-data.actions';
+import * as SupervisorDataActions from './supervisor-data.actions';
 import { supervisorDataInitialState } from './supervisor-data.state';
 
 export const supervisorDataReducer = createReducer(
     supervisorDataInitialState,
-
-    // FACULTIES
-    on(Actions.loadFaculties, (state, { key }) => ({
+    on(SupervisorDataActions.loadFaculties, (state, { key }) => ({
         ...state,
         faculties: {
             ...state.faculties,
             [key]: { data: [], loading: true, error: null }
         }
     })),
-
-    on(Actions.loadFacultiesSuccess, (state, { key, response }) => ({
+    on(SupervisorDataActions.loadFacultiesSuccess, (state, { key, response }) => ({
         ...state,
         faculties: {
             ...state.faculties,
             [key]: { data: response, loading: false, error: null }
         }
     })),
-
-    on(Actions.loadFacultiesFailure, (state, { key, error }) => ({
+    on(SupervisorDataActions.loadFacultiesFailure, (state, { key, error }) => ({
         ...state,
         faculties: {
             ...state.faculties,
             [key]: { data: [], loading: false, error }
         }
     })),
-
-    // CLASSES (BATCH)
-    on(Actions.loadAllFacultyClassesSuccess, (state, { key, results }) => {
+    on(SupervisorDataActions.loadAllFacultyClassesSuccess, (state, { key, results }) => {
         const map = results.reduce((acc, r) => {
             acc[r.facultyId] = {
                 classes: r.classes,
@@ -49,9 +43,7 @@ export const supervisorDataReducer = createReducer(
             }
         };
     }),
-
-    // EVALUATION
-    on(Actions.loadEvaluationStatus, (state, { key, context }) => {
+    on(SupervisorDataActions.loadEvaluationStatus, (state, { key, context }) => {
         const existing = state.evaluationStatus[key] || {
             facultyId: context.facultyId,
             evaluatorId: context.evaluatorId,
@@ -78,8 +70,7 @@ export const supervisorDataReducer = createReducer(
             }
         };
     }),
-
-    on(Actions.loadEvaluationStatusSuccess, (state, { key, classCode, evaluated }) => ({
+    on(SupervisorDataActions.loadEvaluationStatusSuccess, (state, { key, classCode, evaluated }) => ({
         ...state,
         evaluationStatus: {
             ...state.evaluationStatus,
@@ -92,8 +83,7 @@ export const supervisorDataReducer = createReducer(
             }
         }
     })),
-
-    on(Actions.loadEvaluationStatusFailure, (state, { key, classCode, error }) => ({
+    on(SupervisorDataActions.loadEvaluationStatusFailure, (state, { key, classCode, error }) => ({
         ...state,
         evaluationStatus: {
             ...state.evaluationStatus,
@@ -106,8 +96,7 @@ export const supervisorDataReducer = createReducer(
             }
         }
     })),
-
-    on(Actions.updateEvaluatedClass, (state, { key, classCode }) => ({
+    on(SupervisorDataActions.updateEvaluatedClass, (state, { key, classCode }) => ({
         ...state,
         evaluationStatus: {
             ...state.evaluationStatus,
@@ -123,13 +112,11 @@ export const supervisorDataReducer = createReducer(
             }
         }
     })),
-
-    on(Actions.selectFacultyClassForEvaluation, (state, { selectedClass }) => ({
+    on(SupervisorDataActions.selectFacultyClassForEvaluation, (state, { selectedClass }) => ({
         ...state,
         selectedClass
     })),
-    // 🔥 ADD THIS (batch success)
-    on(Actions.loadEvaluationStatusBatchSuccess, (state, { key, results }) => {
+    on(SupervisorDataActions.loadEvaluationStatusBatchSuccess, (state, { key, results }) => {
         const existing = state.evaluationStatus[key] || {
             facultyId: '',
             evaluatorId: '',
@@ -137,7 +124,6 @@ export const supervisorDataReducer = createReducer(
             schoolYear: 0,
             classes: {}
         };
-
         const updatedClasses = results.reduce((acc, r) => {
             acc[r.classCode] = {
                 evaluated: r.evaluated,
@@ -158,7 +144,7 @@ export const supervisorDataReducer = createReducer(
             }
         };
     }),
-    on(Actions.loadEvaluationStatusSuccess, (state, { key, classCode, evaluated }) => {
+    on(SupervisorDataActions.loadEvaluationStatusSuccess, (state, { key, classCode, evaluated }) => {
         const existing = state.evaluationStatus[key] || {
             facultyId: '',
             evaluatorId: '',
@@ -180,5 +166,6 @@ export const supervisorDataReducer = createReducer(
             }
         };
     }),
+    on(SupervisorDataActions.resetSupervisorState, () => supervisorDataInitialState),
 );
 
