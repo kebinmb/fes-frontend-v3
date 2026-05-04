@@ -13,6 +13,7 @@ import { selectRole } from '../auth/auth.selector';
 import * as StudentDataSelectors from './../../store/student-data/student-data.selectors';
 import * as SupervisorDataSelectors from './../../store/supervisor-data/supervisor-data.selectors';
 import { selectEvaluationDataContext } from './evaluation.selector';
+import { updateStudentEvaluatedClass } from '../student-data/student-data.action';
 @Injectable()
 export class EvaluationEffects {
   private actions$ = inject(Actions);
@@ -111,18 +112,37 @@ export class EvaluationEffects {
       })
     )
   );
-  submitSuccess$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(EvaluationActions.submitEvaluationSuccess),
-        tap(() => {
-          this.spinnerFacade.hideSpinner();
-          this.toastFacade.showToast('Evaluation submitted successfully', 'success');
-          this.router.navigate(['/dashboard']); // optional
-        })
-      ),
-    { dispatch: false }
-  );
+  submitSuccess$ = createEffect(() =>
+  this.actions$.pipe(
+    ofType(EvaluationActions.submitEvaluationSuccess),
+
+    withLatestFrom(
+      this.store.select(selectRole),
+      this.store.select(selectEvaluationDataContext)
+    ),
+
+    tap(() => {
+      this.spinnerFacade.hideSpinner();
+      this.toastFacade.showToast('Evaluation submitted successfully', 'success');
+      this.router.navigate(['/dashboard']);
+    }),
+
+    map(([_, role, context]) => {
+      // Only update student dashboard map
+      if (role === 'ROLE_STUDENT' && context) {
+        return updateStudentEvaluatedClass({
+          facultyId: context.facultyId,
+          classCode: context.classCode,
+          semester: context.semester,
+          schoolYear: context.schoolYear,
+        });
+      }
+
+      // If not student, emit a no-op (or handle supervisor similarly if needed)
+      return { type: '[Evaluation] Noop' };
+    })
+  )
+);
 
   submitFailure$ = createEffect(
     () =>

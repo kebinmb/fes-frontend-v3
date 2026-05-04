@@ -9,12 +9,7 @@ export const studentLoadReducer = createReducer(
   // LOAD STUDENT LOADS
   // =========================
   on(StudentDataActions.loadStudentLoads, (state, action) => {
-    const key = createStudentLoadsKey(
-      action.studentId,
-      action.page,
-      action.size,
-      action.sort
-    );
+    const key = createStudentLoadsKey(action.studentId, action.page, action.size, action.sort);
 
     // ✅ Cache hit → DO NOT TOUCH evaluationMap
     if (state.cache[key]) {
@@ -68,7 +63,10 @@ export const studentLoadReducer = createReducer(
 
     return {
       ...state,
-      evaluationMap,
+      evaluationMap: {
+        ...state.evaluationMap,
+        ...evaluationMap,
+      },
     };
   }),
 

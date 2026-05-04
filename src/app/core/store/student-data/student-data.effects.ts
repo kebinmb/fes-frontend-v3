@@ -57,9 +57,7 @@ export class StudentDataEffects {
 
         const hasCache = !!cache[key];
         const hasEvaluation = Object.keys(evaluationMap).length > 0;
-
-        // 🔥 KEY FIX
-        return !hasCache || !hasEvaluation;
+        return !hasCache;
       }),
 
       tap(() => this.spinnerFacade.showSpinner()),
@@ -122,67 +120,91 @@ export class StudentDataEffects {
   );
 
   loadEvaluationStatus$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(StudentDataActions.loadEvaluationStatus),
-      withLatestFrom(this.store.select(selectRole)),
-      filter(([_, role]) => role === 'ROLE_STUDENT'),
-      tap(() => this.spinnerFacade.showSpinner()),
-      exhaustMap(([{ classes, studentId }, role]) => {
-        if (!classes?.length) {
-          this.spinnerFacade.hideSpinner();
-          return of(); // 🔥 do NOTHING instead of overwriting
-        }
-        const buildKey = (cls: any) =>
-          `${cls.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
-        const requests = classes.map((cls) =>
-          this.evaluationService
-            .checkEvaluationStatus(
-              role!,
-              cls.facultyId,
-              studentId,
-              cls.classCode,
-              cls.subjectCode,
-              cls.yearLevel,
-              cls.semester,
-              cls.schoolYear,
-            )
-            .pipe(
-              map((res: EvaluationCheckResponse) => ({
-                key: buildKey(cls),
-                evaluated: res.hasEvaluated,
-              })),
-              catchError((err) => {
-                console.error('Evaluation API ERROR:', err);
-                return of({
-                  key: buildKey(cls),
-                  evaluated: null,
-                });
-              }),
-            ),
-        );
-        return forkJoin(requests).pipe(
-          map((results) => {
-            const evaluationMap: Record<string, boolean | null> = {};
-            results.forEach((r) => {
-              evaluationMap[r.key] = r.evaluated;
-            });
-            this.spinnerFacade.hideSpinner();
-            return StudentDataActions.loadEvaluationStatusSuccess({
-              evaluationMap,
-            });
-          }),
-          catchError((err) => {
-            this.spinnerFacade.hideSpinner();
-            return of(
-              StudentDataActions.loadEvaluationStatusFailure({
-                error: extractErrorMessage(err),
-              }),
-            );
-          }),
-        );
-      }),
+  this.actions$.pipe(
+    ofType(StudentDataActions.loadEvaluationStatus),
+    withLatestFrom(
+      this.store.select(selectRole),
+      this.store.select(selectEvaluationMap)
     ),
-  );
+    filter(([_, role]) => role === 'ROLE_STUDENT'),
+
+    tap(() => this.spinnerFacade.showSpinner()),
+
+    exhaustMap(([{ classes, studentId }, role, existingMap]) => {
+      if (!classes?.length) {
+        this.spinnerFacade.hideSpinner();
+        return of();
+      }
+
+      const buildKey = (cls: any) =>
+        `${cls.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
+
+      const requests = classes.map((cls) => {
+        const key = buildKey(cls);
+
+        // ✅ skip already evaluated (IMPORTANT optimization)
+        if (existingMap[key] === true) {
+          return of({
+            key,
+            evaluated: true,
+          });
+        }
+        console.log(cls.yearLevel);
+        return this.evaluationService
+          .checkEvaluationStatus(
+            role!,
+            cls.facultyId,
+            studentId,
+            cls.classCode,
+            cls.subjectCode,
+            cls.yearLevel,
+            cls.semester,
+            cls.schoolYear
+          )
+          .pipe(
+            tap((res) => console.log('API RESULT:', res)), // ✅ NOW WORKS
+            map((res: EvaluationCheckResponse) => ({
+              key,
+              evaluated: res.hasEvaluated,
+            })),
+            catchError(() =>
+              of({
+                key,
+                evaluated: null,
+              })
+            )
+          );
+      });
+
+      return forkJoin(requests).pipe(
+        map((results) => {
+          const evaluationMap: Record<string, boolean | null> = {
+            ...existingMap, // 🔥 MERGE instead of replace
+          };
+
+          results.forEach((r) => {
+            evaluationMap[r.key] = r.evaluated;
+          });
+
+          this.spinnerFacade.hideSpinner();
+
+          return StudentDataActions.loadEvaluationStatusSuccess({
+            evaluationMap,
+          });
+        }),
+        catchError((err) => {
+          this.spinnerFacade.hideSpinner();
+
+          return of(
+            StudentDataActions.loadEvaluationStatusFailure({
+              error: extractErrorMessage(err),
+            })
+          );
+        })
+      );
+    })
+  )
+);
 
   selectStudentClassForEvaluation$ = createEffect(
     () =>
