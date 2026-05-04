@@ -61,7 +61,7 @@ export class EvaluationEffects {
             facultyName: cls.facultyName,
             subjectDescription: cls.subjectDescription ?? '',
             college: cls.college,
-            yearLevel: 'yearLevel' in cls ? cls.yearLevel ?? '': '',
+            yearLevel: 'yearLevel' in cls ? (cls.yearLevel ?? '') : '',
           },
         });
       }),
@@ -72,10 +72,7 @@ export class EvaluationEffects {
     this.actions$.pipe(
       ofType(EvaluationActions.submitEvaluation),
 
-      withLatestFrom(
-        this.store.select(selectRole),
-        this.store.select(selectEvaluationDataContext)
-      ),
+      withLatestFrom(this.store.select(selectRole), this.store.select(selectEvaluationDataContext)),
 
       filter(([{ payload }, role, context]) => !!payload && !!role && !!context),
 
@@ -85,7 +82,7 @@ export class EvaluationEffects {
           facultyId: context!.facultyId,
           classCode: context!.classCode,
           subjectCode: context!.subjectCode,
-          yearLevel:context!.yearLevel,
+          yearLevel: context!.yearLevel,
           semester: context!.semester,
           schoolYear: context!.schoolYear,
         };
@@ -97,52 +94,52 @@ export class EvaluationEffects {
         this.spinnerFacade.showSpinner();
 
         return this.evaluationService.submitEvaluation(role!, finalPayload).pipe(
-          map((response) =>
-            EvaluationActions.submitEvaluationSuccess({ response })
-          ),
+          map((response) => EvaluationActions.submitEvaluationSuccess({ response })),
 
           catchError((err) =>
             of(
               EvaluationActions.submitEvaluationFailure({
                 error: err?.error?.message || 'Submission failed',
-              })
-            )
-          )
+              }),
+            ),
+          ),
         );
-      })
-    )
+      }),
+    ),
   );
   submitSuccess$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(EvaluationActions.submitEvaluationSuccess),
+    this.actions$.pipe(
+      ofType(EvaluationActions.submitEvaluationSuccess),
 
-    withLatestFrom(
-      this.store.select(selectRole),
-      this.store.select(selectEvaluationDataContext)
+      withLatestFrom(this.store.select(selectRole), this.store.select(selectEvaluationDataContext)),
+
+      tap(([_, role]) => {
+        this.spinnerFacade.hideSpinner();
+        this.toastFacade.showToast('Evaluation submitted successfully', 'success');
+
+        if (role === 'ROLE_STUDENT') {
+          this.router.navigate(['/student-dashboard']);
+        } else {
+          this.router.navigate(['/supervisor-dashboard']);
+        }
+      }),
+
+      map(([_, role, context]) => {
+        // Only update student dashboard map
+        if (role === 'ROLE_STUDENT' && context) {
+          return updateStudentEvaluatedClass({
+            facultyId: context.facultyId,
+            classCode: context.classCode,
+            semester: context.semester,
+            schoolYear: context.schoolYear,
+          });
+        }
+
+        // If not student, emit a no-op (or handle supervisor similarly if needed)
+        return { type: '[Evaluation] Noop' };
+      }),
     ),
-
-    tap(() => {
-      this.spinnerFacade.hideSpinner();
-      this.toastFacade.showToast('Evaluation submitted successfully', 'success');
-      this.router.navigate(['/dashboard']);
-    }),
-
-    map(([_, role, context]) => {
-      // Only update student dashboard map
-      if (role === 'ROLE_STUDENT' && context) {
-        return updateStudentEvaluatedClass({
-          facultyId: context.facultyId,
-          classCode: context.classCode,
-          semester: context.semester,
-          schoolYear: context.schoolYear,
-        });
-      }
-
-      // If not student, emit a no-op (or handle supervisor similarly if needed)
-      return { type: '[Evaluation] Noop' };
-    })
-  )
-);
+  );
 
   submitFailure$ = createEffect(
     () =>
@@ -151,8 +148,8 @@ export class EvaluationEffects {
         tap(({ error }) => {
           this.spinnerFacade.hideSpinner();
           this.toastFacade.showToast(error, 'error');
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 }
