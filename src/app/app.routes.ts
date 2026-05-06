@@ -6,9 +6,11 @@ import { roleGuard } from './utilities/guards/role/role-guard';
 import { SupervisorDashboardComponent } from './core/features/components/dashboards/supervisor-dashboard-component/supervisor-dashboard-component';
 import { AdminDashboardComponent } from './core/features/components/dashboards/admin-dashboard-component/admin-dashboard-component';
 import { EvaluationFormComponent } from './core/features/components/evaluation-form-component/evaluation-form-component';
+import { LoginAdminComponent } from './core/features/components/login-admin-component/login-admin-component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'admin', component: LoginAdminComponent },
   {
     path: 'student-dashboard',
     component: StudentDashboardComponent,
@@ -42,5 +44,4 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'login',
   },
-
 ];

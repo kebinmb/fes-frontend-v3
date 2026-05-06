@@ -55,6 +55,7 @@ export class AdminService {
 
     return this.http.get<PageResponse<FetchFacultyResponse>>(`${this.ADMIN_API_URL}/faculties`, {
       params,
+      withCredentials: true,
     });
   }
 
@@ -66,7 +67,7 @@ export class AdminService {
 
     return this.http.get<PageResponse<FetchUserAccountsResponse>>(
       `${this.ADMIN_API_URL}/user-accounts`,
-      { params },
+      { params, withCredentials: true },
     );
   }
 
@@ -78,7 +79,7 @@ export class AdminService {
 
     return this.http.get<PageResponse<FetchFacultyEvaluationScoreResponse>>(
       `${this.ADMIN_API_URL}/faculty-evaluation-score`,
-      { params },
+      { params, withCredentials: true },
     );
   }
 }

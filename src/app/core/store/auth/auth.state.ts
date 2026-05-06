@@ -1,6 +1,6 @@
 export interface AuthState {
     evaluatorId: string | null;
-    role: 'ROLE_STUDENT' | 'ROLE_DEAN' | null;
+    role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN' | null;
     isAuthenticated: boolean;
     isLoading: boolean;
     isAuthChecked:boolean;
