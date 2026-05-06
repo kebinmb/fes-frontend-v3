@@ -1,37 +1,23 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  output,
-} from '@angular/core';
-
-import { CommonModule } from '@angular/common';
+import { Component, inject } from '@angular/core';
+import { AdminDataFacade } from '../../../store/admin-data/admin-data.facade';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-user-accounts-data-table-component',
-  standalone: true,
-  imports: [CommonModule],
+  imports: [AsyncPipe],
   templateUrl: './user-accounts-data-table-component.html',
   styleUrl: './user-accounts-data-table-component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserAccountsDataTableComponent {
-
-  userAccounts =
-    input<any | null>(null);
-
-  loading =
-    input<boolean | null>(false);
-
-  pageChange =
-    output<number>();
-
+  private adminDataFacade = inject(AdminDataFacade);
+  userAccounts$ = this.adminDataFacade.userAccounts$;
+  ngOnInit(): void {
+    this.adminDataFacade.loadUserAccounts(0, 10);
+  }
   onUserPageChange(page: number): void {
-
     if (page < 0) {
       return;
     }
-
-    this.pageChange.emit(page);
+    this.adminDataFacade.loadUserAccounts(page, 10);
   }
 }

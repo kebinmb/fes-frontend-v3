@@ -1,52 +1,14 @@
 <div class="admin-layout">
-  <!-- SIDEBAR -->
-
   <app-sidebar-layout-component></app-sidebar-layout-component>
-
-  <!-- MAIN -->
-
   <main class="main-layout">
-    <!-- HEADER -->
-
     <app-header-layout-component></app-header-layout-component>
-
-    <!-- CONTENT -->
-
     <section class="dashboard-content">
-      <!-- LOADING -->
-
       @if (loading$ | async) {
         <div class="loading-wrapper">
           <div class="spinner-border loading-spinner"></div>
         </div>
       }
-
-      <!-- FACULTIES -->
-
-      <app-faculty-data-table-component
-        [faculties]="faculties$ | async"
-        [loading]="loading$ | async"
-        (pageChange)="onFacultyPageChange($event)"
-      >
-      </app-faculty-data-table-component>
-
-      <!-- USERS -->
-
-      <app-user-accounts-data-table-component
-        [userAccounts]="userAccounts$ | async"
-        [loading]="loading$ | async"
-        (pageChange)="onUserPageChange($event)"
-      >
-      </app-user-accounts-data-table-component>
-
-      <!-- SCORES -->
-
-      <app-faculty-evaluation-scores-data-table-component
-        [facultyEvaluationScore]="facultyEvaluationScores$ | async"
-        [loading]="loading$ | async"
-        (pageChange)="onScorePageChange($event)"
-      >
-      </app-faculty-evaluation-scores-data-table-component>
+      <router-outlet></router-outlet>
     </section>
   </main>
 </div>

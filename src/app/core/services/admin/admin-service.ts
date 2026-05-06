@@ -3,11 +3,17 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment.development';
 import { Observable } from 'rxjs';
 export interface PageResponse<T> {
+
   content: T[];
+
   totalElements: number;
+
   totalPages: number;
+
   page: number;
+
   size: number;
+
 }
 export interface FetchFacultyResponse {
   facultyId: string;

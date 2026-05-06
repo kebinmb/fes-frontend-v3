@@ -37,33 +37,50 @@
     <nav class="sidebar-nav">
       <!-- DASHBOARD -->
 
-      <!-- DASHBOARD -->
-      <a class="nav-item active" routerLink="/admin-dashboard">
+      <a
+        class="nav-item"
+        routerLink="/admin-dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
         <i class="bi bi-grid-1x2-fill"></i>
+
         <span> Dashboard </span>
       </a>
 
       <!-- FACULTIES -->
-      <a class="nav-item" routerLink="/admin-dashboard/faculty-list">
+
+      <a class="nav-item" routerLink="/admin-dashboard/faculty-list" routerLinkActive="active">
         <i class="bi bi-people-fill"></i>
+
         <span> Faculties </span>
       </a>
 
       <!-- USERS -->
-      <a class="nav-item" routerLink="/admin-dashboard/user-accounts">
+
+      <a class="nav-item" routerLink="/admin-dashboard/user-accounts" routerLinkActive="active">
         <i class="bi bi-person-badge-fill"></i>
+
         <span> User Accounts </span>
       </a>
 
       <!-- SCORES -->
-      <a class="nav-item" routerLink="/admin-dashboard/evaluation-score-list">
+
+      <a
+        class="nav-item"
+        routerLink="/admin-dashboard/evaluation-score-list"
+        routerLinkActive="active"
+      >
         <i class="bi bi-bar-chart-fill"></i>
+
         <span> Evaluation Scores </span>
       </a>
 
       <!-- SETTINGS -->
-      <a class="nav-item" routerLink="/admin-dashboard/settings">
+
+      <a class="nav-item" routerLink="/admin-dashboard/settings" routerLinkActive="active">
         <i class="bi bi-gear-fill"></i>
+
         <span> Settings </span>
       </a>
     </nav>

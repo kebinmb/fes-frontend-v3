@@ -1,16 +1,12 @@
-@let users = userAccounts();
+@let usersData = userAccounts$ | async;
 
 <section class="modern-card">
 
-  <!-- ========================= -->
   <!-- TOP BAR -->
-  <!-- ========================= -->
 
   <div class="card-topbar accent"></div>
 
-  <!-- ========================= -->
   <!-- HEADER -->
-  <!-- ========================= -->
 
   <div class="modern-card-header">
 
@@ -28,46 +24,20 @@
 
     <div class="table-count">
 
-      {{ users?.totalElements || 0 }}
+      {{ usersData?.totalElements || 0 }}
 
     </div>
 
   </div>
 
-  <!-- ========================= -->
-  <!-- LOADING -->
-  <!-- ========================= -->
-
-  @if (loading()) {
-
-    <div class="loading-wrapper">
-
-      <div
-        class="spinner-border text-success"
-        role="status">
-
-        <span class="visually-hidden">
-          Loading...
-        </span>
-
-      </div>
-
-    </div>
-
-  }
-
-  <!-- ========================= -->
   <!-- TABLE -->
-  <!-- ========================= -->
 
   <div class="table-responsive">
 
     <table
       class="table modern-table align-middle mb-0">
 
-      <!-- ========================= -->
       <!-- TABLE HEAD -->
-      <!-- ========================= -->
 
       <thead>
 
@@ -93,24 +63,20 @@
 
       </thead>
 
-      <!-- ========================= -->
       <!-- TABLE BODY -->
-      <!-- ========================= -->
 
       <tbody>
 
-        @if (users?.content?.length) {
+        @if (usersData?.content?.length) {
 
           @for (
-            user of users!.content;
+            user of usersData!.content;
             track user.userId
           ) {
 
             <tr>
 
-              <!-- ========================= -->
               <!-- USERNAME -->
-              <!-- ========================= -->
 
               <td data-label="Username">
 
@@ -140,9 +106,7 @@
 
               </td>
 
-              <!-- ========================= -->
               <!-- EMAIL -->
-              <!-- ========================= -->
 
               <td data-label="Email">
 
@@ -154,9 +118,7 @@
 
               </td>
 
-              <!-- ========================= -->
               <!-- ROLE -->
-              <!-- ========================= -->
 
               <td data-label="Role">
 
@@ -168,9 +130,7 @@
 
               </td>
 
-              <!-- ========================= -->
               <!-- STATUS -->
-              <!-- ========================= -->
 
               <td data-label="Status">
 
@@ -195,9 +155,7 @@
 
         } @else {
 
-          <!-- ========================= -->
           <!-- EMPTY STATE -->
-          <!-- ========================= -->
 
           <tr>
 
@@ -219,9 +177,7 @@
 
   </div>
 
-  <!-- ========================= -->
   <!-- FOOTER -->
-  <!-- ========================= -->
 
   <div class="modern-card-footer">
 
@@ -229,15 +185,13 @@
 
       Showing
 
-      {{ users?.content?.length || 0 }}
+      {{ usersData?.content?.length || 0 }}
 
       user accounts
 
     </small>
 
-    <!-- ========================= -->
     <!-- PAGINATION -->
-    <!-- ========================= -->
 
     <div class="pagination-group">
 
@@ -246,11 +200,11 @@
       <button
         class="pagination-btn"
         [disabled]="
-          (users?.number ?? 0) === 0
+          (usersData?.page ?? 0) === 0
         "
         (click)="
           onUserPageChange(
-            (users?.number ?? 0) - 1
+            (usersData?.page ?? 0) - 1
           )
         ">
 
@@ -263,13 +217,13 @@
       <button
         class="pagination-btn"
         [disabled]="
-          (users?.number ?? 0)
+          ((usersData?.page ?? 0) + 1)
           >=
-          ((users?.totalPages ?? 1) - 1)
+          (usersData?.totalPages ?? 0)
         "
         (click)="
           onUserPageChange(
-            (users?.number ?? 0) + 1
+            (usersData?.page ?? 0) + 1
           )
         ">
 

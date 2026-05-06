@@ -1,25 +1,24 @@
-import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { AsyncPipe, DecimalPipe } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
+import { AdminDataFacade } from '../../../store/admin-data/admin-data.facade';
 
 @Component({
   selector: 'app-faculty-evaluation-scores-data-table-component',
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, AsyncPipe],
   templateUrl: './faculty-evaluation-scores-data-table-component.html',
   styleUrl: './faculty-evaluation-scores-data-table-component.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacultyEvaluationScoresDataTableComponent {
-  facultyEvaluationScore = input<any | null>(null);
-
-  loading = input<boolean | null>(false);
-
-  pageChange = output<number>();
-
-  onScorePageChange(page: number): void {
+  private adminDataFacade = inject(AdminDataFacade);
+  facultyEvaluationScore$ = this.adminDataFacade.facultyEvaluationScores$;
+  ngOnInit(): void {
+    this.adminDataFacade.loadFacultyEvaluationScores(0, 10);
+  }
+  onUserPageChange(page: number): void {
     if (page < 0) {
       return;
     }
-
-    this.pageChange.emit(page);
+    this.adminDataFacade.loadFacultyEvaluationScores(page, 10);
   }
 }

@@ -1,7 +1,6 @@
-@let facultiesData = faculties();
+@let facultiesData = faculties$ | async;
 
 <section class="modern-card">
-
   <!-- ========================= -->
   <!-- TOP BAR -->
   <!-- ========================= -->
@@ -13,21 +12,15 @@
   <!-- ========================= -->
 
   <div class="modern-card-header">
-
     <div>
-      <h2>
-        Faculties
-      </h2>
+      <h2>Faculties</h2>
 
-      <span>
-        Faculty records overview
-      </span>
+      <span> Faculty records overview </span>
     </div>
 
     <div class="table-count">
-      {{ facultiesData?.totalElements || 0 }}
+      {{ facultiesData?.totalElements ?? 0 }}
     </div>
-
   </div>
 
   <!-- ========================= -->
@@ -35,108 +28,88 @@
   <!-- ========================= -->
 
   <div class="table-responsive">
-
     <table class="table modern-table align-middle mb-0">
+      <!-- ========================= -->
+      <!-- TABLE HEAD -->
+      <!-- ========================= -->
 
       <thead>
-
         <tr>
           <th>ID</th>
+
           <th>Faculty Name</th>
+
           <th>Position</th>
+
           <th>College</th>
         </tr>
-
       </thead>
 
+      <!-- ========================= -->
+      <!-- TABLE BODY -->
+      <!-- ========================= -->
+
       <tbody>
-
         @if (facultiesData?.content?.length) {
-
-          @for (
-            faculty of facultiesData!.content;
-            track faculty.facultyId
-          ) {
-
+          @for (faculty of facultiesData!.content; track faculty.facultyId) {
             <tr>
-
+              <!-- ========================= -->
               <!-- ID -->
+              <!-- ========================= -->
 
               <td data-label="ID">
-
-                <span class="id-badge">
-                  #{{ faculty.facultyId }}
-                </span>
-
+                <span class="id-badge"> #{{ faculty.facultyId }} </span>
               </td>
 
+              <!-- ========================= -->
               <!-- FACULTY -->
+              <!-- ========================= -->
 
               <td data-label="Faculty Name">
-
                 <div class="table-user">
-
                   <div class="table-avatar">
-
-                    {{
-                      faculty.firstname?.charAt(0)
-                    }}
-
+                    {{ faculty.firstname.charAt(0).toUpperCase() }}
                   </div>
 
                   <div>
-
                     <div class="fw-semibold">
-
                       {{ faculty.firstname }}
                       {{ faculty.lastname }}
-
                     </div>
-
                   </div>
-
                 </div>
-
               </td>
 
+              <!-- ========================= -->
               <!-- POSITION -->
+              <!-- ========================= -->
 
               <td data-label="Position">
                 {{ faculty.position }}
               </td>
 
+              <!-- ========================= -->
               <!-- COLLEGE -->
+              <!-- ========================= -->
 
               <td data-label="College">
-
                 <span class="college-badge">
                   {{ faculty.college }}
                 </span>
-
               </td>
-
             </tr>
-
           }
-
         } @else {
+          <!-- ========================= -->
+          <!-- EMPTY STATE -->
+          <!-- ========================= -->
 
           <tr>
-
-            <td colspan="4" class="empty-state">
-
-              No faculties found
-
-            </td>
-
+            <td colspan="4" class="empty-state">No faculties found</td>
           </tr>
-
         }
-
       </tbody>
-
     </table>
-
   </div>
 
   <!-- ========================= -->
@@ -144,41 +117,38 @@
   <!-- ========================= -->
 
   <div class="modern-card-footer">
-
     <small>
       Showing
-      {{ facultiesData?.content?.length || 0 }}
+
+      {{ facultiesData?.content?.length ?? 0 }}
+
+      of
+
+      {{ facultiesData?.totalElements ?? 0 }}
+
       faculty records
     </small>
-
     <div class="pagination-group">
-
-      <!-- PREV -->
-
       <button
         class="pagination-btn"
-        [disabled]="facultiesData?.page === 0"
+        [disabled]="(facultiesData?.page ?? 0) === 0"
         (click)="onFacultyPageChange((facultiesData?.page ?? 0) - 1)"
       >
-
         Prev
-
       </button>
-
-      <!-- NEXT -->
-
+      <span class="pagination-info">
+        Page
+        {{ (facultiesData?.page ?? 0) + 1 }}
+        of
+        {{ facultiesData?.totalPages ?? 1 }}
+      </span>
       <button
         class="pagination-btn"
-        [disabled]="facultiesData?.last"
+        [disabled]="(facultiesData?.page ?? 0) >= (facultiesData?.totalPages ?? 1) - 1"
         (click)="onFacultyPageChange((facultiesData?.page ?? 0) + 1)"
       >
-
         Next
-
       </button>
-
     </div>
-
   </div>
-
 </section>

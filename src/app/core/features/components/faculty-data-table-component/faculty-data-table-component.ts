@@ -1,31 +1,24 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  input,
-  output,
-} from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { AdminDataFacade } from '../../../store/admin-data/admin-data.facade';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-faculty-data-table-component',
   standalone: true,
+  imports: [AsyncPipe],
   templateUrl: './faculty-data-table-component.html',
   styleUrl: './faculty-data-table-component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class FacultyDataTableComponent {
-
-  faculties = input<any | null>(null);
-
-  loading = input<boolean | null>(false);
-
-  pageChange = output<number>();
-
+export class FacultyDataTableComponent implements OnInit {
+  private adminDataFacade = inject(AdminDataFacade);
+  faculties$ = this.adminDataFacade.faculties$;
+  ngOnInit(): void {
+    this.adminDataFacade.loadFaculties(0, 10);
+  }
   onFacultyPageChange(page: number): void {
-
     if (page < 0) {
       return;
     }
-
-    this.pageChange.emit(page);
+    this.adminDataFacade.loadFaculties(page, 10);
   }
 }

@@ -1,16 +1,12 @@
-@let scores = facultyEvaluationScore();
+@let scoresData = facultyEvaluationScore$ | async;
 
 <section class="modern-card">
 
-  <!-- ========================= -->
   <!-- TOP BAR -->
-  <!-- ========================= -->
 
   <div class="card-topbar warning"></div>
 
-  <!-- ========================= -->
   <!-- HEADER -->
-  <!-- ========================= -->
 
   <div class="modern-card-header">
 
@@ -28,46 +24,20 @@
 
     <div class="table-count">
 
-      {{ scores?.totalElements || 0 }}
+      {{ scoresData?.totalElements || 0 }}
 
     </div>
 
   </div>
 
-  <!-- ========================= -->
-  <!-- LOADING -->
-  <!-- ========================= -->
-
-  @if (loading()) {
-
-    <div class="loading-wrapper">
-
-      <div
-        class="spinner-border text-warning"
-        role="status">
-
-        <span class="visually-hidden">
-          Loading...
-        </span>
-
-      </div>
-
-    </div>
-
-  }
-
-  <!-- ========================= -->
   <!-- TABLE -->
-  <!-- ========================= -->
 
   <div class="table-responsive">
 
     <table
       class="table modern-table align-middle mb-0">
 
-      <!-- ========================= -->
       <!-- TABLE HEAD -->
-      <!-- ========================= -->
 
       <thead>
 
@@ -97,24 +67,20 @@
 
       </thead>
 
-      <!-- ========================= -->
       <!-- TABLE BODY -->
-      <!-- ========================= -->
 
       <tbody>
 
-        @if (scores?.content?.length) {
+        @if (scoresData?.content?.length) {
 
           @for (
-            score of scores!.content;
+            score of scoresData!.content;
             track score.facultyEvaluationScoreId
           ) {
 
             <tr>
 
-              <!-- ========================= -->
               <!-- FACULTY -->
-              <!-- ========================= -->
 
               <td data-label="Faculty">
 
@@ -144,9 +110,7 @@
 
               </td>
 
-              <!-- ========================= -->
               <!-- SUBJECT -->
-              <!-- ========================= -->
 
               <td data-label="Subject">
 
@@ -158,9 +122,7 @@
 
               </td>
 
-              <!-- ========================= -->
               <!-- SEMESTER -->
-              <!-- ========================= -->
 
               <td data-label="Semester">
 
@@ -168,9 +130,7 @@
 
               </td>
 
-              <!-- ========================= -->
               <!-- SCORE -->
-              <!-- ========================= -->
 
               <td data-label="Score">
 
@@ -185,9 +145,7 @@
 
               </td>
 
-              <!-- ========================= -->
               <!-- INTERPRETATION -->
-              <!-- ========================= -->
 
               <td data-label="Interpretation">
 
@@ -219,9 +177,7 @@
 
         } @else {
 
-          <!-- ========================= -->
           <!-- EMPTY STATE -->
-          <!-- ========================= -->
 
           <tr>
 
@@ -243,9 +199,7 @@
 
   </div>
 
-  <!-- ========================= -->
   <!-- FOOTER -->
-  <!-- ========================= -->
 
   <div class="modern-card-footer">
 
@@ -253,15 +207,13 @@
 
       Showing
 
-      {{ scores?.content?.length || 0 }}
+      {{ scoresData?.content?.length || 0 }}
 
       evaluation records
 
     </small>
 
-    <!-- ========================= -->
     <!-- PAGINATION -->
-    <!-- ========================= -->
 
     <div class="pagination-group">
 
@@ -270,11 +222,11 @@
       <button
         class="pagination-btn warning-btn"
         [disabled]="
-          (scores?.number ?? 0) === 0
+          (scoresData?.page ?? 0) === 0
         "
         (click)="
-          onScorePageChange(
-            (scores?.number ?? 0) - 1
+          onUserPageChange(
+            (scoresData?.page ?? 0) - 1
           )
         ">
 
@@ -287,13 +239,13 @@
       <button
         class="pagination-btn warning-btn"
         [disabled]="
-          (scores?.number ?? 0)
+          ((scoresData?.page ?? 0) + 1)
           >=
-          ((scores?.totalPages ?? 1) - 1)
+          (scoresData?.totalPages ?? 0)
         "
         (click)="
-          onScorePageChange(
-            (scores?.number ?? 0) + 1
+          onUserPageChange(
+            (scoresData?.page ?? 0) + 1
           )
         ">
 
