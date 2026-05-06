@@ -24,36 +24,5 @@ import { RouterModule } from '@angular/router';
 })
 export class AdminDashboardComponent {
   private adminDataFacade = inject(AdminDataFacade);
-  faculties$ = this.adminDataFacade.faculties$;
-  userAccounts$ = this.adminDataFacade.userAccounts$;
-  facultyEvaluationScores$ = this.adminDataFacade.facultyEvaluationScores$;
   loading$ = this.adminDataFacade.loading$;
-  facultyPage = 0;
-  userPage = 0;
-  scorePage = 0;
-
-  pageSize = 10;
-  ngOnInit() {
-    this.changePage(0);
-    this.loadAll();
-  }
-  loadAll() {
-    this.adminDataFacade.loadFaculties(this.facultyPage, this.pageSize);
-    this.adminDataFacade.loadUserAccounts(this.userPage, this.pageSize);
-    this.adminDataFacade.loadFacultyEvaluationScores(this.scorePage, this.pageSize);
-  }
-  changePage(page: number): void {
-    this.adminDataFacade.loadFaculties(page, 10);
-  }
-  onFacultyPageChange(page: number) {
-    this.adminDataFacade.loadFaculties(page, 10);
-  }
-
-  onUserPageChange(page: number) {
-    this.adminDataFacade.loadUserAccounts(page, 10);
-  }
-
-  onScorePageChange(page: number) {
-    this.adminDataFacade.loadFacultyEvaluationScores(page, 10);
-  }
 }

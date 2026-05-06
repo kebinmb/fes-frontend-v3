@@ -226,13 +226,18 @@ export class AuthEffects {
 
       exhaustMap(() =>
         this.authService.getCurrentUser().pipe(
-          tap((res) => console.log('CHECK AUTHENTICATION RESPONSE:', res)),
+          tap((response) => console.log('CHECK AUTHENTICATION RESPONSE:', response)),
 
           map((response: any) => {
-            const isStudent = response.role === 'ROLE_STUDENT';
+            const resolvedUserId =
+              response.studentId ??
+              response.userId ??
+              response.administratorId ??
+              response.evaluatorId ??
+              null;
 
             return AuthActions.checkLoggedInUserAuthenticationSuccess({
-              evaluatorId: isStudent ? response.studentId : response.userId,
+              evaluatorId: resolvedUserId,
 
               role: response.role,
 

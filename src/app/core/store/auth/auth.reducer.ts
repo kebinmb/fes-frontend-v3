@@ -100,5 +100,16 @@ export const authReducer = createReducer(
     isAuthenticated: false,
     error,
   })),
-  on(AuthActions.logout, () => initialAuthState),
+  on(AuthActions.logout, (state) => ({
+    ...state,
+    evaluatorId: null,
+    role: null,
+    userId: null,
+    accessCode: null,
+    college: null,
+    isAuthenticated: false,
+    isAuthChecked: true,
+    isLoading: false,
+    error: null,
+  })),
 );

@@ -1,7 +1,6 @@
 @let scoresData = facultyEvaluationScore$ | async;
 
 <section class="modern-card">
-
   <!-- TOP BAR -->
 
   <div class="card-topbar warning"></div>
@@ -9,252 +8,139 @@
   <!-- HEADER -->
 
   <div class="modern-card-header">
-
     <div>
+      <h2>Faculty Evaluation Scores</h2>
 
-      <h2>
-        Faculty Evaluation Scores
-      </h2>
-
-      <span>
-        Performance evaluation analytics
-      </span>
-
+      <span> Performance evaluation analytics </span>
     </div>
 
     <div class="table-count">
-
       {{ scoresData?.totalElements || 0 }}
-
     </div>
-
   </div>
 
   <!-- TABLE -->
 
   <div class="table-responsive">
-
-    <table
-      class="table modern-table align-middle mb-0">
-
+    <table class="table modern-table align-middle mb-0">
       <!-- TABLE HEAD -->
 
       <thead>
-
         <tr>
+          <th>Faculty</th>
 
-          <th>
-            Faculty
-          </th>
+          <th>Subject</th>
 
-          <th>
-            Subject
-          </th>
+          <th>Semester</th>
 
-          <th>
-            Semester
-          </th>
+          <th>Score</th>
 
-          <th>
-            Score
-          </th>
-
-          <th>
-            Interpretation
-          </th>
-
+          <th>Interpretation</th>
         </tr>
-
       </thead>
 
       <!-- TABLE BODY -->
 
       <tbody>
-
         @if (scoresData?.content?.length) {
-
-          @for (
-            score of scoresData!.content;
-            track score.facultyEvaluationScoreId
-          ) {
-
+          @for (score of scoresData!.content; track score.facultyEvaluationScoreId) {
             <tr>
-
               <!-- FACULTY -->
 
               <td data-label="Faculty">
-
                 <div class="table-user">
-
                   <div class="table-avatar warning-avatar">
-
-                    {{
-                      score.facultyName
-                        ?.charAt(0)
-                        ?.toUpperCase()
-                    }}
-
+                    {{ score.facultyName?.charAt(0)?.toUpperCase() }}
                   </div>
 
                   <div>
-
                     <div class="fw-semibold">
-
                       {{ score.facultyName }}
-
                     </div>
-
                   </div>
-
                 </div>
-
               </td>
 
               <!-- SUBJECT -->
 
               <td data-label="Subject">
-
                 <span class="subject-code">
-
                   {{ score.subjectCode }}
-
                 </span>
-
               </td>
 
               <!-- SEMESTER -->
 
               <td data-label="Semester">
-
                 {{ score.semester }}
-
               </td>
 
               <!-- SCORE -->
 
               <td data-label="Score">
-
                 <span class="score-badge">
-
-                  {{
-                    score.overallAverageScore
-                      | number:'1.2-2'
-                  }}
-
+                  {{ score.overallAverageScore | number: '1.2-2' }}
                 </span>
-
               </td>
 
               <!-- INTERPRETATION -->
 
               <td data-label="Interpretation">
-
                 <span
                   class="interpretation-badge"
-                  [class.excellent]="
-                    score.overallAverageScore >= 4
-                  "
-                  [class.average]="
-                    score.overallAverageScore >= 3
-                    &&
-                    score.overallAverageScore < 4
-                  "
-                  [class.poor]="
-                    score.overallAverageScore < 3
-                  ">
-
-                  {{
-                    score.overallInterpretation
-                  }}
-
+                  [class.excellent]="score.overallAverageScore >= 4"
+                  [class.average]="score.overallAverageScore >= 3 && score.overallAverageScore < 4"
+                  [class.poor]="score.overallAverageScore < 3"
+                >
+                  {{ score.overallInterpretation }}
                 </span>
-
               </td>
-
             </tr>
-
           }
-
         } @else {
-
           <!-- EMPTY STATE -->
 
           <tr>
-
-            <td
-              colspan="5"
-              class="empty-state">
-
-              No evaluation data found
-
-            </td>
-
+            <td colspan="5" class="empty-state">No evaluation data found</td>
           </tr>
-
         }
-
       </tbody>
-
     </table>
-
   </div>
 
   <!-- FOOTER -->
 
   <div class="modern-card-footer">
-
     <small>
-
       Showing
 
       {{ scoresData?.content?.length || 0 }}
 
       evaluation records
-
     </small>
 
     <!-- PAGINATION -->
 
     <div class="pagination-group">
-
       <!-- PREVIOUS -->
 
       <button
         class="pagination-btn warning-btn"
-        [disabled]="
-          (scoresData?.page ?? 0) === 0
-        "
-        (click)="
-          onUserPageChange(
-            (scoresData?.page ?? 0) - 1
-          )
-        ">
-
+        [disabled]="(scoresData?.page ?? 0) === 0"
+        (click)="onUserPageChange((scoresData?.page ?? 0) - 1)"
+      >
         Prev
-
       </button>
 
       <!-- NEXT -->
 
       <button
         class="pagination-btn warning-btn"
-        [disabled]="
-          ((scoresData?.page ?? 0) + 1)
-          >=
-          (scoresData?.totalPages ?? 0)
-        "
-        (click)="
-          onUserPageChange(
-            (scoresData?.page ?? 0) + 1
-          )
-        ">
-
+        [disabled]="(scoresData?.page ?? 0) + 1 >= (scoresData?.totalPages ?? 0)"
+        (click)="onUserPageChange((scoresData?.page ?? 0) + 1)"
+      >
         Next
-
       </button>
-
     </div>
-
   </div>
-
 </section>

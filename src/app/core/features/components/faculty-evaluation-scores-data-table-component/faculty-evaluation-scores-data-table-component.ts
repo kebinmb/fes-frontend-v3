@@ -7,7 +7,6 @@ import { AdminDataFacade } from '../../../store/admin-data/admin-data.facade';
   imports: [DecimalPipe, AsyncPipe],
   templateUrl: './faculty-evaluation-scores-data-table-component.html',
   styleUrl: './faculty-evaluation-scores-data-table-component.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacultyEvaluationScoresDataTableComponent {
   private adminDataFacade = inject(AdminDataFacade);
