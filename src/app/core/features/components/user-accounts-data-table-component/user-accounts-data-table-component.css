@@ -1,0 +1,527 @@
+/* =========================================
+   ROOT
+========================================= */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* =========================================
+   CARD
+========================================= */
+
+.modern-card {
+  position: relative;
+  overflow: hidden;
+
+  background: #ffffff;
+
+  border-radius: 24px;
+
+  border:
+    1px solid rgba(15, 23, 42, 0.06);
+
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.06),
+    0 2px 10px rgba(15, 23, 42, 0.04);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.modern-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.08),
+    0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+/* =========================================
+   TOP BAR
+========================================= */
+
+.card-topbar {
+  height: 5px;
+  width: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      #186443 0%,
+      #2d8b63 50%,
+      #e5d413 100%
+    );
+}
+
+.card-topbar.accent {
+  background:
+    linear-gradient(
+      90deg,
+      #2563eb 0%,
+      #3b82f6 50%,
+      #60a5fa 100%
+    );
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.modern-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  padding:
+    1.5rem
+    1.75rem
+    1.25rem;
+}
+
+.modern-card-header h2 {
+  margin: 0;
+
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+
+  color: #0f172a;
+}
+
+.modern-card-header span {
+  display: inline-block;
+
+  margin-top: 0.3rem;
+
+  font-size: 0.92rem;
+  font-weight: 500;
+
+  color: #64748b;
+}
+
+/* =========================================
+   TABLE COUNT
+========================================= */
+
+.table-count {
+  min-width: 68px;
+  height: 68px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(37, 99, 235, 0.12),
+      rgba(96, 165, 250, 0.12)
+    );
+
+  color: #2563eb;
+
+  font-size: 1.15rem;
+  font-weight: 700;
+
+  border:
+    1px solid rgba(37, 99, 235, 0.08);
+}
+
+/* =========================================
+   LOADING
+========================================= */
+
+.loading-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    2rem
+    1rem;
+}
+
+/* =========================================
+   TABLE
+========================================= */
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.modern-table {
+  width: 100%;
+  margin: 0;
+
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* =========================================
+   TABLE HEAD
+========================================= */
+
+.modern-table thead th {
+  background: #f8fafc;
+
+  padding:
+    1rem
+    1.5rem;
+
+  border: none;
+
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  color: #64748b;
+}
+
+/* =========================================
+   TABLE BODY
+========================================= */
+
+.modern-table tbody tr {
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.modern-table tbody tr:hover {
+  background:
+    rgba(15, 23, 42, 0.02);
+}
+
+/* =========================================
+   TABLE CELLS
+========================================= */
+
+.modern-table tbody td {
+  padding:
+    1.15rem
+    1.5rem;
+
+  border-top:
+    1px solid rgba(15, 23, 42, 0.06);
+
+  vertical-align: middle;
+
+  color: #1e293b;
+
+  font-size: 0.95rem;
+}
+
+/* =========================================
+   USER SECTION
+========================================= */
+
+.table-user {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+/* =========================================
+   AVATAR
+========================================= */
+
+.table-avatar {
+  width: 42px;
+  height: 42px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #60a5fa
+    );
+
+  color: white;
+
+  font-weight: 700;
+  font-size: 1rem;
+
+  text-transform: uppercase;
+
+  box-shadow:
+    0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+/* =========================================
+   EMAIL
+========================================= */
+
+.email-text {
+  color: #475569;
+
+  font-size: 0.92rem;
+
+  word-break: break-word;
+}
+
+/* =========================================
+   ROLE BADGE
+========================================= */
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    0.45rem
+    0.85rem;
+
+  border-radius: 999px;
+
+  background:
+    rgba(37, 99, 235, 0.12);
+
+  color: #1d4ed8;
+
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  border:
+    1px solid rgba(37, 99, 235, 0.12);
+}
+
+/* =========================================
+   STATUS BADGE
+========================================= */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    0.45rem
+    0.85rem;
+
+  border-radius: 999px;
+
+  font-size: 0.8rem;
+  font-weight: 700;
+
+  border:
+    1px solid transparent;
+}
+
+.status-badge.active {
+  background:
+    rgba(34, 197, 94, 0.12);
+
+  color: #15803d;
+
+  border-color:
+    rgba(34, 197, 94, 0.12);
+}
+
+.status-badge.inactive {
+  background:
+    rgba(239, 68, 68, 0.12);
+
+  color: #b91c1c;
+
+  border-color:
+    rgba(239, 68, 68, 0.12);
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.empty-state {
+  text-align: center;
+
+  padding:
+    3rem
+    1rem !important;
+
+  color: #94a3b8;
+
+  font-weight: 500;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.modern-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  padding:
+    1.25rem
+    1.75rem;
+
+  border-top:
+    1px solid rgba(15, 23, 42, 0.06);
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(248, 250, 252, 0.5),
+      rgba(255, 255, 255, 0.9)
+    );
+}
+
+.modern-card-footer small {
+  color: #64748b;
+
+  font-weight: 500;
+}
+
+/* =========================================
+   PAGINATION
+========================================= */
+
+.pagination-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pagination-btn {
+  border: none;
+  outline: none;
+
+  padding:
+    0.7rem
+    1.2rem;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #3b82f6
+    );
+
+  color: white;
+
+  font-size: 0.88rem;
+  font-weight: 700;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
+
+  box-shadow:
+    0 6px 18px rgba(37, 99, 235, 0.18);
+
+  cursor: pointer;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 22px rgba(37, 99, 235, 0.22);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow: none;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .modern-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table-count {
+    width: 100%;
+    height: auto;
+
+    padding: 1rem;
+  }
+
+  .modern-table thead {
+    display: none;
+  }
+
+  .modern-table tbody tr {
+    display: block;
+
+    margin:
+      1rem;
+
+    border:
+      1px solid rgba(15, 23, 42, 0.06);
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    background: white;
+  }
+
+  .modern-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    padding:
+      1rem
+      1.25rem;
+  }
+
+  .modern-table tbody td::before {
+    content: attr(data-label);
+
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+
+    color: #64748b;
+
+    letter-spacing: 0.06em;
+  }
+
+  .modern-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-group {
+    width: 100%;
+  }
+
+  .pagination-btn {
+    flex: 1;
+  }
+}

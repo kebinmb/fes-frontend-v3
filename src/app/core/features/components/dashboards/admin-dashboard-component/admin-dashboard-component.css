@@ -1,0 +1,104 @@
+/* =========================================
+   ADMIN LAYOUT
+========================================= */
+
+.admin-layout {
+  display: flex;
+
+  min-height: 100vh;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--chmsu-bg) 0%,
+      var(--chmsu-bg-soft) 100%
+    );
+
+  overflow: hidden;
+}
+
+/* =========================================
+   MAIN LAYOUT
+========================================= */
+
+.main-layout {
+  flex: 1;
+
+  min-width: 0;
+
+  margin-left: 290px;
+
+  display: flex;
+  flex-direction: column;
+
+  min-height: 100vh;
+
+  transition:
+    margin-left 0.3s ease;
+}
+
+/* =========================================
+   DASHBOARD CONTENT
+========================================= */
+
+.dashboard-content {
+  flex: 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  padding:
+    2rem;
+
+  overflow-x: hidden;
+
+  overflow-y: auto;
+}
+
+/* =========================================
+   LOADING
+========================================= */
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding:
+    3rem
+    0;
+}
+
+.loading-spinner {
+  width: 3rem;
+  height: 3rem;
+
+  color:
+    var(--chmsu-primary);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 992px) {
+
+  .main-layout {
+    margin-left: 0;
+  }
+
+  .dashboard-content {
+    padding: 1rem;
+  }
+
+}
+
+@media (max-width: 576px) {
+
+  .dashboard-content {
+    padding: 0.75rem;
+    gap: 1rem;
+  }
+
+}

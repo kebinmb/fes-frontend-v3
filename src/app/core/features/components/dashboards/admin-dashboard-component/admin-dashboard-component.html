@@ -1,218 +1,52 @@
-<div class="container-fluid py-4">
+<div class="admin-layout">
+  <!-- SIDEBAR -->
 
-  <!-- ========================= -->
-  <!-- LOADING -->
-  <!-- ========================= -->
-  @if (loading$ | async) {
-    <div class="d-flex justify-content-center my-4">
-      <div class="spinner-border text-primary"></div>
-    </div>
-  }
+  <app-sidebar-layout-component></app-sidebar-layout-component>
 
-  <!-- ========================= -->
-  <!-- FACULTIES -->
-  <!-- ========================= -->
-  <div class="card mb-4 shadow-sm">
-    <div class="card-header fw-bold">Faculties</div>
+  <!-- MAIN -->
 
-    @let faculties = (faculties$ | async);
+  <main class="main-layout">
+    <!-- HEADER -->
 
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Position</th>
-            <th>College</th>
-          </tr>
-        </thead>
+    <app-header-layout-component></app-header-layout-component>
 
-        <tbody>
-          @if (faculties?.content?.length) {
-            @for (faculty of faculties!.content; track faculty.facultyId) {
-              <tr>
-                <td>{{ faculty.facultyId }}</td>
-                <td>{{ faculty.firstname }} {{ faculty.lastname }}</td>
-                <td>{{ faculty.position }}</td>
-                <td>{{ faculty.college }}</td>
-              </tr>
-            }
-          } @else {
-            <tr>
-              <td colspan="4" class="text-center text-muted py-3">
-                No faculties found
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+    <!-- CONTENT -->
 
-    <!-- Pagination -->
-    <div class="card-footer d-flex justify-content-between align-items-center">
-      <small>
-        Total: {{ faculties?.totalElements || 0 }}
-      </small>
+    <section class="dashboard-content">
+      <!-- LOADING -->
 
-      <div class="btn-group">
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          [disabled]="faculties?.page === 0"
-          (click)="onFacultyPageChange(faculties!.page - 1)">
-          Prev
-        </button>
+      @if (loading$ | async) {
+        <div class="loading-wrapper">
+          <div class="spinner-border loading-spinner"></div>
+        </div>
+      }
 
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          (click)="onFacultyPageChange(faculties!.page + 1)">
-          Next
-        </button>
-      </div>
-    </div>
-  </div>
+      <!-- FACULTIES -->
 
+      <app-faculty-data-table-component
+        [faculties]="faculties$ | async"
+        [loading]="loading$ | async"
+        (pageChange)="onFacultyPageChange($event)"
+      >
+      </app-faculty-data-table-component>
 
-  <!-- ========================= -->
-  <!-- USER ACCOUNTS -->
-  <!-- ========================= -->
-  <div class="card mb-4 shadow-sm">
-    <div class="card-header fw-bold">User Accounts</div>
+      <!-- USERS -->
 
-    @let users = (userAccounts$ | async);
+      <app-user-accounts-data-table-component
+        [userAccounts]="userAccounts$ | async"
+        [loading]="loading$ | async"
+        (pageChange)="onUserPageChange($event)"
+      >
+      </app-user-accounts-data-table-component>
 
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-          </tr>
-        </thead>
+      <!-- SCORES -->
 
-        <tbody>
-          @if (users?.content?.length) {
-            @for (user of users!.content; track user.userId) {
-              <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
-                <td>
-                  <span class="badge bg-primary">{{ user.role }}</span>
-                </td>
-                <td>
-                  <span
-                    class="badge"
-                    [class.bg-success]="user.status === 'ACTIVE'"
-                    [class.bg-secondary]="user.status !== 'ACTIVE'">
-                    {{ user.status }}
-                  </span>
-                </td>
-              </tr>
-            }
-          } @else {
-            <tr>
-              <td colspan="4" class="text-center text-muted py-3">
-                No users found
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination -->
-    <div class="card-footer d-flex justify-content-between align-items-center">
-      <small>Total: {{ users?.totalElements || 0 }}</small>
-
-      <div class="btn-group">
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          [disabled]="users?.page === 0"
-          (click)="onUserPageChange(users!.page - 1)">
-          Prev
-        </button>
-
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          (click)="onUserPageChange(users!.page + 1)">
-          Next
-        </button>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ========================= -->
-  <!-- FACULTY EVALUATION SCORES -->
-  <!-- ========================= -->
-  <div class="card shadow-sm">
-    <div class="card-header fw-bold">Faculty Evaluation Scores</div>
-
-    @let scores = (facultyEvaluationScores$ | async);
-
-    <div class="table-responsive">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Faculty</th>
-            <th>Subject</th>
-            <th>Semester</th>
-            <th>Score</th>
-            <th>Interpretation</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          @if (scores?.content?.length) {
-            @for (score of scores!.content; track score.facultyEvaluationScoreId) {
-              <tr>
-                <td>{{ score.facultyName }}</td>
-                <td>{{ score.subjectCode }}</td>
-                <td>{{ score.semester }}</td>
-                <td>{{ score.overallAverageScore | number:'1.2-2' }}</td>
-                <td>
-                  <span
-                    class="badge"
-                    [class.bg-success]="score.overallAverageScore >= 4"
-                    [class.bg-warning]="score.overallAverageScore >= 3 && score.overallAverageScore < 4"
-                    [class.bg-danger]="score.overallAverageScore < 3">
-                    {{ score.overallInterpretation }}
-                  </span>
-                </td>
-              </tr>
-            }
-          } @else {
-            <tr>
-              <td colspan="5" class="text-center text-muted py-3">
-                No evaluation data found
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination -->
-    <div class="card-footer d-flex justify-content-between align-items-center">
-      <small>Total: {{ scores?.totalElements || 0 }}</small>
-
-      <div class="btn-group">
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          [disabled]="scores?.page === 0"
-          (click)="onScorePageChange(scores!.page - 1)">
-          Prev
-        </button>
-
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          (click)="onScorePageChange(scores!.page + 1)">
-          Next
-        </button>
-      </div>
-    </div>
-  </div>
-
+      <app-faculty-evaluation-scores-data-table-component
+        [facultyEvaluationScore]="facultyEvaluationScores$ | async"
+        [loading]="loading$ | async"
+        (pageChange)="onScorePageChange($event)"
+      >
+      </app-faculty-evaluation-scores-data-table-component>
+    </section>
+  </main>
 </div>

@@ -1,0 +1,284 @@
+@let users = userAccounts();
+
+<section class="modern-card">
+
+  <!-- ========================= -->
+  <!-- TOP BAR -->
+  <!-- ========================= -->
+
+  <div class="card-topbar accent"></div>
+
+  <!-- ========================= -->
+  <!-- HEADER -->
+  <!-- ========================= -->
+
+  <div class="modern-card-header">
+
+    <div>
+
+      <h2>
+        User Accounts
+      </h2>
+
+      <span>
+        Manage active accounts
+      </span>
+
+    </div>
+
+    <div class="table-count">
+
+      {{ users?.totalElements || 0 }}
+
+    </div>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- LOADING -->
+  <!-- ========================= -->
+
+  @if (loading()) {
+
+    <div class="loading-wrapper">
+
+      <div
+        class="spinner-border text-success"
+        role="status">
+
+        <span class="visually-hidden">
+          Loading...
+        </span>
+
+      </div>
+
+    </div>
+
+  }
+
+  <!-- ========================= -->
+  <!-- TABLE -->
+  <!-- ========================= -->
+
+  <div class="table-responsive">
+
+    <table
+      class="table modern-table align-middle mb-0">
+
+      <!-- ========================= -->
+      <!-- TABLE HEAD -->
+      <!-- ========================= -->
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Username
+          </th>
+
+          <th>
+            Email
+          </th>
+
+          <th>
+            Role
+          </th>
+
+          <th>
+            Status
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <!-- ========================= -->
+      <!-- TABLE BODY -->
+      <!-- ========================= -->
+
+      <tbody>
+
+        @if (users?.content?.length) {
+
+          @for (
+            user of users!.content;
+            track user.userId
+          ) {
+
+            <tr>
+
+              <!-- ========================= -->
+              <!-- USERNAME -->
+              <!-- ========================= -->
+
+              <td data-label="Username">
+
+                <div class="table-user">
+
+                  <div class="table-avatar">
+
+                    {{
+                      user.username
+                        ?.charAt(0)
+                        ?.toUpperCase()
+                    }}
+
+                  </div>
+
+                  <div>
+
+                    <div class="fw-semibold">
+
+                      {{ user.username }}
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+              <!-- ========================= -->
+              <!-- EMAIL -->
+              <!-- ========================= -->
+
+              <td data-label="Email">
+
+                <span class="email-text">
+
+                  {{ user.email }}
+
+                </span>
+
+              </td>
+
+              <!-- ========================= -->
+              <!-- ROLE -->
+              <!-- ========================= -->
+
+              <td data-label="Role">
+
+                <span class="role-badge">
+
+                  {{ user.role }}
+
+                </span>
+
+              </td>
+
+              <!-- ========================= -->
+              <!-- STATUS -->
+              <!-- ========================= -->
+
+              <td data-label="Status">
+
+                <span
+                  class="status-badge"
+                  [class.active]="
+                    user.status === 'ACTIVE'
+                  "
+                  [class.inactive]="
+                    user.status !== 'ACTIVE'
+                  ">
+
+                  {{ user.status }}
+
+                </span>
+
+              </td>
+
+            </tr>
+
+          }
+
+        } @else {
+
+          <!-- ========================= -->
+          <!-- EMPTY STATE -->
+          <!-- ========================= -->
+
+          <tr>
+
+            <td
+              colspan="4"
+              class="empty-state">
+
+              No users found
+
+            </td>
+
+          </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- FOOTER -->
+  <!-- ========================= -->
+
+  <div class="modern-card-footer">
+
+    <small>
+
+      Showing
+
+      {{ users?.content?.length || 0 }}
+
+      user accounts
+
+    </small>
+
+    <!-- ========================= -->
+    <!-- PAGINATION -->
+    <!-- ========================= -->
+
+    <div class="pagination-group">
+
+      <!-- PREVIOUS -->
+
+      <button
+        class="pagination-btn"
+        [disabled]="
+          (users?.number ?? 0) === 0
+        "
+        (click)="
+          onUserPageChange(
+            (users?.number ?? 0) - 1
+          )
+        ">
+
+        Prev
+
+      </button>
+
+      <!-- NEXT -->
+
+      <button
+        class="pagination-btn"
+        [disabled]="
+          (users?.number ?? 0)
+          >=
+          ((users?.totalPages ?? 1) - 1)
+        "
+        (click)="
+          onUserPageChange(
+            (users?.number ?? 0) + 1
+          )
+        ">
+
+        Next
+
+      </button>
+
+    </div>
+
+  </div>
+
+</section>

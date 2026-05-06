@@ -1,0 +1,336 @@
+/* =========================================
+   HEADER
+========================================= */
+
+.admin-header {
+  position: sticky;
+  top: 0;
+
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  padding:
+    1rem
+    2rem;
+
+  background:
+    rgba(255,255,255,0.82);
+
+  backdrop-filter: blur(18px);
+
+  border-bottom:
+    1px solid rgba(0,0,0,0.05);
+
+  box-shadow:
+    0 8px 24px rgba(15,23,42,0.04);
+}
+
+/* =========================================
+   LEFT
+========================================= */
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* =========================================
+   MENU TOGGLE
+========================================= */
+
+.menu-toggle {
+  width: 46px;
+  height: 46px;
+
+  display: none;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  outline: none;
+
+  border-radius: 14px;
+
+  background:
+    rgba(24,100,67,0.08);
+
+  color:
+    var(--chmsu-primary-dark);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.menu-toggle:hover {
+  background:
+    var(--chmsu-primary);
+
+  color: white;
+
+  transform: translateY(-1px);
+}
+
+.menu-toggle i {
+  font-size: 1.2rem;
+}
+
+/* =========================================
+   TITLE
+========================================= */
+
+.header-title-group h1 {
+  margin: 0;
+
+  color:
+    var(--chmsu-primary-dark);
+
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.header-title-group p {
+  margin:
+    0.3rem
+    0
+    0;
+
+  color:
+    var(--chmsu-muted);
+
+  font-size: 0.88rem;
+}
+
+/* =========================================
+   RIGHT
+========================================= */
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* =========================================
+   SEARCH
+========================================= */
+
+.search-wrapper {
+  position: relative;
+
+  width: 280px;
+}
+
+.search-wrapper i {
+  position: absolute;
+
+  top: 50%;
+  left: 1rem;
+
+  transform: translateY(-50%);
+
+  color:
+    var(--chmsu-muted);
+}
+
+.search-wrapper input {
+  width: 100%;
+
+  padding:
+    0.85rem
+    1rem
+    0.85rem
+    2.8rem;
+
+  border:
+    1px solid var(--chmsu-border);
+
+  border-radius: 16px;
+
+  background:
+    rgba(248,249,250,0.85);
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.search-wrapper input:focus {
+  border-color:
+    var(--chmsu-primary);
+
+  box-shadow:
+    0 0 0 4px rgba(24,100,67,0.08);
+}
+
+/* =========================================
+   NOTIFICATION
+========================================= */
+
+.notification-btn {
+  position: relative;
+
+  width: 46px;
+  height: 46px;
+
+  border: none;
+  outline: none;
+
+  border-radius: 14px;
+
+  background:
+    rgba(24,100,67,0.08);
+
+  color:
+    var(--chmsu-primary-dark);
+
+  cursor: pointer;
+}
+
+.notification-dot {
+  position: absolute;
+
+  top: 10px;
+  right: 10px;
+
+  width: 10px;
+  height: 10px;
+
+  border-radius: 50%;
+
+  background:
+    var(--chmsu-warning);
+}
+
+/* =========================================
+   PROFILE
+========================================= */
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  padding:
+    0.5rem
+    0.8rem;
+
+  border-radius: 18px;
+
+  background:
+    rgba(248,249,250,0.9);
+
+  border:
+    1px solid rgba(0,0,0,0.04);
+}
+
+/* =========================================
+   PROFILE AVATAR
+========================================= */
+
+.profile-avatar {
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--chmsu-primary),
+      var(--chmsu-primary-light)
+    );
+
+  color: white;
+
+  font-weight: 800;
+}
+
+/* =========================================
+   PROFILE CONTENT
+========================================= */
+
+.profile-content h3 {
+  margin: 0;
+
+  color:
+    var(--chmsu-primary-dark);
+
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.profile-content span {
+  display: block;
+
+  margin-top: 0.2rem;
+
+  color:
+    var(--chmsu-muted);
+
+  font-size: 0.76rem;
+}
+
+/* =========================================
+   DROPDOWN BUTTON
+========================================= */
+
+.profile-dropdown-btn {
+  border: none;
+  background: transparent;
+
+  color:
+    var(--chmsu-muted);
+
+  cursor: pointer;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 992px) {
+
+  .menu-toggle {
+    display: flex;
+  }
+
+  .search-wrapper {
+    display: none;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .admin-header {
+    padding:
+      1rem;
+  }
+
+  .profile-content {
+    display: none;
+  }
+
+  .profile-dropdown-btn {
+    display: none;
+  }
+
+  .header-title-group h1 {
+    font-size: 1.1rem;
+  }
+
+}

@@ -7,5 +7,13 @@ import { Component } from '@angular/core';
   styleUrl: './header-layout-component.css',
 })
 export class HeaderLayoutComponent {
+  sidebarOpen = false;
 
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  closeSidebar(): void {
+    this.sidebarOpen = false;
+  }
 }
