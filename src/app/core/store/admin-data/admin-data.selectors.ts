@@ -17,3 +17,7 @@ export const selectFacultyEvaluationScores = createSelector(
 export const selectLoading = createSelector(selectAdminDataState, (state) => state.loading);
 
 export const selectError = createSelector(selectAdminDataState, (state) => state.error);
+export const selectUpdateFacultyMessage = createSelector(
+  selectAdminDataState,
+  (state) => state.updateFacultyMessage,
+);

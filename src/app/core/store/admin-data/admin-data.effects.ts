@@ -13,11 +13,24 @@ export class AdminEffects {
   loadFaculties$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AdminDataActions.loadFaculties),
-      mergeMap(({ page, size }) =>
-        this.adminDataService.getFaculties(page, size).pipe(
-          tap(response => console.log('FACULTIES RESPONSE', response)),
-          map((response) => AdminDataActions.loadFacultiesSuccess({ response })),
-          catchError((error) => of(AdminDataActions.loadFacultiesFailure({ error }))),
+
+      mergeMap(({ page, size, search }) =>
+        this.adminDataService.getFaculties(page, size, search ?? '').pipe(
+          tap((response) => console.log('FACULTIES RESPONSE', response)),
+
+          map((response) =>
+            AdminDataActions.loadFacultiesSuccess({
+              response,
+            }),
+          ),
+
+          catchError((error) =>
+            of(
+              AdminDataActions.loadFacultiesFailure({
+                error,
+              }),
+            ),
+          ),
         ),
       ),
     ),
@@ -28,7 +41,7 @@ export class AdminEffects {
       ofType(AdminDataActions.loadUserAccounts),
       mergeMap(({ page, size }) =>
         this.adminDataService.getUserAccounts(page, size).pipe(
-          tap(response => console.log('FACULTIES RESPONSE', response)),
+          tap((response) => console.log('FACULTIES RESPONSE', response)),
           map((response) => AdminDataActions.loadUserAccountsSuccess({ response })),
           catchError((error) => of(AdminDataActions.loadUserAccountsFailure({ error }))),
         ),
@@ -41,11 +54,24 @@ export class AdminEffects {
       ofType(AdminDataActions.loadFacultyEvaluationScores),
       mergeMap(({ page, size }) =>
         this.adminDataService.getFacultyEvaluationScores(page, size).pipe(
-          tap(response => console.log('FACULTIES RESPONSE', response)),
-          map(response => AdminDataActions.loadFacultyEvaluationScoresSuccess({ response })),
-          catchError(error => of(AdminDataActions.loadFacultyEvaluationScoresFailure({ error })))
-        )
-      )
-    )
+          tap((response) => console.log('FACULTIES RESPONSE', response)),
+          map((response) => AdminDataActions.loadFacultyEvaluationScoresSuccess({ response })),
+          catchError((error) => of(AdminDataActions.loadFacultyEvaluationScoresFailure({ error }))),
+        ),
+      ),
+    ),
+  );
+
+  updateFaculty$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AdminDataActions.updateFaculty),
+      mergeMap(({ payload }) =>
+        this.adminDataService.updateFaculty(payload).pipe(
+          tap((response) => console.log('UPDATE FACULTY RESPONSE', response)),
+          map((response) => AdminDataActions.updateFacultySuccess({ response })),
+          catchError((error) => of(AdminDataActions.updateFacultyFailure({ error }))),
+        ),
+      ),
+    ),
   );
 }

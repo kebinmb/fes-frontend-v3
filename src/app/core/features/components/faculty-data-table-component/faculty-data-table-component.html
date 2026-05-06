@@ -1,21 +1,26 @@
 @let facultiesData = faculties$ | async;
 
 <section class="modern-card">
-  <!-- ========================= -->
-  <!-- TOP BAR -->
-  <!-- ========================= -->
-
   <div class="card-topbar"></div>
 
-  <!-- ========================= -->
   <!-- HEADER -->
-  <!-- ========================= -->
 
   <div class="modern-card-header">
     <div>
       <h2>Faculties</h2>
 
       <span> Faculty records overview </span>
+      <div class="search-wrapper">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search faculty..."
+          [(ngModel)]="searchTerm"
+          (keyup.enter)="onSearch()"
+        />
+
+        <button type="button" class="edit-btn" (click)="onSearch()">Search</button>
+      </div>
     </div>
 
     <div class="table-count">
@@ -23,16 +28,10 @@
     </div>
   </div>
 
-  <!-- ========================= -->
   <!-- TABLE -->
-  <!-- ========================= -->
 
   <div class="table-responsive">
     <table class="table modern-table align-middle mb-0">
-      <!-- ========================= -->
-      <!-- TABLE HEAD -->
-      <!-- ========================= -->
-
       <thead>
         <tr>
           <th>ID</th>
@@ -42,79 +41,59 @@
           <th>Position</th>
 
           <th>College</th>
+
+          <th class="text-center">Action</th>
         </tr>
       </thead>
 
-      <!-- ========================= -->
-      <!-- TABLE BODY -->
-      <!-- ========================= -->
-
       <tbody>
         @if (facultiesData?.content?.length) {
-          @for (faculty of facultiesData!.content; track faculty.facultyId) {
+          @for (faculty of facultiesData?.content; track faculty.facultyId) {
             <tr>
-              <!-- ========================= -->
-              <!-- ID -->
-              <!-- ========================= -->
-
               <td data-label="ID">
                 <span class="id-badge"> #{{ faculty.facultyId }} </span>
               </td>
 
-              <!-- ========================= -->
-              <!-- FACULTY -->
-              <!-- ========================= -->
-
               <td data-label="Faculty Name">
                 <div class="table-user">
                   <div class="table-avatar">
-                    {{ faculty.firstname.charAt(0).toUpperCase() }}
+                    {{ faculty.firstname.charAt(0) }}
                   </div>
 
-                  <div>
-                    <div class="fw-semibold">
-                      {{ faculty.firstname }}
-                      {{ faculty.lastname }}
-                    </div>
+                  <div class="fw-semibold">
+                    {{ faculty.firstname }}
+                    {{ faculty.lastname }}
                   </div>
                 </div>
               </td>
 
-              <!-- ========================= -->
-              <!-- POSITION -->
-              <!-- ========================= -->
-
               <td data-label="Position">
                 {{ faculty.position }}
               </td>
-
-              <!-- ========================= -->
-              <!-- COLLEGE -->
-              <!-- ========================= -->
 
               <td data-label="College">
                 <span class="college-badge">
                   {{ faculty.college }}
                 </span>
               </td>
+
+              <td data-label="Action">
+                <button type="button" class="edit-btn" (click)="openEditModal(faculty)">
+                  Edit
+                </button>
+              </td>
             </tr>
           }
         } @else {
-          <!-- ========================= -->
-          <!-- EMPTY STATE -->
-          <!-- ========================= -->
-
           <tr>
-            <td colspan="4" class="empty-state">No faculties found</td>
+            <td colspan="5" class="empty-state">No faculties found</td>
           </tr>
         }
       </tbody>
     </table>
   </div>
 
-  <!-- ========================= -->
   <!-- FOOTER -->
-  <!-- ========================= -->
 
   <div class="modern-card-footer">
     <small>
@@ -128,6 +107,7 @@
 
       faculty records
     </small>
+
     <div class="pagination-group">
       <button
         class="pagination-btn"
@@ -136,12 +116,17 @@
       >
         Prev
       </button>
+
       <span class="pagination-info">
         Page
+
         {{ (facultiesData?.page ?? 0) + 1 }}
+
         of
+
         {{ facultiesData?.totalPages ?? 1 }}
       </span>
+
       <button
         class="pagination-btn"
         [disabled]="(facultiesData?.page ?? 0) >= (facultiesData?.totalPages ?? 1) - 1"
@@ -152,3 +137,80 @@
     </div>
   </div>
 </section>
+
+<!-- MODAL -->
+
+@if (selectedFaculty) {
+  <div class="modal fade show d-block">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Update Faculty</h5>
+
+          <button type="button" class="btn-close" (click)="closeEditModal()"></button>
+        </div>
+
+        <form [formGroup]="facultyForm">
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label"> Firstname </label>
+
+              <input type="text" class="form-control" formControlName="firstname" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"> Middlename </label>
+
+              <input type="text" class="form-control" formControlName="middlename" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"> Lastname </label>
+
+              <input type="text" class="form-control" formControlName="lastname" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"> Position </label>
+
+              <input type="text" class="form-control" formControlName="position" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"> Load Limit </label>
+
+              <input type="number" class="form-control" formControlName="loadLimit" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"> College </label>
+
+              <input type="text" class="form-control" formControlName="college" />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label"> Status </label>
+
+              <input type="text" class="form-control" formControlName="status" />
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-light" (click)="closeEditModal()">Cancel</button>
+
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="facultyForm.invalid"
+              (click)="updateFaculty()"
+            >
+              Update
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop fade show"></div>
+}

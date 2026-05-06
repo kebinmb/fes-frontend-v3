@@ -38,4 +38,31 @@ export const adminDataReducer = createReducer(
       error,
     }),
   ),
+  on(
+  AdminActions.loadFaculties,
+  AdminActions.loadUserAccounts,
+  AdminActions.loadFacultyEvaluationScores,
+  AdminActions.updateFaculty,
+  (state) => ({
+    ...state,
+    loading: true,
+    error: null,
+  }),
+),
+on(AdminActions.updateFacultySuccess, (state, { response }) => ({
+  ...state,
+  updateFacultyMessage: response,
+  loading: false,
+})),
+on(
+  AdminActions.loadFacultiesFailure,
+  AdminActions.loadUserAccountsFailure,
+  AdminActions.loadFacultyEvaluationScoresFailure,
+  AdminActions.updateFacultyFailure,
+  (state, { error }) => ({
+    ...state,
+    loading: false,
+    error,
+  }),
+),
 );

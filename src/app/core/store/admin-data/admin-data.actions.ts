@@ -4,11 +4,16 @@ import {
   FetchFacultyResponse,
   FetchUserAccountsResponse,
   PageResponse,
+  UpdateFacultyRequest,
 } from '../../services/admin/admin-service';
 
 export const loadFaculties = createAction(
   '[Admin] Load Faculties',
-  props<{ page: number; size: number }>(),
+  props<{
+    page: number;
+    size: number;
+    search?: string;
+  }>(),
 );
 
 export const loadFacultiesSuccess = createAction(
@@ -48,5 +53,19 @@ export const loadFacultyEvaluationScoresSuccess = createAction(
 
 export const loadFacultyEvaluationScoresFailure = createAction(
   '[Admin] Load Faculty Evaluation Scores Failure',
+  props<{ error: any }>(),
+);
+export const updateFaculty = createAction(
+  '[Admin] Update Faculty',
+  props<{ payload: UpdateFacultyRequest }>(),
+);
+
+export const updateFacultySuccess = createAction(
+  '[Admin] Update Faculty Success',
+  props<{ response: string }>(),
+);
+
+export const updateFacultyFailure = createAction(
+  '[Admin] Update Faculty Failure',
   props<{ error: any }>(),
 );

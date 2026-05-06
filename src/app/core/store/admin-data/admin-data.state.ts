@@ -10,6 +10,8 @@ export interface AdminState {
   userAccounts: PageResponse<FetchUserAccountsResponse> | null;
   facultyEvaluationScores: PageResponse<FetchFacultyEvaluationScoreResponse> | null;
 
+  updateFacultyMessage: string | null;
+
   loading: boolean;
   error: any;
 }
@@ -17,6 +19,7 @@ export const initialAdminState: AdminState = {
   faculties: null,
   userAccounts: null,
   facultyEvaluationScores: null,
+   updateFacultyMessage: null,
   loading: false,
   error: null,
 };

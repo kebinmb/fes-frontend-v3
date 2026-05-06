@@ -3,7 +3,6 @@ import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment.development';
 import { Observable } from 'rxjs';
 export interface PageResponse<T> {
-
   content: T[];
 
   totalElements: number;
@@ -13,7 +12,6 @@ export interface PageResponse<T> {
   page: number;
 
   size: number;
-
 }
 export interface FetchFacultyResponse {
   facultyId: string;
@@ -46,6 +44,17 @@ export interface FetchFacultyEvaluationScoreResponse {
   overallAverageScore: number;
   overallInterpretation: string;
 }
+
+export interface UpdateFacultyRequest {
+  facultyId: string;
+  firstname: string;
+  middlename?: string;
+  lastname: string;
+  position: string;
+  loadLimit: number;
+  college: string;
+  status: string;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -56,8 +65,13 @@ export class AdminService {
   getFaculties(
     page: number = 0,
     size: number = 10,
+    search: string = '',
   ): Observable<PageResponse<FetchFacultyResponse>> {
-    const params = new HttpParams().set('page', page).set('size', size);
+    let params = new HttpParams().set('page', page).set('size', size);
+
+    if (search.trim()) {
+      params = params.set('search', search);
+    }
 
     return this.http.get<PageResponse<FetchFacultyResponse>>(`${this.ADMIN_API_URL}/faculties`, {
       params,
@@ -86,6 +100,28 @@ export class AdminService {
     return this.http.get<PageResponse<FetchFacultyEvaluationScoreResponse>>(
       `${this.ADMIN_API_URL}/faculty-evaluation-score`,
       { params, withCredentials: true },
+    );
+  }
+
+  updateFaculty(payload: UpdateFacultyRequest): Observable<string> {
+    const params = new HttpParams()
+      .set('facultyId', payload.facultyId)
+      .set('firstname', payload.firstname)
+      .set('middlename', payload.middlename ?? '')
+      .set('lastname', payload.lastname)
+      .set('position', payload.position)
+      .set('loadLimit', payload.loadLimit)
+      .set('college', payload.college)
+      .set('status', payload.status);
+
+    return this.http.put(
+      `${this.ADMIN_API_URL}/update-faculty`,
+      {},
+      {
+        params,
+        responseType: 'text',
+        withCredentials: true,
+      },
     );
   }
 }
