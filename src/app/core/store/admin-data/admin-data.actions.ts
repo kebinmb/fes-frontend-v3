@@ -6,6 +6,7 @@ import {
   PageResponse,
   UpdateFacultyRequest,
 } from '../../services/admin/admin-service';
+import { FacultyEvaluationScore } from '../../services/evaluation/evaluation-service';
 
 export const loadFaculties = createAction(
   '[Admin] Load Faculties',
@@ -68,4 +69,29 @@ export const updateFacultySuccess = createAction(
 export const updateFacultyFailure = createAction(
   '[Admin] Update Faculty Failure',
   props<{ error: any }>(),
+);
+
+export const loadFacultyEvaluationScoresByFacultyId = createAction(
+  '[Admin] Load Faculty Evaluation Scores By Faculty Id',
+
+  props<{
+    facultyId: string;
+    classCode:string;
+  }>(),
+);
+
+export const loadFacultyEvaluationScoresByFacultyIdSuccess = createAction(
+  '[Admin] Load Faculty Evaluation Scores By Faculty Id Success',
+
+  props<{
+    response: FacultyEvaluationScore[];
+  }>(),
+);
+
+export const loadFacultyEvaluationScoresByFacultyIdFailure = createAction(
+  '[Admin] Load Faculty Evaluation Scores By Faculty Id Failure',
+
+  props<{
+    error: any;
+  }>(),
 );

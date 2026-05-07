@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment.development';
 import { Observable } from 'rxjs';
+import { FacultyEvaluationScore } from '../evaluation/evaluation-service';
 export interface PageResponse<T> {
   content: T[];
 
@@ -36,8 +37,10 @@ export interface FetchFacultyEvaluationScoreResponse {
   facultyName: string;
   evaluatorId: string;
   classCode: string;
+  college: string;
+  position: string;
   semester: string;
-  schoolYear: string;
+  schoolYear: number;
   subjectCode: string;
   yearLevel: string;
   commentsOrFeedbacks: string;
@@ -120,6 +123,15 @@ export class AdminService {
       {
         params,
         responseType: 'text',
+        withCredentials: true,
+      },
+    );
+  }
+
+  getFacultyEvaluationScoresByFacultyId(facultyId: string, classCode:string): Observable<FacultyEvaluationScore[]> {
+    return this.http.get<FacultyEvaluationScore[]>(
+      `${this.ADMIN_API_URL}/faculty-evaluation-score/${facultyId}/${classCode}`,
+      {
         withCredentials: true,
       },
     );

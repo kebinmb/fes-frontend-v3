@@ -39,30 +39,37 @@ export const adminDataReducer = createReducer(
     }),
   ),
   on(
-  AdminActions.loadFaculties,
-  AdminActions.loadUserAccounts,
-  AdminActions.loadFacultyEvaluationScores,
-  AdminActions.updateFaculty,
-  (state) => ({
+    AdminActions.loadFaculties,
+    AdminActions.loadUserAccounts,
+    AdminActions.loadFacultyEvaluationScores,
+    AdminActions.updateFaculty,
+    AdminActions.loadFacultyEvaluationScoresByFacultyId,
+    (state) => ({
+      ...state,
+      loading: true,
+      error: null,
+    }),
+  ),
+  on(AdminActions.updateFacultySuccess, (state, { response }) => ({
     ...state,
-    loading: true,
-    error: null,
-  }),
-),
-on(AdminActions.updateFacultySuccess, (state, { response }) => ({
-  ...state,
-  updateFacultyMessage: response,
-  loading: false,
-})),
-on(
-  AdminActions.loadFacultiesFailure,
-  AdminActions.loadUserAccountsFailure,
-  AdminActions.loadFacultyEvaluationScoresFailure,
-  AdminActions.updateFacultyFailure,
-  (state, { error }) => ({
-    ...state,
+    updateFacultyMessage: response,
     loading: false,
-    error,
-  }),
-),
+  })),
+  on(
+    AdminActions.loadFacultiesFailure,
+    AdminActions.loadUserAccountsFailure,
+    AdminActions.loadFacultyEvaluationScoresFailure,
+    AdminActions.updateFacultyFailure,
+    AdminActions.loadFacultyEvaluationScoresByFacultyIdFailure,
+    (state, { error }) => ({
+      ...state,
+      loading: false,
+      error,
+    }),
+  ),
+  on(AdminActions.loadFacultyEvaluationScoresByFacultyIdSuccess, (state, { response }) => ({
+    ...state,
+    facultyEvaluationScoresByFacultyId: response,
+    loading: false,
+  })),
 );

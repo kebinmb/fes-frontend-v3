@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AdminService } from '../../services/admin/admin-service';
-import { mergeMap, map, catchError, of, tap } from 'rxjs';
+import { mergeMap, map, catchError, of, tap, switchMap } from 'rxjs';
 import * as AdminDataActions from './admin-data.actions';
 @Injectable({
   providedIn: 'root',
@@ -61,7 +61,29 @@ export class AdminEffects {
       ),
     ),
   );
+  loadFacultyEvaluationScoresByFacultyId$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AdminDataActions.loadFacultyEvaluationScoresByFacultyId),
 
+      switchMap(({ facultyId, classCode }) =>
+        this.adminDataService.getFacultyEvaluationScoresByFacultyId(facultyId, classCode).pipe(
+          map((response) =>
+            AdminDataActions.loadFacultyEvaluationScoresByFacultyIdSuccess({
+              response,
+            }),
+          ),
+
+          catchError((error) =>
+            of(
+              AdminDataActions.loadFacultyEvaluationScoresByFacultyIdFailure({
+                error,
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
   updateFaculty$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AdminDataActions.updateFaculty),

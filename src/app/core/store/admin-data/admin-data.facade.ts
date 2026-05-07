@@ -12,6 +12,9 @@ export class AdminDataFacade {
   facultyEvaluationScores$ = this.store.select(AdminDataSelectors.selectFacultyEvaluationScores);
   loading$ = this.store.select(AdminDataSelectors.selectLoading);
   updateFacultyMessage$ = this.store.select(AdminDataSelectors.selectUpdateFacultyMessage);
+  facultyEvaluationScoresByFacultyId$ = this.store.select(
+    AdminDataSelectors.selectFacultyEvaluationScoresByFacultyId,
+  );
   loadFaculties(page: number, size: number, search: string = ''): void {
     this.store.dispatch(
       AdminDataActions.loadFaculties({
@@ -28,6 +31,14 @@ export class AdminDataFacade {
 
   loadFacultyEvaluationScores(page: number, size: number) {
     this.store.dispatch(AdminDataActions.loadFacultyEvaluationScores({ page, size }));
+  }
+  loadFacultyEvaluationScoresByFacultyId(facultyId: string, classCode:string): void {
+    this.store.dispatch(
+      AdminDataActions.loadFacultyEvaluationScoresByFacultyId({
+        facultyId,
+        classCode
+      }),
+    );
   }
   updateFaculty(payload: UpdateFacultyRequest) {
     this.store.dispatch(AdminDataActions.updateFaculty({ payload }));

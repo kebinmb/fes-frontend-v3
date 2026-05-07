@@ -19,7 +19,7 @@ export interface SubjectEvaluationDTO {
   classCode: string;
   subjectCode: string;
   semester: string;
-  yearLevel:string;
+  yearLevel: string;
   schoolYear: number;
   accessCode: string;
   ratings: Record<string, string>;
@@ -61,6 +61,8 @@ export interface FacultyEvaluationScore {
   evaluatorId: string;
   facultyId: string;
   subjectCode: string;
+  college:string;
+  position:string;
   classCode: string;
   semester: string;
   schoolYear: number;
@@ -279,8 +281,8 @@ export class EvaluationService {
     facultyId: string,
     evaluatorId: string,
     classCode: string,
-    subjectCode:string,
-    yearLevel:string,
+    subjectCode: string,
+    yearLevel: string,
     semester: string,
     schoolYear: number,
   ): Observable<EvaluationCheckResponse> {
@@ -288,8 +290,8 @@ export class EvaluationService {
       .set('facultyId', facultyId)
       .set('evaluatorId', evaluatorId)
       .set('classCode', classCode)
-      .set('subjectCode',subjectCode)
-      .set('yearLevel',yearLevel)
+      .set('subjectCode', subjectCode)
+      .set('yearLevel', yearLevel)
       .set('semester', semester)
       .set('schoolYear', schoolYear.toString());
 

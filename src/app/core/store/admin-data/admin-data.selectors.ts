@@ -21,3 +21,8 @@ export const selectUpdateFacultyMessage = createSelector(
   selectAdminDataState,
   (state) => state.updateFacultyMessage,
 );
+export const selectFacultyEvaluationScoresByFacultyId = createSelector(
+  selectAdminDataState,
+
+  (state) => state.facultyEvaluationScoresByFacultyId,
+);
