@@ -54,7 +54,7 @@ export class SupervisorDashboardComponent {
     this.supervisorDataFacade.loadFaculties(this.key, this.college, this.status);
   }
   schoolYear() {
-    return new Date().getFullYear();
+    return 2025;
   }
   semester() {
     return '2nd';
