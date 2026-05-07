@@ -57,7 +57,7 @@ export class SupervisorDashboardComponent {
     return new Date().getFullYear();
   }
   semester() {
-    return '1st';
+    return '2nd';
   }
   onFacultyClick(faculty: any) {
     console.log('Faculty clicked:', faculty);
