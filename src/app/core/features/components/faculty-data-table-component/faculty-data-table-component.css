@@ -1,321 +1,492 @@
-:host {
-  display: block;
-  width: 100%;
-}
-
-/* CARD */
+/* =========================================================
+   MODERN FACULTY TABLE UI
+   ========================================================= */
 
 .modern-card {
-  background: var(--bs-body-bg);
-  border: 1px solid var(--bs-border-color);
+  background: var(--chmsu-surface);
+  border: 1px solid var(--chmsu-border);
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
 .card-topbar {
   height: 5px;
-  background: linear-gradient(90deg, var(--bs-primary), var(--bs-success), var(--bs-warning));
+  background: var(--chmsu-primary);
 }
 
-/* HEADER */
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .modern-card-header {
-  padding: 1.5rem;
-  border-bottom: 1px solid var(--bs-border-color);
-
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1.8rem;
+  border-bottom: 1px solid var(--chmsu-border);
 }
 
 .modern-card-header h2 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: var(--bs-body-color);
+  color: var(--chmsu-primary-dark);
 }
 
 .modern-card-header span {
-  color: var(--bs-secondary-color);
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--chmsu-muted);
+  font-size: 0.95rem;
 }
 
 .table-count {
-  width: 60px;
-  height: 60px;
-  border-radius: 18px;
-
+  min-width: 70px;
+  height: 70px;
+  border-radius: 20px;
+  background: var(--chmsu-bg-soft);
   display: flex;
   align-items: center;
   justify-content: center;
-
-  background: var(--bs-primary-bg-subtle);
-  color: var(--bs-primary);
-
+  color: var(--chmsu-primary);
+  font-size: 1.4rem;
   font-weight: 700;
 }
 
-/* TABLE */
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.search-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  min-width: 260px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--chmsu-border);
+  background: var(--chmsu-bg);
+  padding: 0 1rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--chmsu-primary);
+  box-shadow: 0 0 0 4px rgba(24, 100, 67, 0.08);
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.edit-btn,
+.pagination-btn,
+.btn-primary {
+  border: none;
+  border-radius: 14px;
+  background: var(--chmsu-primary);
+  color: white;
+  padding: 0.7rem 1.1rem;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.edit-btn:hover,
+.pagination-btn:hover,
+.btn-primary:hover {
+  background: var(--chmsu-primary-light);
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-light {
+  border-radius: 14px;
+  padding: 0.7rem 1rem;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
 
 .table-responsive {
   overflow-x: auto;
 }
 
+.modern-table {
+  width: 100%;
+  margin: 0;
+}
+
 .modern-table thead th {
-  background: var(--bs-tertiary-bg);
-  border: none;
-
-  padding: 1rem;
-
-  color: var(--bs-secondary-color);
-
-  font-size: 0.8rem;
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary-dark);
+  font-size: 0.82rem;
   font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: none;
+  padding: 1rem 1.2rem;
+  white-space: nowrap;
 }
 
 .modern-table tbody td {
-  padding: 1rem;
-  border-top: 1px solid var(--bs-border-color);
+  border-top: 1px solid var(--chmsu-border);
+  padding: 1rem 1.2rem;
   vertical-align: middle;
+  color: var(--chmsu-text);
+}
+
+.modern-table tbody tr {
+  transition: 0.2s ease;
 }
 
 .modern-table tbody tr:hover {
-  background: var(--bs-tertiary-bg);
+  background: rgba(24, 100, 67, 0.03);
 }
 
-/* USER */
+/* =========================================================
+   TABLE CONTENT
+   ========================================================= */
+
+.id-badge {
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary);
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
 
 .table-user {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.85rem;
 }
 
 .table-avatar {
   width: 42px;
   height: 42px;
-
   border-radius: 50%;
-
+  background: var(--chmsu-primary);
+  color: white;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  background: var(--bs-primary);
-  color: white;
-
-  font-weight: 700;
 }
 
-/* BADGES */
-
-.id-badge,
 .college-badge {
-  padding: 0.45rem 0.8rem;
+  background: rgba(229, 212, 19, 0.15);
+  color: #7c7200;
+  padding: 0.45rem 0.85rem;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
 }
 
-.id-badge {
-  background: var(--bs-primary-bg-subtle);
-  color: var(--bs-primary);
+.empty-state {
+  text-align: center;
+  padding: 3rem !important;
+  color: var(--chmsu-muted);
+  font-size: 0.95rem;
 }
 
-.college-badge {
-  background: var(--bs-warning-bg-subtle);
-  color: var(--bs-warning-text-emphasis);
-}
-
-/* BUTTON */
-
-.edit-btn {
-  border: none;
-
-  background: var(--bs-primary);
-  color: white;
-
-  border-radius: 12px;
-
-  padding: 0.6rem 1rem;
-
-  font-size: 0.85rem;
-  font-weight: 600;
-
-  transition: 0.2s ease;
-}
-
-.edit-btn:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-}
-
-/* FOOTER */
+/* =========================================================
+   FOOTER
+   ========================================================= */
 
 .modern-card-footer {
-  padding: 1.25rem 1.5rem;
-
-  border-top: 1px solid var(--bs-border-color);
-
+  padding: 1.2rem 1.8rem;
+  border-top: 1px solid var(--chmsu-border);
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.modern-card-footer small {
+  color: var(--chmsu-muted);
 }
 
 .pagination-group {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-}
-
-.pagination-btn {
-  border: none;
-
-  padding: 0.7rem 1rem;
-
-  border-radius: 12px;
-
-  background: var(--bs-primary);
-  color: white;
-
-  font-weight: 600;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.5;
+  gap: 0.85rem;
 }
 
 .pagination-info {
-  color: var(--bs-secondary-color);
+  font-size: 0.92rem;
+  color: var(--chmsu-muted);
+}
+/* =========================================================
+   MODERN MODAL
+   ========================================================= */
+
+.modern-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  animation: fadeBackdrop 0.25s ease;
 }
 
-/* EMPTY */
-
-.empty-state {
-  text-align: center;
-  padding: 3rem !important;
-  color: var(--bs-secondary-color);
+.modern-modal-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 1055;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
 }
 
-/* MODAL */
-
-.modal-content {
-  border: none;
-  border-radius: 24px;
-  overflow: hidden;
-}
-
-.modal-header,
-.modal-footer {
-  border-color: var(--bs-border-color);
-}
-
-.modal-body {
-  padding: 1.5rem;
-}
-
-.form-control {
-  border-radius: 12px;
-  min-height: 48px;
-}
-
-.form-control:focus {
-  box-shadow: none;
-  border-color: var(--bs-primary);
-}
-
-/* MOBILE */
-
-@media (max-width: 768px) {
-  .modern-card-header,
-  .modern-card-footer {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .pagination-group {
-    width: 100%;
-  }
-
-  .pagination-btn {
-    flex: 1;
-  }
-
-  .modern-table thead {
-    display: none;
-  }
-
-  .modern-table,
-  .modern-table tbody,
-  .modern-table tr,
-  .modern-table td {
-    display: block;
-    width: 100%;
-  }
-
-  .modern-table tr {
-    padding: 1rem;
-    border-bottom: 1px solid var(--bs-border-color);
-  }
-
-  .modern-table td {
-    border: none;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-
-    gap: 1rem;
-  }
-
-  .modern-table td::before {
-    content: attr(data-label);
-
-    font-weight: 700;
-    color: var(--bs-secondary-color);
-  }
-
-  .edit-btn {
-    width: 100%;
-  }
-}
-.search-wrapper {
-  margin-top: 1rem;
-}
-
-.search-input {
+.modern-modal {
   width: 100%;
-  max-width: 320px;
+  max-width: 720px;
+  background: var(--chmsu-surface);
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid var(--chmsu-border);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
+}
 
-  border: 1px solid var(--bs-border-color);
+/* =========================================================
+   ANIMATION
+   ========================================================= */
 
-  background: var(--bs-body-bg);
-  color: var(--bs-body-color);
+.animate-modal {
+  animation: modalSlide 0.28s ease;
+}
 
+@keyframes modalSlide {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeBackdrop {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.modern-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem 1.2rem;
+  border-bottom: 1px solid var(--chmsu-border);
+}
+
+.modal-title-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.modal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+}
+
+.modal-title-group h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--chmsu-primary-dark);
+}
+
+.modal-title-group span {
+  color: var(--chmsu-muted);
+  font-size: 0.92rem;
+}
+
+.modern-close-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
   border-radius: 14px;
-
-  min-height: 46px;
-
-  padding: 0.75rem 1rem;
-
-  outline: none;
-
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-text);
   transition: 0.2s ease;
 }
 
-.search-input:focus {
-  border-color: var(--bs-primary);
-
-  box-shadow: 0 0 0 0.15rem rgba(var(--bs-primary-rgb), 0.15);
+.modern-close-btn:hover {
+  background: #f1dede;
+  color: #c0392b;
 }
 
-@media (max-width: 768px) {
+/* =========================================================
+   BODY
+   ========================================================= */
 
-  .search-input {
+.modern-modal-body {
+  padding: 1.5rem;
+}
+
+.modern-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.form-group-modern {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group-modern label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--chmsu-primary-dark);
+}
+
+.modern-input {
+  height: 50px;
+  border-radius: 16px;
+  border: 1px solid var(--chmsu-border);
+  background: var(--chmsu-bg);
+  padding: 0 1rem;
+  font-size: 0.95rem;
+  transition: 0.2s ease;
+  outline: none;
+}
+
+.modern-input:focus {
+  border-color: var(--chmsu-primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(24, 100, 67, 0.08);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.modern-modal-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--chmsu-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.cancel-btn,
+.save-btn {
+  height: 48px;
+  border: none;
+  border-radius: 16px;
+  padding: 0 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  transition: 0.2s ease;
+}
+
+.cancel-btn {
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-text);
+}
+
+.cancel-btn:hover {
+  background: #ececec;
+}
+
+.save-btn {
+  background: var(--chmsu-primary);
+  color: white;
+}
+
+.save-btn:hover {
+  background: var(--chmsu-primary-light);
+  transform: translateY(-1px);
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .modern-modal {
     max-width: 100%;
+    border-radius: 24px;
   }
 
+  .modern-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+
+  .modern-modal-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .modern-close-btn {
+    align-self: flex-end;
+  }
+
+  .modern-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }

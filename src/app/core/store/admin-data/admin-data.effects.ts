@@ -65,11 +65,28 @@ export class AdminEffects {
   updateFaculty$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AdminDataActions.updateFaculty),
+
       mergeMap(({ payload }) =>
         this.adminDataService.updateFaculty(payload).pipe(
           tap((response) => console.log('UPDATE FACULTY RESPONSE', response)),
-          map((response) => AdminDataActions.updateFacultySuccess({ response })),
-          catchError((error) => of(AdminDataActions.updateFacultyFailure({ error }))),
+
+          mergeMap((response) => [
+            AdminDataActions.updateFacultySuccess({ response }),
+
+            AdminDataActions.loadFaculties({
+              page: 0,
+              size: 10,
+              search: '',
+            }),
+          ]),
+
+          catchError((error) =>
+            of(
+              AdminDataActions.updateFacultyFailure({
+                error,
+              }),
+            ),
+          ),
         ),
       ),
     ),
