@@ -1,24 +1,35 @@
-/* =========================================
+/* =========================================================
+   SIDEBAR LAYOUT
+   ========================================================= */
+
+.admin-sidebar {
+  width: 290px;
+  height: 100vh;
+  background: var(--chmsu-surface);
+  border-right: 1px solid var(--chmsu-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  transition: transform 0.28s ease;
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.03);
+}
+
+/* =========================================================
    OVERLAY
-========================================= */
+   ========================================================= */
 
 .sidebar-overlay {
   position: fixed;
   inset: 0;
-
-  background:
-    rgba(0,0,0,0.45);
-
-  backdrop-filter: blur(4px);
-
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
   opacity: 0;
   visibility: hidden;
-
-  z-index: 1100;
-
-  transition:
-    opacity 0.25s ease,
-    visibility 0.25s ease;
+  transition: 0.25s ease;
+  z-index: 1035;
 }
 
 .sidebar-overlay.show {
@@ -26,153 +37,61 @@
   visibility: visible;
 }
 
-/* =========================================
-   SIDEBAR
-========================================= */
-
-.admin-sidebar {
-  position: fixed;
-
-  top: 0;
-  left: 0;
-
-  width: 290px;
-  height: 100vh;
-
-  display: flex;
-  flex-direction: column;
-
-  background:
-    linear-gradient(
-      180deg,
-      var(--chmsu-primary-dark) 0%,
-      var(--chmsu-primary) 100%
-    );
-
-  border-right:
-    1px solid rgba(255,255,255,0.08);
-
-  box-shadow:
-    0 18px 50px rgba(0,0,0,0.18);
-
-  z-index: 1200;
-
-  overflow: hidden;
-
-  transition:
-    transform 0.3s ease;
-}
-
-/* =========================================
-   SIDEBAR HEADER
-========================================= */
+/* =========================================================
+   HEADER
+   ========================================================= */
 
 .sidebar-header {
-  padding:
-    1.4rem
-    1.2rem
-    1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--chmsu-border);
 }
-
-/* =========================================
-   LOGO
-========================================= */
 
 .sidebar-logo {
   display: flex;
   align-items: center;
   gap: 1rem;
-
-  padding:
-    1rem;
-
-  border-radius: 24px;
-
-  background:
-    rgba(255,255,255,0.08);
-
-  border:
-    1px solid rgba(255,255,255,0.06);
-
-  backdrop-filter: blur(16px);
 }
 
-/* =========================================
-   LOGO ICON
-========================================= */
-
 .logo-icon {
-  width: 60px;
-  height: 60px;
-
-  flex-shrink: 0;
-
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  background: var(--chmsu-primary);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border-radius: 20px;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--chmsu-accent),
-      #f6ea5d
-    );
-
-  color:
-    var(--chmsu-primary-dark);
-
   font-size: 1rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
-
-  box-shadow:
-    0 10px 28px rgba(229,212,19,0.25);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
 }
-
-/* =========================================
-   LOGO CONTENT
-========================================= */
 
 .logo-content h2 {
   margin: 0;
-
-  color: white;
-
   font-size: 1.1rem;
-  font-weight: 800;
+  font-weight: 700;
+  color: var(--chmsu-primary-dark);
 }
 
 .logo-content span {
-  display: block;
-
-  margin-top: 0.35rem;
-
-  color:
-    rgba(255,255,255,0.7);
-
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+  color: var(--chmsu-muted);
 }
 
-/* =========================================
-   SIDEBAR BODY
-========================================= */
+/* =========================================================
+   BODY
+   ========================================================= */
 
 .sidebar-body {
   flex: 1;
-
   overflow-y: auto;
-
-  padding:
-    0
-    1rem
-    1rem;
+  padding: 1.25rem 1rem;
 }
 
-/* =========================================
+/* =========================================================
    NAVIGATION
-========================================= */
+   ========================================================= */
 
 .sidebar-nav {
   display: flex;
@@ -180,173 +99,108 @@
   gap: 0.45rem;
 }
 
-/* =========================================
-   NAV ITEM
-========================================= */
-
 .nav-item {
-  position: relative;
-
+  height: 54px;
+  border-radius: 18px;
   display: flex;
   align-items: center;
-  gap: 1rem;
-
-  padding:
-    0.95rem
-    1rem;
-
-  border-radius: 18px;
-
-  color:
-    rgba(255,255,255,0.8);
-
+  gap: 0.9rem;
+  padding: 0 1rem;
   text-decoration: none;
-
-  font-size: 0.95rem;
+  color: var(--chmsu-text);
   font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    color 0.2s ease;
+  transition: 0.2s ease;
+  position: relative;
 }
 
 .nav-item i {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  color: var(--chmsu-muted);
+  transition: 0.2s ease;
 }
 
-/* =========================================
-   ACTIVE
-========================================= */
-
-.nav-item.active {
-  background:
-    rgba(255,255,255,0.12);
-
-  color: white;
-
-  box-shadow:
-    0 10px 25px rgba(0,0,0,0.12);
+.nav-item span {
+  font-size: 0.95rem;
 }
 
-.nav-item.active::before {
-  content: "";
-
-  position: absolute;
-
-  top: 12px;
-  left: 0;
-
-  width: 4px;
-  height: calc(100% - 24px);
-
-  border-radius: 50px;
-
-  background:
-    var(--chmsu-accent);
-}
-
-/* =========================================
-   HOVER
-========================================= */
+/* HOVER */
 
 .nav-item:hover {
-  transform: translateX(4px);
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary);
+}
 
-  background:
-    rgba(255,255,255,0.08);
+.nav-item:hover i {
+  color: var(--chmsu-primary);
+}
 
+/* ACTIVE */
+
+.nav-item.active {
+  background: var(--chmsu-primary);
+  color: white;
+  box-shadow: 0 8px 20px rgba(24, 100, 67, 0.16);
+}
+
+.nav-item.active i {
   color: white;
 }
 
-/* =========================================
+/* =========================================================
    FOOTER
-========================================= */
+   ========================================================= */
 
 .sidebar-footer {
+  border-top: 1px solid var(--chmsu-border);
+  padding: 1.25rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-
-  margin:
-    1rem;
-
-  padding:
-    1rem;
-
-  border-radius: 20px;
-
-  background:
-    rgba(255,255,255,0.08);
-
-  border:
-    1px solid rgba(255,255,255,0.08);
-
-  backdrop-filter: blur(14px);
+  gap: 0.9rem;
 }
 
-/* =========================================
-   AVATAR
-========================================= */
-
 .admin-avatar {
-  width: 50px;
-  height: 50px;
-
-  flex-shrink: 0;
-
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary);
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border-radius: 50%;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--chmsu-accent),
-      #f6ea5d
-    );
-
-  color:
-    var(--chmsu-primary-dark);
-
-  font-size: 1rem;
-  font-weight: 800;
+  flex-shrink: 0;
 }
-
-/* =========================================
-   FOOTER CONTENT
-========================================= */
 
 .footer-content h3 {
   margin: 0;
-
-  color: white;
-
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 700;
+  color: var(--chmsu-primary-dark);
 }
 
 .footer-content span {
-  display: block;
-
-  margin-top: 0.25rem;
-
-  color:
-    rgba(255,255,255,0.7);
-
-  font-size: 0.78rem;
+  font-size: 0.82rem;
+  color: var(--chmsu-muted);
 }
 
-/* =========================================
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.sidebar-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-body::-webkit-scrollbar-thumb {
+  background: #d7dede;
+  border-radius: 999px;
+}
+
+/* =========================================================
    MOBILE
-========================================= */
+   ========================================================= */
 
-@media (max-width: 992px) {
-
+@media (max-width: 991px) {
   .admin-sidebar {
     transform: translateX(-100%);
   }
@@ -354,14 +208,29 @@
   .admin-sidebar.mobile-open {
     transform: translateX(0);
   }
-
 }
 
-@media (max-width: 768px) {
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
 
+@media (max-width: 576px) {
   .admin-sidebar {
-    width: 85%;
+    width: 100%;
     max-width: 320px;
   }
 
+  .sidebar-header,
+  .sidebar-footer {
+    padding: 1.25rem;
+  }
+
+  .sidebar-body {
+    padding: 1rem 0.85rem;
+  }
+
+  .nav-item {
+    height: 50px;
+    border-radius: 16px;
+  }
 }

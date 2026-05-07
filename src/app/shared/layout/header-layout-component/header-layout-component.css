@@ -1,37 +1,23 @@
-/* =========================================
+/* =========================================================
    HEADER
-========================================= */
+   ========================================================= */
 
 .admin-header {
-  position: sticky;
-  top: 0;
-
-  z-index: 1000;
-
+  height: 84px;
+  background: var(--chmsu-surface);
+  border-bottom: 1px solid var(--chmsu-border);
+  padding: 0 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-
-  padding:
-    1rem
-    2rem;
-
-  background:
-    rgba(255,255,255,0.82);
-
-  backdrop-filter: blur(18px);
-
-  border-bottom:
-    1px solid rgba(0,0,0,0.05);
-
-  box-shadow:
-    0 8px 24px rgba(15,23,42,0.04);
+  position: sticky;
+  top: 0;
+  z-index: 1030;
 }
 
-/* =========================================
+/* =========================================================
    LEFT
-========================================= */
+   ========================================================= */
 
 .header-left {
   display: flex;
@@ -39,78 +25,51 @@
   gap: 1rem;
 }
 
-/* =========================================
-   MENU TOGGLE
-========================================= */
-
 .menu-toggle {
-  width: 46px;
-  height: 46px;
-
-  display: none;
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 16px;
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary);
+  font-size: 1.35rem;
+  display: flex;
   align-items: center;
   justify-content: center;
-
-  border: none;
-  outline: none;
-
-  border-radius: 14px;
-
-  background:
-    rgba(24,100,67,0.08);
-
-  color:
-    var(--chmsu-primary-dark);
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
+  transition: 0.2s ease;
 }
 
 .menu-toggle:hover {
-  background:
-    var(--chmsu-primary);
-
+  background: var(--chmsu-primary);
   color: white;
-
-  transform: translateY(-1px);
+}
+.menu-toggle {
+  display: none;
 }
 
-.menu-toggle i {
-  font-size: 1.2rem;
+/* MOBILE */
+
+@media (max-width: 991px) {
+  .menu-toggle {
+    display: flex;
+  }
 }
-
-/* =========================================
-   TITLE
-========================================= */
-
 .header-title-group h1 {
   margin: 0;
-
-  color:
-    var(--chmsu-primary-dark);
-
-  font-size: 1.45rem;
-  font-weight: 800;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--chmsu-primary-dark);
 }
 
 .header-title-group p {
-  margin:
-    0.3rem
-    0
-    0;
-
-  color:
-    var(--chmsu-muted);
-
-  font-size: 0.88rem;
+  margin: 0.15rem 0 0;
+  color: var(--chmsu-muted);
+  font-size: 0.9rem;
 }
 
-/* =========================================
+/* =========================================================
    RIGHT
-========================================= */
+   ========================================================= */
 
 .header-right {
   display: flex;
@@ -118,219 +77,120 @@
   gap: 1rem;
 }
 
-/* =========================================
-   SEARCH
-========================================= */
-
-.search-wrapper {
-  position: relative;
-
-  width: 280px;
-}
-
-.search-wrapper i {
-  position: absolute;
-
-  top: 50%;
-  left: 1rem;
-
-  transform: translateY(-50%);
-
-  color:
-    var(--chmsu-muted);
-}
-
-.search-wrapper input {
-  width: 100%;
-
-  padding:
-    0.85rem
-    1rem
-    0.85rem
-    2.8rem;
-
-  border:
-    1px solid var(--chmsu-border);
-
-  border-radius: 16px;
-
-  background:
-    rgba(248,249,250,0.85);
-
-  outline: none;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.search-wrapper input:focus {
-  border-color:
-    var(--chmsu-primary);
-
-  box-shadow:
-    0 0 0 4px rgba(24,100,67,0.08);
-}
-
-/* =========================================
-   NOTIFICATION
-========================================= */
-
-.notification-btn {
-  position: relative;
-
-  width: 46px;
-  height: 46px;
-
-  border: none;
-  outline: none;
-
-  border-radius: 14px;
-
-  background:
-    rgba(24,100,67,0.08);
-
-  color:
-    var(--chmsu-primary-dark);
-
-  cursor: pointer;
-}
-
-.notification-dot {
-  position: absolute;
-
-  top: 10px;
-  right: 10px;
-
-  width: 10px;
-  height: 10px;
-
-  border-radius: 50%;
-
-  background:
-    var(--chmsu-warning);
-}
-
-/* =========================================
+/* =========================================================
    PROFILE
-========================================= */
+   ========================================================= */
 
 .profile-card {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-
-  padding:
-    0.5rem
-    0.8rem;
-
-  border-radius: 18px;
-
-  background:
-    rgba(248,249,250,0.9);
-
-  border:
-    1px solid rgba(0,0,0,0.04);
+  gap: 0.85rem;
+  background: var(--chmsu-bg);
+  border: 1px solid var(--chmsu-border);
+  border-radius: 20px;
+  padding: 0.65rem 0.9rem;
 }
 
-/* =========================================
-   PROFILE AVATAR
-========================================= */
-
 .profile-avatar {
-  width: 44px;
-  height: 44px;
-
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--chmsu-primary);
+  color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  border-radius: 50%;
-
-  background:
-    linear-gradient(
-      135deg,
-      var(--chmsu-primary),
-      var(--chmsu-primary-light)
-    );
-
-  color: white;
-
-  font-weight: 800;
+  font-weight: 700;
+  font-size: 1rem;
 }
-
-/* =========================================
-   PROFILE CONTENT
-========================================= */
 
 .profile-content h3 {
   margin: 0;
-
-  color:
-    var(--chmsu-primary-dark);
-
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 700;
+  color: var(--chmsu-primary-dark);
 }
 
 .profile-content span {
-  display: block;
-
-  margin-top: 0.2rem;
-
-  color:
-    var(--chmsu-muted);
-
-  font-size: 0.76rem;
+  font-size: 0.82rem;
+  color: var(--chmsu-muted);
 }
 
-/* =========================================
-   DROPDOWN BUTTON
-========================================= */
+/* =========================================================
+   LOGOUT
+   ========================================================= */
 
-.profile-dropdown-btn {
+.logout-btn {
+  height: 48px;
+  padding: 0 1.1rem;
   border: none;
-  background: transparent;
-
-  color:
-    var(--chmsu-muted);
-
-  cursor: pointer;
+  border-radius: 16px;
+  background: #fff1f0;
+  color: #cf3f35;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-weight: 600;
+  transition: 0.2s ease;
 }
 
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 992px) {
-
-  .menu-toggle {
-    display: flex;
-  }
-
-  .search-wrapper {
-    display: none;
-  }
-
+.logout-btn:hover {
+  background: #cf3f35;
+  color: white;
+  transform: translateY(-1px);
 }
+
+.logout-btn i {
+  font-size: 1rem;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
 
 @media (max-width: 768px) {
-
   .admin-header {
-    padding:
-      1rem;
+    padding: 0 1rem;
+    height: auto;
+    min-height: 78px;
+  }
+
+  .header-title-group p {
+    display: none;
   }
 
   .profile-content {
     display: none;
   }
 
-  .profile-dropdown-btn {
+  .profile-card {
+    padding: 0.5rem;
+  }
+
+  .logout-btn span {
     display: none;
   }
 
+  .logout-btn {
+    width: 48px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
   .header-title-group h1 {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
+  .menu-toggle,
+  .logout-btn,
+  .profile-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .header-right {
+    gap: 0.6rem;
+  }
 }

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { SidebarService } from '../../../core/services/layout/sidebar/sidebar-service';
 
 @Component({
   selector: 'app-sidebar-layout-component',
@@ -8,13 +9,9 @@ import { Router, RouterModule } from '@angular/router';
   styleUrl: './sidebar-layout-component.css',
 })
 export class SidebarLayoutComponent {
-  sidebarOpen = false;
-
-  toggleSidebar(): void {
-    this.sidebarOpen = !this.sidebarOpen;
-  }
+  sidebarService = inject(SidebarService);
 
   closeSidebar(): void {
-    this.sidebarOpen = false;
+    this.sidebarService.closeSidebar();
   }
 }
