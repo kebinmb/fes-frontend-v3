@@ -39,12 +39,12 @@ export class AuthEffects {
             return of(
               AuthActions.generateAccessCodeForStudentFailure({
                 error: extractErrorMessage(error),
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
   generateAccessCodeSuccess$ = createEffect(
     () =>
@@ -52,9 +52,9 @@ export class AuthEffects {
         ofType(AuthActions.generateAccessCodeForStudentSuccess),
         tap(() => {
           this.toastFacade.showToast('Access Code Generated', 'success');
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
   generateAccessCodeFailure$ = createEffect(
     () =>
@@ -62,9 +62,9 @@ export class AuthEffects {
         ofType(AuthActions.generateAccessCodeForStudentFailure),
         tap(({ error }) => {
           this.toastFacade.showToast(`${error}`, 'error');
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
   loginStudent$ = createEffect(() =>
     this.actions$.pipe(
@@ -87,12 +87,12 @@ export class AuthEffects {
             return of(
               AuthActions.studentLoginFailure({
                 error: extractErrorMessage(error),
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
   loginStudentSuccess$ = createEffect(
     () =>
@@ -101,12 +101,10 @@ export class AuthEffects {
         tap(() => {
           this.toastFacade.showToast(`Login successful`, 'success');
           this.spinnerFacade.hideSpinner();
-          Promise.resolve().then(() =>
-            this.router.navigate(['/student-dashboard'])
-          );
-        })
+          Promise.resolve().then(() => this.router.navigate(['/student-dashboard']));
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
   loginStudentFailure$ = createEffect(
     () =>
@@ -114,9 +112,9 @@ export class AuthEffects {
         ofType(AuthActions.studentLoginFailure),
         tap(({ error }) => {
           this.toastFacade.showToast(`Login failed ${error}`, 'error');
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
   loginSupervisor$ = createEffect(() =>
     this.actions$.pipe(
@@ -141,12 +139,12 @@ export class AuthEffects {
             return of(
               AuthActions.supervisorLoginFailure({
                 error: extractErrorMessage(error),
-              })
+              }),
             );
-          })
+          }),
         );
-      })
-    )
+      }),
+    ),
   );
   loginSupervisorSuccess$ = createEffect(
     () =>
@@ -154,12 +152,10 @@ export class AuthEffects {
         ofType(AuthActions.supervisorLoginSuccess),
         tap(() => {
           this.toastFacade.showToast(`Login successful`, 'success');
-          Promise.resolve().then(() =>
-            this.router.navigate(['/supervisor-dashboard'])
-          );
-        })
+          Promise.resolve().then(() => this.router.navigate(['/supervisor-dashboard']));
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 
   loginSupervisorFailure$ = createEffect(
@@ -168,36 +164,97 @@ export class AuthEffects {
         ofType(AuthActions.supervisorLoginFailure),
         tap(({ error }) => {
           this.toastFacade.showToast(`${error}`, 'error');
-        })
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
+  );
+  loginAdmin$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.administratorLogin),
+      exhaustMap(({ username, password }) => {
+        this.spinnerFacade.showSpinner();
+
+        return this.authService.administratorLogin(username, password).pipe(
+          tap((response: any) => {
+            sessionStorage.setItem('college', response.college);
+          }),
+          map((response: any) => {
+            this.spinnerFacade.hideSpinner();
+            return AuthActions.administratorLoginSuccess({
+              administratorId: response.administratorId,
+              role: 'ROLE_ADMIN',
+            });
+          }),
+          catchError((error) => {
+            this.spinnerFacade.hideSpinner();
+            return of(
+              AuthActions.administratorLoginFailure({
+                error: extractErrorMessage(error),
+              }),
+            );
+          }),
+        );
+      }),
+    ),
+  );
+  loginAdministratorSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.administratorLoginSuccess),
+        tap(() => {
+          this.toastFacade.showToast(`Login successful`, 'success');
+          Promise.resolve().then(() => this.router.navigate(['/admin-dashboard']));
+        }),
+      ),
+    { dispatch: false },
+  );
+  loginAdministratorFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.administratorLoginFailure),
+        tap(({ error }) => {
+          this.toastFacade.showToast(`${error}`, 'error');
+        }),
+      ),
+    { dispatch: false },
   );
   checkLoggedInUserAuthentication$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.checkLoggedInUserAuthentication),
+
       filter(() => !this.router.url.includes('/login')),
+
       exhaustMap(() =>
         this.authService.getCurrentUser().pipe(
-          tap((res) =>
-            console.log('CHECK AUTHENTICATION RESPONSE:', res)
-          ),
-          map((response: any) =>
-            AuthActions.checkLoggedInUserAuthenticationSuccess({
-              evaluatorId: response.userId,
+          tap((response) => console.log('CHECK AUTHENTICATION RESPONSE:', response)),
+
+          map((response: any) => {
+            const resolvedUserId =
+              response.studentId ??
+              response.userId ??
+              response.administratorId ??
+              response.evaluatorId ??
+              null;
+
+            return AuthActions.checkLoggedInUserAuthenticationSuccess({
+              evaluatorId: resolvedUserId,
+
               role: response.role,
-              college: response.college,
-            })
-          ),
+
+              college: response.college ?? null,
+            });
+          }),
+
           catchError((error) =>
             of(
               AuthActions.checkLoggedInUserAuthenticationFailure({
                 error,
-              })
-            )
-          )
-        )
-      )
-    )
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
   );
 
   checkLoggedInUserAuthenticationFailure$ = createEffect(
@@ -206,13 +263,10 @@ export class AuthEffects {
         ofType(AuthActions.checkLoggedInUserAuthenticationFailure),
         filter(() => !this.router.url.includes('/login')),
         tap(() => {
-          this.toastFacade.showToast(
-            `Authentication failed, contact administrator.`,
-            'error'
-          );
-        })
+          this.toastFacade.showToast(`Authentication failed, contact administrator.`, 'error');
+        }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
   logout$ = createEffect(
     () =>
@@ -228,6 +282,6 @@ export class AuthEffects {
           this.router.navigate(['/login']);
         }),
       ),
-    { dispatch: false }
+    { dispatch: false },
   );
 }

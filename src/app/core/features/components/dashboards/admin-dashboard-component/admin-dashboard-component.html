@@ -1,1 +1,14 @@
-<p>admin-dashboard-component works!</p>
+<div class="admin-layout">
+  <app-sidebar-layout-component></app-sidebar-layout-component>
+  <main class="main-layout">
+    <app-header-layout-component></app-header-layout-component>
+    <section class="dashboard-content">
+      @if (loading$ | async) {
+        <div class="loading-wrapper">
+          <div class="spinner-border loading-spinner"></div>
+        </div>
+      }
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>

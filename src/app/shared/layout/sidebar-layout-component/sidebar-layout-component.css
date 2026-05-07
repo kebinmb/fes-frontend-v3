@@ -1,0 +1,236 @@
+/* =========================================================
+   SIDEBAR LAYOUT
+   ========================================================= */
+
+.admin-sidebar {
+  width: 290px;
+  height: 100vh;
+  background: var(--chmsu-surface);
+  border-right: 1px solid var(--chmsu-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  transition: transform 0.28s ease;
+  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.03);
+}
+
+/* =========================================================
+   OVERLAY
+   ========================================================= */
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(2px);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.25s ease;
+  z-index: 1035;
+}
+
+.sidebar-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--chmsu-border);
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 18px;
+  background: var(--chmsu-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+.logo-content h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--chmsu-primary-dark);
+}
+
+.logo-content span {
+  font-size: 0.85rem;
+  color: var(--chmsu-muted);
+}
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+.sidebar-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem 1rem;
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.nav-item {
+  height: 54px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0 1rem;
+  text-decoration: none;
+  color: var(--chmsu-text);
+  font-weight: 600;
+  transition: 0.2s ease;
+  position: relative;
+}
+
+.nav-item i {
+  font-size: 1.05rem;
+  color: var(--chmsu-muted);
+  transition: 0.2s ease;
+}
+
+.nav-item span {
+  font-size: 0.95rem;
+}
+
+/* HOVER */
+
+.nav-item:hover {
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary);
+}
+
+.nav-item:hover i {
+  color: var(--chmsu-primary);
+}
+
+/* ACTIVE */
+
+.nav-item.active {
+  background: var(--chmsu-primary);
+  color: white;
+  box-shadow: 0 8px 20px rgba(24, 100, 67, 0.16);
+}
+
+.nav-item.active i {
+  color: white;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.sidebar-footer {
+  border-top: 1px solid var(--chmsu-border);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.admin-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.footer-content h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--chmsu-primary-dark);
+}
+
+.footer-content span {
+  font-size: 0.82rem;
+  color: var(--chmsu-muted);
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.sidebar-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-body::-webkit-scrollbar-thumb {
+  background: #d7dede;
+  border-radius: 999px;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 991px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .admin-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 576px) {
+  .admin-sidebar {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .sidebar-header,
+  .sidebar-footer {
+    padding: 1.25rem;
+  }
+
+  .sidebar-body {
+    padding: 1rem 0.85rem;
+  }
+
+  .nav-item {
+    height: 50px;
+    border-radius: 16px;
+  }
+}

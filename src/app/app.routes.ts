@@ -6,9 +6,17 @@ import { roleGuard } from './utilities/guards/role/role-guard';
 import { SupervisorDashboardComponent } from './core/features/components/dashboards/supervisor-dashboard-component/supervisor-dashboard-component';
 import { AdminDashboardComponent } from './core/features/components/dashboards/admin-dashboard-component/admin-dashboard-component';
 import { EvaluationFormComponent } from './core/features/components/evaluation-form-component/evaluation-form-component';
+import { LoginAdminComponent } from './core/features/components/login-admin-component/login-admin-component';
+import { FacultyDataTableComponent } from './core/features/components/faculty-data-table-component/faculty-data-table-component';
+import { FacultyEvaluationScoresDataTableComponent } from './core/features/components/faculty-evaluation-scores-data-table-component/faculty-evaluation-scores-data-table-component';
+import { UserAccountsDataTableComponent } from './core/features/components/user-accounts-data-table-component/user-accounts-data-table-component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  {
+    path: 'admin',
+    component: LoginAdminComponent,
+  },
   {
     path: 'student-dashboard',
     component: StudentDashboardComponent,
@@ -31,6 +39,11 @@ export const routes: Routes = [
     component: AdminDashboardComponent,
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' },
+    children: [
+      { path: 'faculty-list', component: FacultyDataTableComponent },
+      { path: 'evaluation-score-list', component: FacultyEvaluationScoresDataTableComponent },
+      { path: 'user-accounts', component: UserAccountsDataTableComponent },
+    ],
   },
   {
     path: '',
@@ -42,5 +55,4 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'login',
   },
-
 ];

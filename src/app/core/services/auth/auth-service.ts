@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { environment } from '../../../../environments/environment.development';
+import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -40,6 +40,17 @@ export class AuthService {
       }
     );
   }
+
+  administratorLogin(usernameOrEmail:string, password:string){
+    return this.http.post<{message:string , administratorId:string}>(
+       `${this.AUTH_URL}/administrator/login`,
+      { usernameOrEmail, password },
+      {
+        withCredentials: true
+      }
+    )
+  }
+  
   getCurrentUser() {
     return this.http.get(`${this.AUTH_URL}/me`, { withCredentials: true });
   }

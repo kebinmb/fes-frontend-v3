@@ -1,36 +1,68 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+
 import { inject } from '@angular/core';
+
 import { Router } from '@angular/router';
+
 import { catchError, throwError } from 'rxjs';
+
 import { ToastFacade } from '../../core/store/toast/toast.facade';
+
+import { Store } from '@ngrx/store';
+
+import * as AuthActions from './../../core/store/auth/auth.action';
+
 let isHandlingAuthError = false;
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const toastFacade = inject(ToastFacade);
+
   const router = inject(Router);
+
+  const store = inject(Store);
+
+  /* =========================================
+     ALWAYS SEND COOKIES
+  ========================================= */
+
   const cloned = req.clone({
     withCredentials: true,
   });
 
-  if (req.url.includes('/auth/login')) {
-    return next(req);
-  }
-
   return next(cloned).pipe(
     catchError((error) => {
-      if (error?.status === 401) {
-        if (!router.url.includes('/login') && !isHandlingAuthError) {
-          isHandlingAuthError = true;
+      /* =========================================
+         HANDLE 401 / 403
+      ========================================= */
 
-          toastFacade.showToast('Session expired. Please login again.', 'error');
+      if ((error?.status === 401 || error?.status === 403) && !isHandlingAuthError) {
+        isHandlingAuthError = true;
 
-          router.navigate(['/login']).finally(() => {
-            isHandlingAuthError = false;
-          });
-        }
+        /* =========================================
+           CLEAR AUTH STATE
+        ========================================= */
+
+        store.dispatch(AuthActions.logout());
+
+        /* =========================================
+           SHOW TOAST
+        ========================================= */
+
+        toastFacade.showToast(
+          'Session expired. Please login again.',
+
+          'error',
+        );
+
+        /* =========================================
+           REDIRECT
+        ========================================= */
+
+        router.navigate(['/login']).finally(() => {
+          isHandlingAuthError = false;
+        });
       }
-      if (error?.status === 403) {
-        alert('Forbidden');
-      }
+
       return throwError(() => error);
     }),
   );

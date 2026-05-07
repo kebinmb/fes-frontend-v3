@@ -1,0 +1,492 @@
+/* =========================================================
+   MODERN FACULTY TABLE UI
+   ========================================================= */
+
+.modern-card {
+  background: var(--chmsu-surface);
+  border: 1px solid var(--chmsu-border);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.card-topbar {
+  height: 5px;
+  background: var(--chmsu-primary);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.modern-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+  padding: 1.8rem;
+  border-bottom: 1px solid var(--chmsu-border);
+}
+
+.modern-card-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--chmsu-primary-dark);
+}
+
+.modern-card-header span {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--chmsu-muted);
+  font-size: 0.95rem;
+}
+
+.table-count {
+  min-width: 70px;
+  height: 70px;
+  border-radius: 20px;
+  background: var(--chmsu-bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--chmsu-primary);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.search-wrapper {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  min-width: 260px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--chmsu-border);
+  background: var(--chmsu-bg);
+  padding: 0 1rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--chmsu-primary);
+  box-shadow: 0 0 0 4px rgba(24, 100, 67, 0.08);
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.edit-btn,
+.pagination-btn,
+.btn-primary {
+  border: none;
+  border-radius: 14px;
+  background: var(--chmsu-primary);
+  color: white;
+  padding: 0.7rem 1.1rem;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.edit-btn:hover,
+.pagination-btn:hover,
+.btn-primary:hover {
+  background: var(--chmsu-primary-light);
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-light {
+  border-radius: 14px;
+  padding: 0.7rem 1rem;
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.modern-table {
+  width: 100%;
+  margin: 0;
+}
+
+.modern-table thead th {
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary-dark);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: none;
+  padding: 1rem 1.2rem;
+  white-space: nowrap;
+}
+
+.modern-table tbody td {
+  border-top: 1px solid var(--chmsu-border);
+  padding: 1rem 1.2rem;
+  vertical-align: middle;
+  color: var(--chmsu-text);
+}
+
+.modern-table tbody tr {
+  transition: 0.2s ease;
+}
+
+.modern-table tbody tr:hover {
+  background: rgba(24, 100, 67, 0.03);
+}
+
+/* =========================================================
+   TABLE CONTENT
+   ========================================================= */
+
+.id-badge {
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary);
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.table-user {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.table-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--chmsu-primary);
+  color: white;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.college-badge {
+  background: rgba(229, 212, 19, 0.15);
+  color: #7c7200;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem !important;
+  color: var(--chmsu-muted);
+  font-size: 0.95rem;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.modern-card-footer {
+  padding: 1.2rem 1.8rem;
+  border-top: 1px solid var(--chmsu-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.modern-card-footer small {
+  color: var(--chmsu-muted);
+}
+
+.pagination-group {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.pagination-info {
+  font-size: 0.92rem;
+  color: var(--chmsu-muted);
+}
+/* =========================================================
+   MODERN MODAL
+   ========================================================= */
+
+.modern-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  animation: fadeBackdrop 0.25s ease;
+}
+
+.modern-modal-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 1055;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.modern-modal {
+  width: 100%;
+  max-width: 720px;
+  background: var(--chmsu-surface);
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid var(--chmsu-border);
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+.animate-modal {
+  animation: modalSlide 0.28s ease;
+}
+
+@keyframes modalSlide {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeBackdrop {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.modern-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem 1.2rem;
+  border-bottom: 1px solid var(--chmsu-border);
+}
+
+.modal-title-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.modal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+}
+
+.modal-title-group h4 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--chmsu-primary-dark);
+}
+
+.modal-title-group span {
+  color: var(--chmsu-muted);
+  font-size: 0.92rem;
+}
+
+.modern-close-btn {
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 14px;
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-text);
+  transition: 0.2s ease;
+}
+
+.modern-close-btn:hover {
+  background: #f1dede;
+  color: #c0392b;
+}
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+.modern-modal-body {
+  padding: 1.5rem;
+}
+
+.modern-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.form-group-modern {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group-modern label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--chmsu-primary-dark);
+}
+
+.modern-input {
+  height: 50px;
+  border-radius: 16px;
+  border: 1px solid var(--chmsu-border);
+  background: var(--chmsu-bg);
+  padding: 0 1rem;
+  font-size: 0.95rem;
+  transition: 0.2s ease;
+  outline: none;
+}
+
+.modern-input:focus {
+  border-color: var(--chmsu-primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(24, 100, 67, 0.08);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.modern-modal-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--chmsu-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.cancel-btn,
+.save-btn {
+  height: 48px;
+  border: none;
+  border-radius: 16px;
+  padding: 0 1.2rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  transition: 0.2s ease;
+}
+
+.cancel-btn {
+  background: var(--chmsu-bg-soft);
+  color: var(--chmsu-text);
+}
+
+.cancel-btn:hover {
+  background: #ececec;
+}
+
+.save-btn {
+  background: var(--chmsu-primary);
+  color: white;
+}
+
+.save-btn:hover {
+  background: var(--chmsu-primary-light);
+  transform: translateY(-1px);
+}
+
+.save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+  .modern-modal {
+    max-width: 100%;
+    border-radius: 24px;
+  }
+
+  .modern-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full-width {
+    grid-column: span 1;
+  }
+
+  .modern-modal-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .modern-close-btn {
+    align-self: flex-end;
+  }
+
+  .modern-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

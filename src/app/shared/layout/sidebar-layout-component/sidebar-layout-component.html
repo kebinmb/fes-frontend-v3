@@ -1,1 +1,126 @@
-<p>sidebar-layout-component works!</p>
+<!-- ===================================== -->
+<!-- MOBILE OVERLAY -->
+<!-- ===================================== -->
+
+<div
+  class="sidebar-overlay"
+  [class.show]="sidebarService.sidebarOpen()"
+  (click)="closeSidebar()"
+></div>
+
+<!-- ===================================== -->
+<!-- SIDEBAR -->
+<!-- ===================================== -->
+
+<aside
+  class="admin-sidebar"
+  [class.mobile-open]="sidebarService.sidebarOpen()"
+>
+  <!-- ===================================== -->
+  <!-- SIDEBAR HEADER -->
+  <!-- ===================================== -->
+
+  <div class="sidebar-header">
+    <!-- LOGO -->
+
+    <div class="sidebar-logo">
+      <div class="logo-icon">FES</div>
+
+      <div class="logo-content">
+        <h2>CHMSU FES</h2>
+
+        <span> Administrator Panel </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================== -->
+  <!-- SIDEBAR BODY -->
+  <!-- ===================================== -->
+
+  <div class="sidebar-body">
+    <!-- NAVIGATION -->
+
+    <nav class="sidebar-nav">
+      <!-- DASHBOARD -->
+
+      <a
+        class="nav-item"
+        routerLink="/admin-dashboard"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        (click)="closeSidebar()"
+      >
+        <i class="bi bi-grid-1x2-fill"></i>
+
+        <span> Dashboard </span>
+      </a>
+
+      <!-- FACULTIES -->
+
+      <a
+        class="nav-item"
+        routerLink="/admin-dashboard/faculty-list"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+      >
+        <i class="bi bi-people-fill"></i>
+
+        <span> Faculties </span>
+      </a>
+
+      <!-- USERS -->
+
+      <a
+        class="nav-item"
+        routerLink="/admin-dashboard/user-accounts"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+      >
+        <i class="bi bi-person-badge-fill"></i>
+
+        <span> User Accounts </span>
+      </a>
+
+      <!-- SCORES -->
+
+      <a
+        class="nav-item"
+        routerLink="/admin-dashboard/evaluation-score-list"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+      >
+        <i class="bi bi-bar-chart-fill"></i>
+
+        <span> Evaluation Scores </span>
+      </a>
+
+      <!-- SETTINGS -->
+
+      <a
+        class="nav-item"
+        routerLink="/admin-dashboard/settings"
+        routerLinkActive="active"
+        (click)="closeSidebar()"
+      >
+        <i class="bi bi-gear-fill"></i>
+
+        <span> Settings </span>
+      </a>
+    </nav>
+  </div>
+
+  <!-- ===================================== -->
+  <!-- SIDEBAR FOOTER -->
+  <!-- ===================================== -->
+
+  <div class="sidebar-footer">
+    <div class="admin-avatar">A</div>
+
+    <div class="footer-content">
+      <h3>Administrator</h3>
+
+      <span> System Manager </span>
+    </div>
+  </div>
+</aside>

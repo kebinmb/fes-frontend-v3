@@ -30,7 +30,14 @@ export class AuthFacade {
       }),
     );
   }
-
+  loginAdministrator(username:string, password:string){
+    this.store.dispatch(
+      AuthActions.administratorLogin({
+        username:username,
+        password,
+      }),
+    );
+  }
   loginStudent(studentId:string,accessCode:string){
     this.store.dispatch(AuthActions.studentLogin({
       evaluatorId:studentId,
@@ -39,6 +46,7 @@ export class AuthFacade {
   );
   }
   
+
   generateStudentAccessCode(evaluatorId: string) {
     this.store.dispatch(AuthActions.generateAccessCodeForStudent({ evaluatorId }));
   }

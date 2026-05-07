@@ -21,7 +21,6 @@ export const roleGuard: CanActivateFn = (route) => {
         return router.createUrlTree(['/login']);
       }
 
-      // Normalize role (handles string or array)
       const userRoles = Array.isArray(state.role)
         ? state.role
         : [state.role];
