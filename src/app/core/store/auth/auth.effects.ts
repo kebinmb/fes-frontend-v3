@@ -25,9 +25,9 @@ export class AuthEffects {
   generateStudentAccessCode$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.generateAccessCodeForStudent),
-      exhaustMap(({ evaluatorId }) => {
+      exhaustMap(({ evaluatorId, password }) => {
         this.spinnerFacade.showSpinner();
-        return this.authService.generateStudentAccessCode(evaluatorId).pipe(
+        return this.authService.generateStudentAccessCode(evaluatorId, password).pipe(
           map((response: any) => {
             this.spinnerFacade.hideSpinner();
             return AuthActions.generateAccessCodeForStudentSuccess({

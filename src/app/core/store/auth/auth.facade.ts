@@ -47,8 +47,8 @@ export class AuthFacade {
   }
   
 
-  generateStudentAccessCode(evaluatorId: string) {
-    this.store.dispatch(AuthActions.generateAccessCodeForStudent({ evaluatorId }));
+  generateStudentAccessCode(evaluatorId: string, password:string) {
+    this.store.dispatch(AuthActions.generateAccessCodeForStudent({ evaluatorId, password }));
   }
   logout() {
     this.store.dispatch(AuthActions.logout());

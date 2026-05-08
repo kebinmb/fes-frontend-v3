@@ -2,7 +2,7 @@ import { createAction, props } from '@ngrx/store';
 
 export const generateAccessCodeForStudent = createAction(
   '[Student Authentication] Generating access code for Student',
-  props<{ evaluatorId: string }>(),
+  props<{ evaluatorId: string, password:string }>(),
 );
 
 export const generateAccessCodeForStudentSuccess = createAction(

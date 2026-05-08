@@ -9,15 +9,25 @@ export class AuthService {
   private readonly AUTH_URL = `${environment.API_URL}/auth`;
   private http = inject(HttpClient)
 
-  generateStudentAccessCode(studentId: string) {
-    return this.http.post<{ studentId: string; accessCode: string; expiresAt: string; }>(
+  generateStudentAccessCode(
+    studentId: string,
+    password: string
+  ) {
+    return this.http.post<{
+      studentId: string;
+      accessCode: string;
+      expiresAt: string;
+    }>(
       `${this.AUTH_URL}/access-code/generate`,
       {},
       {
-        params: { studentId },
+        params: {
+          studentId,
+          password
+        },
         withCredentials: true
       }
-    )
+    );
   }
 
   studentLogin(studentId: string, accessCode: string) {
@@ -41,16 +51,16 @@ export class AuthService {
     );
   }
 
-  administratorLogin(usernameOrEmail:string, password:string){
-    return this.http.post<{message:string , administratorId:string}>(
-       `${this.AUTH_URL}/administrator/login`,
+  administratorLogin(usernameOrEmail: string, password: string) {
+    return this.http.post<{ message: string, administratorId: string }>(
+      `${this.AUTH_URL}/administrator/login`,
       { usernameOrEmail, password },
       {
         withCredentials: true
       }
     )
   }
-  
+
   getCurrentUser() {
     return this.http.get(`${this.AUTH_URL}/me`, { withCredentials: true });
   }

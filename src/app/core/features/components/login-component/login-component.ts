@@ -40,6 +40,7 @@ export class LoginComponent {
 
   studentForm = this.fb.nonNullable.group({
     studentId: ['', Validators.required],
+    password: ['', Validators.required],
     accessCode: [''],
   });
 
@@ -68,7 +69,8 @@ export class LoginComponent {
         return;
       }
       const evaluatorId = this.studentForm.value.studentId!.trim();
-      this.authFacade.generateStudentAccessCode(evaluatorId);
+      const password = this.studentForm.value.password!.trim();
+      this.authFacade.generateStudentAccessCode(evaluatorId, password);
       this.step = 1;
 
       this.studentForm.get('accessCode')?.setValidators([Validators.required]);
