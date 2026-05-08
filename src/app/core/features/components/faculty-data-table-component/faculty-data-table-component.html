@@ -1,16 +1,25 @@
 @let facultiesData = faculties$ | async;
 
 <section class="modern-card">
+
   <div class="card-topbar"></div>
 
   <!-- HEADER -->
 
   <div class="modern-card-header">
-    <div>
-      <h2>Faculties</h2>
 
-      <span> Faculty records overview </span>
+    <div class="header-content">
+
+      <h2>
+        Faculties
+      </h2>
+
+      <span>
+        Faculty records overview
+      </span>
+
       <div class="search-wrapper">
+
         <input
           type="text"
           class="search-input"
@@ -19,43 +28,62 @@
           (ngModelChange)="onSearchChange($event)"
         />
 
-        <button type="button" class="edit-btn" (click)="onSearch()">Search</button>
+        <button
+          type="button"
+          class="edit-btn"
+          (click)="onSearch()"
+        >
+          Search
+        </button>
+
       </div>
+
     </div>
 
     <div class="table-count">
       {{ facultiesData?.totalElements ?? 0 }}
     </div>
+
   </div>
 
   <!-- TABLE -->
 
   <div class="table-responsive">
+
     <table class="table modern-table align-middle mb-0">
+
       <thead>
+
         <tr>
           <th>ID</th>
-
           <th>Faculty Name</th>
-
           <th>Position</th>
-
           <th>College</th>
-
-          <th class="text-center">Action</th>
+          <th class="text-center">Actions</th>
         </tr>
+
       </thead>
 
       <tbody>
+
         @if (facultiesData?.content?.length) {
+
           @for (faculty of facultiesData?.content; track faculty.facultyId) {
+
             <tr>
+
               <td data-label="ID">
-                <span class="id-badge"> #{{ faculty.facultyId }} </span>
+
+                <span class="id-badge">
+                  #{{ faculty.facultyId }}
+                </span>
+
               </td>
 
               <td data-label="Faculty Name">
+
                 <div class="table-user">
+
                   <div class="table-avatar">
                     {{ faculty.firstname.charAt(0) }}
                   </div>
@@ -64,7 +92,9 @@
                     {{ faculty.firstname }}
                     {{ faculty.lastname }}
                   </div>
+
                 </div>
+
               </td>
 
               <td data-label="Position">
@@ -72,31 +102,79 @@
               </td>
 
               <td data-label="College">
+
                 <span class="college-badge">
                   {{ faculty.college }}
                 </span>
+
               </td>
 
-              <td data-label="Action">
-                <button type="button" class="edit-btn" (click)="openEditModal(faculty)">
-                  Edit
-                </button>
+              <td data-label="Actions">
+
+                <div class="action-group">
+
+                  <button
+                    type="button"
+                    class="edit-btn"
+                    (click)="openEditModal(faculty)"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    class="single-print-btn"
+                    (click)="printSingle({
+                      facultyEvaluationScoreId: 0,
+                      facultyId: faculty.facultyId,
+                      facultyName: faculty.firstname + ' ' + faculty.lastname,
+                      college: faculty.college,
+                      position: faculty.position,
+                      classCode: '',
+                      overallAverageScore: 0
+                    })"
+                  >
+
+                    <i class="bi bi-printer"></i>
+
+                    <span>
+                      Print
+                    </span>
+
+                  </button>
+
+                </div>
+
               </td>
+
             </tr>
+
           }
+
         } @else {
+
           <tr>
-            <td colspan="5" class="empty-state">No faculties found</td>
+
+            <td colspan="5" class="empty-state">
+              No faculties found
+            </td>
+
           </tr>
+
         }
+
       </tbody>
+
     </table>
+
   </div>
 
   <!-- FOOTER -->
 
   <div class="modern-card-footer">
+
     <small>
+
       Showing
 
       {{ facultiesData?.content?.length ?? 0 }}
@@ -106,9 +184,11 @@
       {{ facultiesData?.totalElements ?? 0 }}
 
       faculty records
+
     </small>
 
     <div class="pagination-group">
+
       <button
         class="pagination-btn"
         [disabled]="(facultiesData?.page ?? 0) === 0"
@@ -118,6 +198,7 @@
       </button>
 
       <span class="pagination-info">
+
         Page
 
         {{ (facultiesData?.page ?? 0) + 1 }}
@@ -125,6 +206,7 @@
         of
 
         {{ facultiesData?.totalPages ?? 1 }}
+
       </span>
 
       <button
@@ -134,174 +216,9 @@
       >
         Next
       </button>
+
     </div>
+
   </div>
+
 </section>
-
-<!-- MODAL -->
-@if (selectedFaculty) {
-  <div class="modern-modal-backdrop" (click)="closeEditModal()"></div>
-
-  <div class="modern-modal-wrapper">
-    <div class="modern-modal animate-modal">
-      <!-- HEADER -->
-
-      <div class="modern-modal-header">
-        <div class="modal-title-group">
-          <div class="modal-icon">
-            <i class="bi bi-person-gear"></i>
-          </div>
-
-          <div>
-            <h4>Update Faculty</h4>
-
-            <span>Edit faculty information and settings</span>
-          </div>
-        </div>
-
-        <button type="button" class="modern-close-btn" (click)="closeEditModal()">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
-
-      <!-- FORM -->
-
-      <form [formGroup]="facultyForm">
-        <div class="modern-modal-body">
-          <div class="modern-grid">
-            <!-- FIRSTNAME -->
-
-            <div class="form-group-modern">
-              <label>
-                <i class="bi bi-person"></i>
-                Firstname
-              </label>
-
-              <input
-                type="text"
-                class="modern-input"
-                formControlName="firstname"
-                placeholder="Enter firstname"
-              />
-            </div>
-
-            <!-- MIDDLENAME -->
-
-            <div class="form-group-modern">
-              <label>
-                <i class="bi bi-person-lines-fill"></i>
-                Middlename
-              </label>
-
-              <input
-                type="text"
-                class="modern-input"
-                formControlName="middlename"
-                placeholder="Enter middlename"
-              />
-            </div>
-
-            <!-- LASTNAME -->
-
-            <div class="form-group-modern">
-              <label>
-                <i class="bi bi-person-vcard"></i>
-                Lastname
-              </label>
-
-              <input
-                type="text"
-                class="modern-input"
-                formControlName="lastname"
-                placeholder="Enter lastname"
-              />
-            </div>
-
-            <!-- POSITION -->
-
-            <div class="form-group-modern">
-              <label>
-                <i class="bi bi-briefcase"></i>
-                Position
-              </label>
-
-              <input
-                type="text"
-                class="modern-input"
-                formControlName="position"
-                placeholder="Enter position"
-              />
-            </div>
-
-            <!-- LOAD LIMIT -->
-
-            <div class="form-group-modern">
-              <label>
-                <i class="bi bi-speedometer2"></i>
-                Load Limit
-              </label>
-
-              <input
-                type="number"
-                class="modern-input"
-                formControlName="loadLimit"
-                placeholder="Enter load limit"
-              />
-            </div>
-
-            <!-- COLLEGE -->
-
-            <div class="form-group-modern">
-              <label>
-                <i class="bi bi-building"></i>
-                College
-              </label>
-
-              <input
-                type="text"
-                class="modern-input"
-                formControlName="college"
-                placeholder="Enter college"
-              />
-            </div>
-
-            <!-- STATUS -->
-
-            <div class="form-group-modern full-width">
-              <label>
-                <i class="bi bi-check-circle"></i>
-                Status
-              </label>
-
-              <input
-                type="text"
-                class="modern-input"
-                formControlName="status"
-                placeholder="Enter status"
-              />
-            </div>
-          </div>
-        </div>
-
-        <!-- FOOTER -->
-
-        <div class="modern-modal-footer">
-          <button type="button" class="cancel-btn" (click)="closeEditModal()">
-            <i class="bi bi-x-circle"></i>
-            Cancel
-          </button>
-
-          <button
-            type="button"
-            class="save-btn"
-            [disabled]="facultyForm.invalid"
-            (click)="updateFaculty()"
-          >
-            <i class="bi bi-check-circle"></i>
-            Update Faculty
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-}

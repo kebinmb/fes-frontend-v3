@@ -1,198 +1,153 @@
 /* =========================================================
    CARD
    ========================================================= */
-
 .modern-card {
   background: var(--chmsu-surface);
+  border: 1px solid var(--chmsu-border);
   border-radius: 26px;
   overflow: hidden;
-  border: 1px solid var(--chmsu-border);
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.04);
 }
-
 .card-topbar {
   height: 5px;
   background: var(--chmsu-primary);
 }
-
-.card-topbar.warning {
-  background: var(--chmsu-primary);
-}
-
 /* =========================================================
    HEADER
    ========================================================= */
-
-.modern-card-header {
+.modern-card-header,
+.modern-card-footer {
   padding: 28px;
-  border-bottom: 1px solid var(--chmsu-border);
-
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
   flex-wrap: wrap;
 }
-
+.modern-card-header {
+  border-bottom: 1px solid var(--chmsu-border);
+}
+.modern-card-footer {
+  border-top: 1px solid var(--chmsu-border);
+}
 .header-content h2 {
   margin: 0;
   font-size: 1.7rem;
   font-weight: 700;
   color: var(--chmsu-primary-dark);
 }
-
 .header-content span {
-  margin-top: 6px;
   display: inline-block;
+  margin-top: 6px;
   color: var(--chmsu-muted);
   font-size: 0.95rem;
 }
-
 /* =========================================================
    HEADER ACTIONS
    ========================================================= */
-
-.header-actions {
+.header-actions,
+.pagination-group,
+.table-user {
   display: flex;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
 }
-
 /* =========================================================
    TABLE COUNT
    ========================================================= */
-
 .table-count {
   min-width: 74px;
   height: 74px;
   border-radius: 22px;
-
   background: var(--chmsu-bg-soft);
-
   border: 1px solid rgba(24, 100, 67, 0.08);
-
   color: var(--chmsu-primary-dark);
-
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-
   font-weight: 700;
 }
-
 .table-count i {
   font-size: 1rem;
   opacity: 0.7;
 }
-
 .table-count span {
   font-size: 1.15rem;
   line-height: 1;
 }
-
 /* =========================================================
    TABLE
    ========================================================= */
-
 .table-responsive {
   overflow-x: auto;
 }
-
 .modern-table {
   width: 100%;
   margin: 0;
   border-collapse: collapse;
 }
-
 .modern-table thead th {
   background: var(--chmsu-bg-soft);
-
   color: var(--chmsu-primary-dark);
-
+  padding: 18px 22px;
   font-size: 0.9rem;
   font-weight: 700;
-
-  padding: 18px 22px;
-
   border: none;
   white-space: nowrap;
 }
-
 .modern-table tbody td {
   padding: 20px 22px;
-
   border-top: 1px solid var(--chmsu-border);
-
   vertical-align: middle;
-
   color: var(--chmsu-text);
-
   font-size: 0.94rem;
 }
-
 .modern-table tbody tr {
-  transition: 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
-
 .modern-table tbody tr:hover {
   background: rgba(24, 100, 67, 0.025);
 }
-
 /* =========================================================
    USER
    ========================================================= */
-
-.table-user {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
 .table-avatar {
   width: 48px;
   height: 48px;
-
   border-radius: 50%;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  font-weight: 700;
-  font-size: 1rem;
-
-  color: white;
-
   flex-shrink: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: white;
 }
-
 .warning-avatar {
   background: var(--chmsu-warning);
 }
-
 .table-user-content {
   display: flex;
   flex-direction: column;
 }
-
 .fw-semibold {
   font-weight: 600;
   color: var(--chmsu-text);
 }
-
-.table-user-content small {
+.table-user-content small,
+.pagination-info,
+.modern-card-footer small {
   color: var(--chmsu-muted);
-  font-size: 0.82rem;
-  margin-top: 2px;
+  font-size: 0.92rem;
 }
-
 /* =========================================================
    BADGES
    ========================================================= */
-
 .subject-code,
 .semester-badge,
 .score-badge,
@@ -200,296 +155,119 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
   min-height: 38px;
-
   padding: 8px 14px;
-
   border-radius: 999px;
-
   font-size: 0.85rem;
   font-weight: 600;
 }
-
-/* SUBJECT */
-
 .subject-code {
   background: rgba(24, 100, 67, 0.08);
   color: var(--chmsu-primary-dark);
 }
-
-/* SEMESTER */
-
 .semester-badge {
   background: rgba(106, 157, 138, 0.14);
   color: var(--chmsu-primary-dark);
 }
-
-/* SCORE */
-
 .score-badge {
   background: rgba(229, 212, 19, 0.18);
   color: #6b6200;
 }
-
-/* INTERPRETATION */
-
 .interpretation-badge.excellent {
   background: rgba(24, 100, 67, 0.12);
   color: var(--chmsu-primary-dark);
 }
-
 .interpretation-badge.average {
   background: rgba(229, 212, 19, 0.2);
   color: #6d6200;
 }
-
 .interpretation-badge.poor {
   background: rgba(207, 106, 51, 0.15);
   color: #8a3f1b;
 }
-
-/* =========================================================
-   PRINT BUTTONS
-   ========================================================= */
-
-.print-btn,
-.single-print-btn {
-  border: none;
-  outline: none;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-/* PRINT ALL */
-
-.print-btn {
-  height: 48px;
-
-  padding: 0 20px;
-
-  border-radius: 14px;
-
-  background: var(--chmsu-primary);
-
-  color: white;
-
-  font-size: 0.95rem;
-
-  box-shadow: 0 8px 18px rgba(24, 100, 67, 0.18);
-}
-
-.print-btn i {
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.print-btn span {
-  display: flex;
-  align-items: center;
-}
-
-.print-btn:hover:not(:disabled) {
-  background: var(--chmsu-primary-dark);
-  transform: translateY(-1px);
-}
-
-.print-btn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.print-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* SINGLE PRINT */
-
-.single-print-btn {
-  height: 40px;
-
-  padding: 0 16px;
-
-  border-radius: 12px;
-
-  background: var(--chmsu-bg-soft);
-
-  border: 1px solid rgba(24, 100, 67, 0.08);
-
-  color: var(--chmsu-primary-dark);
-
-  font-size: 0.88rem;
-}
-
-.single-print-btn:hover {
-  background: rgba(24, 100, 67, 0.08);
-
-  border-color: rgba(24, 100, 67, 0.14);
-
-  transform: translateY(-1px);
-}
-
-.single-print-btn i {
-  font-size: 0.92rem;
-}
-
 /* =========================================================
    EMPTY STATE
    ========================================================= */
-
 .empty-state {
   padding: 60px 20px !important;
 }
-
 .empty-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-
 .empty-wrapper i {
   font-size: 3rem;
   color: var(--chmsu-muted);
   opacity: 0.5;
 }
-
 .empty-wrapper h4 {
-  margin-top: 18px;
-  margin-bottom: 8px;
-
+  margin: 18px 0 8px;
   color: var(--chmsu-primary-dark);
-
   font-size: 1.15rem;
 }
-
 .empty-wrapper span {
   color: var(--chmsu-muted);
   font-size: 0.92rem;
 }
-
 /* =========================================================
-   FOOTER
+   PAGINATION
    ========================================================= */
-
-.modern-card-footer {
-  padding: 24px 28px;
-
-  border-top: 1px solid var(--chmsu-border);
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.modern-card-footer small {
-  color: var(--chmsu-muted);
-  font-size: 0.92rem;
-}
-
-.pagination-group {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-
-.pagination-info {
-  color: var(--chmsu-muted);
-  font-size: 0.92rem;
-}
-
-/* =========================================================
-   PAGINATION BUTTONS
-   ========================================================= */
-
 .pagination-btn {
   height: 42px;
-
   padding: 0 16px;
-
   border: none;
-
   border-radius: 12px;
-
   background: var(--chmsu-bg-soft);
-
   color: var(--chmsu-primary-dark);
-
   font-size: 0.9rem;
   font-weight: 600;
-
   cursor: pointer;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-
-  transition: 0.2s ease;
+  transition:
+    background 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
-
 .pagination-btn:hover:not(:disabled) {
   background: rgba(24, 100, 67, 0.08);
 }
-
 .pagination-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
 .warning-btn {
   background: rgba(207, 106, 51, 0.1);
   color: #8a3f1b;
 }
-
 .warning-btn:hover:not(:disabled) {
   background: rgba(207, 106, 51, 0.16);
 }
-
 /* =========================================================
    RESPONSIVE
    ========================================================= */
-
 @media (max-width: 992px) {
   .modern-card-header,
   .modern-card-footer {
     flex-direction: column;
     align-items: stretch;
   }
-
   .header-actions {
     justify-content: space-between;
   }
 }
-
 @media (max-width: 768px) {
   .modern-card-header,
   .modern-card-footer {
     padding: 22px;
   }
-
   .modern-table thead {
     display: none;
   }
-
   .modern-table,
   .modern-table tbody,
   .modern-table tr,
@@ -497,41 +275,26 @@
     display: block;
     width: 100%;
   }
-
   .modern-table tr {
     padding: 18px;
     border-bottom: 1px solid var(--chmsu-border);
   }
-
   .modern-table td {
     border: none;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 14px;
-
     padding: 12px 0;
   }
-
   .modern-table td::before {
     content: attr(data-label);
-
-    font-weight: 700;
-
-    color: var(--chmsu-primary-dark);
-
     min-width: 120px;
+    font-weight: 700;
+    color: var(--chmsu-primary-dark);
   }
   .pagination-group {
     width: 100%;
     justify-content: space-between;
-  }
-  .print-btn {
-    width: 100%;
-  }
-  .single-print-btn {
-    width: 100%;
   }
 }
