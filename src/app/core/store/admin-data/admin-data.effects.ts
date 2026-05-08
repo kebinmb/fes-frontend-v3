@@ -58,49 +58,52 @@ export class AdminEffects {
     ),
   );
   loadFacultyEvaluationScoresByFacultyId$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(
-        AdminDataActions.loadFacultyEvaluationScoresByFacultyId
-      ),
-      switchMap(({ facultyId }) =>
-        this.adminDataService
-          .getFacultyEvaluationScoresByFacultyId(facultyId)
-          .pipe(
-            tap((response) => {
-              if (!response || response.length === 0) {
-                this.toastFacade.showToast(
-                  'No faculty evaluation records found.',
-                  'error'
-                );
-                return;
-              }
+  this.actions$.pipe(
+    ofType(
+      AdminDataActions
+        .loadFacultyEvaluationScoresByFacultyId
+    ),
+    switchMap(({ facultyId }) =>
+      this.adminDataService
+        .getFacultyEvaluationScoresByFacultyId(
+          facultyId
+        )
+        .pipe(
+          tap((response) => {
+            if (!response?.length) {
               this.toastFacade.showToast(
-                'Faculty evaluation records loaded successfully.',
-                'success'
-              );
-            }),
-            map((response) =>
-              AdminDataActions
-                .loadFacultyEvaluationScoresByFacultyIdSuccess({
-                  response,
-                })
-            ),
-            catchError((error) => {
-              this.toastFacade.showToast(
-                'Failed to load faculty evaluation records.',
+                'No faculty evaluation records found.',
                 'error'
               );
-              return of(
-                AdminDataActions
-                  .loadFacultyEvaluationScoresByFacultyIdFailure({
-                    error,
-                  })
-              );
-            }),
-          )
-      )
+              return;
+            }
+            this.toastFacade.showToast(
+              'Faculty evaluation records loaded successfully.',
+              'success'
+            );
+          }),
+          map((response) =>
+            AdminDataActions
+              .loadFacultyEvaluationScoresByFacultyIdSuccess({
+                response,
+              })
+          ),
+          catchError((error) => {
+            this.toastFacade.showToast(
+              'Failed to load faculty evaluation records.',
+              'error'
+            );
+            return of(
+              AdminDataActions
+                .loadFacultyEvaluationScoresByFacultyIdFailure({
+                  error,
+                })
+            );
+          })
+        )
     )
-  );
+  )
+);
   updateFaculty$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AdminDataActions.updateFaculty),

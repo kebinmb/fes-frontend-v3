@@ -59,14 +59,14 @@ export interface SubjectEvaluationSummary {
 export interface FacultyEvaluationScore {
   facultyEvaluationScoreId: number;
   evaluatorId: string;
-  facultyName:string;
+  facultyName: string;
   facultyId: string;
-  yearLevel:string;
-  numberOfStudents:number;
-  sefRating:number;
+  yearLevel: string;
+  numberOfStudents: number;
+  sefRating: number;
   subjectCode: string;
-  college:string;
-  position:string;
+  college: string;
+  position: string;
   classCode: string;
   semester: string;
   schoolYear: number;
@@ -77,6 +77,10 @@ export interface FacultyEvaluationScore {
   comments?: string;
   createdAt: string;
   updatedAt: string;
+  setRating: number;
+  evaluatorType: string;
+  studentComments:string;
+  supervisorComments:string;
 }
 export interface EvaluationCriteria {
   id: number;
