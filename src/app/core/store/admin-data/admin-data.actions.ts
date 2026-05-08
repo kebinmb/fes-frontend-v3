@@ -76,7 +76,6 @@ export const loadFacultyEvaluationScoresByFacultyId = createAction(
 
   props<{
     facultyId: string;
-    classCode:string;
   }>(),
 );
 

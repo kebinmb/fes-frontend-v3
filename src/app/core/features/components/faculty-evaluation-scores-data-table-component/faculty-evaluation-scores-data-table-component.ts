@@ -45,32 +45,76 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
     this.adminDataFacade.loadFacultyEvaluationScores(page, 10);
   }
   printSingle(record: FacultyEvaluationPrintRecord): void {
-    this.adminDataFacade.loadFacultyEvaluationScoresByFacultyId(record.facultyId, record.classCode);
-    this.actions$
-      .pipe(ofType(AdminDataActions.loadFacultyEvaluationScoresByFacultyIdSuccess), take(1))
-      .subscribe(({ response }) => {
-        const normalizedData: FacultyEvaluationPrintRecord[] = response.map((item) => ({
-          facultyEvaluationScoreId: item.facultyEvaluationScoreId,
-          facultyId: item.facultyId,
-          facultyName: record.facultyName,
-          evaluatorId: item.evaluatorId,
-          classCode: item.classCode,
-          college: item.college,
-          position: item.position,
-          semester: item.semester,
-          schoolYear: item.schoolYear,
-          subjectCode: item.subjectCode,
-          yearLevel: record.yearLevel ?? '-',
-          commentsOrFeedbacks: item.comments ?? '-',
-          overallAverageScore: item.overallAverageScore,
-          overallInterpretation: item.overallInterpretation,
-          numberOfStudents: 0,
-          sefRating: 0,
+
+  this.adminDataFacade.loadFacultyEvaluationScoresByFacultyId(
+    record.facultyId
+  );
+
+  this.actions$
+    .pipe(
+      ofType(AdminDataActions.loadFacultyEvaluationScoresByFacultyIdSuccess),
+      take(1)
+    )
+    .subscribe(({ response }) => {
+
+      const normalizedData: FacultyEvaluationPrintRecord[] =
+        response.map((item) => ({
+
+          facultyEvaluationScoreId:
+            item.facultyEvaluationScoreId,
+
+          facultyId:
+            item.facultyId,
+
+          facultyName:
+            item.facultyName ?? record.facultyName,
+
+          evaluatorId:
+            item.evaluatorId,
+
+          classCode:
+            item.classCode,
+
+          college:
+            item.college,
+
+          position:
+            item.position,
+
+          semester:
+            item.semester,
+
+          schoolYear:
+            item.schoolYear,
+
+          subjectCode:
+            item.subjectCode,
+
+          yearLevel:
+            item.yearLevel ?? '-',
+
+          commentsOrFeedbacks:
+            item.comments ?? '-',
+
+          overallAverageScore:
+            item.overallAverageScore,
+
+          overallInterpretation:
+            item.overallInterpretation,
+
+          numberOfStudents:
+            item.numberOfStudents ?? 0,
+
+          sefRating:
+            item.sefRating ?? 0,
+
         }));
 
-        this.openPrintWindow(normalizedData);
-      });
-  }
+      this.openPrintWindow(normalizedData);
+
+    });
+
+}
   printBulk(data: FacultyEvaluationPrintRecord[]): void {
     this.openPrintWindow(data);
   }

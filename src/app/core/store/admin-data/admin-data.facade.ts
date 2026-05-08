@@ -32,14 +32,17 @@ export class AdminDataFacade {
   loadFacultyEvaluationScores(page: number, size: number) {
     this.store.dispatch(AdminDataActions.loadFacultyEvaluationScores({ page, size }));
   }
-  loadFacultyEvaluationScoresByFacultyId(facultyId: string, classCode:string): void {
-    this.store.dispatch(
-      AdminDataActions.loadFacultyEvaluationScoresByFacultyId({
-        facultyId,
-        classCode
-      }),
-    );
-  }
+  loadFacultyEvaluationScoresByFacultyId(
+  facultyId: string
+): void {
+
+  this.store.dispatch(
+    AdminDataActions.loadFacultyEvaluationScoresByFacultyId({
+      facultyId,
+    }),
+  );
+
+}
   updateFaculty(payload: UpdateFacultyRequest) {
     this.store.dispatch(AdminDataActions.updateFaculty({ payload }));
   }

@@ -32,7 +32,7 @@ export const routes: Routes = [
   {
     path: 'evaluation-form',
     component: EvaluationFormComponent,
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
   },
   {
     path: 'admin-dashboard',

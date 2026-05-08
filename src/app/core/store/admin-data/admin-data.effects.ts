@@ -65,22 +65,24 @@ export class AdminEffects {
     this.actions$.pipe(
       ofType(AdminDataActions.loadFacultyEvaluationScoresByFacultyId),
 
-      switchMap(({ facultyId, classCode }) =>
-        this.adminDataService.getFacultyEvaluationScoresByFacultyId(facultyId, classCode).pipe(
-          map((response) =>
-            AdminDataActions.loadFacultyEvaluationScoresByFacultyIdSuccess({
-              response,
-            }),
-          ),
-
-          catchError((error) =>
-            of(
-              AdminDataActions.loadFacultyEvaluationScoresByFacultyIdFailure({
-                error,
+      switchMap(({ facultyId }) =>
+        this.adminDataService
+          .getFacultyEvaluationScoresByFacultyId(facultyId)
+          .pipe(
+            map((response) =>
+              AdminDataActions.loadFacultyEvaluationScoresByFacultyIdSuccess({
+                response,
               }),
             ),
+
+            catchError((error) =>
+              of(
+                AdminDataActions.loadFacultyEvaluationScoresByFacultyIdFailure({
+                  error,
+                }),
+              ),
+            ),
           ),
-        ),
       ),
     ),
   );

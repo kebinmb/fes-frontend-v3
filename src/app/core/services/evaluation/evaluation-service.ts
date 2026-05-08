@@ -59,7 +59,11 @@ export interface SubjectEvaluationSummary {
 export interface FacultyEvaluationScore {
   facultyEvaluationScoreId: number;
   evaluatorId: string;
+  facultyName:string;
   facultyId: string;
+  yearLevel:string;
+  numberOfStudents:number;
+  sefRating:number;
   subjectCode: string;
   college:string;
   position:string;

@@ -128,12 +128,15 @@ export class AdminService {
     );
   }
 
-  getFacultyEvaluationScoresByFacultyId(facultyId: string, classCode:string): Observable<FacultyEvaluationScore[]> {
-    return this.http.get<FacultyEvaluationScore[]>(
-      `${this.ADMIN_API_URL}/faculty-evaluation-score/${facultyId}/${classCode}`,
-      {
-        withCredentials: true,
-      },
-    );
-  }
+  getFacultyEvaluationScoresByFacultyId(
+  facultyId: string
+): Observable<FacultyEvaluationScore[]> {
+
+  return this.http.get<FacultyEvaluationScore[]>(
+    `${this.ADMIN_API_URL}/faculty-evaluation-score/${encodeURIComponent(facultyId)}`,
+    {
+      withCredentials: true,
+    },
+  );
+}
 }
