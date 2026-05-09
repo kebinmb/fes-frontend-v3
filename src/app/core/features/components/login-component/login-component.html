@@ -1,120 +1,298 @@
 <div class="login-wrapper">
   <section class="login-brand-display">
+    <div class="brand-overlay"></div>
+
     <div class="brand-panel">
       <div class="brand-content">
         <div class="logo-container">
-          <img src="chmsu-logo.png" alt="Carlos Hilado Memorial State University Logo" class="brand-logo" />
+          <img
+            src="chmsu-logo.png"
+            alt="Carlos Hilado Memorial State University Logo"
+            class="brand-logo"
+          />
         </div>
+
+        <div class="brand-badge">
+          <span>Academic Portal</span>
+        </div>
+
         <h1 class="brand-title">Faculty Evaluation System</h1>
-        <p class="brand-subtitle">Carlos Hilado Memorial State University</p>
+
+        <p class="brand-subtitle">
+          Carlos Hilado Memorial State University
+        </p>
+
+        <div class="brand-features">
+          <div class="feature-item">
+            <i class="bi bi-shield-lock"></i>
+            <span>Secure Authentication</span>
+          </div>
+
+          <div class="feature-item">
+            <i class="bi bi-lightning-charge"></i>
+            <span>Fast Evaluation Process</span>
+          </div>
+
+          <div class="feature-item">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Reliable Faculty Assessment</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="login-card-display">
+    <div class="background-blur-circle top"></div>
+    <div class="background-blur-circle bottom"></div>
+
     <div class="login-card">
+      <div class="card-top-line"></div>
+
       <div class="login-card-header">
-        <h2>Login</h2>
-        <p>Sign in to continue</p>
+        <div class="login-icon">
+          <i class="bi bi-person-circle"></i>
+        </div>
+
+        <h2>Welcome Back</h2>
+        <p>Sign in to continue to your account</p>
       </div>
+
       <div class="role-toggle-btn">
-        <button type="button" [class.active]="role === 'student'" (click)="setRole('student')">
-          Student
+        <button
+          type="button"
+          [class.active]="role === 'student'"
+          (click)="setRole('student')"
+        >
+          <i class="bi bi-mortarboard-fill"></i>
+          <span>Student</span>
         </button>
 
-        <button type="button" [class.active]="role === 'supervisor'" (click)="setRole('supervisor')">
-          Supervisor
+        <button
+          type="button"
+          [class.active]="role === 'supervisor'"
+          (click)="setRole('supervisor')"
+        >
+          <i class="bi bi-person-badge-fill"></i>
+          <span>Supervisor</span>
         </button>
       </div>
+
       @if (role === 'supervisor') {
-      <form class="login-card-content" [formGroup]="supervisorForm" (ngSubmit)="onSupervisorSubmit()">
+      <form
+        class="login-card-content"
+        [formGroup]="supervisorForm"
+        (ngSubmit)="onSupervisorSubmit()"
+      >
         <div class="form-group">
           <label for="username">Username</label>
-          <input id="username" formControlName="username" type="text" placeholder="Enter username" required />
-          @if (
-          supervisorFormControl['username'].touched && supervisorFormControl['username'].invalid
-          ) {
-          <small class="text-danger">Username is required</small>
-          }
-        </div>
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input id="password" formControlName="password" type="password" placeholder="Enter password" required />
-          @if (
-          supervisorFormControl['password'].touched && supervisorFormControl['password'].invalid
-          ) {
-          <small class="text-danger">Password is required</small>
-          }
-        </div>
-        <button type="submit" class="login-btn" [disabled]="supervisorForm.invalid">Login</button>
-      </form>
-      }
-      @if (role === 'student') {
-      <form class="student-login" [formGroup]="studentForm" (ngSubmit)="onStudentSubmit()">
-        @if (step === 0) {
-        <div class="form-group">
-          <label class="form-label">
-            Generate Access Code
-          </label>
 
-          <div class="id-input-group">
-            <input type="text" class="form-control" formControlName="studentId"
-              placeholder="Enter your Identification Number" />
+          <div class="input-wrapper">
+            <i class="bi bi-person"></i>
+
+            <input
+              id="username"
+              formControlName="username"
+              type="text"
+              placeholder="Enter username"
+              required
+            />
           </div>
 
-          <small class="text-danger" *ngIf="
-      studentForm.get('studentId')?.touched &&
-      studentForm.get('studentId')?.hasError('required')
-    ">
+          @if (
+          supervisorFormControl['username'].touched &&
+          supervisorFormControl['username'].invalid
+          ) {
+          <small class="text-danger">
+            Username is required
+          </small>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+
+          <div class="input-wrapper">
+            <i class="bi bi-lock"></i>
+
+            <input
+              id="password"
+              formControlName="password"
+              type="password"
+              placeholder="Enter password"
+              required
+            />
+          </div>
+
+          @if (
+          supervisorFormControl['password'].touched &&
+          supervisorFormControl['password'].invalid
+          ) {
+          <small class="text-danger">
+            Password is required
+          </small>
+          }
+        </div>
+
+        <button
+          type="submit"
+          class="login-btn"
+          [disabled]="supervisorForm.invalid"
+        >
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span>Login</span>
+        </button>
+      </form>
+      }
+
+      @if (role === 'student') {
+      <form
+        class="student-login"
+        [formGroup]="studentForm"
+        (ngSubmit)="onStudentSubmit()"
+      >
+        <div class="step-indicator">
+          <div class="step-item" [class.active]="step >= 0">
+            <div class="step-circle">1</div>
+            <span>Credentials</span>
+          </div>
+
+          <div class="step-line" [class.active]="step === 1"></div>
+
+          <div class="step-item" [class.active]="step === 1">
+            <div class="step-circle">2</div>
+            <span>Verification</span>
+          </div>
+        </div>
+
+        @if (step === 0) {
+
+        <div class="form-group">
+          <label class="form-label">
+            Student ID
+          </label>
+
+          <div class="input-wrapper">
+            <i class="bi bi-person-vcard"></i>
+
+            <input
+              type="text"
+              class="form-control"
+              formControlName="studentId"
+              placeholder="Enter your Identification Number"
+            />
+          </div>
+
+          <small
+            class="text-danger"
+            *ngIf="
+              studentForm.get('studentId')?.touched &&
+              studentForm.get('studentId')?.hasError('required')
+            "
+          >
             Student ID is required
           </small>
         </div>
 
-        <div class="form-group mt-3">
+        <div class="form-group">
           <label class="form-label">
             Password
           </label>
 
-          <div class="id-input-group">
-            <input type="password" class="form-control" formControlName="password" placeholder="Enter your Password" />
+          <div class="input-wrapper">
+            <i class="bi bi-shield-lock"></i>
+
+            <input
+              type="password"
+              class="form-control"
+              formControlName="password"
+              placeholder="Enter your Password"
+            />
           </div>
 
-          <small class="text-danger" *ngIf="
-      studentForm.get('password')?.touched &&
-      studentForm.get('password')?.hasError('required')
-    ">
+          <small
+            class="text-danger"
+            *ngIf="
+              studentForm.get('password')?.touched &&
+              studentForm.get('password')?.hasError('required')
+            "
+          >
             Password is required
           </small>
         </div>
         }
+
         @if (step === 1) {
+
+        <div class="verification-message">
+          <i class="bi bi-envelope-check-fill"></i>
+
+          <div>
+            <h4>Verification Required</h4>
+            <p>
+              Enter the access code sent to your registered email.
+            </p>
+          </div>
+        </div>
+
         <div class="form-group">
           <label class="form-label">Student ID</label>
-          <input class="form-control" formControlName="studentId" readonly />
+
+          <div class="input-wrapper readonly">
+            <i class="bi bi-person-vcard"></i>
+
+            <input
+              class="form-control"
+              formControlName="studentId"
+              readonly
+            />
+          </div>
         </div>
-        <!-- <div class="form-group">
-          <label class="form-label">Generated Access Code</label>
-          <input class="form-control" [value]="accessCode$ | async" readonly />
-        </div> -->
+
         <div class="form-group">
           <label class="form-label">Access Code</label>
-          <div class="input-group">
-            <span class="input-group-text">
-              <i class="bi bi-key"></i>
-            </span>
-            <input type="text" class="form-control" formControlName="accessCode" placeholder="Enter access code" />
+
+          <div class="input-wrapper">
+            <i class="bi bi-key-fill"></i>
+
+            <input
+              type="text"
+              class="form-control"
+              formControlName="accessCode"
+              placeholder="Enter access code"
+            />
           </div>
 
-          <small class="text-danger" *ngIf="
-                  studentForm.get('accessCode')?.touched && studentForm.get('accessCode')?.invalid
-                ">
+          <small
+            class="text-danger"
+            *ngIf="
+              studentForm.get('accessCode')?.touched &&
+              studentForm.get('accessCode')?.invalid
+            "
+          >
             Access Code is required
           </small>
         </div>
         }
-        <button type="submit" class="login-btn"
-          [disabled]="step === 0 ? studentForm.get('studentId')?.invalid : studentForm.invalid">
-          {{ step === 0 ? 'Generate Access Code' : 'Login' }}
+
+        <button
+          type="submit"
+          class="login-btn"
+          [disabled]="
+            step === 0
+              ? studentForm.get('studentId')?.invalid
+              : studentForm.invalid
+          "
+        >
+          <i
+            class="bi"
+            [class.bi-envelope-fill]="step === 0"
+            [class.bi-box-arrow-in-right]="step === 1"
+          ></i>
+
+          <span>
+            {{ step === 0 ? 'Generate Access Code' : 'Login' }}
+          </span>
         </button>
       </form>
       }
