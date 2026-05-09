@@ -44,20 +44,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       ) {
 
         isHandlingAuthError = true;
-
-        /* =========================================
-           CLEAR ALL BROWSER STORAGE
-        ========================================= */
-
         localStorage.clear();
-
         sessionStorage.clear();
-
-        /* =========================================
-           OPTIONAL:
-           CLEAR NON-HTTPONLY COOKIES
-        ========================================= */
-
         document.cookie.split(';').forEach((cookie) => {
 
           const eqPos = cookie.indexOf('=');
@@ -70,13 +58,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           document.cookie =
             `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
         });
-
-        /* =========================================
-           CLEAR NGRX AUTH STATE
-        ========================================= */
-
         store.dispatch(AuthActions.logout());
-
+        
         /* =========================================
            SHOW TOAST
         ========================================= */
