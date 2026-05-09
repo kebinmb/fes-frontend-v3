@@ -15,6 +15,7 @@ import * as AuthActions from './../../core/store/auth/auth.action';
 let isHandlingAuthError = false;
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+
   const toastFacade = inject(ToastFacade);
 
   const router = inject(Router);
@@ -30,16 +31,48 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   });
 
   return next(cloned).pipe(
+
     catchError((error) => {
+
       /* =========================================
          HANDLE 401 / 403
       ========================================= */
 
-      if ((error?.status === 401 || error?.status === 403) && !isHandlingAuthError) {
+      if (
+        (error?.status === 401 || error?.status === 403) &&
+        !isHandlingAuthError
+      ) {
+
         isHandlingAuthError = true;
 
         /* =========================================
-           CLEAR AUTH STATE
+           CLEAR ALL BROWSER STORAGE
+        ========================================= */
+
+        localStorage.clear();
+
+        sessionStorage.clear();
+
+        /* =========================================
+           OPTIONAL:
+           CLEAR NON-HTTPONLY COOKIES
+        ========================================= */
+
+        document.cookie.split(';').forEach((cookie) => {
+
+          const eqPos = cookie.indexOf('=');
+
+          const name =
+            eqPos > -1
+              ? cookie.substring(0, eqPos).trim()
+              : cookie.trim();
+
+          document.cookie =
+            `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+        });
+
+        /* =========================================
+           CLEAR NGRX AUTH STATE
         ========================================= */
 
         store.dispatch(AuthActions.logout());
@@ -50,15 +83,15 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
         toastFacade.showToast(
           'Session expired. Please login again.',
-
           'error',
         );
 
         /* =========================================
-           REDIRECT
+           REDIRECT TO LOGIN
         ========================================= */
 
         router.navigate(['/login']).finally(() => {
+
           isHandlingAuthError = false;
         });
       }

@@ -10,12 +10,18 @@ import { LoginAdminComponent } from './core/features/components/login-admin-comp
 import { FacultyDataTableComponent } from './core/features/components/faculty-data-table-component/faculty-data-table-component';
 import { FacultyEvaluationScoresDataTableComponent } from './core/features/components/faculty-evaluation-scores-data-table-component/faculty-evaluation-scores-data-table-component';
 import { UserAccountsDataTableComponent } from './core/features/components/user-accounts-data-table-component/user-accounts-data-table-component';
+import { guestGuard } from './utilities/guards/guest/guest-guard';
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+    {
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [guestGuard]
+  },
   {
     path: 'admin',
     component: LoginAdminComponent,
+    canActivate: [guestGuard]
   },
   {
     path: 'student-dashboard',
