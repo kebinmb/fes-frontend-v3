@@ -1,265 +1,440 @@
+:host {
+  display: block;
+}
+
+/* =========================
+   GLOBAL DASHBOARD
+========================= */
+
+.dashboard-page {
+  min-height: 100vh;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f8fafc 0%,
+      #f1f5f9 100%
+    );
+
+  animation: fadeIn 0.35s ease;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
 .navbar {
-  background: var(--chmsu-primary);
-  backdrop-filter: blur(8px);
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+
+  padding-top: 0.9rem;
+  padding-bottom: 0.9rem;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(24, 100, 67, 0.96),
+      rgba(16, 70, 48, 0.98)
+    );
+
+  backdrop-filter: blur(16px);
+
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* =========================
+   BRAND
+========================= */
+
+.brand-logo-small {
+  position: relative;
 }
 
 .logo-container {
-  width: 44px;
-  height: 44px;
-  background: #fff;
+  width: 50px;
+  height: 50px;
+
   border-radius: 50%;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.96),
+      rgba(255, 255, 255, 1)
+    );
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   overflow: hidden;
+
+  border: 2px solid rgba(255, 255, 255, 0.2);
+
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.12),
+    inset 0 0 0 6px rgba(24, 100, 67, 0.03);
 }
 
 .logo-image-small {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
+
   object-fit: contain;
 }
 
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .university-name {
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
+  color: #ffffff;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  line-height: 1.1;
+
+  letter-spacing: 0.2px;
 }
 
 .system-name {
-  color: #dadada;
-  font-size: 11px;
-  opacity: 0.7;
+  color: rgba(255, 255, 255, 0.72);
+
+  font-size: 0.74rem;
+
+  margin-top: 2px;
+
+  letter-spacing: 0.3px;
 }
+
+/* =========================
+   USER BADGE
+========================= */
 
 .user-info-badge {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 14px;
-  color: #fff;
+  gap: 0.8rem;
+
+  padding: 0.6rem 1rem;
+
+  color: #ffffff;
+
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  background: rgba(255, 255, 255, 0.12);
+
+  backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
   transition: all 0.25s ease;
 }
 
 .user-info-badge:hover {
   background: rgba(255, 255, 255, 0.16);
+
   transform: translateY(-2px);
 }
 
 .user-icon {
-  font-size: 1.25rem;
-  opacity: 0.9;
+  font-size: 1.35rem;
+
+  opacity: 0.95;
 }
 
 .user-details {
   display: flex;
   flex-direction: column;
+
   line-height: 1.1;
 }
 
 .user-label {
-  font-size: 10px;
-  opacity: 0.6;
+  font-size: 0.62rem;
+
   text-transform: uppercase;
+
+  letter-spacing: 0.6px;
+
+  opacity: 0.65;
 }
 
 .user-id-value {
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
 }
 
-.stat-card-dashboard {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 16px;
-  border-radius: 14px;
-  background: var(--chmsu-surface);
-  border: 1px solid var(--chmsu-border);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-outline-light {
+  border-radius: 12px !important;
+
+  padding: 0.55rem 1rem !important;
+
+  font-weight: 600 !important;
+
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  backdrop-filter: blur(10px);
+
   transition: all 0.25s ease;
 }
 
+.btn-outline-light:hover {
+  transform: translateY(-2px);
+
+  background: rgba(255, 255, 255, 0.16) !important;
+}
+
+.btn-primary {
+  height: 48px;
+
+  border: none !important;
+
+  border-radius: 14px !important;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--chmsu-primary),
+      var(--chmsu-primary-dark)
+    ) !important;
+
+  color: #ffffff !important;
+
+  font-size: 0.92rem;
+  font-weight: 700 !important;
+
+  transition: all 0.25s ease !important;
+
+  box-shadow:
+    0 10px 20px rgba(24, 100, 67, 0.16);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 16px 28px rgba(24, 100, 67, 0.22);
+}
+
+.btn-primary:disabled {
+  opacity: 0.72;
+}
+
+.btn-primary:focus {
+  box-shadow:
+    0 0 0 4px rgba(24, 100, 67, 0.12) !important;
+}
+
+/* =========================
+   STATS
+========================= */
+
+.stat-card-dashboard {
+  position: relative;
+
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  padding: 1.25rem;
+
+  border-radius: 22px;
+
+  background: rgba(255, 255, 255, 0.85);
+
+  backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255, 255, 255, 0.6);
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.05);
+
+  transition: all 0.25s ease;
+}
+
+.stat-card-dashboard::before {
+  content: '';
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 5px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--chmsu-primary),
+      var(--chmsu-secondary)
+    );
+}
+
 .stat-card-dashboard:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 18px 38px rgba(0, 0, 0, 0.08);
 }
 
 .stat-icon {
-  font-size: 18px;
-  padding: 10px;
-  border-radius: 10px;
-}
+  width: 54px;
+  height: 54px;
 
-.stat-value-dashboard {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--chmsu-text);
-}
+  border-radius: 16px;
 
-.stat-label-dashboard {
-  font-size: 12px;
-  color: var(--chmsu-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 1.25rem;
+
+  flex-shrink: 0;
 }
 
 .bg-primary-soft {
-  background: rgba(24, 100, 67, 0.08);
+  background: rgba(24, 100, 67, 0.1);
+
   color: var(--chmsu-primary);
 }
 
 .bg-success-soft {
-  background: rgba(106, 157, 138, 0.12);
+  background: rgba(106, 157, 138, 0.14);
+
   color: var(--chmsu-secondary);
 }
 
 .bg-warning-soft {
-  background: rgba(207, 106, 51, 0.12);
+  background: rgba(207, 106, 51, 0.14);
+
   color: var(--chmsu-warning);
 }
 
+.stat-value-dashboard {
+  font-size: 1.8rem;
+  font-weight: 800;
+
+  line-height: 1;
+
+  color: var(--chmsu-text);
+}
+
+.stat-label-dashboard {
+  margin-top: 0.35rem;
+
+  font-size: 0.82rem;
+
+  color: var(--chmsu-muted);
+
+  font-weight: 500;
+}
+
+/* =========================
+   CLASS CARDS
+========================= */
+
 .class-card {
-  background: var(--chmsu-surface);
-  border-radius: 18px;
-  padding: 16px;
-  border: 1px solid var(--chmsu-border);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
-  cursor: pointer;
-  transition: all 0.25s ease;
+  height: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 1.4rem;
+
+  border-radius: 24px;
+
+  background: rgba(255, 255, 255, 0.92);
+
+  backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255, 255, 255, 0.65);
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.05);
+
+  transition: all 0.28s ease;
 }
 
 .class-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.08);
+  transform: translateY(-6px);
+
+  box-shadow:
+    0 22px 42px rgba(0, 0, 0, 0.08);
+}
+
+.class-card-header {
+  margin-bottom: 1rem;
 }
 
 .class-subject {
-  font-weight: 600;
-  font-size: 15px;
+  margin: 0;
+
+  font-size: 1.05rem;
+  font-weight: 700;
+
   color: var(--chmsu-text);
+}
+
+.class-card-body {
+  flex: 1;
 }
 
 .info-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12.5px;
-  margin-bottom: 6px;
+  gap: 0.7rem;
+
+  padding: 0.55rem 0;
+
   color: var(--chmsu-muted);
+
+  font-size: 0.88rem;
 }
 
-.btn-primary {
-  background: var(--chmsu-primary);
-  border: none;
-  border-radius: 10px;
-  padding: 10px;
-  font-weight: 500;
-  color: #fff;
-  transition: all 0.25s ease;
-}
+.info-item i {
+  width: 18px;
 
-.btn-primary:hover {
-  background: var(--chmsu-primary-dark);
-  transform: translateY(-1px);
-}
-
-.btn-primary:focus {
-  box-shadow: 0 0 0 3px rgba(24, 100, 67, 0.15);
-}
-
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--chmsu-muted);
-}
-
-.empty-icon {
-  font-size: 48px;
-  opacity: 0.6;
-  margin-bottom: 10px;
-  background: var(--chmsu-bg-soft);
-  padding: 20px;
-  border-radius: 50%;
-  display: inline-block;
   color: var(--chmsu-primary);
 }
 
-.spinner-border {
-  color: var(--chmsu-primary);
+.class-card-footer {
+  margin-top: 1rem;
 }
 
-.spinner-lg {
-  width: 2.8rem;
-  height: 2.8rem;
-}
+/* =========================
+   STATUS
+========================= */
 
-.dashboard-page {
-  animation: fadeIn 0.35s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@media (max-width: 768px) {
-  .user-info-badge {
-    padding: 5px 10px;
-    gap: 8px;
-  }
-
-  .user-id-value {
-    font-size: 12px;
-  }
-
-  .stat-card-dashboard {
-    padding: 14px;
-  }
-
-  .stat-value-dashboard {
-    font-size: 18px;
-  }
-
-  .class-card {
-    padding: 14px;
-  }
-
-  .class-subject {
-    font-size: 14px;
-  }
-
-  .info-item {
-    font-size: 12px;
-  }
-
-  .btn {
-    font-size: 13px;
-    padding: 8px;
-  }
-}
-
-.stat-card-dashboard,
-.class-card,
-.btn,
-.user-info-badge {
-  will-change: transform, box-shadow;
-}
 .status-badge {
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  background: rgba(24, 100, 67, 0.06);
+
+  font-size: 1.1rem;
 }
 
 .status-completed {
@@ -268,4 +443,184 @@
 
 .status-pending {
   color: var(--chmsu-warning);
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty-state {
+  text-align: center;
+
+  padding: 5rem 1.5rem;
+
+  border-radius: 26px;
+
+  background: rgba(255, 255, 255, 0.8);
+
+  backdrop-filter: blur(12px);
+
+  border: 1px solid rgba(255, 255, 255, 0.6);
+
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.04);
+}
+
+.empty-icon {
+  width: 110px;
+  height: 110px;
+
+  margin: 0 auto 1.2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: rgba(24, 100, 67, 0.08);
+
+  color: var(--chmsu-primary);
+
+  font-size: 2.7rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+
+  color: var(--chmsu-text);
+}
+
+.empty-state p {
+  color: var(--chmsu-muted);
+}
+
+/* =========================
+   LOADING
+========================= */
+
+.spinner-border {
+  color: var(--chmsu-primary);
+}
+
+.spinner-lg {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================
+   PERFORMANCE
+========================= */
+
+.stat-card-dashboard,
+.class-card,
+.btn,
+.user-info-badge {
+  will-change: transform, box-shadow;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 992px) {
+  .navbar .container-fluid {
+    gap: 1rem;
+  }
+
+  .brand-text {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .stat-card-dashboard {
+    padding: 1rem;
+  }
+
+  .stat-value-dashboard {
+    font-size: 1.45rem;
+  }
+
+  .class-card {
+    padding: 1.1rem;
+  }
+
+  .class-subject {
+    font-size: 0.96rem;
+  }
+
+  .info-item {
+    font-size: 0.82rem;
+  }
+
+  .btn-primary {
+    height: 44px;
+  }
+
+  .logo-container {
+    width: 44px;
+    height: 44px;
+  }
+
+  .logo-image-small {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar {
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
+  }
+
+  .user-info-badge {
+    padding: 0.45rem 0.75rem;
+  }
+
+  .user-id-value {
+    font-size: 0.74rem;
+  }
+
+  .stat-card-dashboard {
+    border-radius: 18px;
+  }
+
+  .class-card {
+    border-radius: 20px;
+  }
+
+  .empty-state {
+    padding: 4rem 1rem;
+  }
+
+  .empty-icon {
+    width: 90px;
+    height: 90px;
+
+    font-size: 2.2rem;
+  }
 }

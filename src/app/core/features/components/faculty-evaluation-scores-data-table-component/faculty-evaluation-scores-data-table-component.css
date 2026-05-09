@@ -1,153 +1,236 @@
 /* =========================================================
    CARD
-   ========================================================= */
+========================================================= */
+
 .modern-card {
   background: var(--chmsu-surface);
+
   border: 1px solid var(--chmsu-border);
-  border-radius: 26px;
+
+  border-radius: 24px;
+
   overflow: hidden;
-  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.04);
+
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.04);
 }
+
 .card-topbar {
   height: 5px;
+
   background: var(--chmsu-primary);
 }
+
 /* =========================================================
    HEADER
-   ========================================================= */
+========================================================= */
+
 .modern-card-header,
 .modern-card-footer {
-  padding: 28px;
+  padding: 1.75rem;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+
+  gap: 1rem;
+
   flex-wrap: wrap;
 }
+
 .modern-card-header {
-  border-bottom: 1px solid var(--chmsu-border);
+  border-bottom:
+    1px solid var(--chmsu-border);
 }
+
 .modern-card-footer {
-  border-top: 1px solid var(--chmsu-border);
+  border-top:
+    1px solid var(--chmsu-border);
+
+  background: #fcfcfc;
 }
+
 .header-content h2 {
   margin: 0;
-  font-size: 1.7rem;
-  font-weight: 700;
+
   color: var(--chmsu-primary-dark);
+
+  font-size: 1.55rem;
+  font-weight: 800;
+
+  letter-spacing: -0.4px;
 }
+
 .header-content span {
   display: inline-block;
-  margin-top: 6px;
+
+  margin-top: 0.4rem;
+
   color: var(--chmsu-muted);
-  font-size: 0.95rem;
+
+  font-size: 0.92rem;
 }
+
 /* =========================================================
    HEADER ACTIONS
-   ========================================================= */
+========================================================= */
+
 .header-actions,
 .pagination-group,
 .table-user {
   display: flex;
   align-items: center;
-  gap: 14px;
+
+  gap: 0.85rem;
+
   flex-wrap: wrap;
 }
+
 /* =========================================================
    TABLE COUNT
-   ========================================================= */
+========================================================= */
+
 .table-count {
-  min-width: 74px;
-  height: 74px;
-  border-radius: 22px;
+  min-width: 76px;
+  height: 76px;
+
+  border-radius: 20px;
+
   background: var(--chmsu-bg-soft);
-  border: 1px solid rgba(24, 100, 67, 0.08);
+
+  border:
+    1px solid rgba(24, 100, 67, 0.08);
+
   color: var(--chmsu-primary-dark);
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+
+  gap: 0.3rem;
+
   font-weight: 700;
 }
+
 .table-count i {
-  font-size: 1rem;
+  font-size: 0.95rem;
+
   opacity: 0.7;
 }
+
 .table-count span {
-  font-size: 1.15rem;
+  font-size: 1.1rem;
+
   line-height: 1;
 }
+
 /* =========================================================
    TABLE
-   ========================================================= */
+========================================================= */
+
 .table-responsive {
   overflow-x: auto;
 }
+
 .modern-table {
   width: 100%;
+
   margin: 0;
+
   border-collapse: collapse;
 }
+
 .modern-table thead th {
   background: var(--chmsu-bg-soft);
+
   color: var(--chmsu-primary-dark);
-  padding: 18px 22px;
-  font-size: 0.9rem;
-  font-weight: 700;
+
+  padding: 1rem 1.2rem;
+
+  font-size: 0.82rem;
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.04em;
+
   border: none;
+
   white-space: nowrap;
 }
+
 .modern-table tbody td {
-  padding: 20px 22px;
-  border-top: 1px solid var(--chmsu-border);
+  padding: 1rem 1.2rem;
+
+  border-top:
+    1px solid var(--chmsu-border);
+
   vertical-align: middle;
+
   color: var(--chmsu-text);
-  font-size: 0.94rem;
+
+  font-size: 0.93rem;
 }
+
 .modern-table tbody tr {
   transition:
     background 0.2s ease,
     transform 0.2s ease;
 }
+
 .modern-table tbody tr:hover {
-  background: rgba(24, 100, 67, 0.025);
+  background:
+    rgba(24, 100, 67, 0.025);
 }
+
 /* =========================================================
-   USER
-   ========================================================= */
+   FACULTY
+========================================================= */
+
 .table-avatar {
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
+
   border-radius: 50%;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   flex-shrink: 0;
+
   font-size: 1rem;
   font-weight: 700;
+
   color: white;
 }
+
 .warning-avatar {
-  background: var(--chmsu-warning);
+  background: var(--chmsu-primary);
 }
+
 .table-user-content {
   display: flex;
   flex-direction: column;
 }
+
 .fw-semibold {
   font-weight: 600;
+
   color: var(--chmsu-text);
 }
-.table-user-content small,
-.pagination-info,
-.modern-card-footer small {
+
+.table-user-content small {
   color: var(--chmsu-muted);
-  font-size: 0.92rem;
+
+  font-size: 0.82rem;
 }
+
 /* =========================================================
    BADGES
-   ========================================================= */
+========================================================= */
+
 .subject-code,
 .semester-badge,
 .score-badge,
@@ -155,146 +238,251 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   min-height: 38px;
-  padding: 8px 14px;
+
+  padding: 0.5rem 0.9rem;
+
   border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
+
+  font-size: 0.82rem;
+  font-weight: 700;
 }
+
+/* SUBJECT */
+
 .subject-code {
-  background: rgba(24, 100, 67, 0.08);
+  background:
+    rgba(24, 100, 67, 0.08);
+
   color: var(--chmsu-primary-dark);
 }
+
+/* SEMESTER */
+
 .semester-badge {
-  background: rgba(106, 157, 138, 0.14);
+  background:
+    rgba(106, 157, 138, 0.14);
+
   color: var(--chmsu-primary-dark);
 }
+
+/* SCORE */
+
 .score-badge {
-  background: rgba(229, 212, 19, 0.18);
-  color: #6b6200;
-}
-.interpretation-badge.excellent {
-  background: rgba(24, 100, 67, 0.12);
-  color: var(--chmsu-primary-dark);
-}
-.interpretation-badge.average {
-  background: rgba(229, 212, 19, 0.2);
+  background:
+    rgba(229, 212, 19, 0.16);
+
   color: #6d6200;
 }
+
+/* INTERPRETATION */
+
+.interpretation-badge.excellent {
+  background:
+    rgba(24, 100, 67, 0.12);
+
+  color: var(--chmsu-primary-dark);
+}
+
+.interpretation-badge.average {
+  background:
+    rgba(229, 212, 19, 0.16);
+
+  color: #6d6200;
+}
+
 .interpretation-badge.poor {
-  background: rgba(207, 106, 51, 0.15);
+  background:
+    rgba(207, 106, 51, 0.14);
+
   color: #8a3f1b;
 }
+
 /* =========================================================
    EMPTY STATE
-   ========================================================= */
+========================================================= */
+
 .empty-state {
-  padding: 60px 20px !important;
+  padding: 4rem 1rem !important;
 }
+
 .empty-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
+
 .empty-wrapper i {
-  font-size: 3rem;
+  font-size: 2.8rem;
+
   color: var(--chmsu-muted);
-  opacity: 0.5;
+
+  opacity: 0.45;
 }
+
 .empty-wrapper h4 {
-  margin: 18px 0 8px;
+  margin:
+    1rem 0 0.45rem;
+
   color: var(--chmsu-primary-dark);
-  font-size: 1.15rem;
+
+  font-size: 1.1rem;
+  font-weight: 700;
 }
+
 .empty-wrapper span {
   color: var(--chmsu-muted);
-  font-size: 0.92rem;
+
+  font-size: 0.9rem;
 }
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.modern-card-footer small {
+  color: var(--chmsu-muted);
+
+  font-size: 0.88rem;
+}
+
+.pagination-info {
+  color: var(--chmsu-muted);
+
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
 /* =========================================================
    PAGINATION
-   ========================================================= */
+========================================================= */
+
 .pagination-btn {
   height: 42px;
-  padding: 0 16px;
+
+  padding: 0 1rem;
+
   border: none;
+
   border-radius: 12px;
+
   background: var(--chmsu-bg-soft);
+
   color: var(--chmsu-primary-dark);
-  font-size: 0.9rem;
-  font-weight: 600;
+
+  font-size: 0.88rem;
+  font-weight: 700;
+
   cursor: pointer;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+
+  gap: 0.45rem;
+
   transition:
     background 0.2s ease,
-    opacity 0.2s ease,
-    transform 0.2s ease;
+    transform 0.2s ease,
+    opacity 0.2s ease;
 }
+
 .pagination-btn:hover:not(:disabled) {
-  background: rgba(24, 100, 67, 0.08);
+  background:
+    rgba(24, 100, 67, 0.08);
+
+  transform: translateY(-1px);
 }
+
 .pagination-btn:disabled {
   opacity: 0.5;
+
   cursor: not-allowed;
+
+  transform: none;
 }
+
 .warning-btn {
-  background: rgba(207, 106, 51, 0.1);
-  color: #8a3f1b;
+  background:
+    rgba(24, 100, 67, 0.08);
+
+  color: var(--chmsu-primary-dark);
 }
+
 .warning-btn:hover:not(:disabled) {
-  background: rgba(207, 106, 51, 0.16);
+  background:
+    rgba(24, 100, 67, 0.14);
 }
+
 /* =========================================================
    RESPONSIVE
-   ========================================================= */
+========================================================= */
+
 @media (max-width: 992px) {
   .modern-card-header,
   .modern-card-footer {
     flex-direction: column;
     align-items: stretch;
   }
+
   .header-actions {
     justify-content: space-between;
   }
 }
+
 @media (max-width: 768px) {
   .modern-card-header,
   .modern-card-footer {
-    padding: 22px;
+    padding: 1.35rem;
   }
+
   .modern-table thead {
     display: none;
   }
+
   .modern-table,
   .modern-table tbody,
   .modern-table tr,
   .modern-table td {
     display: block;
+
     width: 100%;
   }
+
   .modern-table tr {
-    padding: 18px;
-    border-bottom: 1px solid var(--chmsu-border);
+    padding: 1rem;
+
+    border-bottom:
+      1px solid var(--chmsu-border);
   }
+
   .modern-table td {
     border: none;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    padding: 12px 0;
+
+    gap: 1rem;
+
+    padding: 0.75rem 0;
   }
+
   .modern-table td::before {
     content: attr(data-label);
+
     min-width: 120px;
+
     font-weight: 700;
+
     color: var(--chmsu-primary-dark);
   }
+
   .pagination-group {
     width: 100%;
+
     justify-content: space-between;
   }
 }
