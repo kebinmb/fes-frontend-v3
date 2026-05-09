@@ -1,17 +1,48 @@
 <div class="admin-login-wrapper">
+  <div class="background-overlay"></div>
+
+  <div class="floating-circle circle-1"></div>
+  <div class="floating-circle circle-2"></div>
+  <div class="floating-circle circle-3"></div>
+
   <div class="admin-login-card">
+    <div class="card-glow"></div>
+
     <div class="brand-section">
       <div class="logo-container">
         <div class="logo-circle">
-          <i class="bi bi-shield-lock-fill"></i>
+          <img
+            src="chmsu-logo.png"
+            alt="CHMSU Logo"
+            class="brand-logo"
+          />
         </div>
       </div>
 
-      <h1 class="brand-title">Administrator Portal</h1>
+      <div class="admin-badge">
+        <i class="bi bi-shield-check"></i>
+        Administrator Access
+      </div>
+
+      <h1 class="brand-title">
+        Administrator Portal
+      </h1>
 
       <p class="brand-subtitle">
         Faculty Evaluation System
       </p>
+
+      <div class="portal-features">
+        <div class="feature-chip">
+          <i class="bi bi-shield-lock-fill"></i>
+          Secure Access
+        </div>
+
+        <div class="feature-chip">
+          <i class="bi bi-speedometer2"></i>
+          Admin Dashboard
+        </div>
+      </div>
     </div>
 
     <form
@@ -20,7 +51,9 @@
       class="login-form"
     >
       <div class="form-group">
-        <label for="username">Username</label>
+        <label for="username">
+          Username
+        </label>
 
         <div class="input-wrapper">
           <i class="bi bi-person-fill input-icon"></i>
@@ -35,24 +68,28 @@
           />
         </div>
 
-        @if (
-          adminFormControl.username.touched &&
-          adminFormControl.username.invalid
-        ) {
-          <div class="error-message">
-            @if (adminFormControl.username.errors?.['required']) {
-              <span>Username is required.</span>
-            }
+        <div class="error-space">
+          @if (
+            adminFormControl.username.touched &&
+            adminFormControl.username.invalid
+          ) {
+            <div class="error-message">
+              @if (adminFormControl.username.errors?.['required']) {
+                <span>Username is required.</span>
+              }
 
-            @if (adminFormControl.username.errors?.['maxlength']) {
-              <span>Maximum of 12 characters only.</span>
-            }
-          </div>
-        }
+              @if (adminFormControl.username.errors?.['maxlength']) {
+                <span>Maximum of 12 characters only.</span>
+              }
+            </div>
+          }
+        </div>
       </div>
 
       <div class="form-group">
-        <label for="password">Password</label>
+        <label for="password">
+          Password
+        </label>
 
         <div class="input-wrapper">
           <i class="bi bi-lock-fill input-icon"></i>
@@ -67,14 +104,16 @@
           />
         </div>
 
-        @if (
-          adminFormControl.password.touched &&
-          adminFormControl.password.invalid
-        ) {
-          <div class="error-message">
-            <span>Password is required.</span>
-          </div>
-        }
+        <div class="error-space">
+          @if (
+            adminFormControl.password.touched &&
+            adminFormControl.password.invalid
+          ) {
+            <div class="error-message">
+              <span>Password is required.</span>
+            </div>
+          }
+        </div>
       </div>
 
       <button
@@ -83,7 +122,10 @@
         [disabled]="adminForm.invalid"
       >
         <i class="bi bi-box-arrow-in-right"></i>
-        Login as Administrator
+
+        <span>
+          Login as Administrator
+        </span>
       </button>
     </form>
   </div>
