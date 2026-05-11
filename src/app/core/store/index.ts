@@ -7,6 +7,7 @@ import { supervisorDataReducer } from './supervisor-data/supervisor-data.reducer
 import { evaluationReducer } from './evaluation-data/evaluation.reducer';
 import { adminDataReducer } from './admin-data/admin-data.reducer';
 import { migrationReducer } from './migration/migration.reducer';
+import { schoolYearAndSemesterReducer } from './school-year-and-semester/school-year-and-semester.reducer';
 
 export const reducers = {
   auth: authReducer,
@@ -16,5 +17,6 @@ export const reducers = {
   supervisorData: supervisorDataReducer,
   evaluationData: evaluationReducer,
   adminData: adminDataReducer,
-  migrationData: migrationReducer
+  migrationData: migrationReducer,
+  schoolYearAndSemesterData: schoolYearAndSemesterReducer
 };

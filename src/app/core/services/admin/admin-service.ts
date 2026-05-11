@@ -79,7 +79,26 @@ export interface MigrationResponse<T> {
   errors: MigrationErrorResponse[];
   data?: T;
 }
+export type Semester =
+  | 'FIRST_SEMESTER'
+  | 'SECOND_SEMESTER'
+  | 'SUMMER_SEMESTER';
 
+export interface SchoolYearAndSemesterResponse {
+  id: number;
+  schoolYear: number;
+  semester: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface CurrentSchoolYearAndSemesterResponse {
+  id: number;
+  schoolYear: number;
+  semester: string;
+  status: string;
+  createdAt: string;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -166,6 +185,45 @@ export class AdminService {
     return this.http.post<MigrationResponse<void>>(
       `${this.MIGRATION_API_URL}`,
       {},
+      {
+        withCredentials: true,
+      },
+    );
+  }
+  updateSchoolYearAndSemester(
+    schoolYear: number,
+    semester: Semester,
+  ): Observable<SchoolYearAndSemesterResponse> {
+
+    const params = new HttpParams()
+
+      .set(
+        'schoolYear',
+        schoolYear,
+      )
+
+      .set(
+        'semester',
+        semester,
+      );
+
+    return this.http.put<SchoolYearAndSemesterResponse>(
+      `${this.ADMIN_API_URL}/school-year-semester`,
+      {},
+      {
+        params,
+        withCredentials: true,
+      },
+    );
+  }
+
+  fetchCurrentSchoolYearAndSemester():
+    Observable<CurrentSchoolYearAndSemesterResponse> {
+
+    return this.http.get<
+      CurrentSchoolYearAndSemesterResponse
+    >(
+      `${this.ADMIN_API_URL}/school-year-semester`,
       {
         withCredentials: true,
       },

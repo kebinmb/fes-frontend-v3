@@ -1,57 +1,430 @@
 .settings-card {
-  background: #ffffff;
-  border-radius: 24px;
+  background: var(--chmsu-surface);
+
+  border: 1px solid rgba(24, 100, 67, 0.08);
+
+  border-radius: 28px;
+
   padding: 2rem;
-  height: 100%;
-  border: 1px solid #edf0f2;
+
+  position: relative;
+
+  overflow: hidden;
 
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
 
   box-shadow:
-    0 6px 20px rgba(0, 0, 0, 0.04);
+    0 10px 35px rgba(24, 100, 67, 0.05);
 }
 
 .settings-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-6px);
+
+  border-color: rgba(24, 100, 67, 0.14);
 
   box-shadow:
-    0 14px 32px rgba(0, 0, 0, 0.08);
+    0 18px 45px rgba(24, 100, 67, 0.10);
 }
 
+/* =========================================
+   PAGE HEADER
+========================================= */
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+
+  font-weight: 700;
+
+  color: var(--chmsu-primary);
+
+  letter-spacing: -0.03em;
+
+  margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+  color: var(--chmsu-muted);
+
+  font-size: 0.96rem;
+
+  margin-bottom: 0;
+}
+
+/* =========================================
+   SETTINGS ICONS
+========================================= */
+
 .settings-icon {
-  width: 70px;
-  height: 70px;
+  width: 72px;
+
+  height: 72px;
+
   border-radius: 22px;
 
   display: flex;
+
   align-items: center;
+
   justify-content: center;
 
-  font-size: 1.8rem;
+  font-size: 1.75rem;
 
   margin-bottom: 1.5rem;
 }
 
-.settings-content h5 {
-  font-size: 1.15rem;
+.settings-icon.primary {
+  background: rgba(24, 100, 67, 0.08);
+
+  color: var(--chmsu-primary);
 }
 
-.advanced-settings-card {
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 2rem;
+.settings-icon.success {
+  background: rgba(106, 157, 138, 0.12);
 
-  border: 1px solid #f1d7d7;
+  color: var(--chmsu-secondary);
+}
+
+.settings-icon.danger {
+  background: rgba(207, 106, 51, 0.12);
+
+  color: var(--chmsu-warning);
+}
+
+/* =========================================
+   SETTINGS TEXT
+========================================= */
+
+.settings-title {
+  font-size: 1.15rem;
+
+  font-weight: 700;
+
+  color: var(--chmsu-text);
+
+  letter-spacing: -0.02em;
+}
+
+.settings-description {
+  color: var(--chmsu-muted);
+
+  line-height: 1.7;
+
+  font-size: 0.94rem;
+}
+
+/* =========================================
+   CURRENT ACTIVE TERM
+========================================= */
+
+.current-semester-card {
+  background: rgba(24, 100, 67, 0.03);
+
+  border: 1px solid rgba(24, 100, 67, 0.08);
+
+  border-radius: 20px;
+
+  padding: 1rem 1.25rem;
+}
+
+.current-semester-card .label {
+  color: var(--chmsu-muted);
+
+  font-size: 0.76rem;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.08em;
+
+  font-weight: 600;
+}
+
+.current-semester-card .value {
+  font-size: 1.1rem;
+
+  font-weight: 700;
+
+  color: var(--chmsu-primary);
+
+  margin-bottom: 0.25rem;
+}
+
+.semester-text {
+  color: var(--chmsu-secondary);
+
+  font-size: 0.92rem;
+
+  font-weight: 500;
+}
+
+/* =========================================
+   FORM CONTROLS
+========================================= */
+
+.form-label {
+  font-size: 0.88rem;
+
+  font-weight: 600;
+
+  color: var(--chmsu-text);
+
+  margin-bottom: 0.5rem;
+}
+
+.form-control-modern,
+.form-select.form-control-modern {
+  border-radius: 16px;
+
+  border: 1px solid var(--chmsu-border);
+
+  background: var(--chmsu-bg);
+
+  min-height: 52px;
+
+  padding-left: 1rem;
+
+  font-size: 0.95rem;
+
+  color: var(--chmsu-text);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-control-modern:focus,
+.form-select.form-control-modern:focus {
+  border-color: rgba(24, 100, 67, 0.28);
+
+  background: #ffffff;
 
   box-shadow:
-    0 10px 30px rgba(220, 53, 69, 0.08);
+    0 0 0 4px rgba(24, 100, 67, 0.08);
+
+  outline: none;
+}
+
+.form-control-modern::placeholder {
+  color: #9aa4aa;
+}
+
+.input-group-text {
+  border-radius: 16px 0 0 16px;
+
+  border: 1px solid var(--chmsu-border);
+
+  border-right: none;
+
+  background: var(--chmsu-bg);
+
+  color: var(--chmsu-primary);
+
+  padding-inline: 1rem;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.btn-modern {
+  border-radius: 16px;
+
+  min-height: 52px;
+
+  font-weight: 600;
+
+  border: none;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.btn-modern:hover {
+  transform: translateY(-2px);
+}
+
+.btn-modern:disabled {
+  opacity: 0.75;
+
+  cursor: not-allowed;
+}
+
+.btn-primary.btn-modern {
+  background: var(--chmsu-primary);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 10px 24px rgba(24, 100, 67, 0.14);
+}
+
+.btn-success.btn-modern {
+  background: var(--chmsu-secondary);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 10px 24px rgba(106, 157, 138, 0.14);
+}
+
+.btn-danger.btn-modern {
+  background: var(--chmsu-warning);
+
+  color: #ffffff;
+
+  box-shadow:
+    0 10px 24px rgba(207, 106, 51, 0.14);
+}
+
+.btn-outline-dark.btn-modern {
+  border: 1px solid var(--chmsu-border);
+
+  background: #ffffff;
+
+  color: var(--chmsu-text);
+}
+
+/* =========================================
+   ADVANCED SETTINGS
+========================================= */
+
+.advanced-settings-card {
+  background: var(--chmsu-surface);
+
+  border-radius: 28px;
+
+  padding: 2rem;
+
+  border: 1px solid rgba(207, 106, 51, 0.12);
+
+  box-shadow:
+    0 14px 38px rgba(207, 106, 51, 0.08);
+}
+
+.advanced-header {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  margin-bottom: 1.5rem;
 }
 
 .danger-operation {
-  background: #fff5f5;
-  border-radius: 18px;
+  background: rgba(207, 106, 51, 0.04);
+
+  border-radius: 20px;
+
+  border: 1px solid rgba(207, 106, 51, 0.10);
+
   padding: 1.5rem;
-  border: 1px solid #ffd6d6;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  flex-wrap: wrap;
+}
+
+/* =========================================
+   ALERTS
+========================================= */
+
+.modern-alert {
+  border: none;
+
+  border-radius: 18px;
+
+  padding: 1rem 1.25rem;
+
+  font-size: 0.92rem;
+}
+
+.alert-success.modern-alert {
+  background: rgba(24, 100, 67, 0.08);
+
+  color: var(--chmsu-primary);
+}
+
+.alert-danger.modern-alert {
+  background: rgba(207, 106, 51, 0.08);
+
+  color: var(--chmsu-warning);
+}
+
+/* =========================================
+   BADGES
+========================================= */
+
+.badge {
+  border-radius: 999px;
+
+  font-weight: 600;
+
+  padding: 0.55rem 0.85rem;
+
+  font-size: 0.74rem;
+}
+
+/* =========================================
+   TEXT MUTED
+========================================= */
+
+.text-muted {
+  color: var(--chmsu-muted) !important;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 992px) {
+
+  .settings-card,
+  .advanced-settings-card {
+    padding: 1.5rem;
+  }
+
+  .page-title {
+    font-size: 1.65rem;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .danger-operation {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .advanced-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+  .settings-icon {
+    width: 64px;
+
+    height: 64px;
+
+    font-size: 1.5rem;
+  }
 }

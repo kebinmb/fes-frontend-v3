@@ -1,117 +1,267 @@
-<div class="container-fluid py-4">
+<div class="container-fluid">
 
-    <!-- PAGE HEADER -->
+    <!-- HEADER -->
 
-    <div class="mb-4">
+    <div class="page-header">
 
-        <h2 class="fw-bold mb-1">
+        <h2 class="page-title">
             System Settings
         </h2>
 
-        <p class="text-muted mb-0">
+        <p class="page-subtitle">
             Configure and manage faculty evaluation system settings.
         </p>
 
     </div>
 
-    <!-- SETTINGS GRID -->
+    <!-- SETTINGS -->
 
     <div class="row g-4">
 
-        <!-- UPDATE SCHOOL YEAR & SEMESTER -->
+        <!-- SCHOOL YEAR -->
 
-        <div class="col-12 col-md-6 col-xl-4">
+        <div class="col-12 col-lg-6 col-xxl-4">
 
-            <div class="settings-card">
+            <div class="settings-card h-100">
 
-                <div class="settings-icon bg-primary-subtle text-primary">
+                <!-- ICON -->
+
+                <div class="settings-icon primary">
 
                     <i class="bi bi-calendar-event"></i>
 
                 </div>
 
-                <div class="settings-content">
+                <!-- HEADER -->
 
-                    <h5 class="fw-bold mb-2">
-                        Update School Year & Semester
+                <div class="mb-4">
+
+                    <h5 class="settings-title mb-2">
+                        School Year & Semester
                     </h5>
 
-                    <p class="text-muted mb-4">
-                        Configure the active academic year and semester
-                        for faculty evaluation operations.
+                    <p class="settings-description mb-0">
+                        Configure the currently active academic term
+                        used across the faculty evaluation system.
                     </p>
 
-                    <button class="btn btn-primary rounded-pill px-4">
-                        Manage
-                    </button>
+                </div>
+
+                <!-- CURRENT ACTIVE TERM -->
+
+                @if (schoolYearResponse$ | async; as current) {
+
+                <div class="current-semester-card mb-4">
+
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+
+                        <small class="label">
+
+                            Current Active Term
+
+                        </small>
+
+                        <span class="badge bg-primary-subtle text-primary">
+
+                            Active
+
+                        </span>
+
+                    </div>
+
+                    <div class="value">
+
+                        SY {{ current.schoolYear }}
+                        - {{ current.schoolYear + 1 }}
+
+                    </div>
+
+                    <div class="semester-text">
+
+                        {{ formatSemester(current.semester) }}
+
+                    </div>
 
                 </div>
+                }
+
+                <!-- SCHOOL YEAR -->
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-semibold">
+
+                        School Year
+
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text bg-white">
+
+                            <i class="bi bi-calendar3"></i>
+
+                        </span>
+
+                        <input type="number" class="form-control form-control-modern" [(ngModel)]="schoolYear"
+                            placeholder="Enter school year" />
+
+                    </div>
+
+                    <small class="text-muted d-block mt-2">
+
+                        Example:
+                        2025 automatically represents
+                        SY 2025 - 2026.
+
+                    </small>
+
+                </div>
+
+                <!-- SEMESTER -->
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-semibold">
+
+                        Semester
+
+                    </label>
+
+                    <select class="form-select form-control-modern" [(ngModel)]="semester">
+
+                        <option value="FIRST_SEMESTER">
+
+                            First Semester
+
+                        </option>
+
+                        <option value="SECOND_SEMESTER">
+
+                            Second Semester
+
+                        </option>
+
+                        <option value="SUMMER_SEMESTER">
+
+                            Summer Semester
+
+                        </option>
+
+                    </select>
+
+                    <small class="text-muted d-block mt-2">
+
+                        Select the currently active academic semester.
+
+                    </small>
+
+                </div>
+
+                <!-- UPDATE BUTTON -->
+
+                <button class="btn btn-primary btn-modern w-100" (click)="updateSchoolYearAndSemester()"
+                    [disabled]="(schoolYearLoading$ | async) === true">
+
+                    @if ((schoolYearLoading$ | async) === true) {
+
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+
+                    Updating Academic Term...
+
+                    } @else {
+
+                    <i class="bi bi-check-circle me-2"></i>
+
+                    Update Academic Term
+                    }
+
+                </button>
+
+                <!-- ERROR -->
+
+                @if (schoolYearError$ | async; as error) {
+
+                <div class="alert alert-danger modern-alert mt-4">
+
+                    <div class="fw-semibold mb-1">
+
+                        Update Failed
+
+                    </div>
+
+                    <div>
+
+                        {{ error?.error || error }}
+
+                    </div>
+
+                </div>
+                }
 
             </div>
 
         </div>
 
-        <!-- BACKUP DATABASE -->
+        <!-- BACKUP -->
 
-        <div class="col-12 col-md-6 col-xl-4">
+        <div class="col-12 col-lg-6 col-xxl-4">
 
-            <div class="settings-card">
+            <div class="settings-card h-100">
 
-                <div class="settings-icon bg-success-subtle text-success">
+                <div class="settings-icon success">
 
                     <i class="bi bi-cloud-arrow-down"></i>
 
                 </div>
 
-                <div class="settings-content">
+                <h5 class="settings-title">
+                    Backup Database
+                </h5>
 
-                    <h5 class="fw-bold mb-2">
-                        Backup Database
-                    </h5>
+                <p class="settings-description">
+                    Create and download a secure database backup.
+                </p>
 
-                    <p class="text-muted mb-4">
-                        Create and download a secure backup copy
-                        of the evaluation database.
-                    </p>
+                <button class="btn btn-success btn-modern mt-auto">
 
-                    <button class="btn btn-success rounded-pill px-4">
-                        Backup
-                    </button>
+                    <i class="bi bi-download me-2"></i>
 
-                </div>
+                    Backup Database
+
+                </button>
 
             </div>
 
         </div>
 
-        <!-- LOCK SYSTEM -->
+        <!-- LOCK -->
 
-        <div class="col-12 col-md-6 col-xl-4">
+        <div class="col-12 col-lg-6 col-xxl-4">
 
-            <div class="settings-card">
+            <div class="settings-card h-100">
 
-                <div class="settings-icon bg-danger-subtle text-danger">
+                <div class="settings-icon danger">
 
                     <i class="bi bi-lock"></i>
 
                 </div>
 
-                <div class="settings-content">
+                <h5 class="settings-title">
+                    Lock System
+                </h5>
 
-                    <h5 class="fw-bold mb-2">
-                        Lock System
-                    </h5>
+                <p class="settings-description">
+                    Temporarily disable evaluation submissions.
+                </p>
 
-                    <p class="text-muted mb-4">
-                        Restrict access and temporarily disable
-                        evaluation submissions system-wide.
-                    </p>
+                <button class="btn btn-danger btn-modern mt-auto">
 
-                    <button class="btn btn-danger rounded-pill px-4">
-                        Lock
-                    </button>
+                    <i class="bi bi-shield-lock me-2"></i>
 
-                </div>
+                    Lock System
+
+                </button>
 
             </div>
 
@@ -119,112 +269,105 @@
 
     </div>
 
-    <!-- HIDDEN ADVANCED SECTION -->
+    <!-- ADVANCED -->
 
     <div class="mt-5">
 
-        <button class="btn btn-outline-dark rounded-pill px-4" type="button" (click)="toggleAdvancedSettings()">
+        <button class="btn btn-outline-dark btn-modern" (click)="toggleAdvancedSettings()">
 
-            <i class="bi bi-shield-lock me-2"></i>
+            <i class="bi bi-sliders me-2"></i>
 
             Advanced Settings
 
         </button>
+
         @if (showAdvancedSettings) {
-        <div class="mt-4">
 
-            <div class="advanced-settings-card">
+        <div class="advanced-settings-card mt-4">
 
-                <div class="d-flex align-items-center justify-content-between mb-4">
+            <div class="advanced-header">
 
-                    <div>
+                <div>
 
-                        <h5 class="fw-bold mb-1 text-danger">
-                            Dangerous Operations
-                        </h5>
+                    <h5 class="text-danger fw-bold mb-1">
+                        Dangerous Operations
+                    </h5>
 
-                        <p class="text-muted mb-0">
-                            These actions may permanently affect the system.
-                        </p>
-
-                    </div>
-
-                    <span class="badge bg-danger-subtle text-danger px-3 py-2">
-                        Restricted
-                    </span>
+                    <p class="text-muted mb-0">
+                        Restricted administrative operations.
+                    </p>
 
                 </div>
 
-                <!-- MIGRATION -->
+                <span class="badge bg-danger-subtle text-danger">
 
-                <div
-                    class="danger-operation d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
+                    Restricted
 
-                    <div>
-
-                        <h6 class="fw-bold mb-2">
-                            Database Migration
-                        </h6>
-
-                        <p class="text-muted mb-0">
-                            Trigger system-wide migration process for
-                            data transformation and synchronization.
-                        </p>
-
-                    </div>
-
-                    <button class="btn btn-danger rounded-pill px-4 flex-shrink-0" (click)="startMigration()"
-                        [disabled]="(migrationLoading$ | async) === true">
-
-                        @if ((migrationLoading$ | async) === true) {
-
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-
-                        Running...
-
-                        } @else {
-
-                        <i class="bi bi-play-circle me-2"></i>
-
-                        Start Migration
-                        }
-
-                    </button>
-
-                </div>
-
-                <!-- RESPONSE -->
-
-                @if (migrationResponse$ | async; as response) {
-
-                <div class="alert alert-success rounded-4 mt-4 border-0">
-
-                    <strong>
-                        {{ response.status }}
-                    </strong>
-
-                    —
-
-                    {{ response.message }}
-
-                </div>
-                }
-
-                <!-- ERROR -->
-
-                @if (migrationError$ | async; as error) {
-
-                <div class="alert alert-danger rounded-4 mt-4 border-0">
-
-                    {{ error }}
-
-                </div>
-                }
+                </span>
 
             </div>
 
+            <div class="danger-operation">
+
+                <div>
+
+                    <h6 class="fw-bold mb-2">
+                        Database Migration
+                    </h6>
+
+                    <p class="text-muted mb-0">
+                        Trigger data synchronization and migration.
+                    </p>
+
+                </div>
+
+                <button class="btn btn-danger btn-modern" (click)="startMigration()"
+                    [disabled]="(migrationLoading$ | async) === true">
+
+                    @if ((migrationLoading$ | async) === true) {
+
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+
+                    Running...
+
+                    } @else {
+
+                    <i class="bi bi-play-circle me-2"></i>
+
+                    Start Migration
+                    }
+
+                </button>
+
+            </div>
+
+            @if (migrationResponse$ | async; as response) {
+
+            <div class="alert alert-success modern-alert mt-4">
+
+                <strong>
+                    {{ response.status }}
+                </strong>
+
+                —
+
+                {{ response.message }}
+
+            </div>
+            }
+
+            @if (migrationError$ | async; as error) {
+
+            <div class="alert alert-danger modern-alert mt-4">
+
+                {{ error }}
+
+            </div>
+            }
+
         </div>
         }
+
     </div>
 
 </div>
