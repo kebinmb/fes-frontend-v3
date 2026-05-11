@@ -454,3 +454,369 @@
     align-items: flex-start;
   }
 }
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.edit-modal {
+  width: 100%;
+  max-width: 800px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: modalShow 0.2s ease;
+}
+
+@keyframes modalShow {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================================
+   BACKDROP
+   ========================================================= */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background:
+    rgba(15, 23, 42, 0.65);
+
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+
+  z-index: 9999;
+
+  animation:
+    fadeBackdrop 0.25s ease;
+}
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+.edit-modal {
+  width: 100%;
+  max-width: 920px;
+
+  background: #ffffff;
+
+  border-radius: 28px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.22);
+
+  animation:
+    modalShow 0.28s ease;
+
+  position: relative;
+}
+
+/* =========================================================
+   TOP BAR
+   ========================================================= */
+
+.modal-topbar {
+  height: 6px;
+
+  background:
+    linear-gradient(90deg,
+      var(--chmsu-primary),
+      #22c55e);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  padding:
+    28px 32px 0;
+}
+
+.modal-title-group h2 {
+  margin: 0;
+
+  font-size: 28px;
+  font-weight: 800;
+
+  color: #0f172a;
+}
+
+.modal-title-group p {
+  margin-top: 6px;
+
+  font-size: 14px;
+
+  color: #64748b;
+}
+
+/* =========================================================
+   CLOSE BUTTON
+   ========================================================= */
+
+.close-btn {
+  width: 46px;
+  height: 46px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: #f1f5f9;
+
+  color: #334155;
+
+  cursor: pointer;
+
+  transition:
+    0.2s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 16px;
+}
+
+.close-btn:hover {
+  background: #e2e8f0;
+
+  transform: scale(1.05);
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.modal-form {
+  padding:
+    28px 32px 32px;
+}
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit,
+      minmax(260px, 1fr));
+
+  gap: 22px;
+}
+
+/* =========================================================
+   FORM GROUP
+   ========================================================= */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 13px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.3px;
+
+  color: #334155;
+
+  margin-bottom: 8px;
+}
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.form-group input,
+.form-group select {
+  width: 100%;
+
+  height: 52px;
+
+  border-radius: 16px;
+
+  border:
+    1px solid #dbe2ea;
+
+  background: #f8fafc;
+
+  padding:
+    0 16px;
+
+  font-size: 14px;
+
+  transition:
+    0.2s ease;
+
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color:
+    var(--chmsu-primary);
+
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 4px rgba(16, 185, 129, 0.12);
+}
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+
+  margin-top: 36px;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.cancel-btn,
+.save-btn {
+  height: 50px;
+
+  padding:
+    0 24px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  font-weight: 700;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+  transition:
+    0.2s ease;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cancel-btn {
+  background: #eef2f7;
+
+  color: #334155;
+}
+
+.cancel-btn:hover {
+  background: #e2e8f0;
+}
+
+.save-btn {
+  background:
+    linear-gradient(135deg,
+      var(--chmsu-primary),
+      #059669);
+
+  color: white;
+
+  box-shadow:
+    0 10px 24px rgba(16, 185, 129, 0.28);
+}
+
+.save-btn:hover {
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 14px 28px rgba(16, 185, 129, 0.35);
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes modalShow {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(18px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeBackdrop {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  .edit-modal {
+    border-radius: 22px;
+  }
+
+  .modal-header,
+  .modal-form {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+}

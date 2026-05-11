@@ -74,3 +74,4 @@ export const checkLoggedInUserAuthenticationFailure = createAction(
   props<{ error: string }>(),
 );
 export const logout = createAction('[Logout] Logout');
+export const sessionExpired = createAction('[Session Expired] Session Expired')

@@ -105,7 +105,9 @@ export class FacultyDataTableComponent implements OnInit {
     this.facultyForm.reset();
   }
   updateFaculty(): void {
+    console.log("Pressed")
     if (this.facultyForm.invalid) {
+      console.log("Faculty Form Invalid")
       this.facultyForm.markAllAsTouched();
       return;
     }
@@ -320,9 +322,18 @@ export class FacultyDataTableComponent implements OnInit {
       0
     );
     const overallSetRating =
-      faculty?.setRating ?? 0;
+      totalStudents > 0
+        ? totalWeightedScore / totalStudents
+        : 0;
+
     const overallSefRating =
-      faculty?.sefRating ?? 0;
+      sefData.length > 0
+        ? sefData.reduce(
+          (total, item) =>
+            total + (item.sefRating ?? 0),
+          0
+        ) / sefData.length
+        : 0;
     /* =====================================================
        PRINT
        ===================================================== */

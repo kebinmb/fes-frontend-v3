@@ -112,4 +112,16 @@ export const authReducer = createReducer(
     isLoading: false,
     error: null,
   })),
+  on(AuthActions.sessionExpired,(state)=>({
+    ...state,
+    evaluatorId: null,
+    role: null,
+    userId: null,
+    accessCode: null,
+    college: null,
+    isAuthenticated: false,
+    isAuthChecked: true,
+    isLoading: false,
+    error: null,
+  }))
 );

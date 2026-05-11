@@ -58,13 +58,35 @@ export interface UpdateFacultyRequest {
   college: string;
   status: string;
 }
+export interface MigrationErrorResponse {
+  entity?: string;
+  message?: string;
+}
+
+export interface MigrationStatistics {
+  totalRecords?: number;
+  successfulRecords?: number;
+  failedRecords?: number;
+}
+
+export interface MigrationResponse<T> {
+  status: string;
+  message: string;
+  startTime: string;
+  endTime: string;
+  durationMs: number;
+  stats: MigrationStatistics | null;
+  errors: MigrationErrorResponse[];
+  data?: T;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
   private http = inject(HttpClient);
   private readonly ADMIN_API_URL = `${environment.API_URL}/admin`;
-
+  private readonly MIGRATION_API_URL = `${environment.API_URL}/migration/all`;
   getFaculties(
     page: number = 0,
     size: number = 10,
@@ -139,4 +161,15 @@ export class AdminService {
       },
     );
   }
+
+  migrateAll(): Observable<MigrationResponse<void>> {
+    return this.http.post<MigrationResponse<void>>(
+      `${this.MIGRATION_API_URL}`,
+      {},
+      {
+        withCredentials: true,
+      },
+    );
+  }
 }
+

@@ -11,9 +11,10 @@ import { FacultyDataTableComponent } from './core/features/components/faculty-da
 import { FacultyEvaluationScoresDataTableComponent } from './core/features/components/faculty-evaluation-scores-data-table-component/faculty-evaluation-scores-data-table-component';
 import { UserAccountsDataTableComponent } from './core/features/components/user-accounts-data-table-component/user-accounts-data-table-component';
 import { guestGuard } from './utilities/guards/guest/guest-guard';
+import { SettingsComponent } from './core/features/components/settings-component/settings-component';
 
 export const routes: Routes = [
-    {
+  {
     path: 'login',
     component: LoginComponent,
     canActivate: [guestGuard]
@@ -49,6 +50,7 @@ export const routes: Routes = [
       { path: 'faculty-list', component: FacultyDataTableComponent },
       { path: 'evaluation-score-list', component: FacultyEvaluationScoresDataTableComponent },
       { path: 'user-accounts', component: UserAccountsDataTableComponent },
+      { path: 'settings', component: SettingsComponent }
     ],
   },
   {

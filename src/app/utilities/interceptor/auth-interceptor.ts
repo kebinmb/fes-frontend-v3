@@ -58,8 +58,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
           document.cookie =
             `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
         });
-        store.dispatch(AuthActions.logout());
-        
+        store.dispatch(AuthActions.sessionExpired());
+
         /* =========================================
            SHOW TOAST
         ========================================= */

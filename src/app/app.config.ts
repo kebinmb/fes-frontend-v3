@@ -27,6 +27,7 @@ import { reducers } from './core/store';
 import { EvaluationEffects } from './core/store/evaluation-data/evaluation.effects';
 import { AdminEffects } from './core/store/admin-data/admin-data.effects';
 import { authInterceptor } from './utilities/interceptor/auth-interceptor';
+import { MigrationEffects } from './core/store/migration/migration.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -36,7 +37,7 @@ export const appConfig: ApplicationConfig = {
     provideStore(reducers, {
       metaReducers,
     }),
-    provideEffects([AuthEffects, ToastEffect, StudentDataEffects, SupervisorDataEffects, EvaluationEffects, AdminEffects]),
+    provideEffects([AuthEffects, ToastEffect, StudentDataEffects, SupervisorDataEffects, EvaluationEffects, AdminEffects, MigrationEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],
 };

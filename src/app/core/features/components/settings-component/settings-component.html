@@ -1,0 +1,230 @@
+<div class="container-fluid py-4">
+
+    <!-- PAGE HEADER -->
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold mb-1">
+            System Settings
+        </h2>
+
+        <p class="text-muted mb-0">
+            Configure and manage faculty evaluation system settings.
+        </p>
+
+    </div>
+
+    <!-- SETTINGS GRID -->
+
+    <div class="row g-4">
+
+        <!-- UPDATE SCHOOL YEAR & SEMESTER -->
+
+        <div class="col-12 col-md-6 col-xl-4">
+
+            <div class="settings-card">
+
+                <div class="settings-icon bg-primary-subtle text-primary">
+
+                    <i class="bi bi-calendar-event"></i>
+
+                </div>
+
+                <div class="settings-content">
+
+                    <h5 class="fw-bold mb-2">
+                        Update School Year & Semester
+                    </h5>
+
+                    <p class="text-muted mb-4">
+                        Configure the active academic year and semester
+                        for faculty evaluation operations.
+                    </p>
+
+                    <button class="btn btn-primary rounded-pill px-4">
+                        Manage
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BACKUP DATABASE -->
+
+        <div class="col-12 col-md-6 col-xl-4">
+
+            <div class="settings-card">
+
+                <div class="settings-icon bg-success-subtle text-success">
+
+                    <i class="bi bi-cloud-arrow-down"></i>
+
+                </div>
+
+                <div class="settings-content">
+
+                    <h5 class="fw-bold mb-2">
+                        Backup Database
+                    </h5>
+
+                    <p class="text-muted mb-4">
+                        Create and download a secure backup copy
+                        of the evaluation database.
+                    </p>
+
+                    <button class="btn btn-success rounded-pill px-4">
+                        Backup
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- LOCK SYSTEM -->
+
+        <div class="col-12 col-md-6 col-xl-4">
+
+            <div class="settings-card">
+
+                <div class="settings-icon bg-danger-subtle text-danger">
+
+                    <i class="bi bi-lock"></i>
+
+                </div>
+
+                <div class="settings-content">
+
+                    <h5 class="fw-bold mb-2">
+                        Lock System
+                    </h5>
+
+                    <p class="text-muted mb-4">
+                        Restrict access and temporarily disable
+                        evaluation submissions system-wide.
+                    </p>
+
+                    <button class="btn btn-danger rounded-pill px-4">
+                        Lock
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- HIDDEN ADVANCED SECTION -->
+
+    <div class="mt-5">
+
+        <button class="btn btn-outline-dark rounded-pill px-4" type="button" (click)="toggleAdvancedSettings()">
+
+            <i class="bi bi-shield-lock me-2"></i>
+
+            Advanced Settings
+
+        </button>
+        @if (showAdvancedSettings) {
+        <div class="mt-4">
+
+            <div class="advanced-settings-card">
+
+                <div class="d-flex align-items-center justify-content-between mb-4">
+
+                    <div>
+
+                        <h5 class="fw-bold mb-1 text-danger">
+                            Dangerous Operations
+                        </h5>
+
+                        <p class="text-muted mb-0">
+                            These actions may permanently affect the system.
+                        </p>
+
+                    </div>
+
+                    <span class="badge bg-danger-subtle text-danger px-3 py-2">
+                        Restricted
+                    </span>
+
+                </div>
+
+                <!-- MIGRATION -->
+
+                <div
+                    class="danger-operation d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-4">
+
+                    <div>
+
+                        <h6 class="fw-bold mb-2">
+                            Database Migration
+                        </h6>
+
+                        <p class="text-muted mb-0">
+                            Trigger system-wide migration process for
+                            data transformation and synchronization.
+                        </p>
+
+                    </div>
+
+                    <button class="btn btn-danger rounded-pill px-4 flex-shrink-0" (click)="startMigration()"
+                        [disabled]="(migrationLoading$ | async) === true">
+
+                        @if ((migrationLoading$ | async) === true) {
+
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+
+                        Running...
+
+                        } @else {
+
+                        <i class="bi bi-play-circle me-2"></i>
+
+                        Start Migration
+                        }
+
+                    </button>
+
+                </div>
+
+                <!-- RESPONSE -->
+
+                @if (migrationResponse$ | async; as response) {
+
+                <div class="alert alert-success rounded-4 mt-4 border-0">
+
+                    <strong>
+                        {{ response.status }}
+                    </strong>
+
+                    —
+
+                    {{ response.message }}
+
+                </div>
+                }
+
+                <!-- ERROR -->
+
+                @if (migrationError$ | async; as error) {
+
+                <div class="alert alert-danger rounded-4 mt-4 border-0">
+
+                    {{ error }}
+
+                </div>
+                }
+
+            </div>
+
+        </div>
+        }
+    </div>
+
+</div>

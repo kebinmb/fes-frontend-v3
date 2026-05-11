@@ -276,10 +276,32 @@ export class AuthEffects {
           this.store.dispatch(resetStudentState());
           this.store.dispatch(resetSupervisorState());
           this.store.dispatch(resetEvaluationState());
-          localStorage.removeItem('ngrx-store-localstorage');
+          localStorage.clear();
+          sessionStorage.clear();
           this.authService.logout();
           this.toastFacade.showToast(`Logged out successfully`, 'success');
           this.router.navigate(['/login']);
+        }),
+      ),
+    { dispatch: false },
+  );
+  sessionExpired$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.sessionExpired),
+        tap(() => {
+          this.store.dispatch(resetStudentState());
+          this.store.dispatch(resetSupervisorState());
+          this.store.dispatch(resetEvaluationState());
+          localStorage.clear();
+          sessionStorage.clear();
+          this.authService.logout().subscribe({
+            error: () => {
+            },
+          });
+          Promise.resolve().then(() => {
+            this.router.navigate(['/login']);
+          });
         }),
       ),
     { dispatch: false },
