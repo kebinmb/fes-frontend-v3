@@ -1,35 +1,33 @@
-/* =========================================================
-   SIDEBAR LAYOUT
-   ========================================================= */
-
 .admin-sidebar {
-  width: 290px;
-  height: 100vh;
-  background: var(--chmsu-surface);
-  border-right: 1px solid var(--chmsu-border);
-  display: flex;
-  flex-direction: column;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1040;
-  transition: transform 0.28s ease;
-  box-shadow: 4px 0 30px rgba(0, 0, 0, 0.03);
-}
 
-/* =========================================================
-   OVERLAY
-   ========================================================= */
+  width: 290px;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border-right: 1px solid #e5e7eb;
+
+  transition: transform 0.25s ease;
+}
 
 .sidebar-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  backdrop-filter: blur(2px);
+  z-index: 1035;
+
+  background: rgba(15, 23, 42, 0.35);
+
   opacity: 0;
   visibility: hidden;
-  transition: 0.25s ease;
-  z-index: 1035;
+
+  transition: opacity 0.2s ease;
 }
 
 .sidebar-overlay.show {
@@ -37,168 +35,187 @@
   visibility: visible;
 }
 
-/* =========================================================
-   HEADER
-   ========================================================= */
-
 .sidebar-header {
   padding: 1.5rem;
-  border-bottom: 1px solid var(--chmsu-border);
+
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .sidebar-logo {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.9rem;
 }
 
-.logo-icon {
-  width: 54px;
-  height: 54px;
-  border-radius: 18px;
-  background: var(--chmsu-primary);
-  color: white;
+.logo-mark {
+  width: 46px;
+  height: 46px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+
+  border-radius: 10px;
+
+  background: #14532d;
+
+  color: #ffffff;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  letter-spacing: 0.04em;
+
   flex-shrink: 0;
 }
 
 .logo-content h2 {
   margin: 0;
-  font-size: 1.1rem;
+
+  color: #111827;
+
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--chmsu-primary-dark);
+
+  letter-spacing: -0.2px;
 }
 
 .logo-content span {
-  font-size: 0.85rem;
-  color: var(--chmsu-muted);
-}
+  display: block;
 
-/* =========================================================
-   BODY
-   ========================================================= */
+  margin-top: 0.15rem;
+
+  color: #6b7280;
+
+  font-size: 0.8rem;
+}
 
 .sidebar-body {
   flex: 1;
-  overflow-y: auto;
-  padding: 1.25rem 1rem;
-}
 
-/* =========================================================
-   NAVIGATION
-   ========================================================= */
+  overflow-y: auto;
+
+  padding: 1rem 0.8rem;
+}
 
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+
+  gap: 0.2rem;
 }
 
 .nav-item {
-  height: 54px;
-  border-radius: 18px;
+  height: 48px;
+
   display: flex;
   align-items: center;
-  gap: 0.9rem;
-  padding: 0 1rem;
+  gap: 0.85rem;
+
+  padding: 0 0.95rem;
+
+  border-radius: 10px;
+
+  color: #374151;
+
   text-decoration: none;
-  color: var(--chmsu-text);
-  font-weight: 600;
-  transition: 0.2s ease;
-  position: relative;
+
+  font-size: 0.92rem;
+  font-weight: 500;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .nav-item i {
-  font-size: 1.05rem;
-  color: var(--chmsu-muted);
-  transition: 0.2s ease;
-}
+  font-size: 1rem;
 
-.nav-item span {
-  font-size: 0.95rem;
-}
+  color: #6b7280;
 
-/* HOVER */
+  transition: color 0.2s ease;
+}
 
 .nav-item:hover {
-  background: var(--chmsu-bg-soft);
-  color: var(--chmsu-primary);
+  background: #f3f4f6;
+
+  color: #111827;
 }
 
 .nav-item:hover i {
-  color: var(--chmsu-primary);
+  color: #111827;
 }
 
-/* ACTIVE */
-
 .nav-item.active {
-  background: var(--chmsu-primary);
-  color: white;
-  box-shadow: 0 8px 20px rgba(24, 100, 67, 0.16);
+  background: #14532d;
+
+  color: #ffffff;
+
+  font-weight: 600;
 }
 
 .nav-item.active i {
-  color: white;
+  color: #ffffff;
 }
 
-/* =========================================================
-   FOOTER
-   ========================================================= */
-
 .sidebar-footer {
-  border-top: 1px solid var(--chmsu-border);
-  padding: 1.25rem 1.5rem;
   display: flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: 0.8rem;
+
+  padding: 1.25rem 1.5rem;
+
+  border-top: 1px solid #e5e7eb;
 }
 
 .admin-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
-  background: var(--chmsu-bg-soft);
-  color: var(--chmsu-primary);
-  font-weight: 700;
+  width: 42px;
+  height: 42px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  border-radius: 10px;
+
+  background: #14532d;
+
+  color: #ffffff;
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
   flex-shrink: 0;
 }
 
 .footer-content h3 {
   margin: 0;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--chmsu-primary-dark);
+
+  color: #111827;
+
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .footer-content span {
-  font-size: 0.82rem;
-  color: var(--chmsu-muted);
+  display: block;
+
+  margin-top: 0.15rem;
+
+  color: #6b7280;
+
+  font-size: 0.78rem;
 }
 
-/* =========================================================
-   SCROLLBAR
-   ========================================================= */
-
 .sidebar-body::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .sidebar-body::-webkit-scrollbar-thumb {
-  background: #d7dede;
+  background: #d1d5db;
+
   border-radius: 999px;
 }
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
 
 @media (max-width: 991px) {
   .admin-sidebar {
@@ -210,27 +227,22 @@
   }
 }
 
-/* =========================================================
-   SMALL MOBILE
-   ========================================================= */
-
 @media (max-width: 576px) {
   .admin-sidebar {
     width: 100%;
-    max-width: 320px;
+    max-width: 300px;
   }
 
   .sidebar-header,
   .sidebar-footer {
-    padding: 1.25rem;
+    padding: 1.2rem;
   }
 
   .sidebar-body {
-    padding: 1rem 0.85rem;
+    padding: 0.9rem 0.7rem;
   }
 
   .nav-item {
-    height: 50px;
-    border-radius: 16px;
+    height: 46px;
   }
 }

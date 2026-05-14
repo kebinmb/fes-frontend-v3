@@ -1,54 +1,40 @@
-/* =========================================================
-   MODERN FACULTY TABLE UI
-========================================================= */
-
 .modern-card {
   background: #ffffff;
 
-  border: 1px solid var(--chmsu-border);
+  border: 1px solid #e5e7eb;
 
-  border-radius: 24px;
+  border-radius: 14px;
 
   overflow: hidden;
-
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.04);
 }
 
 .card-topbar {
-  height: 5px;
+  height: 4px;
 
-  background: var(--chmsu-primary);
+  background: #14532d;
 }
-
-/* =========================================================
-   HEADER
-========================================================= */
 
 .modern-card-header {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
 
   gap: 1.5rem;
 
-  padding: 1.8rem;
+  padding: 1.5rem;
 
-  border-bottom:
-    1px solid var(--chmsu-border);
-
-  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .header-content h2 {
   margin: 0;
 
-  font-size: 1.55rem;
-  font-weight: 800;
+  color: #111827;
 
-  color: var(--chmsu-primary-dark);
+  font-size: 1.35rem;
+  font-weight: 700;
 
-  letter-spacing: -0.4px;
+  letter-spacing: -0.3px;
 }
 
 .header-content span {
@@ -56,41 +42,36 @@
 
   margin-top: 0.35rem;
 
-  color: var(--chmsu-muted);
+  color: #6b7280;
 
-  font-size: 0.94rem;
+  font-size: 0.88rem;
 }
 
 .table-count {
-  min-width: 72px;
-  height: 72px;
-
-  border-radius: 22px;
-
-  background: var(--chmsu-bg-soft);
+  min-width: 62px;
+  height: 62px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  color: var(--chmsu-primary);
+  border-radius: 12px;
 
-  font-size: 1.5rem;
-  font-weight: 800;
+  background: #f3f4f6;
 
-  border:
-    1px solid rgba(24, 100, 67, 0.06);
+  border: 1px solid #e5e7eb;
+
+  color: #14532d;
+
+  font-size: 1.2rem;
+  font-weight: 700;
 }
-
-/* =========================================================
-   SEARCH
-========================================================= */
 
 .search-wrapper {
   display: flex;
   align-items: center;
 
-  gap: 0.75rem;
+  gap: 0.7rem;
 
   margin-top: 1rem;
 
@@ -99,49 +80,43 @@
 
 .search-input {
   min-width: 260px;
-  height: 48px;
-
-  border-radius: 14px;
-
-  border:
-    1px solid var(--chmsu-border);
-
-  background: #ffffff;
+  height: 44px;
 
   padding: 0 1rem;
 
-  font-size: 0.94rem;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
 
-  color: var(--chmsu-text);
+  background: #ffffff;
+
+  color: #111827;
+
+  font-size: 0.92rem;
 
   outline: none;
 
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+    box-shadow 0.2s ease;
 }
 
 .search-input::placeholder {
-  color: #94a3b8;
+  color: #9ca3af;
 }
 
 .search-input:focus {
-  border-color: var(--chmsu-primary);
+  border-color: #166534;
 
   box-shadow:
-    0 0 0 4px rgba(24, 100, 67, 0.08);
+    0 0 0 3px rgba(22, 101, 52, 0.08);
 }
-
-/* =========================================================
-   BUTTON BASE
-========================================================= */
 
 .edit-btn,
 .pagination-btn,
-.single-print-btn {
+.single-print-btn,
+.cancel-btn,
+.save-btn {
   border: none;
-  outline: none;
 
   cursor: pointer;
 
@@ -149,92 +124,65 @@
   align-items: center;
   justify-content: center;
 
-  gap: 0.55rem;
+  gap: 0.5rem;
 
-  font-weight: 700;
+  font-weight: 600;
 
   transition:
     background 0.2s ease,
-    transform 0.2s ease,
-    opacity 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
-
-/* =========================================================
-   PRIMARY BUTTONS
-========================================================= */
 
 .edit-btn,
-.pagination-btn {
-  height: 46px;
+.pagination-btn,
+.save-btn {
+  height: 44px;
 
-  padding: 0 1.15rem;
+  padding: 0 1rem;
 
-  border-radius: 14px;
+  border-radius: 10px;
 
-  background: var(--chmsu-primary);
+  background: #14532d;
 
-  color: white;
-
-  box-shadow:
-    0 8px 18px rgba(24, 100, 67, 0.14);
-}
-
-.edit-btn:hover,
-.pagination-btn:hover {
-  background: var(--chmsu-primary-dark);
-
-  transform: translateY(-1px);
-
-  box-shadow:
-    0 14px 24px rgba(24, 100, 67, 0.18);
-}
-
-.pagination-btn:disabled {
-  opacity: 0.45;
-
-  cursor: not-allowed;
-
-  transform: none;
-
-  box-shadow: none;
-}
-
-/* =========================================================
-   PRINT BUTTON
-========================================================= */
-
-.single-print-btn {
-  height: 42px;
-
-  padding: 0 16px;
-
-  border-radius: 12px;
-
-  background: #f8fafc;
-
-  border:
-    1px solid rgba(24, 100, 67, 0.08);
-
-  color: var(--chmsu-primary-dark);
+  color: #ffffff;
 
   font-size: 0.88rem;
 }
 
-.single-print-btn:hover {
-  background:
-    rgba(24, 100, 67, 0.06);
-
-  transform: translateY(-1px);
+.edit-btn:hover,
+.pagination-btn:hover,
+.save-btn:hover {
+  background: #166534;
 }
 
-.single-print-btn i {
-  font-size: 0.9rem;
+.pagination-btn:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
 }
 
-/* =========================================================
-   TABLE
-========================================================= */
+.single-print-btn,
+.cancel-btn {
+  height: 42px;
+
+  padding: 0 1rem;
+
+  border-radius: 10px;
+
+  border: 1px solid #d1d5db;
+
+  background: #ffffff;
+
+  color: #374151;
+
+  font-size: 0.88rem;
+}
+
+.single-print-btn:hover,
+.cancel-btn:hover {
+  background: #f9fafb;
+}
 
 .table-responsive {
   overflow-x: auto;
@@ -242,98 +190,89 @@
 
 .modern-table {
   width: 100%;
-
-  margin: 0;
 }
 
 .modern-table thead th {
-  background: #f8fafc;
+  padding: 0.95rem 1.2rem;
 
-  color: var(--chmsu-primary-dark);
+  background: #f9fafb;
 
-  font-size: 0.8rem;
-  font-weight: 800;
+  border: none;
+
+  color: #374151;
+
+  font-size: 0.76rem;
+  font-weight: 700;
 
   text-transform: uppercase;
 
   letter-spacing: 0.04em;
 
-  border: none;
-
-  padding: 1rem 1.2rem;
-
   white-space: nowrap;
 }
 
 .modern-table tbody td {
-  border-top:
-    1px solid var(--chmsu-border);
-
   padding: 1rem 1.2rem;
 
-  vertical-align: middle;
+  border-top: 1px solid #f1f5f9;
 
-  color: var(--chmsu-text);
+  color: #111827;
+
+  font-size: 0.92rem;
+
+  vertical-align: middle;
 }
 
 .modern-table tbody tr {
-  transition:
-    background 0.2s ease,
-    transform 0.2s ease;
+  transition: background 0.2s ease;
 }
 
 .modern-table tbody tr:hover {
-  background:
-    rgba(24, 100, 67, 0.025);
+  background: #fafafa;
 }
-
-/* =========================================================
-   TABLE CONTENT
-========================================================= */
 
 .id-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  padding: 0.45rem 0.8rem;
+  padding: 0.35rem 0.7rem;
 
   border-radius: 999px;
 
-  background:
-    rgba(24, 100, 67, 0.08);
+  background: #f3f4f6;
 
-  color: var(--chmsu-primary);
+  color: #374151;
 
-  font-size: 0.82rem;
-  font-weight: 800;
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .table-user {
   display: flex;
   align-items: center;
 
-  gap: 0.85rem;
+  gap: 0.8rem;
 }
 
 .table-avatar {
-  width: 44px;
-  height: 44px;
-
-  border-radius: 50%;
-
-  background: var(--chmsu-primary);
-
-  color: white;
-
-  font-weight: 800;
+  width: 40px;
+  height: 40px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  box-shadow:
-    0 8px 18px rgba(24, 100, 67, 0.14);
+  border-radius: 10px;
+
+  background: #14532d;
+
+  color: #ffffff;
+
+  font-size: 0.88rem;
+  font-weight: 700;
+
+  flex-shrink: 0;
 }
 
 .college-badge {
@@ -341,17 +280,16 @@
   align-items: center;
   justify-content: center;
 
-  padding: 0.45rem 0.85rem;
+  padding: 0.35rem 0.7rem;
 
   border-radius: 999px;
 
-  background:
-    rgba(229, 212, 19, 0.12);
+  background: #fef3c7;
 
-  color: #7c7200;
+  color: #92400e;
 
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 600;
 }
 
 .action-group {
@@ -359,35 +297,22 @@
   align-items: center;
   justify-content: center;
 
-  gap: 0.55rem;
+  gap: 0.5rem;
 
   flex-wrap: wrap;
 }
 
-/* =========================================================
-   EMPTY STATE
-========================================================= */
-
 .empty-state {
-  text-align: center;
-
   padding: 3rem !important;
 
-  color: var(--chmsu-muted);
+  text-align: center;
 
-  font-size: 0.95rem;
+  color: #6b7280;
+
+  font-size: 0.92rem;
 }
 
-/* =========================================================
-   FOOTER
-========================================================= */
-
 .modern-card-footer {
-  padding: 1.2rem 1.8rem;
-
-  border-top:
-    1px solid var(--chmsu-border);
-
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -396,50 +321,206 @@
 
   flex-wrap: wrap;
 
-  background: #ffffff;
+  padding: 1rem 1.5rem;
+
+  border-top: 1px solid #e5e7eb;
 }
 
 .modern-card-footer small {
-  color: var(--chmsu-muted);
+  color: #6b7280;
+
+  font-size: 0.82rem;
 }
 
 .pagination-group {
   display: flex;
   align-items: center;
 
-  gap: 0.85rem;
+  gap: 0.75rem;
 }
 
 .pagination-info {
-  font-size: 0.9rem;
-  font-weight: 600;
+  color: #6b7280;
 
-  color: var(--chmsu-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-/* =========================================================
-   MOBILE
-========================================================= */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1.5rem;
+
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.edit-modal {
+  width: 100%;
+  max-width: 860px;
+
+  background: #ffffff;
+
+  border-radius: 14px;
+
+  border: 1px solid #e5e7eb;
+
+  overflow: hidden;
+}
+
+.modal-topbar {
+  height: 4px;
+
+  background: #14532d;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  padding: 1.5rem 1.5rem 0;
+}
+
+.modal-title-group h2 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.modal-title-group p {
+  margin-top: 0.35rem;
+
+  color: #6b7280;
+
+  font-size: 0.88rem;
+}
+
+.close-btn {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #374151;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #f9fafb;
+}
+
+.modal-form {
+  padding: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(240px, 1fr));
+
+  gap: 1.2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+
+  color: #374151;
+
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  height: 46px;
+
+  padding: 0 0.95rem;
+
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #111827;
+
+  font-size: 0.9rem;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #166534;
+
+  box-shadow:
+    0 0 0 3px rgba(22, 101, 52, 0.08);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 0.75rem;
+
+  margin-top: 2rem;
+}
+
+.sidebar-body::-webkit-scrollbar,
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.sidebar-body::-webkit-scrollbar-thumb,
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+
+  border-radius: 999px;
+}
 
 @media (max-width: 768px) {
-  .modern-card-header {
+  .modern-card-header,
+  .modern-card-footer {
     flex-direction: column;
+    align-items: flex-start;
   }
 
   .search-input {
     width: 100%;
 
     min-width: unset;
-  }
-
-  .action-group {
-    justify-content: flex-start;
-  }
-
-  .edit-btn,
-  .single-print-btn,
-  .pagination-btn {
-    width: 100%;
   }
 
   .pagination-group {
@@ -449,364 +530,14 @@
     align-items: stretch;
   }
 
-  .modern-card-footer {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-  padding: 20px;
-}
-
-.edit-modal {
-  width: 100%;
-  max-width: 800px;
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.2);
-  animation: modalShow 0.2s ease;
-}
-
-@keyframes modalShow {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.98);
+  .pagination-btn,
+  .edit-btn,
+  .single-print-btn {
+    width: 100%;
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* =========================================================
-   BACKDROP
-   ========================================================= */
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background:
-    rgba(15, 23, 42, 0.65);
-
-  backdrop-filter: blur(6px);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  padding: 24px;
-
-  z-index: 9999;
-
-  animation:
-    fadeBackdrop 0.25s ease;
-}
-
-/* =========================================================
-   MODAL
-   ========================================================= */
-
-.edit-modal {
-  width: 100%;
-  max-width: 920px;
-
-  background: #ffffff;
-
-  border-radius: 28px;
-
-  overflow: hidden;
-
-  box-shadow:
-    0 24px 80px rgba(0, 0, 0, 0.22);
-
-  animation:
-    modalShow 0.28s ease;
-
-  position: relative;
-}
-
-/* =========================================================
-   TOP BAR
-   ========================================================= */
-
-.modal-topbar {
-  height: 6px;
-
-  background:
-    linear-gradient(90deg,
-      var(--chmsu-primary),
-      #22c55e);
-}
-
-/* =========================================================
-   HEADER
-   ========================================================= */
-
-.modal-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-
-  padding:
-    28px 32px 0;
-}
-
-.modal-title-group h2 {
-  margin: 0;
-
-  font-size: 28px;
-  font-weight: 800;
-
-  color: #0f172a;
-}
-
-.modal-title-group p {
-  margin-top: 6px;
-
-  font-size: 14px;
-
-  color: #64748b;
-}
-
-/* =========================================================
-   CLOSE BUTTON
-   ========================================================= */
-
-.close-btn {
-  width: 46px;
-  height: 46px;
-
-  border: none;
-
-  border-radius: 14px;
-
-  background: #f1f5f9;
-
-  color: #334155;
-
-  cursor: pointer;
-
-  transition:
-    0.2s ease;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 16px;
-}
-
-.close-btn:hover {
-  background: #e2e8f0;
-
-  transform: scale(1.05);
-}
-
-/* =========================================================
-   FORM
-   ========================================================= */
-
-.modal-form {
-  padding:
-    28px 32px 32px;
-}
-
-.form-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(auto-fit,
-      minmax(260px, 1fr));
-
-  gap: 22px;
-}
-
-/* =========================================================
-   FORM GROUP
-   ========================================================= */
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group label {
-  font-size: 13px;
-
-  font-weight: 700;
-
-  letter-spacing: 0.3px;
-
-  color: #334155;
-
-  margin-bottom: 8px;
-}
-
-/* =========================================================
-   INPUTS
-   ========================================================= */
-
-.form-group input,
-.form-group select {
-  width: 100%;
-
-  height: 52px;
-
-  border-radius: 16px;
-
-  border:
-    1px solid #dbe2ea;
-
-  background: #f8fafc;
-
-  padding:
-    0 16px;
-
-  font-size: 14px;
-
-  transition:
-    0.2s ease;
-
-  outline: none;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  border-color:
-    var(--chmsu-primary);
-
-  background: #ffffff;
-
-  box-shadow:
-    0 0 0 4px rgba(16, 185, 129, 0.12);
-}
-
-/* =========================================================
-   ACTIONS
-   ========================================================= */
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 14px;
-
-  margin-top: 36px;
-}
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
-
-.cancel-btn,
-.save-btn {
-  height: 50px;
-
-  padding:
-    0 24px;
-
-  border: none;
-
-  border-radius: 16px;
-
-  font-weight: 700;
-
-  font-size: 14px;
-
-  cursor: pointer;
-
-  transition:
-    0.2s ease;
-
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.cancel-btn {
-  background: #eef2f7;
-
-  color: #334155;
-}
-
-.cancel-btn:hover {
-  background: #e2e8f0;
-}
-
-.save-btn {
-  background:
-    linear-gradient(135deg,
-      var(--chmsu-primary),
-      #059669);
-
-  color: white;
-
-  box-shadow:
-    0 10px 24px rgba(16, 185, 129, 0.28);
-}
-
-.save-btn:hover {
-  transform:
-    translateY(-2px);
-
-  box-shadow:
-    0 14px 28px rgba(16, 185, 129, 0.35);
-}
-
-/* =========================================================
-   ANIMATIONS
-   ========================================================= */
-
-@keyframes modalShow {
-  from {
-    opacity: 0;
-
-    transform:
-      translateY(18px) scale(0.96);
-  }
-
-  to {
-    opacity: 1;
-
-    transform:
-      translateY(0) scale(1);
-  }
-}
-
-@keyframes fadeBackdrop {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
-
-@media (max-width: 768px) {
-
-  .edit-modal {
-    border-radius: 22px;
-  }
-
-  .modal-header,
-  .modal-form {
-    padding-left: 20px;
-    padding-right: 20px;
+  .action-group {
+    justify-content: flex-start;
   }
 
   .modal-actions {
@@ -816,7 +547,15 @@
   .cancel-btn,
   .save-btn {
     width: 100%;
-    justify-content: center;
   }
 
+  .edit-modal {
+    border-radius: 12px;
+  }
+
+  .modal-header,
+  .modal-form {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }

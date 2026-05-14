@@ -1,20 +1,12 @@
-<!-- ===================================== -->
-<!-- HEADER -->
-<!-- ===================================== -->
-
 <header class="admin-header">
-  <!-- ===================================== -->
-  <!-- LEFT -->
-  <!-- ===================================== -->
-
   <div class="header-left">
-    <!-- MOBILE TOGGLE -->
-
-    <button class="menu-toggle" type="button" (click)="toggleSidebar()">
+    <button
+      class="menu-toggle"
+      type="button"
+      (click)="toggleSidebar()"
+    >
       <i class="bi bi-list"></i>
     </button>
-
-    <!-- TITLE -->
 
     <div class="header-title-group">
       <h1>Administrator Dashboard</h1>
@@ -23,30 +15,24 @@
     </div>
   </div>
 
-  <!-- ===================================== -->
-  <!-- RIGHT -->
-  <!-- ===================================== -->
-
   <div class="header-right">
-    <!-- PROFILE -->
+    <div class="profile-section">
+      <div class="profile-avatar">
+        A
+      </div>
 
-    <div class="profile-card">
-      <!-- AVATAR -->
-
-      <div class="profile-avatar">A</div>
-
-      <!-- CONTENT -->
-
-      <div class="profile-content">
+      <div class="profile-details">
         <h3>Administrator</h3>
 
         <span>System Manager</span>
       </div>
     </div>
 
-    <!-- LOGOUT -->
-
-    <button class="logout-btn" type="button" (click)="onLogout()">
+    <button
+      class="logout-btn"
+      type="button"
+      (click)="onLogout()"
+    >
       <i class="bi bi-box-arrow-right"></i>
 
       <span>Logout</span>

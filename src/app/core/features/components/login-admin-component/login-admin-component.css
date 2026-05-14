@@ -2,28 +2,27 @@
   display: block;
 }
 
-/* =========================
-   MAIN WRAPPER
-========================= */
+/* ====================================
+   MAIN LAYOUT
+==================================== */
 
 .admin-login-wrapper {
   position: relative;
 
   min-height: 100vh;
 
-  overflow: hidden;
-
   display: flex;
   align-items: center;
   justify-content: center;
 
-  padding: clamp(1rem, 2vw, 2rem);
+  padding: 1.5rem;
+
+  overflow: hidden;
 
   background:
     linear-gradient(
-      135deg,
-      rgba(16, 70, 48, 0.96),
-      rgba(8, 35, 24, 0.98)
+      rgba(10, 45, 30, 0.88),
+      rgba(10, 45, 30, 0.88)
     ),
     url("https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070&auto=format&fit=crop");
 
@@ -31,99 +30,49 @@
   background-position: center;
 }
 
-/* =========================
-   BACKGROUND EFFECTS
-========================= */
-
 .background-overlay {
   position: absolute;
   inset: 0;
 
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 30%),
-    radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.06), transparent 35%);
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.02),
+      rgba(0, 0, 0, 0.15)
+    );
 }
 
-.floating-circle {
-  position: absolute;
-
-  border-radius: 50%;
-
-  filter: blur(90px);
-
-  opacity: 0.22;
-
-  pointer-events: none;
-}
-
-.circle-1 {
-  top: -100px;
-  left: -60px;
-
-  width: 260px;
-  height: 260px;
-
-  background: #4ade80;
-}
-
-.circle-2 {
-  right: -80px;
-  bottom: -100px;
-
-  width: 320px;
-  height: 320px;
-
-  background: #22c55e;
-}
-
-.circle-3 {
-  top: 50%;
-  left: 50%;
-
-  width: 180px;
-  height: 180px;
-
-  background: #bbf7d0;
-
-  transform: translate(-50%, -50%);
-}
-
-/* =========================
+/* ====================================
    LOGIN CARD
-========================= */
+==================================== */
 
 .admin-login-card {
   position: relative;
   z-index: 2;
 
   width: 100%;
-  max-width: 450px;
+  max-width: 420px;
 
-  padding: clamp(1.5rem, 2vw, 2.4rem);
+  padding: 2rem;
 
-  border-radius: 30px;
+  border-radius: 14px;
 
-  background: rgba(255, 255, 255, 0.95);
+  background: #ffffff;
 
-  backdrop-filter: blur(16px);
-
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 1px solid #dfe5eb;
 
   box-shadow:
-    0 25px 50px rgba(0, 0, 0, 0.22),
-    0 10px 20px rgba(0, 0, 0, 0.08);
-
-  animation: fadeInUp 0.5s ease;
+    0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* =========================
-   BRAND SECTION
-========================= */
+/* ====================================
+   BRANDING
+==================================== */
 
 .brand-section {
   text-align: center;
 
-  margin-bottom: 1.6rem;
+  margin-bottom: 2rem;
 }
 
 .logo-container {
@@ -133,99 +82,27 @@
   margin-bottom: 1rem;
 }
 
-.logo-circle {
-  width: clamp(90px, 9vw, 120px);
-  height: clamp(90px, 9vw, 120px);
-
-  border-radius: 50%;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.8),
-      rgba(255, 255, 255, 0.95)
-    );
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 3px solid rgba(255, 255, 255, 0.6);
-
-  box-shadow:
-    0 20px 30px rgba(24, 100, 67, 0.2),
-    inset 0 0 0 8px rgba(24, 100, 67, 0.04);
-}
-
 .brand-logo {
-  width: 72%;
-  height: 72%;
+  width: 95px;
+  height: 95px;
 
   object-fit: contain;
 }
 
-.admin-badge {
+.system-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 0.45rem;
+
+  padding: 0.45rem 0.85rem;
 
   margin-bottom: 1rem;
 
-  padding: 0.5rem 1rem;
+  border-radius: 20px;
 
-  border-radius: 999px;
+  background: #f3f6f8;
 
-  background: rgba(24, 100, 67, 0.08);
-
-  border: 1px solid rgba(24, 100, 67, 0.12);
-
-  color: var(--chmsu-primary-dark);
-
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.brand-title {
-  margin: 0;
-
-  font-size: clamp(1.8rem, 3vw, 2.3rem);
-
-  font-weight: 800;
-
-  letter-spacing: -1px;
-
-  color: var(--chmsu-primary-dark);
-}
-
-.brand-subtitle {
-  margin-top: 0.55rem;
-
-  color: var(--chmsu-muted);
-
-  font-size: 0.95rem;
-}
-
-.portal-features {
-  display: flex;
-  justify-content: center;
-  gap: 0.7rem;
-
-  flex-wrap: wrap;
-
-  margin-top: 1.3rem;
-}
-
-.feature-chip {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-
-  padding: 0.55rem 0.85rem;
-
-  border-radius: 999px;
-
-  background: rgba(24, 100, 67, 0.06);
+  border: 1px solid #e4e8ec;
 
   color: var(--chmsu-primary-dark);
 
@@ -233,15 +110,36 @@
   font-weight: 600;
 }
 
-/* =========================
+.brand-title {
+  margin: 0;
+
+  color: var(--chmsu-primary-dark);
+
+  font-size: 1.9rem;
+  font-weight: 700;
+
+  letter-spacing: -0.3px;
+}
+
+.brand-subtitle {
+  margin-top: 0.5rem;
+
+  color: #6b7280;
+
+  font-size: 0.88rem;
+
+  line-height: 1.5;
+}
+
+/* ====================================
    FORM
-========================= */
+==================================== */
 
 .login-form {
   display: flex;
   flex-direction: column;
 
-  gap: 0.6rem;
+  gap: 0.8rem;
 }
 
 .form-group {
@@ -253,10 +151,10 @@
 
   margin-bottom: 0.55rem;
 
-  font-size: 0.92rem;
-  font-weight: 700;
+  color: #1f2937;
 
-  color: var(--chmsu-text);
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .input-wrapper {
@@ -266,8 +164,8 @@
 .input-icon {
   position: absolute;
 
-  left: 1rem;
   top: 50%;
+  left: 1rem;
 
   transform: translateY(-50%);
 
@@ -278,104 +176,102 @@
 
 .form-control {
   width: 100%;
-  height: 54px;
+  height: 52px;
 
-  border-radius: 15px;
+  padding: 0 1rem 0 2.9rem;
 
-  border: 1.5px solid #dbe3ec;
+  border-radius: 10px;
 
-  background: #f8fafc;
+  border: 1px solid #d1d5db;
 
-  padding: 0 1rem 0 3rem;
+  background: #ffffff;
+
+  color: #111827;
 
   font-size: 0.94rem;
 
-  color: var(--chmsu-text);
-
-  transition: all 0.25s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .form-control:focus {
   outline: none;
 
-  border-color: var(--chmsu-primary);
+  border-color: var(--chmsu-primary-dark);
 
-  background: white;
-
-  box-shadow: 0 0 0 5px rgba(24, 100, 67, 0.1);
+  box-shadow:
+    0 0 0 3px rgba(24, 100, 67, 0.08);
 }
 
 .form-control::placeholder {
   color: #9ca3af;
 }
 
-/* =========================
-   ERRORS
-========================= */
+/* ====================================
+   ERROR MESSAGE
+==================================== */
 
 .error-space {
-  min-height: 20px;
+  min-height: 18px;
 
   display: flex;
   align-items: center;
 }
 
 .error-message {
-  margin-top: 0.4rem;
+  margin-top: 0.35rem;
 
   color: #dc2626;
 
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.76rem;
+  font-weight: 500;
 }
 
-/* =========================
+/* ====================================
    BUTTON
-========================= */
+==================================== */
 
 .login-btn {
   width: 100%;
-  height: 56px;
+  height: 52px;
 
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
 
   border: none;
-  border-radius: 16px;
+  border-radius: 10px;
 
-  background:
-    linear-gradient(
-      135deg,
-      var(--chmsu-primary),
-      var(--chmsu-primary-dark)
-    );
+  background: var(--chmsu-primary-dark);
 
-  color: white;
-
-  font-size: 0.96rem;
-  font-weight: 700;
+  color: #ffffff;
 
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.7rem;
+  gap: 0.6rem;
+
+  font-size: 0.95rem;
+  font-weight: 600;
 
   cursor: pointer;
 
-  transition: all 0.25s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
 
   box-shadow:
-    0 14px 24px rgba(24, 100, 67, 0.18);
+    0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .login-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
+  background: var(--chmsu-primary);
 
-  box-shadow:
-    0 18px 32px rgba(24, 100, 67, 0.24);
+  transform: translateY(-1px);
 }
 
 .login-btn:active:not(:disabled) {
-  transform: scale(0.985);
+  transform: scale(0.99);
 }
 
 .login-btn:disabled {
@@ -384,25 +280,23 @@
   cursor: not-allowed;
 }
 
-/* =========================
-   ANIMATION
-========================= */
+/* ====================================
+   FOOTER
+==================================== */
 
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
+.footer-note {
+  margin-top: 1.5rem;
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  text-align: center;
+
+  color: #6b7280;
+
+  font-size: 0.76rem;
 }
 
-/* =========================
+/* ====================================
    RESPONSIVE
-========================= */
+==================================== */
 
 @media (max-width: 576px) {
   .admin-login-wrapper {
@@ -410,19 +304,18 @@
   }
 
   .admin-login-card {
-    border-radius: 24px;
+    padding: 1.5rem;
+
+    border-radius: 12px;
+  }
+
+  .brand-logo {
+    width: 85px;
+    height: 85px;
   }
 
   .brand-title {
-    font-size: 1.8rem;
-  }
-
-  .portal-features {
-    gap: 0.5rem;
-  }
-
-  .feature-chip {
-    font-size: 0.72rem;
+    font-size: 1.6rem;
   }
 
   .form-control {
@@ -430,6 +323,6 @@
   }
 
   .login-btn {
-    height: 52px;
+    height: 50px;
   }
 }

@@ -1,23 +1,20 @@
-/* =========================================================
-   HEADER
-   ========================================================= */
-
 .admin-header {
-  height: 84px;
-  background: var(--chmsu-surface);
-  border-bottom: 1px solid var(--chmsu-border);
-  padding: 0 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 1030;
-}
 
-/* =========================================================
-   LEFT
-   ========================================================= */
+  height: 76px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 1.5rem;
+
+  background: #ffffff;
+
+  border-bottom: 1px solid #e5e7eb;
+}
 
 .header-left {
   display: flex;
@@ -26,145 +23,168 @@
 }
 
 .menu-toggle {
-  width: 48px;
-  height: 48px;
-  border: none;
-  border-radius: 16px;
-  background: var(--chmsu-bg-soft);
-  color: var(--chmsu-primary);
-  font-size: 1.35rem;
-  display: flex;
+  width: 42px;
+  height: 42px;
+
+  display: none;
   align-items: center;
   justify-content: center;
-  transition: 0.2s ease;
+
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #1f2937;
+
+  font-size: 1.1rem;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .menu-toggle:hover {
-  background: var(--chmsu-primary);
-  color: white;
-}
-.menu-toggle {
-  display: none;
+  background: #f9fafb;
+
+  border-color: #9ca3af;
 }
 
-/* MOBILE */
+.header-title-group h1 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 1.2rem;
+  font-weight: 700;
+
+  letter-spacing: -0.3px;
+}
+
+.header-title-group p {
+  margin: 0.2rem 0 0;
+
+  color: #6b7280;
+
+  font-size: 0.85rem;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  padding-right: 0.9rem;
+
+  border-right: 1px solid #e5e7eb;
+}
+
+.profile-avatar {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #14532d;
+
+  color: #ffffff;
+
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.profile-details h3 {
+  margin: 0;
+
+  color: #111827;
+
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.profile-details span {
+  display: block;
+
+  margin-top: 0.15rem;
+
+  color: #6b7280;
+
+  font-size: 0.78rem;
+}
+
+.logout-btn {
+  height: 42px;
+
+  padding: 0 1rem;
+
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #374151;
+
+  font-size: 0.88rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #f9fafb;
+
+  border-color: #9ca3af;
+}
+
+.logout-btn i {
+  font-size: 0.95rem;
+}
 
 @media (max-width: 991px) {
   .menu-toggle {
     display: flex;
   }
 }
-.header-title-group h1 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--chmsu-primary-dark);
-}
-
-.header-title-group p {
-  margin: 0.15rem 0 0;
-  color: var(--chmsu-muted);
-  font-size: 0.9rem;
-}
-
-/* =========================================================
-   RIGHT
-   ========================================================= */
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-/* =========================================================
-   PROFILE
-   ========================================================= */
-
-.profile-card {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  background: var(--chmsu-bg);
-  border: 1px solid var(--chmsu-border);
-  border-radius: 20px;
-  padding: 0.65rem 0.9rem;
-}
-
-.profile-avatar {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  background: var(--chmsu-primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.profile-content h3 {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--chmsu-primary-dark);
-}
-
-.profile-content span {
-  font-size: 0.82rem;
-  color: var(--chmsu-muted);
-}
-
-/* =========================================================
-   LOGOUT
-   ========================================================= */
-
-.logout-btn {
-  height: 48px;
-  padding: 0 1.1rem;
-  border: none;
-  border-radius: 16px;
-  background: #fff1f0;
-  color: #cf3f35;
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  font-weight: 600;
-  transition: 0.2s ease;
-}
-
-.logout-btn:hover {
-  background: #cf3f35;
-  color: white;
-  transform: translateY(-1px);
-}
-
-.logout-btn i {
-  font-size: 1rem;
-}
-
-/* =========================================================
-   MOBILE
-   ========================================================= */
 
 @media (max-width: 768px) {
   .admin-header {
+    height: 70px;
+
     padding: 0 1rem;
-    height: auto;
-    min-height: 78px;
   }
 
   .header-title-group p {
     display: none;
   }
 
-  .profile-content {
+  .profile-details {
     display: none;
   }
 
-  .profile-card {
-    padding: 0.5rem;
+  .profile-section {
+    padding-right: 0;
+
+    border-right: none;
   }
 
   .logout-btn span {
@@ -172,8 +192,10 @@
   }
 
   .logout-btn {
-    width: 48px;
+    width: 42px;
+
     padding: 0;
+
     justify-content: center;
   }
 }
@@ -183,14 +205,14 @@
     font-size: 1rem;
   }
 
+  .header-right {
+    gap: 0.55rem;
+  }
+
   .menu-toggle,
   .logout-btn,
   .profile-avatar {
-    width: 44px;
-    height: 44px;
-  }
-
-  .header-right {
-    gap: 0.6rem;
+    width: 40px;
+    height: 40px;
   }
 }

@@ -1,49 +1,29 @@
-<!-- ===================================== -->
-<!-- MOBILE OVERLAY -->
-<!-- ===================================== -->
-
 <div
   class="sidebar-overlay"
   [class.show]="sidebarService.sidebarOpen()"
   (click)="closeSidebar()"
 ></div>
 
-<!-- ===================================== -->
-<!-- SIDEBAR -->
-<!-- ===================================== -->
-
 <aside
   class="admin-sidebar"
   [class.mobile-open]="sidebarService.sidebarOpen()"
 >
-  <!-- ===================================== -->
-  <!-- SIDEBAR HEADER -->
-  <!-- ===================================== -->
-
   <div class="sidebar-header">
-    <!-- LOGO -->
-
     <div class="sidebar-logo">
-      <div class="logo-icon">FES</div>
+      <div class="logo-mark">
+        CH
+      </div>
 
       <div class="logo-content">
         <h2>CHMSU FES</h2>
 
-        <span> Administrator Panel </span>
+        <span>Administrator Panel</span>
       </div>
     </div>
   </div>
 
-  <!-- ===================================== -->
-  <!-- SIDEBAR BODY -->
-  <!-- ===================================== -->
-
   <div class="sidebar-body">
-    <!-- NAVIGATION -->
-
     <nav class="sidebar-nav">
-      <!-- DASHBOARD -->
-
       <a
         class="nav-item"
         routerLink="/admin-dashboard"
@@ -51,12 +31,10 @@
         [routerLinkActiveOptions]="{ exact: true }"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-grid-1x2-fill"></i>
+        <i class="bi bi-grid-1x2"></i>
 
-        <span> Dashboard </span>
+        <span>Dashboard</span>
       </a>
-
-      <!-- FACULTIES -->
 
       <a
         class="nav-item"
@@ -64,12 +42,10 @@
         routerLinkActive="active"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-people-fill"></i>
+        <i class="bi bi-people"></i>
 
-        <span> Faculties </span>
+        <span>Faculties</span>
       </a>
-
-      <!-- USERS -->
 
       <a
         class="nav-item"
@@ -77,12 +53,10 @@
         routerLinkActive="active"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-person-badge-fill"></i>
+        <i class="bi bi-person-badge"></i>
 
-        <span> User Accounts </span>
+        <span>User Accounts</span>
       </a>
-
-      <!-- SCORES -->
 
       <a
         class="nav-item"
@@ -90,12 +64,10 @@
         routerLinkActive="active"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-bar-chart-fill"></i>
+        <i class="bi bi-bar-chart"></i>
 
-        <span> Evaluation Scores </span>
+        <span>Evaluation Scores</span>
       </a>
-
-      <!-- SETTINGS -->
 
       <a
         class="nav-item"
@@ -103,24 +75,22 @@
         routerLinkActive="active"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-gear-fill"></i>
+        <i class="bi bi-gear"></i>
 
-        <span> Settings </span>
+        <span>Settings</span>
       </a>
     </nav>
   </div>
 
-  <!-- ===================================== -->
-  <!-- SIDEBAR FOOTER -->
-  <!-- ===================================== -->
-
   <div class="sidebar-footer">
-    <div class="admin-avatar">A</div>
+    <div class="admin-avatar">
+      A
+    </div>
 
     <div class="footer-content">
       <h3>Administrator</h3>
 
-      <span> System Manager </span>
+      <span>System Manager</span>
     </div>
   </div>
 </aside>
