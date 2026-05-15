@@ -2,7 +2,7 @@ import { createAction, props } from '@ngrx/store';
 
 export const generateAccessCodeForStudent = createAction(
   '[Student Authentication] Generating access code for Student',
-  props<{ evaluatorId: string, password:string }>(),
+  props<{ evaluatorId: string; password: string }>(),
 );
 
 export const generateAccessCodeForStudentSuccess = createAction(
@@ -37,7 +37,7 @@ export const supervisorLogin = createAction(
 
 export const supervisorLoginSuccess = createAction(
   '[Supervisor Authentication] Supervisor Login Successful',
-  props<{ evaluatorId: string; role: 'ROLE_DEAN'; college: string }>(),
+  props<{ evaluatorId: string; role: 'ROLE_DEAN'; college: string; program: string }>(),
 );
 
 export const supervisorLoginFailure = createAction(
@@ -74,4 +74,4 @@ export const checkLoggedInUserAuthenticationFailure = createAction(
   props<{ error: string }>(),
 );
 export const logout = createAction('[Logout] Logout');
-export const sessionExpired = createAction('[Session Expired] Session Expired')
+export const sessionExpired = createAction('[Session Expired] Session Expired');

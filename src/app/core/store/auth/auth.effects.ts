@@ -125,6 +125,7 @@ export class AuthEffects {
         return this.authService.supervisorLogin(username, password).pipe(
           tap((response: any) => {
             sessionStorage.setItem('college', response.college);
+            sessionStorage.setItem('program', response.program);
           }),
           map((response: any) => {
             this.spinnerFacade.hideSpinner();
@@ -132,6 +133,7 @@ export class AuthEffects {
               evaluatorId: response.evaluatorId,
               role: 'ROLE_DEAN',
               college: response.college,
+              program: response.programs,
             });
           }),
           catchError((error) => {
@@ -296,8 +298,7 @@ export class AuthEffects {
           localStorage.clear();
           sessionStorage.clear();
           this.authService.logout().subscribe({
-            error: () => {
-            },
+            error: () => {},
           });
           Promise.resolve().then(() => {
             this.router.navigate(['/login']);

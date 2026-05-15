@@ -61,70 +61,60 @@ export class SupervisorDataEffects {
 
   loadFaculties$ = createEffect(() =>
 
-    this.actions$.pipe(
+  this.actions$.pipe(
 
-      ofType(ActionsSet.loadFaculties),
+    ofType(ActionsSet.loadFaculties),
 
-      withLatestFrom(
-        this.store.select(
-          s => s.supervisorData.faculties
-        )
-      ),
+    switchMap(({ key, program }) => {
 
-      filter(([{ key }, state]) =>
-        !state[key] ||
-        state[key].data.length === 0
-      ),
+      this.spinner.showSpinner();
 
-      switchMap(([{ key, college, status }]) => {
+      return this.api
+        .getFacultyLoadsByProgram(program)
+        .pipe(
 
-        this.spinner.showSpinner();
+          switchMap(res => [
 
-        return this.api
-          .getFaculties(college, status)
-          .pipe(
-
-            switchMap(res => [
-
-              ActionsSet.loadFacultiesSuccess({
-                key,
-                response: res
-              }),
-
-              ActionsSet.loadAllFacultyClasses({
-                key,
-                faculties: res
-              })
-
-            ]),
-
-            catchError(err => {
-
-              this.toast.showToast(
-                'Failed to load faculties',
-                'error'
-              );
-
-              return of(
-                ActionsSet.loadFacultiesFailure({
-                  key,
-                  error: err
-                })
-              );
-
+            ActionsSet.loadFacultiesSuccess({
+              key,
+              response: res
             }),
 
-            finalize(() =>
-              this.spinner.hideSpinner()
-            )
+            ActionsSet.loadAllFacultyClasses({
+              key,
+              faculties: res,
+              program
+            })
 
-          );
+          ]),
 
-      })
+          catchError(err => {
 
-    )
+            this.toast.showToast(
+              'Failed to load faculties',
+              'error'
+            );
 
-  );
+            return of(
+              ActionsSet.loadFacultiesFailure({
+                key,
+                error: err
+              })
+            );
+
+          }),
+
+          finalize(() =>
+            this.spinner.hideSpinner()
+          )
+
+        );
+
+    })
+
+  )
+
+);
 
   /* ================= CLASSES ================= */
 
@@ -134,7 +124,7 @@ export class SupervisorDataEffects {
 
       ofType(ActionsSet.loadAllFacultyClasses),
 
-      switchMap(({ key, faculties }) => {
+      switchMap(({ key, faculties, program }) => {
 
         this.spinner.showSpinner();
 
@@ -143,7 +133,7 @@ export class SupervisorDataEffects {
           faculties.map(f =>
 
             this.api
-              .loadFacultyClasses(f.facultyId)
+              .loadFacultyClasses(f.facultyId, program)
               .pipe(
 
                 map(classes => ({

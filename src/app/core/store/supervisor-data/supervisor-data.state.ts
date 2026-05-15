@@ -1,10 +1,10 @@
 import { EvaluationClass } from "../../services/evaluation/evaluation-service";
-import { FacultyClass, FacultyDTO } from "../../services/supervisor-data/supervisor-data-service"
+import { FacultyClass, FacultyDTO, FacultyLoadDTO } from "../../services/supervisor-data/supervisor-data-service"
 
 export interface SupervisorDataState {
     faculties: {
         [key: string]: {
-            data: FacultyDTO[];
+            data: FacultyLoadDTO[];
             loading: boolean;
             error: any;
         };

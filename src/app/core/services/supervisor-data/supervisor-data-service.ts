@@ -37,6 +37,18 @@ export interface FacultyClass {
   programCode: string;
   sectionCode: string;
 }
+
+export interface FacultyLoadDTO {
+  facultyId: string;
+  firstname: string;
+  lastname:string;
+  position: string;
+  subjectCode: string;
+  programYearSection: string;
+  campus: string;
+  loadLimit: number;
+  typeOfLoad: string;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -44,36 +56,34 @@ export class SupervisorDataService {
   private readonly FACULTY_API_URL = `${environment.API_URL}/faculty`;
   private http = inject(HttpClient);
 
-  getFaculties(
-    college: string,
-    status: string
-  ): Observable<FacultyDTO[]> {
-    console.log("Service Running");
+  getFaculties(college: string, status: string): Observable<FacultyDTO[]> {
+    console.log('Service Running');
 
-    const params = new HttpParams()
-      .set('college', college)
-      .set('status', status);
+    const params = new HttpParams().set('college', college).set('status', status);
 
-    return this.http.get<FacultyDTO[]>(
-      `${this.FACULTY_API_URL}/list`,
-      {
-        params,
-        withCredentials: true
-      }
-    );
+    return this.http.get<FacultyDTO[]>(`${this.FACULTY_API_URL}/list`, {
+      params,
+      withCredentials: true,
+    });
   }
 
-  loadFacultyClasses(
-    facultyId: string,
-  ): Observable<FacultyClass[]> {
+  loadFacultyClasses(facultyId: string, program:string): Observable<FacultyClass[]> {
     if (!facultyId?.trim()) {
       throw new Error('Invalid facultyId');
     }
-    const params = new HttpParams()
-      .set('facultyId', facultyId.trim());
-    return this.http.get<FacultyClass[]>(
-      `${this.FACULTY_API_URL}/faculty-classes`,
-      { params, withCredentials: true }
-    );
+    const params = new HttpParams().set('facultyId', facultyId.trim()).set('program', program.trim());
+    return this.http.get<FacultyClass[]>(`${this.FACULTY_API_URL}/faculty-classes`, {
+      params,
+      withCredentials: true,
+    });
+  }
+
+  getFacultyLoadsByProgram(programCode: string): Observable<FacultyLoadDTO[]> {
+    const params = new HttpParams().set('programCode', programCode);
+
+    return this.http.get<FacultyLoadDTO[]>(`${this.FACULTY_API_URL}/faculty-loads`, {
+      params,
+      withCredentials: true,
+    });
   }
 }

@@ -6,7 +6,8 @@ import * as SupervisorSelectors from './supervisor-data.selectors';
 
 import {
   FacultyClass,
-  FacultyDTO
+  FacultyDTO,
+  FacultyLoadDTO
 } from '../../services/supervisor-data/supervisor-data-service';
 
 import {
@@ -20,7 +21,7 @@ import {
 } from '../../services/evaluation/evaluation-service';
 
 export type FacultyDashboardVM = {
-  faculty: FacultyDTO;
+  faculty: FacultyLoadDTO;
   classes: (FacultyClass & { isEvaluated: boolean })[];
   loading: boolean;
 };
@@ -49,7 +50,7 @@ export class SupervisorDataFacade {
   selectedClass$ =
     this.store.select(SupervisorSelectors.selectSelectedClass);
 
-  faculties$(key: string): Observable<FacultyDTO[]> {
+  faculties$(key: string): Observable<FacultyLoadDTO[]> {
 
     return this.store.select(
       SupervisorSelectors.selectFacultyDataByKey(key)
@@ -93,15 +94,13 @@ export class SupervisorDataFacade {
 
   loadFaculties(
     key: string,
-    college: string,
-    status: string
+    program: string,
   ): void {
 
     this.store.dispatch(
       SupervisorActions.loadFaculties({
         key,
-        college,
-        status
+        program,
       })
     );
 

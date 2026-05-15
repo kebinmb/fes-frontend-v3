@@ -9,6 +9,7 @@ import { AuthFacade } from '../../../../store/auth/auth.facade';
 import {
   FacultyDTO,
   FacultyClass,
+  FacultyLoadDTO,
 } from '../../../../services/supervisor-data/supervisor-data-service';
 type ClassVM = {
   subjectCode?: string;
@@ -27,9 +28,9 @@ type ClassVM = {
 export class SupervisorDashboardComponent {
   private supervisorDataFacade = inject(SupervisorDataFacade);
   private authFacade = inject(AuthFacade);
-  college = sessionStorage.getItem('college') ?? '';
+  program = sessionStorage.getItem('program') ?? '';
   status = 'ACTIVE';
-  key = `${this.college}-${this.status}`;
+  key = `${this.program}-${this.status}`;
   faculties$ = this.supervisorDataFacade.faculties$(this.key);
   facultiesLoading$ = this.supervisorDataFacade.facultiesLoading$(this.key);
   evaluatorId$ = this.authFacade.evaluatorId$;
@@ -51,7 +52,7 @@ export class SupervisorDashboardComponent {
     map(([total = 0, completed = 0]) => total - completed),
   );
   ngOnInit(): void {
-    this.supervisorDataFacade.loadFaculties(this.key, this.college, this.status);
+    this.supervisorDataFacade.loadFaculties(this.key, this.program);
   }
   schoolYear() {
     return 2025;
@@ -62,7 +63,7 @@ export class SupervisorDashboardComponent {
   onFacultyClick(faculty: any) {
     console.log('Faculty clicked:', faculty);
   }
-  startEvaluation(cls: FacultyClass, faculty: FacultyDTO, event: Event) {
+  startEvaluation(cls: FacultyClass, faculty: FacultyLoadDTO, event: Event) {
     event.stopPropagation();
 
     const key = `${faculty.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;

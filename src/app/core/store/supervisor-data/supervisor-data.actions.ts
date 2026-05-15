@@ -1,7 +1,8 @@
 import { createAction, props } from "@ngrx/store";
 import {
   FacultyDTO,
-  FacultyClass
+  FacultyClass,
+  FacultyLoadDTO
 } from "../../services/supervisor-data/supervisor-data-service";
 
 import {
@@ -14,8 +15,9 @@ export const loadFaculties = createAction(
   '[Faculty Data] Load Faculties',
   props<{
     key: string;
-    college: string;
-    status: string;
+    // college: string;
+    // status: string;
+    program:string;
   }>()
 );
 
@@ -23,7 +25,7 @@ export const loadFacultiesSuccess = createAction(
   '[Faculty Data] Load Faculties Success',
   props<{
     key: string;
-    response: FacultyDTO[];
+    response: FacultyLoadDTO[];
   }>()
 );
 
@@ -41,7 +43,8 @@ export const loadAllFacultyClasses = createAction(
   '[Faculty Classes Data] Load All Faculty Classes',
   props<{
     key: string;
-    faculties: FacultyDTO[];
+    program:string;
+    faculties: FacultyLoadDTO[];
   }>()
 );
 
