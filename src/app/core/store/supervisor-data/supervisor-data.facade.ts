@@ -7,18 +7,12 @@ import * as SupervisorSelectors from './supervisor-data.selectors';
 import {
   FacultyClass,
   FacultyDTO,
-  FacultyLoadDTO
+  FacultyLoadDTO,
 } from '../../services/supervisor-data/supervisor-data-service';
 
-import {
-  combineLatest,
-  map,
-  Observable
-} from 'rxjs';
+import { combineLatest, map, Observable } from 'rxjs';
 
-import {
-  EvaluationClass
-} from '../../services/evaluation/evaluation-service';
+import { EvaluationClass } from '../../services/evaluation/evaluation-service';
 
 export type FacultyDashboardVM = {
   faculty: FacultyLoadDTO;
@@ -28,7 +22,6 @@ export type FacultyDashboardVM = {
 
 @Injectable({ providedIn: 'root' })
 export class SupervisorDataFacade {
-
   private store = inject(Store);
 
   /* ================= HELPERS ================= */
@@ -38,186 +31,106 @@ export class SupervisorDataFacade {
     subjectCode: string,
     yearLevel: string,
     semester: string,
-    schoolYear: number
+    schoolYear: number,
   ): string {
-
     return `${classCode}-${subjectCode}-${yearLevel}-${semester}-${schoolYear}`;
-
   }
 
   /* ================= BASICS ================= */
 
-  selectedClass$ =
-    this.store.select(SupervisorSelectors.selectSelectedClass);
+  selectedClass$ = this.store.select(SupervisorSelectors.selectSelectedClass);
 
   faculties$(key: string): Observable<FacultyLoadDTO[]> {
-
-    return this.store.select(
-      SupervisorSelectors.selectFacultyDataByKey(key)
-    );
-
+    return this.store.select(SupervisorSelectors.selectFacultyDataByKey(key));
   }
 
   facultiesLoading$(key: string): Observable<boolean> {
-
-    return this.store.select(
-      SupervisorSelectors.selectFacultyDataLoading(key)
-    );
-
+    return this.store.select(SupervisorSelectors.selectFacultyDataLoading(key));
   }
 
   facultiesError$(key: string): Observable<any> {
-
-    return this.store.select(
-      SupervisorSelectors.selectFacultyDataError(key)
-    );
-
+    return this.store.select(SupervisorSelectors.selectFacultyDataError(key));
   }
 
   facultyClasses$(key: string) {
-
-    return this.store.select(
-      SupervisorSelectors.selectFacultyClassesDataByKey(key)
-    );
-
+    return this.store.select(SupervisorSelectors.selectFacultyClassesDataByKey(key));
   }
 
   facultyClassesLoading$(key: string) {
-
-    return this.store.select(
-      SupervisorSelectors.selectFacultyClassesDataLoading(key)
-    );
-
+    return this.store.select(SupervisorSelectors.selectFacultyClassesDataLoading(key));
   }
 
   /* ================= LOAD ================= */
 
-  loadFaculties(
-    key: string,
-    program: string,
-  ): void {
-
+  loadFaculties(key: string, program: string): void {
     this.store.dispatch(
       SupervisorActions.loadFaculties({
         key,
         program,
-      })
+      }),
     );
-
   }
 
   /* ================= DASHBOARD VM ================= */
 
   facultyDashboard$(key: string): Observable<FacultyDashboardVM[]> {
-
     return combineLatest([
       this.faculties$(key),
       this.facultyClasses$(key),
-      this.store.select(
-        SupervisorSelectors.selectEvaluationStatusState
-      ),
+      this.store.select(SupervisorSelectors.selectEvaluationStatusState),
     ]).pipe(
+      map(([faculties, classMap, evalState]) => {
+        const uniqueFaculties = faculties.filter(
+          (faculty, index, self) =>
+            index === self.findIndex((f) => f.facultyId === faculty.facultyId),
+        );
 
-      map(([faculties, classMap, evalState]) =>
-
-        faculties.map((faculty) => {
-
+        return uniqueFaculties.map((faculty) => {
           const entry = classMap?.[faculty.facultyId];
 
           const classes = (entry?.classes ?? []).map((c) => {
+            const evaluationKey = this.buildEvaluationKey(
+              c.classCode,
+              c.subjectCode,
+              c.yearLevel,
+              c.semester,
+              c.schoolYear,
+            );
 
-            const evaluationKey =
-              this.buildEvaluationKey(
-                c.classCode,
-                c.subjectCode,
-                c.yearLevel,
-                c.semester,
-                c.schoolYear
-              );
-
-            const evaluated =
-              evalState[key]
-                ?.classes
-                ?.[evaluationKey]
-                ?.evaluated ?? false;
+            const evaluated = evalState[key]?.classes?.[evaluationKey]?.evaluated ?? false;
 
             return {
               ...c,
-              isEvaluated: evaluated
+              isEvaluated: evaluated,
             };
-
           });
 
           return {
             faculty,
             classes,
-            loading: entry?.loading ?? false
+            loading: entry?.loading ?? false,
           };
-
-        })
-
-      )
-
+        });
+      }),
     );
-
   }
 
   /* ================= EVALUATION ================= */
 
-  evaluationForClass$(
-    key: string,
-    evaluationKey: string
-  ) {
-
-    return this.store.select(
-      SupervisorSelectors.selectEvaluationForClass(
-        key,
-        evaluationKey
-      )
-    );
-
+  evaluationForClass$(key: string, evaluationKey: string) {
+    return this.store.select(SupervisorSelectors.selectEvaluationForClass(key, evaluationKey));
   }
 
-  isEvaluated$(
-    key: string,
-    evaluationKey: string
-  ) {
-
-    return this.store.select(
-      SupervisorSelectors.selectIsEvaluated(
-        key,
-        evaluationKey
-      )
-    );
-
+  isEvaluated$(key: string, evaluationKey: string) {
+    return this.store.select(SupervisorSelectors.selectIsEvaluated(key, evaluationKey));
   }
 
-  evaluationLoading$(
-    key: string,
-    evaluationKey: string
-  ) {
-
-    return this.store.select(
-      SupervisorSelectors.selectEvaluationLoading(
-        key,
-        evaluationKey
-      )
-    );
-
+  evaluationLoading$(key: string, evaluationKey: string) {
+    return this.store.select(SupervisorSelectors.selectEvaluationLoading(key, evaluationKey));
   }
 
-  evaluationError$(
-    key: string,
-    evaluationKey: string
-  ) {
-
-    return this.store.select(
-      SupervisorSelectors.selectEvaluationError(
-        key,
-        evaluationKey
-      )
-    );
-
+  evaluationError$(key: string, evaluationKey: string) {
+    return this.store.select(SupervisorSelectors.selectEvaluationError(key, evaluationKey));
   }
 
   loadEvaluationStatus(
@@ -235,17 +148,15 @@ export class SupervisorDataFacade {
       schoolYear: number;
 
       college: string;
-    }
+    },
   ): void {
-
-    const evaluationKey =
-      this.buildEvaluationKey(
-        context.classCode,
-        context.subjectCode,
-        context.yearLevel,
-        context.semester,
-        context.schoolYear
-      );
+    const evaluationKey = this.buildEvaluationKey(
+      context.classCode,
+      context.subjectCode,
+      context.yearLevel,
+      context.semester,
+      context.schoolYear,
+    );
 
     this.store.dispatch(
       SupervisorActions.loadEvaluationStatus({
@@ -253,25 +164,19 @@ export class SupervisorDataFacade {
         role,
         context: {
           ...context,
-          evaluationKey
-        }
-      })
+          evaluationKey,
+        },
+      }),
     );
-
   }
 
-  updateEvaluatedClass(
-    key: string,
-    evaluationKey: string
-  ): void {
-
+  updateEvaluatedClass(key: string, evaluationKey: string): void {
     this.store.dispatch(
       SupervisorActions.updateEvaluatedClass({
         key,
-        evaluationKey
-      })
+        evaluationKey,
+      }),
     );
-
   }
 
   /* ================= BATCH ================= */
@@ -289,22 +194,18 @@ export class SupervisorDataFacade {
 
       semester: string;
       schoolYear: number;
-    }[]
+    }[],
   ): void {
-
     const transformedPayload = payload.map((p) => ({
-
       ...p,
 
-      evaluationKey:
-        this.buildEvaluationKey(
-          p.classCode,
-          p.subjectCode,
-          p.yearLevel,
-          p.semester,
-          p.schoolYear
-        )
-
+      evaluationKey: this.buildEvaluationKey(
+        p.classCode,
+        p.subjectCode,
+        p.yearLevel,
+        p.semester,
+        p.schoolYear,
+      ),
     }));
 
     this.store.dispatch(
@@ -312,24 +213,18 @@ export class SupervisorDataFacade {
         key,
         role,
         evaluatorId,
-        payload: transformedPayload
-      })
+        payload: transformedPayload,
+      }),
     );
-
   }
 
   /* ================= SELECTION ================= */
 
-  selectClass(
-    selectedClass: EvaluationClass
-  ): void {
-
+  selectClass(selectedClass: EvaluationClass): void {
     this.store.dispatch(
       SupervisorActions.selectFacultyClassForEvaluation({
-        selectedClass
-      })
+        selectedClass,
+      }),
     );
-
   }
-
 }
