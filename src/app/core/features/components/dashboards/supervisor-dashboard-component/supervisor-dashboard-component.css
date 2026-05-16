@@ -581,6 +581,58 @@
   }
 }
 /* =========================
+   EVALUATE BUTTON HOVER
+========================= */
+
+.class-card-footer .btn-primary {
+  position: relative;
+
+  border: none;
+
+  overflow: hidden;
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease;
+}
+
+.class-card-footer .btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  background:
+    var(--chmsu-primary-dark);
+
+  box-shadow:
+    0 8px 18px rgba(24, 100, 67, 0.18);
+
+  filter: brightness(1.02);
+}
+
+.class-card-footer .btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.class-card-footer .btn-primary i {
+  transition:
+    transform 180ms ease;
+}
+
+.class-card-footer .btn-primary:hover:not(:disabled) i {
+  transform: translateX(2px);
+}
+
+.class-card-footer .btn-primary:disabled {
+  opacity: 0.7;
+
+  cursor: not-allowed;
+
+  box-shadow: none;
+
+  transform: none;
+}
+/* =========================
    RESPONSIVE
 ========================= */
 
