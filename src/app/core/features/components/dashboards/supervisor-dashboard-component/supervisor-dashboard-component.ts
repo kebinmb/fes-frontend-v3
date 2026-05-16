@@ -80,7 +80,7 @@ export class SupervisorDashboardComponent {
   }
   getButtonLabel(cls: ClassVM): string {
     if (cls.isEvaluated) return 'Done';
-    const parts = [cls.subjectCode, cls.programCode, cls.yearLevel, cls.sectionCode].filter(
+    const parts = [cls.subjectCode, cls.programCode].filter(
       Boolean,
     );
     return `${parts.join(' ')} - Evaluate`;
