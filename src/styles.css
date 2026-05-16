@@ -12,3 +12,21 @@
   --chmsu-border: #e9ecef;
   --chmsu-muted: #6c757d;
 }
+
+@font-face {
+  font-family: 'Optima';
+  src: url('/assets/fonts/OPTIMA.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Optima';
+  src: url('/assets/fonts/OPTIMA_B.TTF') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+body {
+  min-height: 100vh;
+  font-family: 'Optima', sans-serif !important;
+}
