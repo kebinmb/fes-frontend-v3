@@ -3,6 +3,7 @@ import { AuthFacade } from '../../../store/auth/auth.facade';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-login-component',
@@ -86,6 +87,6 @@ export class LoginComponent {
   }
   loginWithGoogle(): void {
     window.location.href =
-      'http://localhost:8090/api/oauth2/authorization/google';
+      environment.oauth;
   }
 }

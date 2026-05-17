@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthFacade } from '../../../store/auth/auth.facade';
 import { CommonModule } from '@angular/common';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
   selector: 'app-login-admin-component',
@@ -41,6 +42,6 @@ export class LoginAdminComponent {
   }
   loginWithGoogle(): void {
     window.location.href =
-      'http://localhost:8090/api/oauth2/authorization/google';
+      environment.oauth;
   }
 }
