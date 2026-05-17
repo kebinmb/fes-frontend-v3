@@ -66,6 +66,7 @@ export const checkLoggedInUserAuthenticationSuccess = createAction(
     evaluatorId: string;
     role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN';
     college: string;
+    program:string;
   }>(),
 );
 

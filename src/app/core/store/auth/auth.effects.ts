@@ -123,19 +123,9 @@ export class AuthEffects {
         this.spinnerFacade.showSpinner();
 
         return this.authService.supervisorLogin(username, password).pipe(
-          tap((response: any) => {
-            sessionStorage.setItem('college', response.college);
-            sessionStorage.setItem('program', response.program);
-          }),
-          map((response: any) => {
-            this.spinnerFacade.hideSpinner();
-            return AuthActions.supervisorLoginSuccess({
-              evaluatorId: response.evaluatorId,
-              role: 'ROLE_DEAN',
-              college: response.college,
-              program: response.programs,
-            });
-          }),
+          map((response: any) =>
+            this.handleSupervisorLoginSuccess(response),
+          ),
           catchError((error) => {
             this.spinnerFacade.hideSpinner();
             return of(
@@ -244,6 +234,7 @@ export class AuthEffects {
               role: response.role,
 
               college: response.college ?? null,
+              program: response.program
             });
           }),
 
@@ -258,7 +249,36 @@ export class AuthEffects {
       ),
     ),
   );
+  checkLoggedInUserAuthenticationSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.checkLoggedInUserAuthenticationSuccess),
 
+      map((response: any) => {
+
+        if (
+          response.role === 'ROLE_DEAN' ||
+          response.role === 'ROLE_PROGRAM_CHAIR'
+        ) {
+
+          return this.handleSupervisorLoginSuccess(response);
+        }
+
+        if (response.role === 'ROLE_ADMIN') {
+
+          return AuthActions.administratorLoginSuccess({
+            administratorId: response.evaluatorId,
+            role: 'ROLE_ADMIN',
+          });
+        }
+
+        return AuthActions.studentLoginSuccess({
+          evaluatorId: response.evaluatorId,
+          accessCode: '',
+          role: 'ROLE_STUDENT',
+        });
+      }),
+    ),
+  );
   checkLoggedInUserAuthenticationFailure$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -298,7 +318,7 @@ export class AuthEffects {
           localStorage.clear();
           sessionStorage.clear();
           this.authService.logout().subscribe({
-            error: () => {},
+            error: () => { },
           });
           Promise.resolve().then(() => {
             this.router.navigate(['/login']);
@@ -307,4 +327,21 @@ export class AuthEffects {
       ),
     { dispatch: false },
   );
+  private handleSupervisorLoginSuccess(
+    response: any,
+  ) {
+
+    sessionStorage.setItem('college', response.college);
+
+    sessionStorage.setItem('program', response.program);
+
+    this.spinnerFacade.hideSpinner();
+
+    return AuthActions.supervisorLoginSuccess({
+      evaluatorId: response.evaluatorId,
+      role: response.role,
+      college: response.college,
+      program: response.program,
+    });
+  }
 }

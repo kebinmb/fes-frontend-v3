@@ -84,4 +84,8 @@ export class LoginComponent {
       this.authFacade.loginStudent(payload.studentId, payload.accessCode);
     }
   }
+  loginWithGoogle(): void {
+    window.location.href =
+      'http://localhost:8090/api/oauth2/authorization/google';
+  }
 }

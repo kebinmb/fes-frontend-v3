@@ -12,8 +12,13 @@ import { FacultyEvaluationScoresDataTableComponent } from './core/features/compo
 import { UserAccountsDataTableComponent } from './core/features/components/user-accounts-data-table-component/user-accounts-data-table-component';
 import { guestGuard } from './utilities/guards/guest/guest-guard';
 import { SettingsComponent } from './core/features/components/settings-component/settings-component';
+import { OauthSuccessComponent } from './shared/components/oauth-success-component/oauth-success-component';
 
 export const routes: Routes = [
+  {
+    path: 'oauth-success',
+    component: OauthSuccessComponent,
+  },
   {
     path: 'login',
     component: LoginComponent,

@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-login-admin-component',
-  imports: [CommonModule,ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login-admin-component.html',
   styleUrl: './login-admin-component.css',
 })
@@ -38,5 +38,9 @@ export class LoginAdminComponent {
 
   get adminFormControl() {
     return this.adminForm.controls;
+  }
+  loginWithGoogle(): void {
+    window.location.href =
+      'http://localhost:8090/api/oauth2/authorization/google';
   }
 }
