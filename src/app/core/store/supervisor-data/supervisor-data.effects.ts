@@ -65,12 +65,12 @@ export class SupervisorDataEffects {
 
     ofType(ActionsSet.loadFaculties),
 
-    switchMap(({ key, program }) => {
+    switchMap(({ key, program, userId }) => {
 
       this.spinner.showSpinner();
 
       return this.api
-        .getFacultyLoadsByProgram(program)
+        .getFacultyLoadsByProgram(program,userId)
         .pipe(
 
           switchMap(res => [

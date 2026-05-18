@@ -1,16 +1,8 @@
 import { Component, inject } from '@angular/core';
 
-import {
-  AsyncPipe,
-  CommonModule,
-} from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 
-import {
-  combineLatest,
-  map,
-  Observable,
-  shareReplay,
-} from 'rxjs';
+import { combineLatest, map, Observable, shareReplay, take } from 'rxjs';
 
 import {
   FacultyDashboardVM,
@@ -38,217 +30,108 @@ type ClassVM = {
 
   standalone: true,
 
-  imports: [
-    AsyncPipe,
-    CommonModule,
-  ],
+  imports: [AsyncPipe, CommonModule],
 
-  templateUrl:
-    './supervisor-dashboard-component.html',
+  templateUrl: './supervisor-dashboard-component.html',
 
-  styleUrl:
-    './supervisor-dashboard-component.css',
+  styleUrl: './supervisor-dashboard-component.css',
 })
 export class SupervisorDashboardComponent {
+  private supervisorDataFacade = inject(SupervisorDataFacade);
 
-  private supervisorDataFacade =
-    inject(SupervisorDataFacade);
+  private authFacade = inject(AuthFacade);
 
-  private authFacade =
-    inject(AuthFacade);
-
-  program =
-    sessionStorage.getItem(
-      'program',
-    ) ?? '';
+  program = sessionStorage.getItem('program') ?? '';
 
   status = 'ACTIVE';
 
-  key =
-    `${this.program}-${this.status}`;
+  key = `${this.program}-${this.status}`;
 
   currentPage = 1;
 
   readonly pageSize = 6;
 
-  faculties$ =
-    this.supervisorDataFacade
-      .faculties$(this.key)
-      .pipe(
-        shareReplay(1),
-      );
+  faculties$ = this.supervisorDataFacade.faculties$(this.key).pipe(shareReplay(1));
 
-  facultiesLoading$ =
-    this.supervisorDataFacade
-      .facultiesLoading$(this.key)
-      .pipe(
-        shareReplay(1),
-      );
+  facultiesLoading$ = this.supervisorDataFacade.facultiesLoading$(this.key).pipe(shareReplay(1));
 
-  evaluatorId$ =
-    this.authFacade.evaluatorId$;
+  evaluatorId$ = this.authFacade.evaluatorId$;
 
-  facultyDashboard$:
-    Observable<
-      FacultyDashboardVM[]
-    > =
-    this.supervisorDataFacade
-      .facultyDashboard$(
-        this.key,
-      )
-      .pipe(
-        shareReplay(1),
-      );
+  facultyDashboard$: Observable<FacultyDashboardVM[]> = this.supervisorDataFacade
+    .facultyDashboard$(this.key)
+    .pipe(shareReplay(1));
 
-  loaded$ = combineLatest([
-    this.faculties$,
-    this.facultiesLoading$,
-  ]).pipe(
-    map(
-      ([
-        faculties,
-        loading,
-      ]) =>
-        !loading &&
-        faculties.length >= 0,
+  loaded$ = combineLatest([this.faculties$, this.facultiesLoading$]).pipe(
+    map(([faculties, loading]) => !loading && faculties.length >= 0),
+    shareReplay(1),
+  );
+
+  collegeFaculties$ = this.faculties$;
+
+  totalClassesCount$ = this.facultyDashboard$.pipe(
+    map((list) => list.reduce((sum, faculty) => sum + faculty.classes.length, 0)),
+    shareReplay(1),
+  );
+
+  completedEvaluationsCount$ = this.facultyDashboard$.pipe(
+    map((list) =>
+      list.reduce(
+        (sum, faculty) => sum + faculty.classes.filter((cls) => cls.isEvaluated).length,
+        0,
+      ),
     ),
     shareReplay(1),
   );
 
-  collegeFaculties$ =
-    this.faculties$;
+  isLoading$ = this.facultiesLoading$;
 
-  totalClassesCount$ =
-    this.facultyDashboard$.pipe(
-      map((list) =>
-        list.reduce(
-          (
-            sum,
-            faculty,
-          ) =>
-            sum +
-            faculty.classes.length,
-          0,
-        ),
-      ),
-      shareReplay(1),
-    );
+  pendingCount$ = combineLatest([this.totalClassesCount$, this.completedEvaluationsCount$]).pipe(
+    map(([total = 0, completed = 0]) => total - completed),
+    shareReplay(1),
+  );
 
-  completedEvaluationsCount$ =
-    this.facultyDashboard$.pipe(
-      map((list) =>
-        list.reduce(
-          (
-            sum,
-            faculty,
-          ) =>
-            sum +
-            faculty.classes.filter(
-              (
-                cls,
-              ) =>
-                cls.isEvaluated,
-            ).length,
-          0,
-        ),
-      ),
-      shareReplay(1),
-    );
+  totalPages$ = this.facultyDashboard$.pipe(
+    map((list) => Math.max(1, Math.ceil(list.length / this.pageSize))),
+    shareReplay(1),
+  );
 
-  isLoading$ =
-    this.facultiesLoading$;
+  paginatedFacultyDashboard$: Observable<FacultyDashboardVM[]> = this.facultyDashboard$.pipe(
+    map((list) => {
+      const start = (this.currentPage - 1) * this.pageSize;
 
-  pendingCount$ =
-    combineLatest([
-      this.totalClassesCount$,
-      this
-        .completedEvaluationsCount$,
-    ]).pipe(
-      map(
-        ([
-          total = 0,
-          completed = 0,
-        ]) =>
-          total - completed,
-      ),
-      shareReplay(1),
-    );
+      const end = start + this.pageSize;
 
-  totalPages$ =
-    this.facultyDashboard$.pipe(
-      map((list) =>
-        Math.max(
-          1,
-          Math.ceil(
-            list.length /
-            this.pageSize,
-          ),
-        ),
-      ),
-      shareReplay(1),
-    );
-
-  paginatedFacultyDashboard$:
-    Observable<
-      FacultyDashboardVM[]
-    > =
-    this.facultyDashboard$.pipe(
-      map((list) => {
-
-        const start =
-          (this.currentPage - 1) *
-          this.pageSize;
-
-        const end =
-          start + this.pageSize;
-
-        return list.slice(
-          start,
-          end,
-        );
-      }),
-      shareReplay(1),
-    );
+      return list.slice(start, end);
+    }),
+    shareReplay(1),
+  );
 
   ngOnInit(): void {
+    this.evaluatorId$.pipe(take(1)).subscribe((userId) => {
+      console.log('Evaluator ID:', userId);
+      if (!userId) {
+        return;
+      }
 
-    this.supervisorDataFacade.loadFaculties(
-      this.key,
-      this.program,
-    );
+      this.supervisorDataFacade.loadFaculties(this.key, this.program, Number(userId));
+    });
   }
 
   refreshPagination(): void {
+    this.paginatedFacultyDashboard$ = this.facultyDashboard$.pipe(
+      map((list) => {
+        const start = (this.currentPage - 1) * this.pageSize;
 
-    this.paginatedFacultyDashboard$ =
-      this.facultyDashboard$.pipe(
-        map((list) => {
+        const end = start + this.pageSize;
 
-          const start =
-            (this.currentPage - 1) *
-            this.pageSize;
-
-          const end =
-            start + this.pageSize;
-
-          return list.slice(
-            start,
-            end,
-          );
-        }),
-        shareReplay(1),
-      );
+        return list.slice(start, end);
+      }),
+      shareReplay(1),
+    );
   }
 
-  nextPage(
-    totalPages: number,
-  ): void {
-
-    if (
-      this.currentPage <
-      totalPages
-    ) {
-
+  nextPage(totalPages: number): void {
+    if (this.currentPage < totalPages) {
       this.currentPage++;
 
       this.refreshPagination();
@@ -256,131 +139,79 @@ export class SupervisorDashboardComponent {
   }
 
   previousPage(): void {
-
-    if (
-      this.currentPage > 1
-    ) {
-
+    if (this.currentPage > 1) {
       this.currentPage--;
 
       this.refreshPagination();
     }
   }
 
-  goToPage(
-    page: number,
-  ): void {
-
+  goToPage(page: number): void {
     this.currentPage = page;
 
     this.refreshPagination();
   }
 
-  getPageNumbers(
-    totalPages: number,
-  ): number[] {
-
+  getPageNumbers(totalPages: number): number[] {
     return Array.from(
       {
-        length:
-          totalPages,
+        length: totalPages,
       },
-      (_, index) =>
-        index + 1,
+      (_, index) => index + 1,
     );
   }
 
   schoolYear(): number {
-
     return new Date().getFullYear();
   }
 
   semester(): string {
-
     return '2nd';
   }
 
-  getFacultyInitials(
-    faculty: FacultyLoadDTO,
-  ): string {
+  getFacultyInitials(faculty: FacultyLoadDTO): string {
+    const first = faculty.firstname?.charAt(0) ?? '';
 
-    const first =
-      faculty.firstname?.charAt(
-        0,
-      ) ?? '';
-
-    const last =
-      faculty.lastname?.charAt(
-        0,
-      ) ?? '';
+    const last = faculty.lastname?.charAt(0) ?? '';
 
     return `${first}${last}`;
   }
 
-  onFacultyClick(
-    faculty: FacultyLoadDTO,
-  ): void {
-
-    console.log(
-      'Faculty clicked:',
-      faculty,
-    );
+  onFacultyClick(faculty: FacultyLoadDTO): void {
+    console.log('Faculty clicked:', faculty);
   }
 
-  startEvaluation(
-    cls: FacultyClass,
-    faculty: FacultyLoadDTO,
-    event: Event,
-  ): void {
-
+  startEvaluation(cls: FacultyClass, faculty: FacultyLoadDTO, event: Event): void {
     event.stopPropagation();
 
-    const key =
-      `${faculty.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
+    const key = `${faculty.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
 
-    const facultyName =
-      `${faculty.firstname} ${faculty.lastname}`;
+    const facultyName = `${faculty.firstname} ${faculty.lastname}`;
 
     this.supervisorDataFacade.selectClass({
       ...cls,
-      facultyId:
-        faculty.facultyId,
+      facultyId: faculty.facultyId,
       facultyName,
     });
 
-    console.log(
-      'Evaluate:',
-      {
-        key,
-        cls,
-        faculty,
-      },
-    );
+    console.log('Evaluate:', {
+      key,
+      cls,
+      faculty,
+    });
   }
 
-  getButtonLabel(
-    cls: ClassVM,
-  ): string {
-
-    if (
-      cls.isEvaluated
-    ) {
-
+  getButtonLabel(cls: ClassVM): string {
+    if (cls.isEvaluated) {
       return 'Done';
     }
 
-    const parts = [
-      cls.subjectCode,
-      cls.programCode,
-    ].filter(Boolean);
+    const parts = [cls.subjectCode, cls.programCode].filter(Boolean);
 
-    return `${parts.join(
-      ' ',
-    )} - Evaluate`;
+    return `${parts.join(' ')} - Evaluate`;
   }
 
   logout(): void {
-
     this.authFacade.logout();
   }
 }

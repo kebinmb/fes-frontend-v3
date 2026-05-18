@@ -62,11 +62,12 @@ export class SupervisorDataFacade {
 
   /* ================= LOAD ================= */
 
-  loadFaculties(key: string, program: string): void {
+  loadFaculties(key: string, program: string, userId:number): void {
     this.store.dispatch(
       SupervisorActions.loadFaculties({
         key,
         program,
+        userId: userId,
       }),
     );
   }

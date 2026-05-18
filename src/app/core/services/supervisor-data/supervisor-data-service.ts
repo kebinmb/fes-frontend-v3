@@ -78,8 +78,8 @@ export class SupervisorDataService {
     });
   }
 
-  getFacultyLoadsByProgram(programCode: string): Observable<FacultyLoadDTO[]> {
-    const params = new HttpParams().set('programCode', programCode);
+  getFacultyLoadsByProgram(programCode: string, userId:number): Observable<FacultyLoadDTO[]> {
+    const params = new HttpParams().set('programCode', programCode).set('userId', userId.toString());
 
     return this.http.get<FacultyLoadDTO[]>(`${this.FACULTY_API_URL}/faculty-loads`, {
       params,

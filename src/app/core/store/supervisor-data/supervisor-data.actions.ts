@@ -18,6 +18,7 @@ export const loadFaculties = createAction(
     // college: string;
     // status: string;
     program:string;
+    userId:number;
   }>()
 );
 
