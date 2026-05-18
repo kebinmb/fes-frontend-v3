@@ -46,7 +46,7 @@ export class LoginComponent {
   });
 
   supervisorForm = this.fb.nonNullable.group({
-    username: ['', [Validators.required, Validators.maxLength(12)]],
+    username: ['', [Validators.required, Validators.maxLength(40)]],
     password: ['', [Validators.required]],
   });
 

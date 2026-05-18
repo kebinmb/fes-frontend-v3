@@ -117,27 +117,31 @@ export class AuthEffects {
     { dispatch: false },
   );
   loginSupervisor$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AuthActions.supervisorLogin),
-      exhaustMap(({ username, password }) => {
-        this.spinnerFacade.showSpinner();
+  this.actions$.pipe(
+    ofType(AuthActions.supervisorLogin),
 
-        return this.authService.supervisorLogin(username, password).pipe(
-          map((response: any) =>
-            this.handleSupervisorLoginSuccess(response),
-          ),
-          catchError((error) => {
-            this.spinnerFacade.hideSpinner();
-            return of(
-              AuthActions.supervisorLoginFailure({
-                error: extractErrorMessage(error),
-              }),
-            );
-          }),
-        );
-      }),
-    ),
-  );
+    exhaustMap(({ username, password }) => {
+      this.spinnerFacade.showSpinner();
+
+      return this.authService.supervisorLogin(username, password).pipe(
+
+        map(() =>
+          AuthActions.checkLoggedInUserAuthentication()
+        ),
+
+        catchError((error) => {
+          this.spinnerFacade.hideSpinner();
+
+          return of(
+            AuthActions.supervisorLoginFailure({
+              error: extractErrorMessage(error),
+            }),
+          );
+        }),
+      );
+    }),
+  ),
+);
   loginSupervisorSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -214,7 +218,7 @@ export class AuthEffects {
     this.actions$.pipe(
       ofType(AuthActions.checkLoggedInUserAuthentication),
 
-      filter(() => !this.router.url.includes('/login')),
+      // filter(() => !this.router.url.includes('/login')),
 
       exhaustMap(() =>
         this.authService.getCurrentUser().pipe(
