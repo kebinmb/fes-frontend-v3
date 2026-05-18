@@ -7,14 +7,15 @@ import { filter, map, tap } from 'rxjs';
 export const roleGuard: CanActivateFn = (route) => {
   const store = inject(Store);
   const router = inject(Router);
-  const expectedRole = route.data?.['role'];
+
+  const expectedRoles = route.data?.['role'];
 
   return store.select(selectAuthenticationState).pipe(
     filter((state) => state.isAuthChecked && !state.isLoading),
 
     map((state) => {
       console.log('🔍 Auth State:', state);
-      console.log('🔍 Expected Role:', expectedRole);
+      console.log('🔍 Expected Roles:', expectedRoles);
 
       if (!state.isAuthenticated || !state.role) {
         console.warn('❌ Not authenticated or role missing');
@@ -27,13 +28,25 @@ export const roleGuard: CanActivateFn = (route) => {
 
       console.log('🔍 User Roles:', userRoles);
 
-      if (expectedRole && !userRoles.includes(expectedRole)) {
-        console.warn('❌ Role mismatch');
-        return router.createUrlTree(['/login']);
+      // HANDLE MULTIPLE ROLES
+      if (expectedRoles) {
+
+        const allowedRoles = Array.isArray(expectedRoles)
+          ? expectedRoles
+          : [expectedRoles];
+
+        const hasRole = allowedRoles.some((role) =>
+          userRoles.includes(role),
+        );
+
+        if (!hasRole) {
+          console.warn('❌ Role mismatch');
+          return router.createUrlTree(['/login']);
+        }
       }
 
       console.log('✅ Access granted');
       return true;
-    })
+    }),
   );
 };

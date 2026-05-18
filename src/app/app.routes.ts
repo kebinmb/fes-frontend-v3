@@ -22,12 +22,12 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
-    canActivate: [guestGuard]
+    canActivate: [guestGuard],
   },
   {
     path: 'admin',
     component: LoginAdminComponent,
-    canActivate: [guestGuard]
+    canActivate: [guestGuard],
   },
   {
     path: 'student-dashboard',
@@ -39,7 +39,7 @@ export const routes: Routes = [
     path: 'supervisor-dashboard',
     component: SupervisorDashboardComponent,
     canActivate: [authGuard, roleGuard],
-    data: { role: 'ROLE_DEAN' },
+    data: { role: ['ROLE_DEAN', 'ROLE_PROGRAM_CHAIR'] },
   },
   {
     path: 'evaluation-form',
@@ -55,7 +55,7 @@ export const routes: Routes = [
       { path: 'faculty-list', component: FacultyDataTableComponent },
       { path: 'evaluation-score-list', component: FacultyEvaluationScoresDataTableComponent },
       { path: 'user-accounts', component: UserAccountsDataTableComponent },
-      { path: 'settings', component: SettingsComponent }
+      { path: 'settings', component: SettingsComponent },
     ],
   },
   {
