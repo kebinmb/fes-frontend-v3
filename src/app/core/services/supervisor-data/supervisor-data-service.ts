@@ -43,6 +43,7 @@ export interface FacultyLoadDTO {
   firstname: string;
   lastname: string;
   position: string;
+  college:string;
   // subjectCode: string;
   // programYearSection: string;
   campus: string;

@@ -1,0 +1,94 @@
+@if (visible) {
+
+<div class="confirmation-overlay">
+
+  <div class="confirmation-modal">
+
+    <div class="confirmation-header">
+
+      <div>
+
+        <h5 class="confirmation-title">
+          {{ title }}
+        </h5>
+
+        @if (subtitle) {
+
+          <p class="confirmation-subtitle">
+            {{ subtitle }}
+          </p>
+
+        }
+
+      </div>
+
+      <button
+        type="button"
+        class="confirmation-close"
+        (click)="close()"
+      >
+
+        <i class="bi bi-x-lg"></i>
+
+      </button>
+
+    </div>
+
+    <div class="confirmation-body">
+
+      <p class="confirmation-message">
+        {{ message }}
+      </p>
+
+      @if (faculty) {
+
+        <div class="confirmation-faculty">
+
+          <div class="faculty-name">
+
+            {{ faculty.firstname }}
+            {{ faculty.lastname }}
+
+          </div>
+
+          <!-- <div class="faculty-meta">
+
+            {{ faculty.college }}
+
+          </div> -->
+
+        </div>
+
+      }
+
+    </div>
+
+    <div class="confirmation-footer">
+
+      <button
+        type="button"
+        class="btn btn-light"
+        (click)="close()"
+      >
+
+        {{ cancelText }}
+
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="confirm()"
+      >
+
+        {{ confirmText }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+}

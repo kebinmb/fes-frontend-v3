@@ -44,13 +44,18 @@
 
     <!-- SEARCH -->
     <div class="row mb-4">
-
       <div class="col-lg-4">
+        <div class="search-wrapper position-relative">
 
-        <input type="text" class="form-control" placeholder="Search faculty..." (input)="onSearch($event)" />
+          <input type="text" class="form-control pe-5" placeholder="Search faculty..." (input)="onSearch($event)" />
 
+          <button type="button" class="tooltip-btn" data-bs-toggle="tooltip" data-bs-placement="top"
+            title="Use this search bar to find the faculty that you wish to evaluate">
+            <i class="bi bi-info-circle"></i>
+          </button>
+
+        </div>
       </div>
-
     </div>
 
     <!-- LOADING -->
@@ -104,6 +109,13 @@
             Manage faculty subject evaluations
           </p>
 
+          <div class="dashboard-instruction">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>
+              Ensure that the selected faculty is under your program and college.
+            </span>
+          </div>
+
         </div>
 
         <div class="faculty-count-badge">
@@ -129,7 +141,7 @@
 
               <th>Campus</th>
 
-              <th>Load</th>
+              <!-- <th>Load</th> -->
 
               <th class="text-end">
                 Action
@@ -193,13 +205,13 @@
 
                 <span class="campus-badge">
 
-                  {{ faculty.campus }}
+                  {{getCampusName(faculty.campus)}}
 
                 </span>
 
               </td>
 
-              <td>
+              <!-- <td>
 
                 <span class="load-badge" [ngClass]="
                   faculty.typeOfLoad === 'OVERLOAD'
@@ -211,11 +223,11 @@
 
                 </span>
 
-              </td>
+              </td> -->
 
               <td class="text-end">
 
-                <button class="btn btn-primary btn-evaluate" (click)="openFaculty(faculty)">
+                <button class="btn btn-primary btn-evaluate" (click)="openFacultyConfirmation(faculty)">
 
                   <i class="bi bi-clipboard-check me-2"></i>
 
@@ -293,182 +305,166 @@
   <!-- MODAL -->
   @if (selectedFaculty; as faculty) {
 
-<div class="custom-modal-backdrop">
+  <div class="custom-modal-backdrop">
 
-  <div class="custom-modal">
+    <div class="custom-modal">
 
-    <!-- HEADER -->
-    <div class="modal-profile-wrapper">
+      <!-- HEADER -->
+      <div class="modal-profile-wrapper">
 
-      <div class="modal-profile">
+        <div class="modal-profile">
 
-        <div class="modal-avatar">
+          <div class="modal-avatar">
+            {{ getFacultyInitials(faculty) }}
+          </div>
 
-          {{ getFacultyInitials(faculty) }}
+          <div class="modal-profile-content">
 
-        </div>
+            <h4 class="modal-title">
+              {{ faculty.firstname }} {{ faculty.lastname }}
+            </h4>
 
-        <div class="modal-profile-content">
+            <p class="modal-subtitle">
+              <i class="bi bi-briefcase-fill"></i>
+              <span>{{ faculty.position }}</span>
+            </p>
 
-          <h4 class="modal-title">
+            <div class="modal-meta">
 
-            {{ faculty.firstname }}
-            {{ faculty.lastname }}
+              <div class="modal-meta-chip">
+                <i class="bi bi-person-vcard-fill"></i>
+                <span>{{ faculty.facultyId }}</span>
+              </div>
 
-          </h4>
+              <div class="modal-meta-chip">
+                <i class="bi bi-buildings-fill"></i>
 
-          <div class="modal-subtitle">
+                <span>
+                  {{ getCampusName(faculty.campus) }}
+                </span>
+              </div>
+              <!--               
+              <div class="modal-meta-chip">
+                <i class="bi bi-school-fill"></i>
+                <span>{{ faculty.college }}</span>
+              </div> -->
 
-            {{ faculty.position }}
+            </div>
 
           </div>
 
-          <div class="modal-meta">
-
-            <span class="modal-meta-chip">
-              <i class="bi bi-person-badge me-1"></i>
-              {{ faculty.facultyId }}
-            </span>
-
-            <span class="modal-meta-chip">
-              <i class="bi bi-building me-1"></i>
-              {{ faculty.campus }}
-            </span>
-
-          </div>
-
         </div>
+
+        <button type="button" class="modal-close-btn" aria-label="Close" (click)="closeFacultyModal()">
+
+          <i class="bi bi-x-lg"></i>
+
+        </button>
 
       </div>
 
-      <button
-        class="btn-close modal-close-btn"
-        (click)="closeFacultyModal()">
-      </button>
+      <!-- BODY -->
+      <div class="custom-modal-body">
 
-    </div>
+        @if (facultyClasses$ | async; as facultyClasses) {
 
-    <!-- BODY -->
-    <div class="custom-modal-body">
+        @let classes =
+        facultyClasses[faculty.facultyId]?.classes ?? [];
 
-      @if (
-      facultyClasses$ | async;
-      as facultyClasses
-      ) {
+        @if (classes.length > 0) {
 
-      <div class="subjects-grid">
+        <div class="subjects-grid">
 
-        @for (
-        cls of
-        facultyClasses[
-        faculty.facultyId
-        ]?.classes ?? [];
+          @for (cls of classes; track trackClass($index, cls)) {
 
-        track trackClass($index, cls)
-        )
-        {
+          <div class="subject-card-modal" [class.subject-done]="cls.isEvaluated">
 
-        <div
-          class="subject-card-modal"
-          [class.subject-done]="cls.isEvaluated">
+            <!-- CARD HEADER -->
+            <div class="subject-card-top">
 
-          <!-- TOP -->
-          <div class="subject-card-top">
+              <div class="subject-main-info">
 
-            <div class="subject-main-info">
+                <div class="subject-code">
+                  <i class="bi bi-book-half"></i>
+                  <span>{{ cls.subjectCode }}</span>
+                </div>
 
-              <div class="subject-code">
-
-                {{ cls.subjectCode }}
+                <div class="subject-description">
+                  {{ cls.subjectDescription }}
+                </div>
 
               </div>
 
-              <div class="subject-description">
+              <div class="subject-status" [class.status-complete]="cls.isEvaluated">
 
-                {{ cls.subjectDescription }}
+                <i class="bi" [ngClass]="
+                          cls.isEvaluated
+                            ? 'bi-check-circle-fill'
+                            : 'bi-clock-history'
+                        ">
+                </i>
 
               </div>
 
             </div>
 
-            <div
-              class="subject-status"
-              [class.status-complete]="cls.isEvaluated">
+            <!-- META -->
+            <div class="subject-meta-row">
 
-              <i
-                class="bi"
-                [ngClass]="
-                  cls.isEvaluated
-                    ? 'bi-check-circle-fill'
-                    : 'bi-hourglass-split'
-                ">
+              <span class="subject-chip">
+                <i class="bi bi-mortarboard-fill"></i>
+                {{ cls.programCode }}
+              </span>
+
+              <span class="subject-chip">
+                <i class="bi bi-bar-chart-fill"></i>
+                {{ cls.yearLevel }}
+              </span>
+
+              <span class="subject-chip">
+                <i class="bi bi-people-fill"></i>
+                {{ cls.sectionCode }}
+              </span>
+
+            </div>
+
+            <!-- ACTION -->
+            <button type="button" class="btn btn-primary btn-subject-action" [disabled]="cls.isEvaluated"
+              (click)="startEvaluation(cls, faculty)">
+
+              <i class="bi" [ngClass]="
+                        cls.isEvaluated
+                          ? 'bi-check-circle-fill'
+                          : 'bi-play-circle-fill'
+                      ">
               </i>
 
-            </div>
-
-          </div>
-
-          <!-- META -->
-          <div class="subject-meta-row">
-
-            <span class="subject-chip">
-              {{ cls.programCode }}
-            </span>
-
-            <span class="subject-chip">
-              {{ cls.yearLevel }}
-            </span>
-
-            <span class="subject-chip">
-              {{ cls.sectionCode }}
-            </span>
-
-          </div>
-
-          <!-- ACTION -->
-          <button
-            class="btn btn-primary btn-subject-action"
-            [disabled]="cls.isEvaluated"
-            (click)="startEvaluation(cls, faculty)">
-
-            <i
-              class="bi me-2"
-              [ngClass]="
+              <span>
+                {{
                 cls.isEvaluated
-                  ? 'bi-check-circle-fill'
-                  : 'bi-play-fill'
-              ">
-            </i>
+                ? 'Completed'
+                : 'Start Evaluation'
+                }}
+              </span>
 
-            {{
-            cls.isEvaluated
-            ? 'Completed'
-            : 'Start Evaluation'
-            }}
+            </button>
 
-          </button>
+          </div>
+
+          }
 
         </div>
 
-        }
+        } @else {
 
-        @if (
-        (facultyClasses[
-        faculty.facultyId
-        ]?.classes ?? []).length === 0
-        ) {
-
+        <!-- EMPTY STATE -->
         <div class="modal-empty-state">
 
           <div class="modal-empty-icon">
-
             <i class="bi bi-journal-x"></i>
-
           </div>
 
-          <h5>
-            No Subjects Found
-          </h5>
+          <h5>No Subjects Found</h5>
 
           <p>
             This faculty currently has no assigned subjects.
@@ -478,16 +474,21 @@
 
         }
 
-      </div>
+        }
 
-      }
+      </div>
 
     </div>
 
   </div>
 
-</div>
-
-}
-
+  }
+  <app-confirmation-modal-component [visible]="isConfirmationVisible" [title]="'Confirm Evaluation'" [subtitle]="
+    'Please verify faculty information'
+  " [message]="
+    'Are you sure this faculty is under your program and college?'
+  " [confirmText]="
+    'Continue Evaluation'
+  " [faculty]="pendingFaculty" (confirmed)="confirmFacultyEvaluation()" (closed)="closeFacultyConfirmation()">
+  </app-confirmation-modal-component>
 </div>

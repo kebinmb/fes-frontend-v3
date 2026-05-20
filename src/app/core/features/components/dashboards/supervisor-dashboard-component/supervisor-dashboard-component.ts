@@ -1,89 +1,93 @@
 import {
-
+  AfterViewInit,
   Component,
-
-  inject,
-
-  OnInit
-
+  DestroyRef,
+  OnInit,
+  ViewChild,
+  inject
 } from '@angular/core';
 
 import {
-
   AsyncPipe,
-
   CommonModule
-
 } from '@angular/common';
 
 import {
-
-  debounceTime,
-
-  distinctUntilChanged,
-
-  filter,
-
-  map,
-
   Subject,
-
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  map,
   take
-
 } from 'rxjs';
 
 import {
+  takeUntilDestroyed
+} from '@angular/core/rxjs-interop';
 
+import {
   SupervisorDataFacade
-
 } from '../../../../store/supervisor-data/supervisor-data.facade';
 
 import {
-
   AuthFacade
-
 } from '../../../../store/auth/auth.facade';
 
 import {
-
   FacultyClass,
-
   FacultyLoadDTO
-
 } from '../../../../services/supervisor-data/supervisor-data-service';
 
-@Component({
+import {
+  ConfirmationModalComponent
+} from '../../../../../shared/components/confirmation-modal-component/confirmation-modal-component';
 
+@Component({
   selector:
     'app-supervisor-dashboard-component',
 
   standalone: true,
 
   imports: [
-
     AsyncPipe,
-
-    CommonModule
-
+    CommonModule,
+    ConfirmationModalComponent
   ],
 
   templateUrl:
     './supervisor-dashboard-component.html',
 
   styleUrl:
-    './supervisor-dashboard-component.css',
-
+    './supervisor-dashboard-component.css'
 })
 export class SupervisorDashboardComponent
-  implements OnInit {
+  implements OnInit, AfterViewInit {
+  isConfirmationVisible = false;
+  pendingFaculty:
+    FacultyLoadDTO | null = null;
+  /* =========================================================
+   * DEPENDENCIES
+   * =======================================================*/
 
-  private supervisorDataFacade =
+  private readonly supervisorDataFacade =
     inject(SupervisorDataFacade);
 
-  private authFacade =
+  private readonly authFacade =
     inject(AuthFacade);
 
-  /* ================= CONFIG ================= */
+  private readonly destroyRef =
+    inject(DestroyRef);
+
+  /* =========================================================
+   * VIEWCHILD
+   * =======================================================*/
+
+  @ViewChild('confirmationModal')
+  confirmationModal!: ConfirmationModalComponent;
+
+  /* =========================================================
+   * CONFIG
+   * =======================================================*/
 
   readonly pageSize = 10;
 
@@ -95,6 +99,10 @@ export class SupervisorDashboardComponent
   readonly key =
     `${this.program}-${this.status}`;
 
+  /* =========================================================
+   * STATE
+   * =======================================================*/
+
   currentPage = 0;
 
   search = '';
@@ -102,56 +110,87 @@ export class SupervisorDashboardComponent
   selectedFaculty:
     FacultyLoadDTO | null = null;
 
-  /* ================= SEARCH ================= */
+  selectedClass:
+    FacultyClass | null = null;
 
-  private searchSubject =
+  /* =========================================================
+   * SEARCH
+   * =======================================================*/
+
+  private readonly searchSubject =
     new Subject<string>();
 
-  /* ================= OBSERVABLES ================= */
+  /* =========================================================
+   * OBSERVABLES
+   * =======================================================*/
 
-  evaluatorId$ =
+  readonly evaluatorId$ =
     this.authFacade.evaluatorId$;
 
-  faculties$ =
+  readonly faculties$ =
     this.supervisorDataFacade
       .faculties$(this.key);
 
-  loading$ =
+  readonly loading$ =
     this.supervisorDataFacade
       .facultiesLoading$(this.key);
 
-  error$ =
+  readonly error$ =
     this.supervisorDataFacade
       .facultiesError$(this.key);
 
-  pagination$ =
+  readonly pagination$ =
     this.supervisorDataFacade
       .facultyPagination$(this.key);
 
-  facultyClasses$ =
+  readonly facultyClasses$ =
     this.supervisorDataFacade
       .facultyClasses$(this.key);
 
-  totalFaculty$ =
+  readonly totalFaculty$ =
     this.pagination$.pipe(
-      map(p => p.totalElements)
+      map(pagination =>
+        pagination.totalElements
+      )
     );
 
-  totalPages$ =
+  readonly totalPages$ =
     this.pagination$.pipe(
-      map(p => p.totalPages)
+      map(pagination =>
+        pagination.totalPages
+      )
     );
 
-  /* ================= INIT ================= */
+  /* =========================================================
+   * LIFECYCLE
+   * =======================================================*/
 
   ngOnInit(): void {
+
+    this.initializeSearch();
+
+    this.initializeFacultyLoad();
+
+  }
+
+  ngAfterViewInit(): void { }
+
+  /* =========================================================
+   * INITIALIZATION
+   * =======================================================*/
+
+  private initializeFacultyLoad(): void {
 
     this.evaluatorId$
       .pipe(
 
         filter(Boolean),
 
-        take(1)
+        take(1),
+
+        takeUntilDestroyed(
+          this.destroyRef
+        )
 
       )
       .subscribe(userId => {
@@ -162,13 +201,9 @@ export class SupervisorDashboardComponent
 
       });
 
-    this.initializeSearch();
-
   }
 
-  /* ================= SEARCH ================= */
-
-  initializeSearch(): void {
+  private initializeSearch(): void {
 
     this.searchSubject
       .pipe(
@@ -179,12 +214,17 @@ export class SupervisorDashboardComponent
 
         debounceTime(300),
 
-        distinctUntilChanged()
+        distinctUntilChanged(),
+
+        takeUntilDestroyed(
+          this.destroyRef
+        )
 
       )
-      .subscribe(value => {
+      .subscribe(search => {
 
-        this.search = value.toLowerCase();
+        this.search =
+          search.toLowerCase();
 
         this.currentPage = 0;
 
@@ -193,6 +233,10 @@ export class SupervisorDashboardComponent
       });
 
   }
+
+  /* =========================================================
+   * SEARCH
+   * =======================================================*/
 
   onSearch(
     event: Event
@@ -206,9 +250,11 @@ export class SupervisorDashboardComponent
 
   }
 
-  /* ================= LOAD ================= */
+  /* =========================================================
+   * LOAD
+   * =======================================================*/
 
-  loadFaculties(
+  private loadFaculties(
     userId: number
   ): void {
 
@@ -236,7 +282,15 @@ export class SupervisorDashboardComponent
   reload(): void {
 
     this.evaluatorId$
-      .pipe(take(1))
+      .pipe(
+
+        take(1),
+
+        takeUntilDestroyed(
+          this.destroyRef
+        )
+
+      )
       .subscribe(userId => {
 
         if (!userId) {
@@ -251,14 +305,17 @@ export class SupervisorDashboardComponent
 
   }
 
-  /* ================= PAGINATION ================= */
+  /* =========================================================
+   * PAGINATION
+   * =======================================================*/
 
   nextPage(
     totalPages: number
   ): void {
 
     if (
-      this.currentPage + 1 >= totalPages
+      this.currentPage + 1 >=
+      totalPages
     ) {
       return;
     }
@@ -285,6 +342,10 @@ export class SupervisorDashboardComponent
     page: number
   ): void {
 
+    if (page === this.currentPage) {
+      return;
+    }
+
     this.currentPage = page;
 
     this.reload();
@@ -297,18 +358,21 @@ export class SupervisorDashboardComponent
 
     return Array.from(
       { length: totalPages },
-      (_, i) => i
+      (_, index) => index
     );
 
   }
 
-  /* ================= FACULTY ================= */
+  /* =========================================================
+   * FACULTY
+   * =======================================================*/
 
   openFaculty(
     faculty: FacultyLoadDTO
   ): void {
 
-    this.selectedFaculty = faculty;
+    this.selectedFaculty =
+      faculty;
 
     this.supervisorDataFacade
       .loadFacultyClasses(
@@ -329,14 +393,68 @@ export class SupervisorDashboardComponent
 
   }
 
-  /* ================= EVALUATION ================= */
+  /* =========================================================
+   * CONFIRMATION MODAL
+   * =======================================================*/
+
+  openFacultyConfirmation(
+    faculty: FacultyLoadDTO
+  ): void {
+
+    this.pendingFaculty =
+      faculty;
+
+    this.isConfirmationVisible =
+      true;
+
+  }
+  confirmFacultyEvaluation(): void {
+
+    if (!this.pendingFaculty) {
+      return;
+    }
+
+    this.isConfirmationVisible =
+      false;
+
+    this.openFaculty(
+      this.pendingFaculty
+    );
+
+  }
+  closeFacultyConfirmation(): void {
+
+    this.isConfirmationVisible =
+      false;
+
+    this.pendingFaculty = null;
+
+  }
+
+  confirmEvaluation(): void {
+
+    this.isConfirmationVisible = false;
+
+    if (
+      !this.selectedClass ||
+      !this.selectedFaculty
+    ) {
+      return;
+    }
+
+    this.startEvaluation(
+      this.selectedClass,
+      this.selectedFaculty
+    );
+  }
+
+  /* =========================================================
+   * EVALUATION
+   * =======================================================*/
 
   startEvaluation(
-
     cls: FacultyClass,
-
     faculty: FacultyLoadDTO
-
   ): void {
 
     const facultyName =
@@ -356,7 +474,53 @@ export class SupervisorDashboardComponent
 
   }
 
-  /* ================= HELPERS ================= */
+  /* =========================================================
+   * HELPERS
+   * =======================================================*/
+
+  getCampusName(
+    campus: string
+  ): string {
+
+    const campusMap:
+      Record<string, string> = {
+
+      LEGACY_FT:
+        'Fortune Towne Campus',
+
+      LEGACY_ALIJIS:
+        'Alijis Campus',
+
+      LEGACY_BINALBAGAN:
+        'Binalbagan Campus',
+
+      LEGACY_TALISAY:
+        'Talisay Campus'
+
+    };
+
+    return (
+      campusMap[campus] ||
+      campus
+    );
+
+  }
+
+  getFacultyInitials(
+    faculty: FacultyLoadDTO
+  ): string {
+
+    const first =
+      faculty.firstname
+        ?.charAt(0) ?? '';
+
+    const last =
+      faculty.lastname
+        ?.charAt(0) ?? '';
+
+    return `${first}${last}`;
+
+  }
 
   schoolYear(): number {
 
@@ -371,19 +535,9 @@ export class SupervisorDashboardComponent
 
   }
 
-  getFacultyInitials(
-    faculty: FacultyLoadDTO
-  ): string {
-
-    const first =
-      faculty.firstname?.charAt(0) ?? '';
-
-    const last =
-      faculty.lastname?.charAt(0) ?? '';
-
-    return `${first}${last}`;
-
-  }
+  /* =========================================================
+   * TRACKBY
+   * =======================================================*/
 
   trackFaculty(
     _: number,
@@ -403,7 +557,9 @@ export class SupervisorDashboardComponent
 
   }
 
-  /* ================= AUTH ================= */
+  /* =========================================================
+   * AUTH
+   * =======================================================*/
 
   logout(): void {
 
