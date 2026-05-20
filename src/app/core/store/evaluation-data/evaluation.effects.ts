@@ -41,7 +41,10 @@ export class EvaluationEffects {
 
         if (role === 'ROLE_STUDENT') {
           cls = studentCls;
-        } else if (role === 'ROLE_DEAN') {
+        } else if (
+          role === 'ROLE_DEAN' ||
+          role === 'ROLE_PROGRAM_CHAIR'
+        ) {
           cls = supervisorCls;
         }
 

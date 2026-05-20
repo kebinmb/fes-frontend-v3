@@ -14,7 +14,7 @@ import {
   SubjectEvaluationDTO,
 } from '../../../services/evaluation/evaluation-service';
 
-export type UserRole = 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN';
+export type UserRole = 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN' | 'ROLE_PROGRAM_CHAIR';
 
 @Component({
   selector: 'app-evaluation-form-component',
@@ -177,13 +177,17 @@ export class EvaluationFormComponent {
     if (confirm('Are you sure you want to cancel? Your progress will be lost.')) {
       const role = this.role();
 
-      if (role === 'ROLE_DEAN') {
-        this.router.navigate(['/supervisor-dashboard']);
-      } else if (role === 'ROLE_STUDENT') {
-        this.router.navigate(['/student-dashboard']);
-      } else {
-        this.router.navigate(['/login']);
-      }
+      if (
+  role === 'ROLE_DEAN' ||
+  role === 'ROLE_PROGRAM_CHAIR'
+) {
+  this.router.navigate(['/supervisor-dashboard']);
+} else if (role === 'ROLE_STUDENT') {
+  this.router.navigate(['/student-dashboard']);
+} else {
+  console.error('Unknown role:', role);
+  this.router.navigate(['/login']);
+}
     }
   }
 
