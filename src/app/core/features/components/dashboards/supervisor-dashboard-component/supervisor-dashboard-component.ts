@@ -1,217 +1,414 @@
-import { Component, inject } from '@angular/core';
+import {
 
-import { AsyncPipe, CommonModule } from '@angular/common';
+  Component,
 
-import { combineLatest, map, Observable, shareReplay, take } from 'rxjs';
+  inject,
+
+  OnInit
+
+} from '@angular/core';
 
 import {
-  FacultyDashboardVM,
-  SupervisorDataFacade,
+
+  AsyncPipe,
+
+  CommonModule
+
+} from '@angular/common';
+
+import {
+
+  debounceTime,
+
+  distinctUntilChanged,
+
+  filter,
+
+  map,
+
+  Subject,
+
+  take
+
+} from 'rxjs';
+
+import {
+
+  SupervisorDataFacade
+
 } from '../../../../store/supervisor-data/supervisor-data.facade';
 
-import { AuthFacade } from '../../../../store/auth/auth.facade';
+import {
+
+  AuthFacade
+
+} from '../../../../store/auth/auth.facade';
 
 import {
-  FacultyDTO,
+
   FacultyClass,
-  FacultyLoadDTO,
+
+  FacultyLoadDTO
+
 } from '../../../../services/supervisor-data/supervisor-data-service';
 
-type ClassVM = {
-  subjectCode?: string;
-  programCode?: string;
-  yearLevel?: string;
-  sectionCode?: string;
-  isEvaluated: boolean;
-};
-
 @Component({
-  selector: 'app-supervisor-dashboard-component',
+
+  selector:
+    'app-supervisor-dashboard-component',
 
   standalone: true,
 
-  imports: [AsyncPipe, CommonModule],
+  imports: [
 
-  templateUrl: './supervisor-dashboard-component.html',
+    AsyncPipe,
 
-  styleUrl: './supervisor-dashboard-component.css',
+    CommonModule
+
+  ],
+
+  templateUrl:
+    './supervisor-dashboard-component.html',
+
+  styleUrl:
+    './supervisor-dashboard-component.css',
+
 })
-export class SupervisorDashboardComponent {
-  private supervisorDataFacade = inject(SupervisorDataFacade);
+export class SupervisorDashboardComponent
+  implements OnInit {
 
-  private authFacade = inject(AuthFacade);
+  private supervisorDataFacade =
+    inject(SupervisorDataFacade);
 
-  program = sessionStorage.getItem('program') ?? '';
+  private authFacade =
+    inject(AuthFacade);
 
-  status = 'ACTIVE';
+  /* ================= CONFIG ================= */
 
-  key = `${this.program}-${this.status}`;
+  readonly pageSize = 10;
 
-  currentPage = 1;
+  readonly status = 'ACTIVE';
 
-  readonly pageSize = 6;
+  readonly program =
+    sessionStorage.getItem('program') ?? '';
 
-  faculties$ = this.supervisorDataFacade.faculties$(this.key).pipe(shareReplay(1));
+  readonly key =
+    `${this.program}-${this.status}`;
 
-  facultiesLoading$ = this.supervisorDataFacade.facultiesLoading$(this.key).pipe(shareReplay(1));
+  currentPage = 0;
 
-  evaluatorId$ = this.authFacade.evaluatorId$;
+  search = '';
 
-  facultyDashboard$: Observable<FacultyDashboardVM[]> = this.supervisorDataFacade
-    .facultyDashboard$(this.key)
-    .pipe(shareReplay(1));
+  selectedFaculty:
+    FacultyLoadDTO | null = null;
 
-  loaded$ = combineLatest([this.faculties$, this.facultiesLoading$]).pipe(
-    map(([faculties, loading]) => !loading && faculties.length >= 0),
-    shareReplay(1),
-  );
+  /* ================= SEARCH ================= */
 
-  collegeFaculties$ = this.faculties$;
+  private searchSubject =
+    new Subject<string>();
 
-  totalClassesCount$ = this.facultyDashboard$.pipe(
-    map((list) => list.reduce((sum, faculty) => sum + faculty.classes.length, 0)),
-    shareReplay(1),
-  );
+  /* ================= OBSERVABLES ================= */
 
-  completedEvaluationsCount$ = this.facultyDashboard$.pipe(
-    map((list) =>
-      list.reduce(
-        (sum, faculty) => sum + faculty.classes.filter((cls) => cls.isEvaluated).length,
-        0,
-      ),
-    ),
-    shareReplay(1),
-  );
+  evaluatorId$ =
+    this.authFacade.evaluatorId$;
 
-  isLoading$ = this.facultiesLoading$;
+  faculties$ =
+    this.supervisorDataFacade
+      .faculties$(this.key);
 
-  pendingCount$ = combineLatest([this.totalClassesCount$, this.completedEvaluationsCount$]).pipe(
-    map(([total = 0, completed = 0]) => total - completed),
-    shareReplay(1),
-  );
+  loading$ =
+    this.supervisorDataFacade
+      .facultiesLoading$(this.key);
 
-  totalPages$ = this.facultyDashboard$.pipe(
-    map((list) => Math.max(1, Math.ceil(list.length / this.pageSize))),
-    shareReplay(1),
-  );
+  error$ =
+    this.supervisorDataFacade
+      .facultiesError$(this.key);
 
-  paginatedFacultyDashboard$: Observable<FacultyDashboardVM[]> = this.facultyDashboard$.pipe(
-    map((list) => {
-      const start = (this.currentPage - 1) * this.pageSize;
+  pagination$ =
+    this.supervisorDataFacade
+      .facultyPagination$(this.key);
 
-      const end = start + this.pageSize;
+  facultyClasses$ =
+    this.supervisorDataFacade
+      .facultyClasses$(this.key);
 
-      return list.slice(start, end);
-    }),
-    shareReplay(1),
-  );
+  totalFaculty$ =
+    this.pagination$.pipe(
+      map(p => p.totalElements)
+    );
+
+  totalPages$ =
+    this.pagination$.pipe(
+      map(p => p.totalPages)
+    );
+
+  /* ================= INIT ================= */
 
   ngOnInit(): void {
-    this.evaluatorId$.pipe(take(1)).subscribe((userId) => {
-      console.log('Evaluator ID:', userId);
-      if (!userId) {
-        return;
-      }
 
-      this.supervisorDataFacade.loadFaculties(this.key, this.program, Number(userId));
-    });
+    this.evaluatorId$
+      .pipe(
+
+        filter(Boolean),
+
+        take(1)
+
+      )
+      .subscribe(userId => {
+
+        this.loadFaculties(
+          Number(userId)
+        );
+
+      });
+
+    this.initializeSearch();
+
   }
 
-  refreshPagination(): void {
-    this.paginatedFacultyDashboard$ = this.facultyDashboard$.pipe(
-      map((list) => {
-        const start = (this.currentPage - 1) * this.pageSize;
+  /* ================= SEARCH ================= */
 
-        const end = start + this.pageSize;
+  initializeSearch(): void {
 
-        return list.slice(start, end);
-      }),
-      shareReplay(1),
-    );
+    this.searchSubject
+      .pipe(
+
+        map(value =>
+          value.trim()
+        ),
+
+        debounceTime(300),
+
+        distinctUntilChanged()
+
+      )
+      .subscribe(value => {
+
+        this.search = value.toLowerCase();
+
+        this.currentPage = 0;
+
+        this.reload();
+
+      });
+
   }
 
-  nextPage(totalPages: number): void {
-    if (this.currentPage < totalPages) {
-      this.currentPage++;
+  onSearch(
+    event: Event
+  ): void {
 
-      this.refreshPagination();
+    const value =
+      (event.target as HTMLInputElement)
+        ?.value ?? '';
+
+    this.searchSubject.next(value);
+
+  }
+
+  /* ================= LOAD ================= */
+
+  loadFaculties(
+    userId: number
+  ): void {
+
+    this.supervisorDataFacade
+      .loadFaculties(
+
+        this.key,
+
+        this.program,
+
+        userId,
+
+        this.currentPage,
+
+        this.pageSize,
+
+        'lastname,asc',
+
+        this.search
+
+      );
+
+  }
+
+  reload(): void {
+
+    this.evaluatorId$
+      .pipe(take(1))
+      .subscribe(userId => {
+
+        if (!userId) {
+          return;
+        }
+
+        this.loadFaculties(
+          Number(userId)
+        );
+
+      });
+
+  }
+
+  /* ================= PAGINATION ================= */
+
+  nextPage(
+    totalPages: number
+  ): void {
+
+    if (
+      this.currentPage + 1 >= totalPages
+    ) {
+      return;
     }
+
+    this.currentPage++;
+
+    this.reload();
+
   }
 
   previousPage(): void {
-    if (this.currentPage > 1) {
-      this.currentPage--;
 
-      this.refreshPagination();
+    if (this.currentPage <= 0) {
+      return;
     }
+
+    this.currentPage--;
+
+    this.reload();
+
   }
 
-  goToPage(page: number): void {
+  goToPage(
+    page: number
+  ): void {
+
     this.currentPage = page;
 
-    this.refreshPagination();
+    this.reload();
+
   }
 
-  getPageNumbers(totalPages: number): number[] {
+  getPageNumbers(
+    totalPages: number
+  ): number[] {
+
     return Array.from(
-      {
-        length: totalPages,
-      },
-      (_, index) => index + 1,
+      { length: totalPages },
+      (_, i) => i
     );
+
   }
+
+  /* ================= FACULTY ================= */
+
+  openFaculty(
+    faculty: FacultyLoadDTO
+  ): void {
+
+    this.selectedFaculty = faculty;
+
+    this.supervisorDataFacade
+      .loadFacultyClasses(
+
+        this.key,
+
+        faculty.facultyId,
+
+        this.program
+
+      );
+
+  }
+
+  closeFacultyModal(): void {
+
+    this.selectedFaculty = null;
+
+  }
+
+  /* ================= EVALUATION ================= */
+
+  startEvaluation(
+
+    cls: FacultyClass,
+
+    faculty: FacultyLoadDTO
+
+  ): void {
+
+    const facultyName =
+      `${faculty.firstname} ${faculty.lastname}`;
+
+    this.supervisorDataFacade
+      .selectClass({
+
+        ...cls,
+
+        facultyId:
+          faculty.facultyId,
+
+        facultyName
+
+      });
+
+  }
+
+  /* ================= HELPERS ================= */
 
   schoolYear(): number {
-    return new Date().getFullYear();
+
+    return new Date()
+      .getFullYear();
+
   }
 
   semester(): string {
+
     return '2nd';
+
   }
 
-  getFacultyInitials(faculty: FacultyLoadDTO): string {
-    const first = faculty.firstname?.charAt(0) ?? '';
+  getFacultyInitials(
+    faculty: FacultyLoadDTO
+  ): string {
 
-    const last = faculty.lastname?.charAt(0) ?? '';
+    const first =
+      faculty.firstname?.charAt(0) ?? '';
+
+    const last =
+      faculty.lastname?.charAt(0) ?? '';
 
     return `${first}${last}`;
+
   }
 
-  onFacultyClick(faculty: FacultyLoadDTO): void {
-    console.log('Faculty clicked:', faculty);
+  trackFaculty(
+    _: number,
+    faculty: FacultyLoadDTO
+  ): string {
+
+    return faculty.facultyId;
+
   }
 
-  startEvaluation(cls: FacultyClass, faculty: FacultyLoadDTO, event: Event): void {
-    event.stopPropagation();
+  trackClass(
+    _: number,
+    cls: FacultyClass
+  ): string {
 
-    const key = `${faculty.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
+    return cls.classCode;
 
-    const facultyName = `${faculty.firstname} ${faculty.lastname}`;
-
-    this.supervisorDataFacade.selectClass({
-      ...cls,
-      facultyId: faculty.facultyId,
-      facultyName,
-    });
-
-    console.log('Evaluate:', {
-      key,
-      cls,
-      faculty,
-    });
   }
 
-  getButtonLabel(cls: ClassVM): string {
-    if (cls.isEvaluated) {
-      return 'Done';
-    }
-
-    const parts = [cls.subjectCode, cls.programCode].filter(Boolean);
-
-    return `${parts.join(' ')} - Evaluate`;
-  }
+  /* ================= AUTH ================= */
 
   logout(): void {
+
     this.authFacade.logout();
+
   }
+
 }

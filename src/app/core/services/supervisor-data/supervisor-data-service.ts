@@ -41,7 +41,7 @@ export interface FacultyClass {
 export interface FacultyLoadDTO {
   facultyId: string;
   firstname: string;
-  lastname:string;
+  lastname: string;
   position: string;
   // subjectCode: string;
   // programYearSection: string;
@@ -67,7 +67,7 @@ export class SupervisorDataService {
     });
   }
 
-  loadFacultyClasses(facultyId: string, program:string): Observable<FacultyClass[]> {
+  loadFacultyClasses(facultyId: string, program: string): Observable<FacultyClass[]> {
     if (!facultyId?.trim()) {
       throw new Error('Invalid facultyId');
     }
@@ -78,12 +78,32 @@ export class SupervisorDataService {
     });
   }
 
-  getFacultyLoadsByProgram(programCode: string, userId:number): Observable<FacultyLoadDTO[]> {
-    const params = new HttpParams().set('programCode', programCode).set('userId', userId.toString());
+  getFacultyLoadsByProgram(
+    programCode: string,
+    userId: number,
+    page: number = 0,
+    size: number = 10,
+    sort: string = 'lastname,asc',
+    search: string = ''
+  ): Observable<PageResponse<FacultyLoadDTO>> {
 
-    return this.http.get<FacultyLoadDTO[]>(`${this.FACULTY_API_URL}/faculty-loads`, {
-      params,
-      withCredentials: true,
-    });
+    let params = new HttpParams()
+      .set('programCode', programCode.trim())
+      .set('userId', userId.toString())
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+
+    if (search?.trim()) {
+      params = params.set('search', search.trim());
+    }
+
+    return this.http.get<PageResponse<FacultyLoadDTO>>(
+      `${this.FACULTY_API_URL}/faculty-loads`,
+      {
+        params,
+        withCredentials: true,
+      }
+    );
   }
 }

@@ -2,7 +2,8 @@ import { createAction, props } from "@ngrx/store";
 import {
   FacultyDTO,
   FacultyClass,
-  FacultyLoadDTO
+  FacultyLoadDTO,
+  PageResponse
 } from "../../services/supervisor-data/supervisor-data-service";
 
 import {
@@ -13,61 +14,108 @@ import {
 
 export const loadFaculties = createAction(
   '[Faculty Data] Load Faculties',
+
   props<{
     key: string;
-    // college: string;
-    // status: string;
-    program:string;
-    userId:number;
+
+    program: string;
+
+    userId: number;
+
+    page: number;
+
+    size: number;
+
+    sort?: string;
+
+    search?: string;
   }>()
 );
 
 export const loadFacultiesSuccess = createAction(
   '[Faculty Data] Load Faculties Success',
+
   props<{
     key: string;
-    response: FacultyLoadDTO[];
+
+    response: PageResponse<FacultyLoadDTO>;
   }>()
 );
 
 export const loadFacultiesFailure = createAction(
   '[Faculty Data] Load Faculties Failure',
+
   props<{
     key: string;
+
     error: any;
   }>()
 );
 
-/* ================= CLASSES (BATCH) ================= */
+// /* ================= CLASSES (BATCH) ================= */
 
-export const loadAllFacultyClasses = createAction(
-  '[Faculty Classes Data] Load All Faculty Classes',
+// export const loadAllFacultyClasses = createAction(
+//   '[Faculty Classes Data] Load All Faculty Classes',
+//   props<{
+//     key: string;
+//     program:string;
+//     faculties: FacultyLoadDTO[];
+//   }>()
+// );
+
+// export const loadAllFacultyClassesSuccess = createAction(
+//   '[Faculty Classes Data] Load All Faculty Classes Success',
+//   props<{
+//     key: string;
+//     results: {
+//       facultyId: string;
+//       classes: FacultyClass[];
+//     }[];
+//   }>()
+// );
+
+// export const loadAllFacultyClassesFailure = createAction(
+//   '[Faculty Classes Data] Load All Faculty Classes Failure',
+//   props<{
+//     key: string;
+//     error: any;
+//   }>()
+// );
+export const loadFacultyClasses = createAction(
+  '[Faculty Classes] Load Faculty Classes',
+
   props<{
     key: string;
-    program:string;
-    faculties: FacultyLoadDTO[];
+
+    facultyId: string;
+
+    program: string;
   }>()
 );
 
-export const loadAllFacultyClassesSuccess = createAction(
-  '[Faculty Classes Data] Load All Faculty Classes Success',
+export const loadFacultyClassesSuccess = createAction(
+  '[Faculty Classes] Load Faculty Classes Success',
+
   props<{
     key: string;
-    results: {
-      facultyId: string;
-      classes: FacultyClass[];
-    }[];
+
+    facultyId: string;
+
+    classes: FacultyClass[];
   }>()
 );
 
-export const loadAllFacultyClassesFailure = createAction(
-  '[Faculty Classes Data] Load All Faculty Classes Failure',
+export const loadFacultyClassesFailure = createAction(
+  '[Faculty Classes] Load Faculty Classes Failure',
+
   props<{
     key: string;
+
+    facultyId: string;
+
     error: any;
   }>()
 );
-
 /* ================= EVALUATION ================= */
 
 export interface EvaluationContext {

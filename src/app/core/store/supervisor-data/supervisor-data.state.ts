@@ -4,8 +4,19 @@ import { FacultyClass, FacultyDTO, FacultyLoadDTO } from "../../services/supervi
 export interface SupervisorDataState {
     faculties: {
         [key: string]: {
+
             data: FacultyLoadDTO[];
+
+            totalElements: number;
+
+            totalPages: number;
+
+            page: number;
+
+            size: number;
+
             loading: boolean;
+
             error: any;
         };
     };
@@ -38,8 +49,12 @@ export interface SupervisorDataState {
     selectedClass: EvaluationClass | null;
 }
 export const supervisorDataInitialState: SupervisorDataState = {
+
     faculties: {},
+
     facultyClasses: {},
+
     evaluationStatus: {},
+
     selectedClass: null
-}
+};

@@ -36,14 +36,16 @@ export class EvaluationFormComponent {
   evaluatorId$ = this.authFacade.evaluatorId$;
 
   selectedClass$ = combineLatest([
-    this.role$,
-    this.studentDataFacade.selectedClass$,
-    this.supervisorDataFacade.selectedClass$,
-  ]).pipe(
-    map(([role, studentClass, supervisorClass]) =>
-      role === 'ROLE_DEAN' ? supervisorClass : studentClass
-    )
-  );
+  this.role$,
+  this.studentDataFacade.selectedClass$,
+  this.supervisorDataFacade.selectedClass$,
+]).pipe(
+  map(([role, studentClass, supervisorClass]) =>
+    role === 'ROLE_DEAN' || role === 'ROLE_PROGRAM_CHAIR'
+      ? supervisorClass
+      : studentClass
+  )
+);
 
   selectedClass = toSignal(this.selectedClass$, { initialValue: null });
 

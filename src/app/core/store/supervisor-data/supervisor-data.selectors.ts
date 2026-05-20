@@ -30,7 +30,26 @@ export const selectFacultyClassesDataState = createSelector(
     selectSupervisorDataState,
     state => state.facultyClasses
 );
+export const selectFacultyPagination = (
+  key: string
+) =>
+  createSelector(
+    selectFacultiesState,
 
+    faculties => ({
+      totalElements:
+        faculties[key]?.totalElements || 0,
+
+      totalPages:
+        faculties[key]?.totalPages || 0,
+
+      page:
+        faculties[key]?.page || 0,
+
+      size:
+        faculties[key]?.size || 10,
+    })
+  );
 export const selectFacultyClassesDataByKey = (key: string) =>
     createSelector(
         selectSupervisorDataState,

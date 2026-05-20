@@ -1,36 +1,67 @@
 import { inject, Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-
-import * as ActionsSet from './supervisor-data.actions';
-import * as SupervisorDataActions from './supervisor-data.actions';
-
-import { SupervisorDataService } from '../../services/supervisor-data/supervisor-data-service';
-import { EvaluationService } from '../../services/evaluation/evaluation-service';
-
-import { Store } from '@ngrx/store';
-import { Router } from '@angular/router';
-
-import { SpinnerFacade } from '../spinner/spinner.facade';
-import { ToastFacade } from '../toast/toast.facade';
 
 import {
+  Actions,
+  createEffect,
+  ofType
+} from '@ngrx/effects';
+
+import * as ActionsSet
+from './supervisor-data.actions';
+
+import * as SupervisorDataActions
+from './supervisor-data.actions';
+
+import {
+  SupervisorDataService
+} from '../../services/supervisor-data/supervisor-data-service';
+
+import {
+  EvaluationService
+} from '../../services/evaluation/evaluation-service';
+
+import { Store } from '@ngrx/store';
+
+import { Router } from '@angular/router';
+
+import {
+  SpinnerFacade
+} from '../spinner/spinner.facade';
+
+import {
+  ToastFacade
+} from '../toast/toast.facade';
+
+import {
+
   catchError,
+
   filter,
+
   finalize,
-  forkJoin,
+
   map,
+
   of,
+
   switchMap,
+
   tap,
+
   withLatestFrom
+
 } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class SupervisorDataEffects {
 
   private actions$ = inject(Actions);
 
-  private api = inject(SupervisorDataService);
+  private api = inject(
+    SupervisorDataService
+  );
 
   private evaluationDataService =
     inject(EvaluationService);
@@ -39,18 +70,28 @@ export class SupervisorDataEffects {
 
   private router = inject(Router);
 
-  private spinner = inject(SpinnerFacade);
+  private spinner = inject(
+    SpinnerFacade
+  );
 
-  private toast = inject(ToastFacade);
+  private toast = inject(
+    ToastFacade
+  );
 
   /* ================= HELPERS ================= */
 
   private buildEvaluationKey(
+
     classCode: string,
+
     subjectCode: string,
+
     yearLevel: string,
+
     semester: string,
+
     schoolYear: number
+
   ): string {
 
     return `${classCode}-${subjectCode}-${yearLevel}-${semester}-${schoolYear}`;
@@ -61,120 +102,164 @@ export class SupervisorDataEffects {
 
   loadFaculties$ = createEffect(() =>
 
-  this.actions$.pipe(
-
-    ofType(ActionsSet.loadFaculties),
-
-    switchMap(({ key, program, userId }) => {
-
-      this.spinner.showSpinner();
-
-      return this.api
-        .getFacultyLoadsByProgram(program,userId)
-        .pipe(
-
-          switchMap(res => [
-
-            ActionsSet.loadFacultiesSuccess({
-              key,
-              response: res
-            }),
-
-            ActionsSet.loadAllFacultyClasses({
-              key,
-              faculties: res,
-              program
-            })
-
-          ]),
-
-          catchError(err => {
-
-            this.toast.showToast(
-              'Failed to load faculties',
-              'error'
-            );
-
-            return of(
-              ActionsSet.loadFacultiesFailure({
-                key,
-                error: err
-              })
-            );
-
-          }),
-
-          finalize(() =>
-            this.spinner.hideSpinner()
-          )
-
-        );
-
-    })
-
-  )
-
-);
-
-  /* ================= CLASSES ================= */
-
-  loadAllFacultyClasses$ = createEffect(() =>
-
     this.actions$.pipe(
 
-      ofType(ActionsSet.loadAllFacultyClasses),
+      ofType(
+        ActionsSet.loadFaculties
+      ),
 
-      switchMap(({ key, faculties, program }) => {
+      switchMap(({
+
+        key,
+
+        program,
+
+        userId,
+
+        page,
+
+        size,
+
+        sort,
+
+        search
+
+      }) => {
 
         this.spinner.showSpinner();
 
-        return forkJoin(
+        return this.api
+          .getFacultyLoadsByProgram(
 
-          faculties.map(f =>
+            program,
 
-            this.api
-              .loadFacultyClasses(f.facultyId, program)
-              .pipe(
+            userId,
 
-                map(classes => ({
-                  facultyId: f.facultyId,
-                  classes
-                })),
+            page,
 
-                catchError(() =>
-                  of({
-                    facultyId: f.facultyId,
-                    classes: []
+            size,
+
+            sort,
+
+            search
+
+          )
+          .pipe(
+
+            map(response =>
+
+              ActionsSet
+                .loadFacultiesSuccess({
+
+                  key,
+
+                  response
+
+                })
+
+            ),
+
+            catchError(error => {
+
+              this.toast.showToast(
+                'Failed to load faculties',
+                'error'
+              );
+
+              return of(
+
+                ActionsSet
+                  .loadFacultiesFailure({
+
+                    key,
+
+                    error
+
                   })
-                )
 
-              )
+              );
 
-          )
+            }),
 
-        ).pipe(
-
-          map(results =>
-            ActionsSet.loadAllFacultyClassesSuccess({
-              key,
-              results
-            })
-          ),
-
-          catchError(err =>
-            of(
-              ActionsSet.loadAllFacultyClassesFailure({
-                key,
-                error: err
-              })
+            finalize(() =>
+              this.spinner.hideSpinner()
             )
-          ),
 
-          finalize(() =>
-            this.spinner.hideSpinner()
+          );
+
+      })
+
+    )
+
+  );
+
+  /* ================= FACULTY CLASSES ================= */
+
+  loadFacultyClasses$ = createEffect(() =>
+
+    this.actions$.pipe(
+
+      ofType(
+        ActionsSet.loadFacultyClasses
+      ),
+
+      switchMap(({
+
+        key,
+
+        facultyId,
+
+        program
+
+      }) => {
+
+        return this.api
+          .loadFacultyClasses(
+            facultyId,
+            program
           )
+          .pipe(
 
-        );
+            map(classes =>
+
+              ActionsSet
+                .loadFacultyClassesSuccess({
+
+                  key,
+
+                  facultyId,
+
+                  classes
+
+                })
+
+            ),
+
+            catchError(error => {
+
+              this.toast.showToast(
+                'Failed to load faculty classes',
+                'error'
+              );
+
+              return of(
+
+                ActionsSet
+                  .loadFacultyClassesFailure({
+
+                    key,
+
+                    facultyId,
+
+                    error
+
+                  })
+
+              );
+
+            })
+
+          );
 
       })
 
@@ -189,18 +274,26 @@ export class SupervisorDataEffects {
     this.actions$.pipe(
 
       ofType(
-        SupervisorDataActions.loadEvaluationStatus
+        SupervisorDataActions
+          .loadEvaluationStatus
       ),
 
       filter(({ role }) => !!role),
 
       withLatestFrom(
+
         this.store.select(
-          state => state.supervisorData.evaluationStatus
+          state =>
+            state.supervisorData
+              .evaluationStatus
         )
+
       ),
 
-      filter(([{ key, context }, state]) => {
+      filter(([{
+        key,
+        context
+      }, state]) => {
 
         const cached =
           state[key]
@@ -212,18 +305,31 @@ export class SupervisorDataEffects {
 
       }),
 
-      switchMap(([{ key, context, role }]) =>
+      switchMap(([{
+        key,
+        context,
+        role
+      }]) =>
 
         this.evaluationDataService
           .checkEvaluationStatus(
+
             role!,
+
             context.facultyId,
+
             context.evaluatorId,
+
             context.classCode,
+
             context.subjectCode,
+
             context.yearLevel,
+
             context.semester,
+
             context.schoolYear
+
           )
           .pipe(
 
@@ -244,7 +350,7 @@ export class SupervisorDataEffects {
 
             ),
 
-            catchError(err =>
+            catchError(error =>
 
               of(
 
@@ -257,7 +363,7 @@ export class SupervisorDataEffects {
                       context.evaluationKey,
 
                     error:
-                      err.message ||
+                      error.message ||
                       'Evaluation status failed'
 
                   })
@@ -277,12 +383,14 @@ export class SupervisorDataEffects {
   /* ================= NAVIGATION ================= */
 
   selectClass$ = createEffect(
+
     () =>
 
       this.actions$.pipe(
 
         ofType(
-          ActionsSet.selectFacultyClassForEvaluation
+          ActionsSet
+            .selectFacultyClassForEvaluation
         ),
 
         filter(a => !!a.selectedClass),
@@ -291,56 +399,67 @@ export class SupervisorDataEffects {
           this.store.select(s => s.auth)
         ),
 
-        tap(([{ selectedClass }, auth]) => {
+        tap(([{
+          selectedClass
+        }, auth]) => {
 
           const evaluationKey =
             this.buildEvaluationKey(
+
               selectedClass!.classCode,
+
               selectedClass!.subjectCode,
+
               selectedClass!.yearLevel,
+
               selectedClass!.semester,
+
               selectedClass!.schoolYear
+
             );
 
           this.store.dispatch(
 
-            ActionsSet.loadEvaluationStatus({
+            ActionsSet
+              .loadEvaluationStatus({
 
-              key: `${auth.college}-ACTIVE`,
+                key:
+                  `${auth.college}-ACTIVE`,
 
-              role: auth.role,
+                role:
+                  auth.role,
 
-              context: {
+                context: {
 
-                facultyId:
-                  selectedClass!.facultyId,
+                  facultyId:
+                    selectedClass!.facultyId,
 
-                evaluatorId:
-                  auth.evaluatorId,
+                  evaluatorId:
+                    auth.evaluatorId,
 
-                classCode:
-                  selectedClass!.classCode,
+                  classCode:
+                    selectedClass!.classCode,
 
-                subjectCode:
-                  selectedClass!.subjectCode,
+                  subjectCode:
+                    selectedClass!.subjectCode,
 
-                yearLevel:
-                  selectedClass!.yearLevel,
+                  yearLevel:
+                    selectedClass!.yearLevel,
 
-                semester:
-                  selectedClass!.semester,
+                  semester:
+                    selectedClass!.semester,
 
-                schoolYear:
-                  selectedClass!.schoolYear,
+                  schoolYear:
+                    selectedClass!.schoolYear,
 
-                college:
-                  selectedClass!.college,
+                  college:
+                    selectedClass!.college,
 
-                evaluationKey
+                  evaluationKey
 
-              }
+                }
 
-            })
+              })
 
           );
 
@@ -352,201 +471,9 @@ export class SupervisorDataEffects {
 
       ),
 
-    { dispatch: false }
-  );
-
-  /* ================= BATCH TRIGGER ================= */
-
-  loadEvaluationStatusBatchTrigger$ = createEffect(() =>
-
-    this.actions$.pipe(
-
-      ofType(
-        ActionsSet.loadAllFacultyClassesSuccess
-      ),
-
-      withLatestFrom(
-        this.store.select(s => s.auth)
-      ),
-
-      filter(([_, auth]) =>
-        !!auth.role &&
-        !!auth.evaluatorId
-      ),
-
-      map(([{ key, results }, auth]) => {
-
-        const payload = results.flatMap(r =>
-
-          r.classes.map(cls => ({
-
-            facultyId: r.facultyId,
-
-            classCode: cls.classCode,
-
-            subjectCode: cls.subjectCode,
-
-            yearLevel: cls.yearLevel,
-
-            semester: cls.semester,
-
-            schoolYear: cls.schoolYear,
-
-            evaluationKey:
-              this.buildEvaluationKey(
-                cls.classCode,
-                cls.subjectCode,
-                cls.yearLevel,
-                cls.semester,
-                cls.schoolYear
-              )
-
-          }))
-
-        );
-
-        return ActionsSet
-          .loadEvaluationStatusBatch({
-
-            key,
-
-            role: auth.role!,
-
-            evaluatorId:
-              auth.evaluatorId!,
-
-            payload
-
-          });
-
-      })
-
-    )
-
-  );
-
-  /* ================= BATCH STATUS ================= */
-
-  loadEvaluationStatusBatch$ = createEffect(() =>
-
-    this.actions$.pipe(
-
-      ofType(
-        ActionsSet.loadEvaluationStatusBatch
-      ),
-
-      switchMap(({
-        key,
-        role,
-        evaluatorId,
-        payload
-      }) =>
-
-        forkJoin(
-
-          payload.map(item =>
-
-            this.evaluationDataService
-              .checkEvaluationStatus(
-                role,
-                item.facultyId,
-                evaluatorId,
-                item.classCode,
-                item.subjectCode,
-                item.yearLevel,
-                item.semester,
-                item.schoolYear
-              )
-              .pipe(
-
-                map(res => ({
-
-                  classCode:
-                    item.classCode,
-
-                  subjectCode:
-                    item.subjectCode,
-
-                  yearLevel:
-                    item.yearLevel,
-
-                  semester:
-                    item.semester,
-
-                  schoolYear:
-                    item.schoolYear,
-
-                  evaluationKey:
-                    item.evaluationKey,
-
-                  evaluated:
-                    res.hasEvaluated
-
-                })),
-
-                catchError(() =>
-
-                  of({
-
-                    classCode:
-                      item.classCode,
-
-                    subjectCode:
-                      item.subjectCode,
-
-                    yearLevel:
-                      item.yearLevel,
-
-                    semester:
-                      item.semester,
-
-                    schoolYear:
-                      item.schoolYear,
-
-                    evaluationKey:
-                      item.evaluationKey,
-
-                    evaluated: false
-
-                  })
-
-                )
-
-              )
-
-          )
-
-        ).pipe(
-
-          map(results =>
-
-            ActionsSet
-              .loadEvaluationStatusBatchSuccess({
-                key,
-                results
-              })
-
-          ),
-
-          catchError(err =>
-
-            of(
-
-              ActionsSet
-                .loadEvaluationStatusBatchFailure({
-                  key,
-                  error: err
-                })
-
-            )
-
-          )
-
-        )
-
-      )
-
-    )
+    {
+      dispatch: false
+    }
 
   );
 
