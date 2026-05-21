@@ -18,7 +18,7 @@ import {
 import { ConfirmationModalComponent } from '../../../../../shared/components/confirmation-modal-component/confirmation-modal-component';
 import { selectEvaluationStatusState } from '../../../../store/supervisor-data/supervisor-data.selectors';
 import { Store } from '@ngrx/store';
-
+import { Tooltip } from 'bootstrap';
 @Component({
   selector: 'app-supervisor-dashboard-component',
 
@@ -123,7 +123,13 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
     this.initializeFacultyLoad();
   }
 
-  ngAfterViewInit(): void {}
+  ngAfterViewInit(): void {
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+
+    tooltipTriggerList.forEach((tooltipTriggerEl) => {
+      new Tooltip(tooltipTriggerEl);
+    });
+  }
 
   /* =========================================================
    * INITIALIZATION

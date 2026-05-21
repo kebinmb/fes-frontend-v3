@@ -64,7 +64,16 @@
   font-size: 0.72rem;
   letter-spacing: 0.3px;
 }
+.system-context {
+  margin-top: 0.25rem;
 
+  color: rgba(255, 255, 255, 0.82);
+
+  font-size: 0.72rem;
+  font-weight: 600;
+
+  letter-spacing: 0.4px;
+}
 .user-info-badge {
   display: flex;
   align-items: center;

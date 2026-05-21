@@ -11,6 +11,8 @@
           <div class="university-name">Carlos Hilado Memorial State University</div>
 
           <div class="system-name">Faculty Evaluation System</div>
+
+          <div class="system-context">Supervisor's Evaluation of Faculty</div>
         </div>
       </div>
 
@@ -262,151 +264,99 @@
             @let classes = facultyClasses[faculty.facultyId]?.classes ?? [];
 
             @if (classes.length > 0) {
+              <div class="subjects-grid">
+                @for (cls of classes; track trackClass($index, cls)) {
+                  @let evaluationKey =
+                    buildEvaluationKey(
+                      cls.classCode,
+                      cls.subjectCode,
+                      cls.yearLevel,
+                      cls.semester,
+                      cls.schoolYear
+                    );
 
-  <div class="subjects-grid">
+                  @let evaluationState =
+                    (evaluationStatus$ | async)?.['BSIS-ACTIVE']?.classes?.[evaluationKey];
 
-    @for (cls of classes; track trackClass($index, cls)) {
+                  @let isEvaluated = evaluationState?.evaluated ?? false;
 
-      @let evaluationKey =
-        buildEvaluationKey(
-          cls.classCode,
-          cls.subjectCode,
-          cls.yearLevel,
-          cls.semester,
-          cls.schoolYear
-        );
+                  <div class="subject-card-modal" [class.subject-done]="isEvaluated">
+                    <!-- CARD HEADER -->
 
-      @let evaluationState =
-        (evaluationStatus$ | async)?.['BSIS-ACTIVE']
-          ?.classes?.[evaluationKey];
+                    <div class="subject-card-top">
+                      <div class="subject-main-info">
+                        <div class="subject-code">
+                          <i class="bi bi-book-half"></i>
 
-      @let isEvaluated =
-        evaluationState?.evaluated ?? false;
+                          <span>
+                            {{ cls.subjectCode }}
+                          </span>
+                        </div>
 
-      <div
-        class="subject-card-modal"
-        [class.subject-done]="isEvaluated"
-      >
+                        <div class="subject-description">
+                          {{ cls.subjectDescription }}
+                        </div>
+                      </div>
 
-        <!-- CARD HEADER -->
+                      <div class="subject-status" [class.status-complete]="isEvaluated">
+                        <i
+                          class="bi"
+                          [ngClass]="isEvaluated ? 'bi-check-circle-fill' : 'bi-clock-history'"
+                        >
+                        </i>
+                      </div>
+                    </div>
 
-        <div class="subject-card-top">
+                    <!-- META -->
 
-          <div class="subject-main-info">
+                    <div class="subject-meta-row">
+                      <span class="subject-chip">
+                        <i class="bi bi-mortarboard-fill"></i>
 
-            <div class="subject-code">
+                        {{ cls.programCode }}
+                      </span>
 
-              <i class="bi bi-book-half"></i>
+                      <span class="subject-chip">
+                        <i class="bi bi-bar-chart-fill"></i>
 
-              <span>
-                {{ cls.subjectCode }}
-              </span>
+                        {{ cls.yearLevel }}
+                      </span>
 
-            </div>
+                      <span class="subject-chip">
+                        <i class="bi bi-people-fill"></i>
 
-            <div class="subject-description">
+                        {{ cls.sectionCode }}
+                      </span>
 
-              {{ cls.subjectDescription }}
+                      <span class="subject-chip">
+                        <i class="bi bi-hash"></i>
 
-            </div>
+                        {{ cls.classCode }}
+                      </span>
+                    </div>
 
-          </div>
+                    <!-- ACTION -->
 
-          <div
-            class="subject-status"
-            [class.status-complete]="isEvaluated"
-          >
+                    <button
+                      type="button"
+                      class="btn btn-primary btn-subject-action"
+                      [disabled]="isEvaluated"
+                      (click)="startEvaluation(cls, faculty)"
+                    >
+                      <i
+                        class="bi"
+                        [ngClass]="isEvaluated ? 'bi-check-circle-fill' : 'bi-play-circle-fill'"
+                      >
+                      </i>
 
-            <i
-              class="bi"
-              [ngClass]="
-                isEvaluated
-                  ? 'bi-check-circle-fill'
-                  : 'bi-clock-history'
-              "
-            >
-            </i>
-
-          </div>
-
-        </div>
-
-        <!-- META -->
-
-        <div class="subject-meta-row">
-
-          <span class="subject-chip">
-
-            <i class="bi bi-mortarboard-fill"></i>
-
-            {{ cls.programCode }}
-
-          </span>
-
-          <span class="subject-chip">
-
-            <i class="bi bi-bar-chart-fill"></i>
-
-            {{ cls.yearLevel }}
-
-          </span>
-
-          <span class="subject-chip">
-
-            <i class="bi bi-people-fill"></i>
-
-            {{ cls.sectionCode }}
-
-          </span>
-
-          <span class="subject-chip">
-
-            <i class="bi bi-hash"></i>
-
-            {{ cls.classCode }}
-
-          </span>
-
-        </div>
-
-        <!-- ACTION -->
-
-        <button
-          type="button"
-          class="btn btn-primary btn-subject-action"
-          [disabled]="isEvaluated"
-          (click)="startEvaluation(cls, faculty)"
-        >
-
-          <i
-            class="bi"
-            [ngClass]="
-              isEvaluated
-                ? 'bi-check-circle-fill'
-                : 'bi-play-circle-fill'
-            "
-          >
-          </i>
-
-          <span>
-
-            {{
-              isEvaluated
-                ? 'Completed'
-                : 'Start Evaluation'
-            }}
-
-          </span>
-
-        </button>
-
-      </div>
-
-    }
-
-  </div>
-
-} @else {
+                      <span>
+                        {{ isEvaluated ? 'Completed' : 'Start Evaluation' }}
+                      </span>
+                    </button>
+                  </div>
+                }
+              </div>
+            } @else {
               <!-- EMPTY STATE -->
               <div class="modal-empty-state">
                 <div class="modal-empty-icon">
