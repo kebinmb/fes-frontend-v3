@@ -96,7 +96,16 @@
 
   letter-spacing: 0.2px;
 }
+.system-context {
+  margin-top: 0.25rem;
 
+  color: rgba(255, 255, 255, 0.82);
+
+  font-size: 0.72rem;
+  font-weight: 600;
+
+  letter-spacing: 0.4px;
+}
 .system-name {
   margin-top: 0.15rem;
 

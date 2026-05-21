@@ -193,4 +193,10 @@
         </form>
     </div>
     }
+    <app-confirmation-modal-component [visible]="showSubmitConfirmation" title="Submit Evaluation"
+        subtitle="Final Confirmation"
+        message="Are you sure you want to submit this evaluation? You will no longer be able to modify your responses after submission."
+        confirmText="Submit Evaluation" cancelText="Review Again" (confirmed)="confirmSubmit()"
+        (closed)="closeSubmitConfirmation()">
+    </app-confirmation-modal-component>
 </div>

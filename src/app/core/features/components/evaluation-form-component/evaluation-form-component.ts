@@ -13,12 +13,13 @@ import {
   EvaluationCriteria,
   SubjectEvaluationDTO,
 } from '../../../services/evaluation/evaluation-service';
+import { ConfirmationModalComponent } from "../../../../shared/components/confirmation-modal-component/confirmation-modal-component";
 
 export type UserRole = 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN' | 'ROLE_PROGRAM_CHAIR';
 
 @Component({
   selector: 'app-evaluation-form-component',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ConfirmationModalComponent],
   templateUrl: './evaluation-form-component.html',
   styleUrl: './evaluation-form-component.css',
 })
@@ -36,16 +37,16 @@ export class EvaluationFormComponent {
   evaluatorId$ = this.authFacade.evaluatorId$;
 
   selectedClass$ = combineLatest([
-  this.role$,
-  this.studentDataFacade.selectedClass$,
-  this.supervisorDataFacade.selectedClass$,
-]).pipe(
-  map(([role, studentClass, supervisorClass]) =>
-    role === 'ROLE_DEAN' || role === 'ROLE_PROGRAM_CHAIR'
-      ? supervisorClass
-      : studentClass
-  )
-);
+    this.role$,
+    this.studentDataFacade.selectedClass$,
+    this.supervisorDataFacade.selectedClass$,
+  ]).pipe(
+    map(([role, studentClass, supervisorClass]) =>
+      role === 'ROLE_DEAN' || role === 'ROLE_PROGRAM_CHAIR'
+        ? supervisorClass
+        : studentClass
+    )
+  );
 
   selectedClass = toSignal(this.selectedClass$, { initialValue: null });
 
@@ -57,7 +58,7 @@ export class EvaluationFormComponent {
   role = toSignal(this.role$);
   evaluatorId = toSignal(this.evaluatorId$);
   accessCode = toSignal(this.authFacade.accessCode$);
-  
+
   /* ================= COMPUTED ================= */
 
   facultyId = computed(() => this.selectedClass()?.facultyId || '');
@@ -76,7 +77,7 @@ export class EvaluationFormComponent {
   /* ================= FORM ================= */
 
   evaluationForm: FormGroup = this.fb.group({});
-
+  showSubmitConfirmation = false;
   constructor() {
     effect(() => {
       const categories = this.categories();
@@ -139,15 +140,40 @@ export class EvaluationFormComponent {
   /* ================= SUBMIT ================= */
 
   onSubmit() {
-    if (this.evaluationForm.invalid || this.hasAlreadyEvaluated()) {
+
+    if (
+      this.evaluationForm.invalid ||
+      this.hasAlreadyEvaluated()
+    ) {
+
       this.markFormGroupTouched();
       return;
+
     }
-    console.log("Access Code", this.accessCode());
-    const dto = this.mapFormToDTO(this.evaluationForm.value);
+
+    this.showSubmitConfirmation = true;
+
+  }
+  confirmSubmit(): void {
+
+    this.showSubmitConfirmation = false;
+
+    console.log('Access Code', this.accessCode());
+
+    const dto =
+      this.mapFormToDTO(
+        this.evaluationForm.value
+      );
+
     this.evaluationDataFacade.submit(dto);
+
   }
 
+  closeSubmitConfirmation(): void {
+
+    this.showSubmitConfirmation = false;
+
+  }
   private mapFormToDTO(formValue: any): SubjectEvaluationDTO {
     const ratings: Record<string, string> = {};
 
@@ -163,7 +189,7 @@ export class EvaluationFormComponent {
       subjectCode: this.subjectCode(),
       classCode: this.classCode(),
       semester: this.semester(),
-      yearLevel:this.yearLevel(),
+      yearLevel: this.yearLevel(),
       schoolYear: this.schoolYear(),
       accessCode: this.accessCode() || '',
       ratings,
@@ -178,16 +204,16 @@ export class EvaluationFormComponent {
       const role = this.role();
 
       if (
-  role === 'ROLE_DEAN' ||
-  role === 'ROLE_PROGRAM_CHAIR'
-) {
-  this.router.navigate(['/supervisor-dashboard']);
-} else if (role === 'ROLE_STUDENT') {
-  this.router.navigate(['/student-dashboard']);
-} else {
-  console.error('Unknown role:', role);
-  this.router.navigate(['/login']);
-}
+        role === 'ROLE_DEAN' ||
+        role === 'ROLE_PROGRAM_CHAIR'
+      ) {
+        this.router.navigate(['/supervisor-dashboard']);
+      } else if (role === 'ROLE_STUDENT') {
+        this.router.navigate(['/student-dashboard']);
+      } else {
+        console.error('Unknown role:', role);
+        this.router.navigate(['/login']);
+      }
     }
   }
 
