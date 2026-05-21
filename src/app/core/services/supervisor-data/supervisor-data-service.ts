@@ -25,17 +25,30 @@ export interface FacultyWithClasses {
   classes: any[];
 }
 export interface FacultyClass {
+
   subjectCode: string;
-  yearLevel: string;
+
   facultyId: string;
+
   schoolYear: number;
+
   semester: string;
+
   classCode: string;
-  isEvaluated?: boolean;
-  subjectDescription: string;
-  college: string;
+
+  yearLevel: string;
+
   programCode: string;
+
   sectionCode: string;
+
+  isEvaluated?: boolean;
+
+  loading?: boolean;
+
+  subjectDescription:string;
+  
+  error?: string | null;
 }
 
 export interface FacultyLoadDTO {

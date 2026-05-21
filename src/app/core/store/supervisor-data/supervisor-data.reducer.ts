@@ -1,435 +1,419 @@
 import { createReducer, on } from '@ngrx/store';
 
-import * as SupervisorDataActions
-from './supervisor-data.actions';
+import * as SupervisorDataActions from './supervisor-data.actions';
 
-import {
-  supervisorDataInitialState
-} from './supervisor-data.state';
+import { supervisorDataInitialState } from './supervisor-data.state';
 
 const buildEvaluationKey = (
   classCode: string,
   subjectCode: string,
   yearLevel: string,
   semester: string,
-  schoolYear: number
-): string =>
-  `${classCode}-${subjectCode}-${yearLevel}-${semester}-${schoolYear}`;
+  schoolYear: number,
+): string => `${classCode}-${subjectCode}-${yearLevel}-${semester}-${schoolYear}`;
 
-export const supervisorDataReducer =
-  createReducer(
+export const supervisorDataReducer = createReducer(
+  supervisorDataInitialState,
 
-    supervisorDataInitialState,
+  /* ================= FACULTIES ================= */
 
-    /* ================= FACULTIES ================= */
+  on(
+    SupervisorDataActions.loadFaculties,
 
-    on(
-      SupervisorDataActions.loadFaculties,
+    (state, { key }) => ({
+      ...state,
 
-      (state, { key }) => ({
+      faculties: {
+        ...state.faculties,
 
-        ...state,
+        [key]: {
+          data: [],
 
-        faculties: {
+          totalElements: 0,
 
-          ...state.faculties,
+          totalPages: 0,
 
-          [key]: {
+          page: 0,
 
-            data: [],
+          size: 10,
 
-            totalElements: 0,
+          loading: true,
 
-            totalPages: 0,
+          error: null,
+        },
+      },
+    }),
+  ),
 
-            page: 0,
+  on(
+    SupervisorDataActions.loadFacultiesSuccess,
 
-            size: 10,
+    (state, { key, response }) => ({
+      ...state,
+
+      faculties: {
+        ...state.faculties,
+
+        [key]: {
+          data: response.content,
+
+          totalElements: response.totalElements,
+
+          totalPages: response.totalPages,
+
+          page: response.number,
+
+          size: response.size,
+
+          loading: false,
+
+          error: null,
+        },
+      },
+    }),
+  ),
+
+  on(
+    SupervisorDataActions.loadFacultiesFailure,
+
+    (state, { key, error }) => ({
+      ...state,
+
+      faculties: {
+        ...state.faculties,
+
+        [key]: {
+          data: [],
+
+          totalElements: 0,
+
+          totalPages: 0,
+
+          page: 0,
+
+          size: 10,
+
+          loading: false,
+
+          error,
+        },
+      },
+    }),
+  ),
+
+  /* ================= FACULTY CLASSES ================= */
+
+  on(
+    SupervisorDataActions.loadFacultyClasses,
+
+    (state, { key, facultyId }) => ({
+      ...state,
+
+      facultyClasses: {
+        ...state.facultyClasses,
+
+        [key]: {
+          ...state.facultyClasses[key],
+
+          [facultyId]: {
+            classes: [],
 
             loading: true,
 
-            error: null
-          }
-        }
-      })
-    ),
+            error: null,
+          },
+        },
+      },
+    }),
+  ),
 
-    on(
-      SupervisorDataActions.loadFacultiesSuccess,
+  on(
+    SupervisorDataActions.loadFacultyClassesSuccess,
 
-      (state, { key, response }) => ({
+    (state, { key, facultyId, classes }) => ({
+      ...state,
 
-        ...state,
+      facultyClasses: {
+        ...state.facultyClasses,
 
-        faculties: {
+        [key]: {
+          ...state.facultyClasses[key],
 
-          ...state.faculties,
-
-          [key]: {
-
-            data: response.content,
-
-            totalElements:
-              response.totalElements,
-
-            totalPages:
-              response.totalPages,
-
-            page:
-              response.number,
-
-            size:
-              response.size,
+          [facultyId]: {
+            classes,
 
             loading: false,
 
-            error: null
-          }
-        }
-      })
-    ),
+            error: null,
+          },
+        },
+      },
+    }),
+  ),
 
-    on(
-      SupervisorDataActions.loadFacultiesFailure,
+  on(
+    SupervisorDataActions.loadFacultyClassesFailure,
 
-      (state, { key, error }) => ({
+    (state, { key, facultyId, error }) => ({
+      ...state,
 
-        ...state,
+      facultyClasses: {
+        ...state.facultyClasses,
 
-        faculties: {
+        [key]: {
+          ...state.facultyClasses[key],
 
-          ...state.faculties,
-
-          [key]: {
-
-            data: [],
-
-            totalElements: 0,
-
-            totalPages: 0,
-
-            page: 0,
-
-            size: 10,
+          [facultyId]: {
+            classes: [],
 
             loading: false,
 
-            error
-          }
-        }
-      })
-    ),
+            error,
+          },
+        },
+      },
+    }),
+  ),
 
-    /* ================= FACULTY CLASSES ================= */
+  /* ================= EVALUATION ================= */
 
-    on(
-      SupervisorDataActions.loadFacultyClasses,
+  on(
+    SupervisorDataActions.loadEvaluationStatus,
 
-      (state, {
-        key,
-        facultyId
-      }) => ({
+    (state, { key, context }) => {
+      const existing = state.evaluationStatus[key] || {
+        facultyId: context.facultyId,
 
-        ...state,
+        evaluatorId: context.evaluatorId,
 
-        facultyClasses: {
+        semester: context.semester,
 
-          ...state.facultyClasses,
+        schoolYear: context.schoolYear,
 
-          [key]: {
+        classes: {},
+      };
 
-            ...state.facultyClasses[key],
+      const evaluationKey = buildEvaluationKey(
+        context.classCode,
+        context.subjectCode,
+        context.yearLevel,
+        context.semester,
+        context.schoolYear,
+      );
 
-            [facultyId]: {
-
-              classes: [],
-
-              loading: true,
-
-              error: null
-            }
-          }
-        }
-      })
-    ),
-
-    on(
-      SupervisorDataActions.loadFacultyClassesSuccess,
-
-      (state, {
-        key,
-        facultyId,
-        classes
-      }) => ({
-
-        ...state,
-
-        facultyClasses: {
-
-          ...state.facultyClasses,
-
-          [key]: {
-
-            ...state.facultyClasses[key],
-
-            [facultyId]: {
-
-              classes,
-
-              loading: false,
-
-              error: null
-            }
-          }
-        }
-      })
-    ),
-
-    on(
-      SupervisorDataActions.loadFacultyClassesFailure,
-
-      (state, {
-        key,
-        facultyId,
-        error
-      }) => ({
-
-        ...state,
-
-        facultyClasses: {
-
-          ...state.facultyClasses,
-
-          [key]: {
-
-            ...state.facultyClasses[key],
-
-            [facultyId]: {
-
-              classes: [],
-
-              loading: false,
-
-              error
-            }
-          }
-        }
-      })
-    ),
-
-    /* ================= EVALUATION ================= */
-
-    on(
-      SupervisorDataActions.loadEvaluationStatus,
-
-      (state, {
-        key,
-        context
-      }) => {
-
-        const existing =
-          state.evaluationStatus[key] || {
-
-            facultyId:
-              context.facultyId,
-
-            evaluatorId:
-              context.evaluatorId,
-
-            semester:
-              context.semester,
-
-            schoolYear:
-              context.schoolYear,
-
-            classes: {}
-          };
-
-        const evaluationKey =
-          buildEvaluationKey(
-            context.classCode,
-            context.subjectCode,
-            context.yearLevel,
-            context.semester,
-            context.schoolYear
-          );
-
-        return {
-
-          ...state,
-
-          evaluationStatus: {
-
-            ...state.evaluationStatus,
-
-            [key]: {
-
-              ...existing,
-
-              classes: {
-
-                ...existing.classes,
-
-                [evaluationKey]: {
-
-                  evaluated: null,
-
-                  loading: true,
-
-                  error: null
-                }
-              }
-            }
-          }
-        };
-      }
-    ),
-
-    on(
-      SupervisorDataActions
-        .loadEvaluationStatusSuccess,
-
-      (state, {
-        key,
-        evaluationKey,
-        evaluated
-      }) => {
-
-        const existing =
-          state.evaluationStatus[key];
-
-        return {
-
-          ...state,
-
-          evaluationStatus: {
-
-            ...state.evaluationStatus,
-
-            [key]: {
-
-              ...existing,
-
-              classes: {
-
-                ...existing.classes,
-
-                [evaluationKey]: {
-
-                  evaluated,
-
-                  loading: false,
-
-                  error: null
-                }
-              }
-            }
-          }
-        };
-      }
-    ),
-
-    on(
-      SupervisorDataActions
-        .loadEvaluationStatusFailure,
-
-      (state, {
-        key,
-        evaluationKey,
-        error
-      }) => {
-
-        const existing =
-          state.evaluationStatus[key];
-
-        return {
-
-          ...state,
-
-          evaluationStatus: {
-
-            ...state.evaluationStatus,
-
-            [key]: {
-
-              ...existing,
-
-              classes: {
-
-                ...existing.classes,
-
-                [evaluationKey]: {
-
-                  evaluated: null,
-
-                  loading: false,
-
-                  error
-                }
-              }
-            }
-          }
-        };
-      }
-    ),
-
-    on(
-      SupervisorDataActions
-        .updateEvaluatedClass,
-
-      (state, {
-        key,
-        evaluationKey
-      }) => ({
-
+      return {
         ...state,
 
         evaluationStatus: {
-
           ...state.evaluationStatus,
 
           [key]: {
-
-            ...state.evaluationStatus[key],
+            ...existing,
 
             classes: {
-
-              ...state
-                .evaluationStatus[key]
-                .classes,
+              ...existing.classes,
 
               [evaluationKey]: {
+                evaluated: null,
 
-                ...state
-                  .evaluationStatus[key]
-                  .classes[evaluationKey],
+                loading: true,
 
-                evaluated: true
-              }
-            }
-          }
-        }
-      })
-    ),
+                error: null,
+              },
+            },
+          },
+        },
+      };
+    },
+  ),
 
-    on(
-      SupervisorDataActions
-        .selectFacultyClassForEvaluation,
+  on(
+    SupervisorDataActions.loadEvaluationStatusSuccess,
 
-      (state, {
-        selectedClass
-      }) => ({
+    (state, { key, evaluationKey, evaluated }) => {
+      const existing = state.evaluationStatus[key];
 
+      return {
         ...state,
 
-        selectedClass
-      })
-    ),
+        evaluationStatus: {
+          ...state.evaluationStatus,
 
-    on(
-      SupervisorDataActions
-        .resetSupervisorState,
+          [key]: {
+            ...existing,
 
-      () => supervisorDataInitialState
-    )
+            classes: {
+              ...existing.classes,
+
+              [evaluationKey]: {
+                evaluated,
+
+                loading: false,
+
+                error: null,
+              },
+            },
+          },
+        },
+      };
+    },
+  ),
+  on(
+    SupervisorDataActions.loadEvaluationStatusBatchSuccess,
+
+    (state, { key, results }) => {
+      const existingGroup = state.evaluationStatus[key];
+
+      const existingClasses = existingGroup?.classes || {};
+
+      const updatedClasses = {
+        ...existingClasses,
+      };
+
+      results.forEach((result) => {
+        updatedClasses[result.evaluationKey] = {
+          evaluated: result.evaluated,
+
+          loading: false,
+
+          error: null,
+        };
+      });
+
+      return {
+        ...state,
+
+        evaluationStatus: {
+          ...state.evaluationStatus,
+
+          [key]: {
+            facultyId: existingGroup?.facultyId || '',
+
+            evaluatorId: existingGroup?.evaluatorId || '',
+
+            semester: existingGroup?.semester || '',
+
+            schoolYear: existingGroup?.schoolYear || 0,
+
+            classes: updatedClasses,
+          },
+        },
+      };
+    },
+  ),
+  on(
+    SupervisorDataActions.loadEvaluationStatusFailure,
+
+    (state, { key, evaluationKey, error }) => {
+      const existing = state.evaluationStatus[key];
+
+      return {
+        ...state,
+
+        evaluationStatus: {
+          ...state.evaluationStatus,
+
+          [key]: {
+            ...existing,
+
+            classes: {
+              ...existing.classes,
+
+              [evaluationKey]: {
+                evaluated: null,
+
+                loading: false,
+
+                error,
+              },
+            },
+          },
+        },
+      };
+    },
+  ),
+
+  on(
+    SupervisorDataActions.updateEvaluatedClass,
+
+    (state, { key, evaluationKey }) => ({
+      ...state,
+
+      evaluationStatus: {
+        ...state.evaluationStatus,
+
+        [key]: {
+          ...state.evaluationStatus[key],
+
+          classes: {
+            ...state.evaluationStatus[key].classes,
+
+            [evaluationKey]: {
+              ...state.evaluationStatus[key].classes[evaluationKey],
+
+              evaluated: true,
+            },
+          },
+        },
+      },
+    }),
+  ),
+
+  on(
+    SupervisorDataActions.selectFacultyClassForEvaluation,
+
+    (state, { selectedClass }) => ({
+      ...state,
+
+      selectedClass,
+    }),
+  ),
+  on(
+    SupervisorDataActions.loadEvaluationStatusBatch,
+
+    (state, { key, payload, evaluatorId }) => {
+      const existingGroup = state.evaluationStatus[key];
+
+      const existingClasses = existingGroup?.classes || {};
+
+      const updatedClasses = {
+        ...existingClasses,
+      };
+
+      payload.forEach((item) => {
+        updatedClasses[item.evaluationKey] = {
+          evaluated: null,
+
+          loading: true,
+
+          error: null,
+        };
+      });
+
+      return {
+        ...state,
+
+        evaluationStatus: {
+          ...state.evaluationStatus,
+
+          [key]: {
+            facultyId: '',
+
+            evaluatorId,
+
+            semester: '',
+
+            schoolYear: 0,
+
+            classes: updatedClasses,
+          },
+        },
+      };
+    },
+  ),
+  on(
+    SupervisorDataActions.resetSupervisorState,
+
+    () => supervisorDataInitialState,
+  ),
 );

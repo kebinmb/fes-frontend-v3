@@ -210,7 +210,7 @@ export const loadEvaluationStatusBatch = createAction(
   '[Evaluation] Load Evaluation Status Batch',
   props<{
     key: string;
-    role: 'ROLE_STUDENT' | 'ROLE_DEAN';
+    role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_PROGRAM_CHAIR';
     evaluatorId: string;
     payload: BatchEvaluationPayload[];
   }>()
