@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { SpinnerFacade } from '../spinner/spinner.facade';
 import { ToastFacade } from '../toast/toast.facade';
 import * as AuthActions from './auth.action';
-import { catchError, exhaustMap, filter, map, of, tap } from 'rxjs';
+import { catchError, EMPTY, exhaustMap, filter, map, of, switchMap, tap } from 'rxjs';
 import { extractErrorMessage } from '../../../utilities/extract-error.util';
 import { Store } from '@ngrx/store';
 import { resetEvaluationState } from '../evaluation-data/evaluation.action';
@@ -117,31 +117,28 @@ export class AuthEffects {
     { dispatch: false },
   );
   loginSupervisor$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(AuthActions.supervisorLogin),
+    this.actions$.pipe(
+      ofType(AuthActions.supervisorLogin),
 
-    exhaustMap(({ username, password }) => {
-      this.spinnerFacade.showSpinner();
+      exhaustMap(({ username, password }) => {
+        this.spinnerFacade.showSpinner();
 
-      return this.authService.supervisorLogin(username, password).pipe(
+        return this.authService.supervisorLogin(username, password).pipe(
+          map(() => AuthActions.checkLoggedInUserAuthentication()),
 
-        map(() =>
-          AuthActions.checkLoggedInUserAuthentication()
-        ),
+          catchError((error) => {
+            this.spinnerFacade.hideSpinner();
 
-        catchError((error) => {
-          this.spinnerFacade.hideSpinner();
-
-          return of(
-            AuthActions.supervisorLoginFailure({
-              error: extractErrorMessage(error),
-            }),
-          );
-        }),
-      );
-    }),
-  ),
-);
+            return of(
+              AuthActions.supervisorLoginFailure({
+                error: extractErrorMessage(error),
+              }),
+            );
+          }),
+        );
+      }),
+    ),
+  );
   loginSupervisorSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
@@ -238,7 +235,7 @@ export class AuthEffects {
               role: response.role,
 
               college: response.college ?? null,
-              program: response.program
+              program: response.program,
             });
           }),
 
@@ -258,17 +255,11 @@ export class AuthEffects {
       ofType(AuthActions.checkLoggedInUserAuthenticationSuccess),
 
       map((response: any) => {
-
-        if (
-          response.role === 'ROLE_DEAN' ||
-          response.role === 'ROLE_PROGRAM_CHAIR'
-        ) {
-
+        if (response.role === 'ROLE_DEAN' || response.role === 'ROLE_PROGRAM_CHAIR') {
           return this.handleSupervisorLoginSuccess(response);
         }
 
         if (response.role === 'ROLE_ADMIN') {
-
           return AuthActions.administratorLoginSuccess({
             administratorId: response.evaluatorId,
             role: 'ROLE_ADMIN',
@@ -298,16 +289,29 @@ export class AuthEffects {
     () =>
       this.actions$.pipe(
         ofType(AuthActions.logout),
-        tap(() => {
-          this.store.dispatch(resetStudentState());
-          this.store.dispatch(resetSupervisorState());
-          this.store.dispatch(resetEvaluationState());
-          localStorage.clear();
-          sessionStorage.clear();
-          this.authService.logout();
-          this.toastFacade.showToast(`Logged out successfully`, 'success');
-          this.router.navigate(['/login']);
-        }),
+
+        switchMap(() =>
+          this.authService.logout().pipe(
+            tap(() => {
+              this.store.dispatch(resetStudentState());
+              this.store.dispatch(resetSupervisorState());
+              this.store.dispatch(resetEvaluationState());
+
+              localStorage.clear();
+              sessionStorage.clear();
+
+              this.toastFacade.showToast('Logged out successfully', 'success');
+
+              this.router.navigate(['/login']);
+            }),
+
+            catchError((error) => {
+              console.error(error);
+
+              return EMPTY;
+            }),
+          ),
+        ),
       ),
     { dispatch: false },
   );
@@ -322,7 +326,7 @@ export class AuthEffects {
           localStorage.clear();
           sessionStorage.clear();
           this.authService.logout().subscribe({
-            error: () => { },
+            error: () => {},
           });
           Promise.resolve().then(() => {
             this.router.navigate(['/login']);
@@ -331,10 +335,7 @@ export class AuthEffects {
       ),
     { dispatch: false },
   );
-  private handleSupervisorLoginSuccess(
-    response: any,
-  ) {
-
+  private handleSupervisorLoginSuccess(response: any) {
     sessionStorage.setItem('college', response.college);
 
     sessionStorage.setItem('program', response.program);

@@ -45,8 +45,6 @@ export class AuthFacade {
     }),
   );
   }
-  
-
   generateStudentAccessCode(evaluatorId: string, password:string) {
     this.store.dispatch(AuthActions.generateAccessCodeForStudent({ evaluatorId, password }));
   }
