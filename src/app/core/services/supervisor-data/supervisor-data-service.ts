@@ -43,7 +43,7 @@ export interface FacultyLoadDTO {
   firstname: string;
   lastname: string;
   position: string;
-  college:string;
+  college: string;
   // subjectCode: string;
   // programYearSection: string;
   campus: string;
@@ -68,28 +68,34 @@ export class SupervisorDataService {
     });
   }
 
-  loadFacultyClasses(facultyId: string, program: string): Observable<FacultyClass[]> {
-    if (!facultyId?.trim()) {
-      throw new Error('Invalid facultyId');
-    }
-    const params = new HttpParams().set('facultyId', facultyId.trim()).set('program', program.trim());
-    return this.http.get<FacultyClass[]>(`${this.FACULTY_API_URL}/faculty-classes`, {
-      params,
-      withCredentials: true,
-    });
+  loadFacultyClasses(
+  facultyId: string
+): Observable<FacultyClass[]> {
+
+  if (!facultyId?.trim()) {
+    throw new Error('Invalid facultyId');
   }
 
+  const params = new HttpParams()
+    .set('facultyId', facultyId.trim());
+
+  return this.http.get<FacultyClass[]>(
+    `${this.FACULTY_API_URL}/faculty-classes`,
+    {
+      params,
+      withCredentials: true,
+    }
+  );
+}
+
   getFacultyLoadsByProgram(
-    programCode: string,
     userId: number,
     page: number = 0,
     size: number = 10,
     sort: string = 'lastname,asc',
-    search: string = ''
+    search: string = '',
   ): Observable<PageResponse<FacultyLoadDTO>> {
-
     let params = new HttpParams()
-      .set('programCode', programCode.trim())
       .set('userId', userId.toString())
       .set('page', page.toString())
       .set('size', size.toString())
@@ -99,12 +105,9 @@ export class SupervisorDataService {
       params = params.set('search', search.trim());
     }
 
-    return this.http.get<PageResponse<FacultyLoadDTO>>(
-      `${this.FACULTY_API_URL}/faculty-loads`,
-      {
-        params,
-        withCredentials: true,
-      }
-    );
+    return this.http.get<PageResponse<FacultyLoadDTO>>(`${this.FACULTY_API_URL}/faculty-loads`, {
+      params,
+      withCredentials: true,
+    });
   }
 }

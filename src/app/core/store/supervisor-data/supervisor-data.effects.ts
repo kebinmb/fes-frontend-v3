@@ -1,87 +1,46 @@
 import { inject, Injectable } from '@angular/core';
 
-import {
-  Actions,
-  createEffect,
-  ofType
-} from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 
-import * as ActionsSet
-from './supervisor-data.actions';
+import * as ActionsSet from './supervisor-data.actions';
 
-import * as SupervisorDataActions
-from './supervisor-data.actions';
+import * as SupervisorDataActions from './supervisor-data.actions';
 
-import {
-  SupervisorDataService
-} from '../../services/supervisor-data/supervisor-data-service';
+import { SupervisorDataService } from '../../services/supervisor-data/supervisor-data-service';
 
-import {
-  EvaluationService
-} from '../../services/evaluation/evaluation-service';
+import { EvaluationService } from '../../services/evaluation/evaluation-service';
 
 import { Store } from '@ngrx/store';
 
 import { Router } from '@angular/router';
 
-import {
-  SpinnerFacade
-} from '../spinner/spinner.facade';
+import { SpinnerFacade } from '../spinner/spinner.facade';
 
-import {
-  ToastFacade
-} from '../toast/toast.facade';
+import { ToastFacade } from '../toast/toast.facade';
 
-import {
-
-  catchError,
-
-  filter,
-
-  finalize,
-
-  map,
-
-  of,
-
-  switchMap,
-
-  tap,
-
-  withLatestFrom
-
-} from 'rxjs';
+import { catchError, filter, finalize, map, of, switchMap, tap, withLatestFrom } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class SupervisorDataEffects {
-
   private actions$ = inject(Actions);
 
-  private api = inject(
-    SupervisorDataService
-  );
+  private api = inject(SupervisorDataService);
 
-  private evaluationDataService =
-    inject(EvaluationService);
+  private evaluationDataService = inject(EvaluationService);
 
   private store = inject(Store);
 
   private router = inject(Router);
 
-  private spinner = inject(
-    SpinnerFacade
-  );
+  private spinner = inject(SpinnerFacade);
 
-  private toast = inject(
-    ToastFacade
-  );
+  private toast = inject(ToastFacade);
 
   /* ================= HELPERS ================= */
 
   private buildEvaluationKey(
-
     classCode: string,
 
     subjectCode: string,
@@ -90,230 +49,141 @@ export class SupervisorDataEffects {
 
     semester: string,
 
-    schoolYear: number
-
+    schoolYear: number,
   ): string {
-
     return `${classCode}-${subjectCode}-${yearLevel}-${semester}-${schoolYear}`;
-
   }
 
   /* ================= FACULTIES ================= */
 
   loadFaculties$ = createEffect(() =>
-
     this.actions$.pipe(
+      ofType(ActionsSet.loadFaculties),
 
-      ofType(
-        ActionsSet.loadFaculties
-      ),
+      switchMap(
+        ({
+          key,
 
-      switchMap(({
+          userId,
 
-        key,
+          page,
 
-        program,
+          size,
 
-        userId,
+          sort,
 
-        page,
+          search,
+        }) => {
+          this.spinner.showSpinner();
 
-        size,
+          return this.api
+            .getFacultyLoadsByProgram(
+              userId,
 
-        sort,
+              page,
 
-        search
+              size,
 
-      }) => {
+              sort,
 
-        this.spinner.showSpinner();
-
-        return this.api
-          .getFacultyLoadsByProgram(
-
-            program,
-
-            userId,
-
-            page,
-
-            size,
-
-            sort,
-
-            search
-
-          )
-          .pipe(
-
-            map(response =>
-
-              ActionsSet
-                .loadFacultiesSuccess({
-
+              search,
+            )
+            .pipe(
+              map((response) =>
+                ActionsSet.loadFacultiesSuccess({
                   key,
 
-                  response
+                  response,
+                }),
+              ),
 
-                })
+              catchError((error) => {
+                this.toast.showToast('Failed to load faculties', 'error');
 
-            ),
-
-            catchError(error => {
-
-              this.toast.showToast(
-                'Failed to load faculties',
-                'error'
-              );
-
-              return of(
-
-                ActionsSet
-                  .loadFacultiesFailure({
-
+                return of(
+                  ActionsSet.loadFacultiesFailure({
                     key,
 
-                    error
+                    error,
+                  }),
+                );
+              }),
 
-                  })
-
-              );
-
-            }),
-
-            finalize(() =>
-              this.spinner.hideSpinner()
-            )
-
-          );
-
-      })
-
-    )
-
+              finalize(() => this.spinner.hideSpinner()),
+            );
+        },
+      ),
+    ),
   );
 
   /* ================= FACULTY CLASSES ================= */
 
   loadFacultyClasses$ = createEffect(() =>
+  this.actions$.pipe(
+    ofType(ActionsSet.loadFacultyClasses),
 
-    this.actions$.pipe(
-
-      ofType(
-        ActionsSet.loadFacultyClasses
-      ),
-
-      switchMap(({
-
+    switchMap(
+      ({
         key,
 
         facultyId,
-
-        program
-
       }) => {
 
-        return this.api
-          .loadFacultyClasses(
-            facultyId,
-            program
-          )
-          .pipe(
+        return this.api.loadFacultyClasses(facultyId).pipe(
 
-            map(classes =>
+          map((classes) =>
+            ActionsSet.loadFacultyClassesSuccess({
+              key,
 
-              ActionsSet
-                .loadFacultyClassesSuccess({
+              facultyId,
 
-                  key,
+              classes,
+            }),
+          ),
 
-                  facultyId,
+          catchError((error) => {
 
-                  classes
+            this.toast.showToast(
+              'Failed to load faculty classes',
+              'error'
+            );
 
-                })
+            return of(
+              ActionsSet.loadFacultyClassesFailure({
+                key,
 
-            ),
+                facultyId,
 
-            catchError(error => {
+                error,
+              }),
+            );
 
-              this.toast.showToast(
-                'Failed to load faculty classes',
-                'error'
-              );
-
-              return of(
-
-                ActionsSet
-                  .loadFacultyClassesFailure({
-
-                    key,
-
-                    facultyId,
-
-                    error
-
-                  })
-
-              );
-
-            })
-
-          );
-
-      })
-
-    )
-
-  );
+          }),
+        );
+      },
+    ),
+  ),
+);
 
   /* ================= SINGLE STATUS ================= */
 
   loadEvaluationStatus$ = createEffect(() =>
-
     this.actions$.pipe(
-
-      ofType(
-        SupervisorDataActions
-          .loadEvaluationStatus
-      ),
+      ofType(SupervisorDataActions.loadEvaluationStatus),
 
       filter(({ role }) => !!role),
 
-      withLatestFrom(
+      withLatestFrom(this.store.select((state) => state.supervisorData.evaluationStatus)),
 
-        this.store.select(
-          state =>
-            state.supervisorData
-              .evaluationStatus
-        )
+      filter(([{ key, context }, state]) => {
+        const cached = state[key]?.classes?.[context.evaluationKey];
 
-      ),
-
-      filter(([{
-        key,
-        context
-      }, state]) => {
-
-        const cached =
-          state[key]
-            ?.classes
-            ?.[context.evaluationKey];
-
-        return !cached ||
-          cached.evaluated === null;
-
+        return !cached || cached.evaluated === null;
       }),
 
-      switchMap(([{
-        key,
-        context,
-        role
-      }]) =>
-
+      switchMap(([{ key, context, role }]) =>
         this.evaluationDataService
           .checkEvaluationStatus(
-
             role!,
 
             context.facultyId,
@@ -328,153 +198,93 @@ export class SupervisorDataEffects {
 
             context.semester,
 
-            context.schoolYear
-
+            context.schoolYear,
           )
           .pipe(
+            map((res) =>
+              SupervisorDataActions.loadEvaluationStatusSuccess({
+                key,
 
-            map(res =>
+                evaluationKey: context.evaluationKey,
 
-              SupervisorDataActions
-                .loadEvaluationStatusSuccess({
-
-                  key,
-
-                  evaluationKey:
-                    context.evaluationKey,
-
-                  evaluated:
-                    res.hasEvaluated
-
-                })
-
+                evaluated: res.hasEvaluated,
+              }),
             ),
 
-            catchError(error =>
-
+            catchError((error) =>
               of(
+                SupervisorDataActions.loadEvaluationStatusFailure({
+                  key,
 
-                SupervisorDataActions
-                  .loadEvaluationStatusFailure({
+                  evaluationKey: context.evaluationKey,
 
-                    key,
-
-                    evaluationKey:
-                      context.evaluationKey,
-
-                    error:
-                      error.message ||
-                      'Evaluation status failed'
-
-                  })
-
-              )
-
-            )
-
-          )
-
-      )
-
-    )
-
+                  error: error.message || 'Evaluation status failed',
+                }),
+              ),
+            ),
+          ),
+      ),
+    ),
   );
 
   /* ================= NAVIGATION ================= */
 
   selectClass$ = createEffect(
-
     () =>
-
       this.actions$.pipe(
+        ofType(ActionsSet.selectFacultyClassForEvaluation),
 
-        ofType(
-          ActionsSet
-            .selectFacultyClassForEvaluation
-        ),
+        filter((a) => !!a.selectedClass),
 
-        filter(a => !!a.selectedClass),
+        withLatestFrom(this.store.select((s) => s.auth)),
 
-        withLatestFrom(
-          this.store.select(s => s.auth)
-        ),
+        tap(([{ selectedClass }, auth]) => {
+          const evaluationKey = this.buildEvaluationKey(
+            selectedClass!.classCode,
 
-        tap(([{
-          selectedClass
-        }, auth]) => {
+            selectedClass!.subjectCode,
 
-          const evaluationKey =
-            this.buildEvaluationKey(
+            selectedClass!.yearLevel,
 
-              selectedClass!.classCode,
+            selectedClass!.semester,
 
-              selectedClass!.subjectCode,
-
-              selectedClass!.yearLevel,
-
-              selectedClass!.semester,
-
-              selectedClass!.schoolYear
-
-            );
-
-          this.store.dispatch(
-
-            ActionsSet
-              .loadEvaluationStatus({
-
-                key:
-                  `${auth.college}-ACTIVE`,
-
-                role:
-                  auth.role,
-
-                context: {
-
-                  facultyId:
-                    selectedClass!.facultyId,
-
-                  evaluatorId:
-                    auth.evaluatorId,
-
-                  classCode:
-                    selectedClass!.classCode,
-
-                  subjectCode:
-                    selectedClass!.subjectCode,
-
-                  yearLevel:
-                    selectedClass!.yearLevel,
-
-                  semester:
-                    selectedClass!.semester,
-
-                  schoolYear:
-                    selectedClass!.schoolYear,
-
-                  college:
-                    selectedClass!.college,
-
-                  evaluationKey
-
-                }
-
-              })
-
+            selectedClass!.schoolYear,
           );
 
-          this.router.navigate([
-            '/evaluation-form'
-          ]);
+          this.store.dispatch(
+            ActionsSet.loadEvaluationStatus({
+              key: `${auth.college}-ACTIVE`,
 
-        })
+              role: auth.role,
 
+              context: {
+                facultyId: selectedClass!.facultyId,
+
+                evaluatorId: auth.evaluatorId,
+
+                classCode: selectedClass!.classCode,
+
+                subjectCode: selectedClass!.subjectCode,
+
+                yearLevel: selectedClass!.yearLevel,
+
+                semester: selectedClass!.semester,
+
+                schoolYear: selectedClass!.schoolYear,
+
+                college: selectedClass!.college,
+
+                evaluationKey,
+              },
+            }),
+          );
+
+          this.router.navigate(['/evaluation-form']);
+        }),
       ),
 
     {
-      dispatch: false
-    }
-
+      dispatch: false,
+    },
   );
-
 }
