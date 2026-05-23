@@ -350,6 +350,43 @@
   flex-shrink: 0;
 }
 
+/* =========================================
+   CAPS LOCK WARNING
+========================================= */
+
+.capslock-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+
+  margin-top: 0.35rem;
+
+  color: #d97706;
+
+  font-size: 0.76rem;
+  font-weight: 600;
+
+  animation:
+    capsFadeIn 0.16s ease;
+}
+
+.capslock-warning i {
+  font-size: 0.8rem;
+}
+
+@keyframes capsFadeIn {
+
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* ====================================
    RESPONSIVE
 ==================================== */

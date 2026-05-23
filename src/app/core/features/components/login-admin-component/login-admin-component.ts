@@ -17,6 +17,7 @@ export class LoginAdminComponent {
   role: 'student' | 'supervisor' = 'student';
   step: number = 0;
   accessCode$ = this.authFacade.accessCode$;
+  isCapsLockOn = false;
   setRole(role: 'student' | 'supervisor') {
     this.role = role;
 
@@ -44,4 +45,10 @@ export class LoginAdminComponent {
     window.location.href =
       environment.oauth;
   }
+  detectCapsLock(event: KeyboardEvent): void {
+
+  this.isCapsLockOn =
+    event.getModifierState &&
+    event.getModifierState('CapsLock');
+}
 }

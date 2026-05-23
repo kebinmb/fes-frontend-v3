@@ -61,7 +61,8 @@
           <i class="bi bi-lock input-icon"></i>
 
           <input id="password" type="password" formControlName="password" class="form-control"
-            placeholder="Enter password" autocomplete="current-password" />
+            placeholder="Enter password" autocomplete="current-password" (keydown)="detectCapsLock($event)"
+            (keyup)="detectCapsLock($event)" (blur)="isCapsLockOn = false" />
         </div>
 
         <div class="error-space">
@@ -71,6 +72,15 @@
           ) {
           <div class="error-message">
             <span>Password is required.</span>
+          </div>
+          }
+          @if (isCapsLockOn) {
+          <div class="capslock-warning">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+
+            <span>
+              Caps Lock is ON
+            </span>
           </div>
           }
         </div>
