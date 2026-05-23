@@ -76,3 +76,6 @@ export const checkLoggedInUserAuthenticationFailure = createAction(
 );
 export const logout = createAction('[Logout] Logout');
 export const sessionExpired = createAction('[Session Expired] Session Expired');
+export const resetStudentLoginFlow = createAction(
+  '[Auth] Reset Student Login Flow'
+);

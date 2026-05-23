@@ -589,7 +589,146 @@
   height: 22px;
   flex-shrink: 0;
 }
+/* =========================
+   NEWLY ADDED ENHANCEMENTS
+========================= */
 
+.capslock-warning {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  margin-top: 0.35rem;
+
+  color: #d97706;
+
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.capslock-warning i {
+  font-size: 0.78rem;
+}
+
+.input-wrapper.readonly {
+  opacity: 0.92;
+}
+
+.input-wrapper.readonly input {
+  cursor: not-allowed;
+  color: #475569;
+}
+
+.input-wrapper input::placeholder {
+  color: #94a3b8;
+}
+
+.input-wrapper input:focus {
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.input-wrapper input[readonly]:focus {
+  box-shadow: none;
+}
+
+.login-btn i {
+  font-size: 0.92rem;
+}
+
+.login-btn:active:not(:disabled) {
+  transform: scale(0.99);
+}
+
+.role-toggle-btn button:hover:not(.active) {
+  border-color: var(--chmsu-primary);
+  background: #f1f5f9;
+}
+
+.role-toggle-btn button.active:hover {
+  opacity: 0.96;
+}
+
+.form-group small {
+  animation: fadeInValidation 0.15s ease;
+}
+
+@keyframes fadeInValidation {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.verification-message {
+  animation: fadeInVerification 0.2s ease;
+}
+
+@keyframes fadeInVerification {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.step-circle {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.step-item.active .step-circle {
+  transform: scale(1.03);
+}
+
+.google-login-btn svg {
+  flex-shrink: 0;
+}
+
+.google-login-btn span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.login-card {
+  animation: fadeInCard 0.25s ease;
+}
+
+@keyframes fadeInCard {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 576px) {
+
+  .login-btn,
+  .google-login-btn {
+    min-height: 50px;
+  }
+
+  .input-wrapper input {
+    font-size: 16px;
+  }
+}
 /* =========================
    RESPONSIVE
 ========================= */

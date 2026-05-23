@@ -55,4 +55,9 @@ export class AuthFacade {
   checkLoggedInUserAuthentication() {
     this.store.dispatch(AuthActions.checkLoggedInUserAuthentication());
   }
+  resetStudentLoginFlow() {
+  this.store.dispatch(
+    AuthActions.resetStudentLoginFlow()
+  );
+}
 }

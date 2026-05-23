@@ -123,5 +123,10 @@ export const authReducer = createReducer(
     isAuthChecked: true,
     isLoading: false,
     error: null,
-  }))
+  })),
+  on(AuthActions.resetStudentLoginFlow, (state) => ({
+  ...state,
+  accessCode: null,
+  error: null,
+})),
 );
