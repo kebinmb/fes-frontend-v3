@@ -29,6 +29,7 @@ import { AdminEffects } from './core/store/admin-data/admin-data.effects';
 import { authInterceptor } from './utilities/interceptor/auth-interceptor';
 import { MigrationEffects } from './core/store/migration/migration.effects';
 import { SchoolYearAndSemesterEffects } from './core/store/school-year-and-semester/school-year-and-semester.effects';
+import { StudentEvaluationEffects } from './core/store/student-evaluation-data/student-evaluation-data.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -38,7 +39,7 @@ export const appConfig: ApplicationConfig = {
     provideStore(reducers, {
       metaReducers,
     }),
-    provideEffects([AuthEffects, ToastEffect, StudentDataEffects, SupervisorDataEffects, EvaluationEffects, AdminEffects, MigrationEffects, SchoolYearAndSemesterEffects]),
+    provideEffects([AuthEffects, ToastEffect, StudentDataEffects, SupervisorDataEffects, EvaluationEffects, AdminEffects, MigrationEffects, SchoolYearAndSemesterEffects,StudentEvaluationEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],
 };

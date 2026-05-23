@@ -13,6 +13,7 @@ import { UserAccountsDataTableComponent } from './core/features/components/user-
 import { guestGuard } from './utilities/guards/guest/guest-guard';
 import { SettingsComponent } from './core/features/components/settings-component/settings-component';
 import { OauthSuccessComponent } from './shared/components/oauth-success-component/oauth-success-component';
+import { StudentEvaluationsDataTableComponent } from './core/features/components/student-evaluations-data-table/student-evaluations-data-table-component';
 
 export const routes: Routes = [
   {
@@ -55,6 +56,7 @@ export const routes: Routes = [
       { path: 'faculty-list', component: FacultyDataTableComponent },
       { path: 'evaluation-score-list', component: FacultyEvaluationScoresDataTableComponent },
       { path: 'user-accounts', component: UserAccountsDataTableComponent },
+      { path: 'student-evaluations', component: StudentEvaluationsDataTableComponent },
       { path: 'settings', component: SettingsComponent },
     ],
   },

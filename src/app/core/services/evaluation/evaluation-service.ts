@@ -79,8 +79,8 @@ export interface FacultyEvaluationScore {
   updatedAt: string;
   setRating: number;
   evaluatorType: string;
-  studentComments:string;
-  supervisorComments:string;
+  studentComments: string;
+  supervisorComments: string;
 }
 export interface EvaluationCriteria {
   id: number;
@@ -265,6 +265,28 @@ export interface EvaluationCheckResponse {
   hasEvaluated: boolean;
   message: string;
 }
+export interface StudentEvaluationDTO {
+  studentId: string;
+  studentFirstname: string;
+  studentLastname: string;
+  createdAt: string;
+  schoolYear: number;
+  semester: string;
+  classCode: string;
+  subjectCode: string;
+  programCode: string;
+  sectionCode: string;
+}
+export interface Page<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -360,4 +382,5 @@ export class EvaluationService {
       withCredentials: true,
     });
   }
+  
 }

@@ -1,0 +1,251 @@
+@let evaluationsData = studentEvaluations$ | async;
+
+<section class="modern-card">
+
+  <!-- TOP BAR -->
+  <div class="card-topbar"></div>
+
+  <!-- HEADER -->
+  <div class="modern-card-header">
+
+    <div class="header-content">
+
+      <h2>
+        Student Faculty Evaluations
+      </h2>
+
+      <span>
+        Submitted student faculty evaluation records
+      </span>
+
+      <div class="search-wrapper">
+
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search student, faculty, class, program..."
+          (input)="onSearch($any($event.target).value)"
+        />
+
+      </div>
+
+    </div>
+
+    <div class="table-count">
+
+      {{ evaluationsData?.totalElements ?? 0 }}
+
+    </div>
+
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-responsive">
+
+    <table class="table modern-table align-middle mb-0">
+
+      <thead>
+
+        <tr>
+
+          <th>Student ID</th>
+
+          <th>Student Name</th>
+
+          <th>Class Code</th>
+
+          <th>Program</th>
+
+          <th>Section</th>
+
+          <th>Faculty</th>
+
+          <th>Submitted</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        @if (loading$ | async) {
+
+          <tr>
+
+            <td colspan="7">
+
+              <div class="loading-wrapper">
+
+                <div
+                  class="spinner-border text-success"
+                  role="status"
+                >
+                  <span class="visually-hidden">
+                    Loading...
+                  </span>
+                </div>
+
+              </div>
+
+            </td>
+
+          </tr>
+
+        } @else if (evaluationsData?.content?.length) {
+
+          @for (
+            evaluation of evaluationsData?.content;
+            track evaluation.studentId
+          ) {
+
+            <tr>
+
+              <td data-label="Student ID">
+
+                <span class="id-badge">
+
+                  {{ evaluation.studentId }}
+
+                </span>
+
+              </td>
+
+              <td data-label="Student Name">
+
+                <div class="table-user">
+
+                  <div class="table-avatar">
+
+                    {{ evaluation.studentFirstname.charAt(0) }}
+
+                  </div>
+
+                  <div class="fw-semibold">
+
+                    {{ evaluation.studentLastname }},
+                    {{ evaluation.studentFirstname }}
+
+                  </div>
+
+                </div>
+
+              </td>
+
+              <td data-label="Class Code">
+
+                <span class="class-badge">
+
+                  {{ evaluation.classCode }}
+
+                </span>
+
+              </td>
+
+              <td data-label="Program">
+
+                {{ evaluation.programCode }}
+
+              </td>
+
+              <td data-label="Section">
+
+                {{ evaluation.sectionCode }}
+
+              </td>
+
+              <td data-label="Faculty">
+
+                <div class="faculty-wrapper">
+
+                  <span class="faculty-name">
+
+                    {{ evaluation.facultyLastname }},
+                    {{ evaluation.facultyFirstname }}
+
+                  </span>
+
+                  <small class="faculty-id">
+
+                    {{ evaluation.facultyId }}
+
+                  </small>
+
+                </div>
+
+              </td>
+
+              <td data-label="Submitted">
+
+                {{ evaluation.createdAt | date:'medium' }}
+
+              </td>
+
+            </tr>
+
+          }
+
+        } @else {
+
+          <tr>
+
+            <td colspan="7" class="empty-state">
+
+              No student faculty evaluations found
+
+            </td>
+
+          </tr>
+
+        }
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="modern-card-footer">
+
+    <small>
+
+      Showing
+      {{ evaluationsData?.content?.length ?? 0 }}
+      of
+      {{ evaluationsData?.totalElements ?? 0 }}
+      evaluation records
+
+    </small>
+
+    <div class="pagination-group">
+
+      <button
+        class="pagination-btn"
+        [disabled]="(evaluationsData?.number ?? 0) === 0"
+        (click)="previousPage()"
+      >
+        Prev
+      </button>
+
+      <span class="pagination-info">
+
+        Page
+        {{ (evaluationsData?.number ?? 0) + 1 }}
+        of
+        {{ evaluationsData?.totalPages ?? 1 }}
+
+      </span>
+
+      <button
+        class="pagination-btn"
+        [disabled]="evaluationsData?.last ?? true"
+        (click)="nextPage()"
+      >
+        Next
+      </button>
+
+    </div>
+
+  </div>
+
+</section>

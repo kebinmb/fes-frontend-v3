@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
-import { FacultyEvaluationScore } from '../evaluation/evaluation-service';
+import { FacultyEvaluationScore, Page } from '../evaluation/evaluation-service';
 export interface PageResponse<T> {
   content: T[];
 
@@ -97,6 +97,29 @@ export interface CurrentSchoolYearAndSemesterResponse {
   schoolYear: number;
   semester: string;
   status: string;
+  createdAt: string;
+}
+
+export interface StudentFacultyEvaluationDTO {
+
+  studentId: string;
+
+  studentFirstname: string;
+
+  studentLastname: string;
+
+  classCode: string;
+
+  programCode: string;
+
+  sectionCode: string;
+
+  facultyId: string;
+
+  facultyFirstname: string;
+
+  facultyLastname: string;
+
   createdAt: string;
 }
 @Injectable({
@@ -229,5 +252,30 @@ export class AdminService {
       },
     );
   }
+
+  getStudentEvaluations(
+    page: number = 0,
+    size: number = 10,
+    search: string = '',
+    sortBy: string = 'created_at',
+    sortDirection: 'asc' | 'desc' = 'desc',
+  ): Observable<Page<StudentFacultyEvaluationDTO>> {
+
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('search', search)
+      .set('sortBy', sortBy)
+      .set('sortDirection', sortDirection);
+
+    return this.http.get<Page<StudentFacultyEvaluationDTO>>(
+      `${this.ADMIN_API_URL}/student-faculty-evaluation`,
+      {
+        params,
+        withCredentials: true,
+      },
+    );
+  }
 }
+
 
