@@ -48,7 +48,8 @@ export const studentLoadReducer = createReducer(
     ...state,
     loading: false,
     error,
-    loadsReady: false,
+    loadsReady: true,
+    evaluationReady: true
   })),
   on(StudentDataActions.loadEvaluationStatusSuccess, (state, { evaluationMap }) => {
     if (!evaluationMap || Object.keys(evaluationMap).length === 0) {

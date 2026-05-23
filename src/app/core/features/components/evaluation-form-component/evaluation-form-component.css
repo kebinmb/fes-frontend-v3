@@ -246,7 +246,172 @@
 .class-info-body {
   padding: 2rem;
 }
+/* =========================
+   PAGE ENTER ANIMATION
+========================= */
 
+.page-enter-animation {
+  animation:
+    pageFadeIn 0.45s ease,
+    pageSlideIn 0.45s ease;
+}
+
+.class-info-card,
+.rating-guide-card,
+.category-card,
+.comments-card,
+.submit-section {
+  animation:
+    cardFadeUp 0.45s ease;
+  animation-fill-mode: both;
+}
+
+.class-info-card {
+  animation-delay: 0.04s;
+}
+
+.rating-guide-card {
+  animation-delay: 0.08s;
+}
+
+.category-card:nth-of-type(1) {
+  animation-delay: 0.12s;
+}
+
+.category-card:nth-of-type(2) {
+  animation-delay: 0.16s;
+}
+
+.category-card:nth-of-type(3) {
+  animation-delay: 0.2s;
+}
+
+.comments-card {
+  animation-delay: 0.24s;
+}
+
+.submit-section {
+  animation-delay: 0.28s;
+}
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pageSlideIn {
+  from {
+    transform: translateY(10px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================
+   BUTTON INTERACTION
+========================= */
+
+.btn-primary:active:not(:disabled),
+.btn-outline-light:active {
+  transform: scale(0.985);
+}
+
+/* =========================
+   CARD HOVER POLISH
+========================= */
+
+.class-info-card,
+.rating-guide-card,
+.category-card,
+.comments-card,
+.submit-section {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.class-info-card:hover,
+.rating-guide-card:hover,
+.category-card:hover,
+.comments-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 18px 42px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================
+   SMOOTHER RADIO INTERACTION
+========================= */
+
+.rating-content {
+  position: relative;
+  overflow: hidden;
+}
+
+.rating-content::after {
+  content: '';
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(255,255,255,0.14),
+      transparent 70%
+    );
+
+  opacity: 0;
+
+  transition: opacity 0.2s ease;
+}
+
+.rating-option:hover .rating-content::after {
+  opacity: 1;
+}
+
+/* =========================
+   MOBILE PERFORMANCE
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .page-enter-animation,
+  .class-info-card,
+  .rating-guide-card,
+  .category-card,
+  .comments-card,
+  .submit-section {
+    animation: none !important;
+  }
+
+  .class-info-card:hover,
+  .rating-guide-card:hover,
+  .category-card:hover,
+  .comments-card:hover {
+    transform: none;
+  }
+}
 .info-row {
   display: grid;
 
