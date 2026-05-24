@@ -2,11 +2,7 @@
 
 <section class="modern-card">
 
-  <!-- TOP BAR -->
-
   <div class="card-topbar accent"></div>
-
-  <!-- HEADER -->
 
   <div class="modern-card-header">
 
@@ -22,22 +18,29 @@
 
     </div>
 
-    <div class="table-count">
+    <div class="header-actions">
 
-      {{ usersData?.totalElements || 0 }}
+      <div class="table-count">
+
+        {{ usersData?.totalElements || 0 }}
+
+      </div>
+
+      <button class="create-btn" (click)="openCreateModal()">
+
+        <i class="bi bi-plus-lg"></i>
+
+        Create User
+
+      </button>
 
     </div>
 
   </div>
 
-  <!-- TABLE -->
-
   <div class="table-responsive">
 
-    <table
-      class="table modern-table align-middle mb-0">
-
-      <!-- TABLE HEAD -->
+    <table class="table modern-table align-middle mb-0">
 
       <thead>
 
@@ -59,115 +62,114 @@
             Status
           </th>
 
+          <th class="text-end">
+            Actions
+          </th>
+
         </tr>
 
       </thead>
-
-      <!-- TABLE BODY -->
 
       <tbody>
 
         @if (usersData?.content?.length) {
 
-          @for (
-            user of usersData!.content;
-            track user.userId
-          ) {
+        @for (
+        user of usersData!.content;
+        track user.userId
+        ) {
 
-            <tr>
+        <tr>
 
-              <!-- USERNAME -->
+          <td data-label="Username">
 
-              <td data-label="Username">
+            <div class="table-user">
 
-                <div class="table-user">
+              <div class="table-avatar">
 
-                  <div class="table-avatar">
+                {{
+                user.username
+                ?.charAt(0)
+                ?.toUpperCase()
+                }}
 
-                    {{
-                      user.username
-                        ?.charAt(0)
-                        ?.toUpperCase()
-                    }}
+              </div>
 
-                  </div>
+              <div>
 
-                  <div>
+                <div class="fw-semibold">
 
-                    <div class="fw-semibold">
-
-                      {{ user.username }}
-
-                    </div>
-
-                  </div>
+                  {{ user.username }}
 
                 </div>
 
-              </td>
+              </div>
 
-              <!-- EMAIL -->
+            </div>
 
-              <td data-label="Email">
+          </td>
 
-                <span class="email-text">
+          <td data-label="Email">
 
-                  {{ user.email }}
+            <span class="email-text">
 
-                </span>
+              {{ user.email }}
 
-              </td>
+            </span>
 
-              <!-- ROLE -->
+          </td>
 
-              <td data-label="Role">
+          <td data-label="Role">
 
-                <span class="role-badge">
+            <span class="role-badge">
 
-                  {{ user.role }}
+              {{ user.role }}
 
-                </span>
+            </span>
 
-              </td>
+          </td>
 
-              <!-- STATUS -->
+          <td data-label="Status">
 
-              <td data-label="Status">
-
-                <span
-                  class="status-badge"
-                  [class.active]="
+            <span class="status-badge" [class.active]="
                     user.status === 'ACTIVE'
-                  "
-                  [class.inactive]="
+                  " [class.inactive]="
                     user.status !== 'ACTIVE'
                   ">
 
-                  {{ user.status }}
+              {{ user.status }}
 
-                </span>
+            </span>
 
-              </td>
+          </td>
 
-            </tr>
+          <td class="text-end">
 
-          }
+            <button class="edit-btn" (click)="openEditModal(user)">
+
+              <i class="bi bi-pencil-square"></i>
+
+              Edit
+
+            </button>
+
+          </td>
+
+        </tr>
+
+        }
 
         } @else {
 
-          <!-- EMPTY STATE -->
+        <tr>
 
-          <tr>
+          <td colspan="5" class="empty-state">
 
-            <td
-              colspan="4"
-              class="empty-state">
+            No users found
 
-              No users found
+          </td>
 
-            </td>
-
-          </tr>
+        </tr>
 
         }
 
@@ -176,8 +178,6 @@
     </table>
 
   </div>
-
-  <!-- FOOTER -->
 
   <div class="modern-card-footer">
 
@@ -191,18 +191,11 @@
 
     </small>
 
-    <!-- PAGINATION -->
-
     <div class="pagination-group">
 
-      <!-- PREVIOUS -->
-
-      <button
-        class="pagination-btn"
-        [disabled]="
+      <button class="pagination-btn" [disabled]="
           (usersData?.page ?? 0) === 0
-        "
-        (click)="
+        " (click)="
           onUserPageChange(
             (usersData?.page ?? 0) - 1
           )
@@ -212,16 +205,11 @@
 
       </button>
 
-      <!-- NEXT -->
-
-      <button
-        class="pagination-btn"
-        [disabled]="
+      <button class="pagination-btn" [disabled]="
           ((usersData?.page ?? 0) + 1)
           >=
           (usersData?.totalPages ?? 0)
-        "
-        (click)="
+        " (click)="
           onUserPageChange(
             (usersData?.page ?? 0) + 1
           )
@@ -236,3 +224,276 @@
   </div>
 
 </section>
+
+@if (isModalOpen()) {
+
+<div class="modal-backdrop">
+
+  <div class="user-modal">
+
+    <div class="modal-header">
+
+      <h3>
+
+        {{
+        isEditMode()
+        ? 'Edit User'
+        : 'Create User'
+        }}
+
+      </h3>
+
+      <button class="close-btn" (click)="closeModal()">
+
+        ✕
+
+      </button>
+
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submitForm()">
+
+      <div class="form-grid">
+
+        <div class="form-group" [class.invalid]="
+    isInvalid('username')
+  ">
+
+          <label>
+            Username
+          </label>
+
+          <input type="text" formControlName="username" placeholder="Enter username">
+
+          @if (isInvalid('username')) {
+
+          <small class="error-text">
+
+            {{
+            getErrorMessage(
+            'username'
+            )
+            }}
+
+          </small>
+
+          }
+
+        </div>
+
+        <div class="form-group" [class.invalid]="
+    isInvalid('email')
+  ">
+
+          <label>
+            Email
+          </label>
+
+          <input type="email" formControlName="email" placeholder="example@email.com">
+
+          @if (isInvalid('email')) {
+
+          <small class="error-text">
+
+            {{
+            getErrorMessage(
+            'email'
+            )
+            }}
+
+          </small>
+
+          }
+
+        </div>
+
+        <div class="form-group" [class.invalid]="
+    isInvalid('password')
+  ">
+
+          <label>
+            Password
+          </label>
+
+          <input type="password" formControlName="password" class="password-input" autocomplete="new-password"
+            [placeholder]="
+      isEditMode()
+        ? 'Leave blank to keep current password'
+        : 'Enter secure password'
+    ">
+
+          <div class="field-helper">
+
+            Minimum 8 characters with uppercase,
+            lowercase and number.
+
+          </div>
+
+          @if (isInvalid('password')) {
+
+          <small class="error-text">
+
+            {{
+            getErrorMessage(
+            'password'
+            )
+            }}
+
+          </small>
+
+          }
+
+        </div>
+        <div class="form-group">
+
+          <label>
+            College
+          </label>
+
+          <select formControlName="college">
+
+            @for (
+            college of colleges;
+            track college
+            ) {
+
+            <option [value]="college">
+
+              {{ college }}
+
+            </option>
+
+            }
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>
+            Program
+          </label>
+
+          <select formControlName="programs">
+
+            @for (
+            program of programs;
+            track program
+            ) {
+
+            <option [value]="program">
+
+              {{ program }}
+
+            </option>
+
+            }
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>
+            Major
+          </label>
+
+          <select formControlName="majors">
+
+            @for (
+            major of majors;
+            track major
+            ) {
+
+            <option [value]="major">
+
+              {{ major }}
+
+            </option>
+
+            }
+
+          </select>
+
+        </div>
+        <div class="form-group">
+
+          <label>
+            Role
+          </label>
+
+          <select formControlName="role">
+
+            @for (
+            role of roles;
+            track role
+            ) {
+
+            <option [value]="role">
+
+              {{ role }}
+
+            </option>
+
+            }
+
+          </select>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>
+            Status
+          </label>
+
+          <select formControlName="status">
+
+            @for (
+            status of statuses;
+            track status
+            ) {
+
+            <option [value]="status">
+
+              {{ status }}
+
+            </option>
+
+            }
+
+          </select>
+
+        </div>
+
+      </div>
+
+      <div class="modal-actions">
+
+        <button type="button" class="cancel-btn" (click)="closeModal()">
+
+          Cancel
+
+        </button>
+
+        <button type="submit" class="submit-btn" [disabled]="form.invalid">
+
+          {{
+          isEditMode()
+          ? 'Update User'
+          : 'Create User'
+          }}
+
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+}

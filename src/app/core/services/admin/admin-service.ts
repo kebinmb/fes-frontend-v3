@@ -30,6 +30,9 @@ export interface FetchUserAccountsResponse {
   email: string;
   role: string;
   status: string;
+  college:string;
+  programs:string;
+  majors:string;
 }
 export interface FetchFacultyEvaluationScoreResponse {
   facultyEvaluationScoreId: number;
@@ -57,6 +60,34 @@ export interface UpdateFacultyRequest {
   loadLimit: number;
   college: string;
   status: string;
+}
+export interface CreateUserAccountRequest {
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+  college?: string;
+  programs?: string;
+  majors?: string;
+  status: string;
+}
+
+export interface UpdateUserAccountRequest {
+  userId: number;
+  username: string;
+  email: string;
+  role: string;
+  college?: string;
+  programs?: string;
+  majors?: string;
+  status: string;
+  isEnabled: boolean;
+  isLocked: boolean;
+}
+
+export interface UpdateUserPasswordRequest {
+  userId: number;
+  newPassword: string;
 }
 export interface MigrationErrorResponse {
   entity?: string;
@@ -272,6 +303,46 @@ export class AdminService {
       `${this.ADMIN_API_URL}/student-faculty-evaluation`,
       {
         params,
+        withCredentials: true,
+      },
+    );
+  }
+
+  createUserAccount(
+    payload: CreateUserAccountRequest,
+  ): Observable<string> {
+
+    return this.http.post(
+      `${this.ADMIN_API_URL}/create-user`,
+      payload,
+      {
+        responseType: 'text',
+        withCredentials: true,
+      },
+    );
+  }
+  updateUserAccount(
+    payload: UpdateUserAccountRequest,
+  ): Observable<string> {
+
+    return this.http.put(
+      `${this.ADMIN_API_URL}/update-user`,
+      payload,
+      {
+        responseType: 'text',
+        withCredentials: true,
+      },
+    );
+  }
+  updateUserPassword(
+    payload: UpdateUserPasswordRequest,
+  ): Observable<string> {
+
+    return this.http.put(
+      `${this.ADMIN_API_URL}/update-password`,
+      payload,
+      {
+        responseType: 'text',
         withCredentials: true,
       },
     );

@@ -115,7 +115,7 @@ export class SchoolYearAndSemesterEffects {
                 tap(({ error }) => {
 
                     this.toastFacade.showToast(
-                        error?.error ||
+                        error?.error.message ||
                         'Failed to update school year and semester.',
                         'error',
                     );

@@ -72,4 +72,21 @@ export const adminDataReducer = createReducer(
     facultyEvaluationScoresByFacultyId: response,
     loading: false,
   })),
+  on(AdminActions.createUserAccountSuccess, (state, { response }) => ({
+  ...state,
+  createUserAccountMessage: response,
+  loading: false,
+})),
+
+on(AdminActions.updateUserAccountSuccess, (state, { response }) => ({
+  ...state,
+  updateUserAccountMessage: response,
+  loading: false,
+})),
+
+on(AdminActions.updateUserPasswordSuccess, (state, { response }) => ({
+  ...state,
+  updateUserPasswordMessage: response,
+  loading: false,
+})),
 );

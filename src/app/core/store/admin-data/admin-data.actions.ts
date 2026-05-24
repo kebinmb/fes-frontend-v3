@@ -1,10 +1,13 @@
 import { createAction, props } from '@ngrx/store';
 import {
+  CreateUserAccountRequest,
   FetchFacultyEvaluationScoreResponse,
   FetchFacultyResponse,
   FetchUserAccountsResponse,
   PageResponse,
   UpdateFacultyRequest,
+  UpdateUserAccountRequest,
+  UpdateUserPasswordRequest,
 } from '../../services/admin/admin-service';
 import { FacultyEvaluationScore } from '../../services/evaluation/evaluation-service';
 
@@ -70,7 +73,50 @@ export const updateFacultyFailure = createAction(
   '[Admin] Update Faculty Failure',
   props<{ error: any }>(),
 );
+export const createUserAccount = createAction(
+  '[Admin] Create User Account',
+  props<{ payload: CreateUserAccountRequest }>(),
+);
 
+export const createUserAccountSuccess = createAction(
+  '[Admin] Create User Account Success',
+  props<{ response: string }>(),
+);
+
+export const createUserAccountFailure = createAction(
+  '[Admin] Create User Account Failure',
+  props<{ error: any }>(),
+);
+
+export const updateUserAccount = createAction(
+  '[Admin] Update User Account',
+  props<{ payload: UpdateUserAccountRequest }>(),
+);
+
+export const updateUserAccountSuccess = createAction(
+  '[Admin] Update User Account Success',
+  props<{ response: string }>(),
+);
+
+export const updateUserAccountFailure = createAction(
+  '[Admin] Update User Account Failure',
+  props<{ error: any }>(),
+);
+
+export const updateUserPassword = createAction(
+  '[Admin] Update User Password',
+  props<{ payload: UpdateUserPasswordRequest }>(),
+);
+
+export const updateUserPasswordSuccess = createAction(
+  '[Admin] Update User Password Success',
+  props<{ response: string }>(),
+);
+
+export const updateUserPasswordFailure = createAction(
+  '[Admin] Update User Password Failure',
+  props<{ error: any }>(),
+);
 export const loadFacultyEvaluationScoresByFacultyId = createAction(
   '[Admin] Load Faculty Evaluation Scores By Faculty Id',
 

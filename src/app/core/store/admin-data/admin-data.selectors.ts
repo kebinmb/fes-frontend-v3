@@ -26,3 +26,17 @@ export const selectFacultyEvaluationScoresByFacultyId = createSelector(
 
   (state) => state.facultyEvaluationScoresByFacultyId,
 );
+export const selectCreateUserAccountMessage = createSelector(
+  selectAdminDataState,
+  (state) => state.createUserAccountMessage,
+);
+
+export const selectUpdateUserAccountMessage = createSelector(
+  selectAdminDataState,
+  (state) => state.updateUserAccountMessage,
+);
+
+export const selectUpdateUserPasswordMessage = createSelector(
+  selectAdminDataState,
+  (state) => state.updateUserPasswordMessage,
+);
