@@ -58,7 +58,7 @@
           <i class="bi bi-person-circle"></i>
         </div>
 
-        <h2>Welcome Back</h2>
+        <h2>Welcome</h2>
 
         <p>
           Sign in to continue to your account
@@ -202,9 +202,23 @@
       }
 
       @if (role === 'student') {
-
       <form class="student-login" [formGroup]="studentForm" (ngSubmit)="onStudentSubmit()">
+        @if(step === 0){
+          <div class="sis-login-banner">
 
+          <div class="sis-login-icon">
+            <i class="bi bi-shield-check"></i>
+          </div>
+
+          <div class="sis-login-content">
+            <h4>Login using your SIS Account</h4>
+            <p>
+              Use your official Student Information System credentials to continue.
+            </p>
+          </div>
+
+        </div>
+        }
         <div class="step-indicator">
 
           <div class="step-item" [class.active]="step >= 0">
@@ -245,7 +259,7 @@
 
             <input type="text" class="form-control" formControlName="studentId"
               placeholder="Enter your Identification Number" maxlength="12" inputmode="numeric" autocomplete="username"
-              spellcheck="false" autocorrect="off" (keypress)="allowOnlyNumbers($event)" />
+              spellcheck="false" autocorrect="off" />
 
           </div>
 
@@ -254,13 +268,6 @@
               studentForm.get('studentId')?.hasError('required')
             ">
             Student ID is required
-          </small>
-
-          <small class="text-danger" *ngIf="
-              studentForm.get('studentId')?.touched &&
-              studentForm.get('studentId')?.hasError('pattern')
-            ">
-            Student ID must contain numbers only
           </small>
 
           <small class="text-danger" *ngIf="
@@ -330,7 +337,6 @@
           </div>
 
         </div>
-
         <div class="form-group">
 
           <label class="form-label">
@@ -380,7 +386,19 @@
         </div>
 
         }
+        @if(step == 0){
+          <div class="sis-password-link">
 
+          <span>
+            Need your SIS password?
+          </span>
+
+          <a href="https://sis.chmsu.edu.ph" target="_blank" rel="noopener noreferrer">
+            Request it here
+          </a>
+
+        </div>
+        }
         <button type="submit" class="login-btn" [disabled]="
             step === 0
               ? studentForm.get('studentId')?.invalid ||

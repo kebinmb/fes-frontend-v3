@@ -62,8 +62,7 @@ export class LoginComponent
       [
         Validators.required,
         Validators.minLength(8),
-        Validators.maxLength(12),
-        Validators.pattern(/^\d+$/),
+        Validators.maxLength(12)
       ],
     ],
 
