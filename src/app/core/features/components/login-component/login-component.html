@@ -4,25 +4,23 @@
 
     <div class="brand-panel">
       <div class="brand-content">
-
         <div class="logo-container">
-          <img src="chmsu-logo.png" alt="Carlos Hilado Memorial State University Logo" class="brand-logo" />
+          <img
+            src="chmsu-logo.png"
+            alt="Carlos Hilado Memorial State University Logo"
+            class="brand-logo"
+          />
         </div>
 
         <div class="brand-badge">
           <span>Academic Portal</span>
         </div>
 
-        <h1 class="brand-title">
-          Faculty Evaluation System
-        </h1>
+        <h1 class="brand-title">Faculty Evaluation System</h1>
 
-        <p class="brand-subtitle">
-          Carlos Hilado Memorial State University
-        </p>
+        <p class="brand-subtitle">Carlos Hilado Memorial State University</p>
 
         <div class="brand-features">
-
           <div class="feature-item">
             <i class="bi bi-shield-lock"></i>
             <span>Secure Authentication</span>
@@ -37,390 +35,365 @@
             <i class="bi bi-graph-up-arrow"></i>
             <span>Reliable Faculty Assessment</span>
           </div>
-
         </div>
       </div>
     </div>
   </section>
 
   <section class="login-card-display">
-
     <div class="background-blur-circle top"></div>
     <div class="background-blur-circle bottom"></div>
 
     <div class="login-card">
-
       <div class="card-top-line"></div>
 
       <div class="login-card-header">
-
         <div class="login-icon">
           <i class="bi bi-person-circle"></i>
         </div>
 
         <h2>Welcome</h2>
 
-        <p>
-          Sign in to continue to your account
-        </p>
-
+        <p>Sign in to continue to your account</p>
       </div>
 
       <div class="role-toggle-btn">
-
         <button type="button" [class.active]="role === 'student'" (click)="setRole('student')">
           <i class="bi bi-mortarboard-fill"></i>
 
           <span>Student</span>
         </button>
 
-        <button type="button" [class.active]="role === 'supervisor'" (click)="setRole('supervisor')">
+        <button
+          type="button"
+          [class.active]="role === 'supervisor'"
+          (click)="setRole('supervisor')"
+        >
           <i class="bi bi-person-badge-fill"></i>
 
           <span>Supervisor</span>
         </button>
-
       </div>
 
       @if (role === 'supervisor') {
+        <form
+          class="login-card-content"
+          [formGroup]="supervisorForm"
+          (ngSubmit)="onSupervisorSubmit()"
+        >
+          <div class="form-group">
+            <label for="username"> Username </label>
 
-      <form class="login-card-content" [formGroup]="supervisorForm" (ngSubmit)="onSupervisorSubmit()">
+            <div class="input-wrapper">
+              <i class="bi bi-person"></i>
 
-        <div class="form-group">
+              <input
+                id="username"
+                formControlName="username"
+                type="text"
+                placeholder="Enter username"
+                autocomplete="username"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+                maxlength="40"
+              />
+            </div>
 
-          <label for="username">
-            Username
-          </label>
+            @if (
+              supervisorFormControl['username'].touched &&
+              supervisorFormControl['username'].hasError('required')
+            ) {
+              <small class="text-danger"> Username is required </small>
+            }
 
-          <div class="input-wrapper">
-
-            <i class="bi bi-person"></i>
-
-            <input id="username" formControlName="username" type="text" placeholder="Enter username"
-              autocomplete="username" spellcheck="false" autocorrect="off" autocapitalize="off" maxlength="40" />
-
+            @if (
+              supervisorFormControl['username'].touched &&
+              supervisorFormControl['username'].hasError('maxlength')
+            ) {
+              <small class="text-danger"> Username is too long </small>
+            }
           </div>
 
-          @if (
-          supervisorFormControl['username'].touched &&
-          supervisorFormControl['username'].hasError('required')
-          ) {
+          <div class="form-group">
+            <label for="supervisorPassword"> Password </label>
 
-          <small class="text-danger">
-            Username is required
-          </small>
+            <div class="input-wrapper">
+              <i class="bi bi-lock"></i>
 
-          }
+              <input
+                id="supervisorPassword"
+                formControlName="password"
+                type="password"
+                placeholder="Enter password"
+                autocomplete="current-password"
+                spellcheck="false"
+                autocorrect="off"
+                autocapitalize="off"
+                (keydown)="detectCapsLock($event)"
+                (keyup)="detectCapsLock($event)"
+                (blur)="isCapsLockOn = false"
+              />
+            </div>
 
-          @if (
-          supervisorFormControl['username'].touched &&
-          supervisorFormControl['username'].hasError('maxlength')
-          ) {
+            <small class="text-warning capslock-warning" *ngIf="isCapsLockOn">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              Caps Lock is ON
+            </small>
 
-          <small class="text-danger">
-            Username is too long
-          </small>
-
-          }
-
-        </div>
-
-        <div class="form-group">
-
-          <label for="supervisorPassword">
-            Password
-          </label>
-
-          <div class="input-wrapper">
-
-            <i class="bi bi-lock"></i>
-
-            <input id="supervisorPassword" formControlName="password" type="password" placeholder="Enter password"
-              autocomplete="current-password" spellcheck="false" autocorrect="off" autocapitalize="off"
-              (keydown)="detectCapsLock($event)" (keyup)="detectCapsLock($event)" (blur)="isCapsLockOn = false" />
-
+            @if (
+              supervisorFormControl['password'].touched &&
+              supervisorFormControl['password'].hasError('required')
+            ) {
+              <small class="text-danger"> Password is required </small>
+            }
           </div>
 
-          <small class="text-warning capslock-warning" *ngIf="isCapsLockOn">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            Caps Lock is ON
-          </small>
+          <button type="submit" class="login-btn" [disabled]="supervisorForm.invalid">
+            <i class="bi bi-box-arrow-in-right"></i>
 
-          @if (
-          supervisorFormControl['password'].touched &&
-          supervisorFormControl['password'].hasError('required')
-          ) {
+            <span> Login </span>
+          </button>
+        </form>
 
-          <small class="text-danger">
-            Password is required
-          </small>
-
-          }
-
+        <div class="divider">
+          <span>or continue with</span>
         </div>
 
-        <button type="submit" class="login-btn" [disabled]="supervisorForm.invalid">
+        <button type="button" class="google-login-btn" (click)="loginWithGoogle()">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="google-icon">
+            <path
+              fill="#FFC107"
+              d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"
+            />
 
-          <i class="bi bi-box-arrow-in-right"></i>
+            <path
+              fill="#FF3D00"
+              d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"
+            />
 
-          <span>
-            Login
-          </span>
+            <path
+              fill="#4CAF50"
+              d="M24 44c5.2 0 10-2 13.5-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.8-3.3-11.5-8l-6.5 5C9.3 39.6 16.1 44 24 44z"
+            />
 
+            <path
+              fill="#1976D2"
+              d="M43.6 20.5H42V20H24v8h11.3c-1.1 3-3.2 5.4-6 7l6.2 5.2C39.7 36.4 44 30.7 44 24c0-1.3-.1-2.3-.4-3.5z"
+            />
+          </svg>
+
+          <span> Continue with Google </span>
         </button>
-
-      </form>
-
-      <div class="divider">
-        <span>or continue with</span>
-      </div>
-
-      <button type="button" class="google-login-btn" (click)="loginWithGoogle()">
-
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="google-icon">
-
-          <path fill="#FFC107"
-            d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z" />
-
-          <path fill="#FF3D00"
-            d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
-
-          <path fill="#4CAF50"
-            d="M24 44c5.2 0 10-2 13.5-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.8-3.3-11.5-8l-6.5 5C9.3 39.6 16.1 44 24 44z" />
-
-          <path fill="#1976D2"
-            d="M43.6 20.5H42V20H24v8h11.3c-1.1 3-3.2 5.4-6 7l6.2 5.2C39.7 36.4 44 30.7 44 24c0-1.3-.1-2.3-.4-3.5z" />
-
-        </svg>
-
-        <span>
-          Continue with Google
-        </span>
-
-      </button>
-
       }
 
       @if (role === 'student') {
-      <form class="student-login" [formGroup]="studentForm" (ngSubmit)="onStudentSubmit()">
-        @if(step === 0){
-          <div class="sis-login-banner">
+        <form class="student-login" [formGroup]="studentForm" (ngSubmit)="onStudentSubmit()">
+          @if (step === 0) {
+            <div class="sis-login-banner">
+              <div class="sis-login-icon">
+                <i class="bi bi-shield-check"></i>
+              </div>
 
-          <div class="sis-login-icon">
-            <i class="bi bi-shield-check"></i>
-          </div>
+              <div class="sis-login-content">
+                <h4>Login using your SIS Account</h4>
+                <p>Use your official Student Information System credentials to continue.</p>
+              </div>
+            </div>
+          }
+          <div class="step-indicator">
+            <div class="step-item" [class.active]="step >= 0">
+              <div class="step-circle">1</div>
 
-          <div class="sis-login-content">
-            <h4>Login using your SIS Account</h4>
-            <p>
-              Use your official Student Information System credentials to continue.
-            </p>
-          </div>
-
-        </div>
-        }
-        <div class="step-indicator">
-
-          <div class="step-item" [class.active]="step >= 0">
-
-            <div class="step-circle">
-              1
+              <span>Credentials</span>
             </div>
 
-            <span>Credentials</span>
+            <div class="step-line" [class.active]="step === 1"></div>
 
+            <div class="step-item" [class.active]="step === 1">
+              <div class="step-circle">2</div>
+
+              <span>Verification</span>
+            </div>
           </div>
 
-          <div class="step-line" [class.active]="step === 1"></div>
+          @if (step === 0) {
+            <div class="form-group">
+              <label class="form-label"> Student ID </label>
 
-          <div class="step-item" [class.active]="step === 1">
+              <div class="input-wrapper">
+                <i class="bi bi-person-vcard"></i>
 
-            <div class="step-circle">
-              2
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="studentId"
+                  placeholder="Enter your Identification Number"
+                  maxlength="12"
+                  autocomplete="username"
+                  spellcheck="false"
+                  autocorrect="off"
+                />
+              </div>
+
+              <small
+                class="text-danger"
+                *ngIf="
+                  studentForm.get('studentId')?.touched &&
+                  studentForm.get('studentId')?.hasError('required')
+                "
+              >
+                Student ID is required
+              </small>
+
+              <small
+                class="text-danger"
+                *ngIf="
+                  studentForm.get('studentId')?.touched &&
+                  studentForm.get('studentId')?.hasError('minlength')
+                "
+              >
+                Student ID is too short
+              </small>
             </div>
 
-            <span>Verification</span>
+            <div class="form-group">
+              <label class="form-label"> Password </label>
 
-          </div>
+              <div class="input-wrapper">
+                <i class="bi bi-shield-lock"></i>
 
-        </div>
+                <input
+                  type="password"
+                  class="form-control"
+                  formControlName="password"
+                  placeholder="Enter your Password"
+                  autocomplete="current-password"
+                  spellcheck="false"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  (keydown)="detectCapsLock($event)"
+                  (keyup)="detectCapsLock($event)"
+                  (blur)="isCapsLockOn = false"
+                />
+              </div>
 
-        @if (step === 0) {
+              <small class="text-warning capslock-warning" *ngIf="isCapsLockOn">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Caps Lock is ON
+              </small>
 
-        <div class="form-group">
+              <small
+                class="text-danger"
+                *ngIf="
+                  studentForm.get('password')?.touched &&
+                  studentForm.get('password')?.hasError('required')
+                "
+              >
+                Password is required
+              </small>
 
-          <label class="form-label">
-            Student ID
-          </label>
+              <small
+                class="text-danger"
+                *ngIf="
+                  studentForm.get('password')?.touched &&
+                  studentForm.get('password')?.hasError('minlength')
+                "
+              >
+                Password must contain at least 6 characters
+              </small>
+            </div>
+          }
 
-          <div class="input-wrapper">
+          @if (step === 1) {
+            <div class="verification-message">
+              <i class="bi bi-envelope-check-fill"></i>
 
-            <i class="bi bi-person-vcard"></i>
+              <div>
+                <h4>Verification Required</h4>
 
-            <input type="text" class="form-control" formControlName="studentId"
-              placeholder="Enter your Identification Number" maxlength="12" inputmode="numeric" autocomplete="username"
-              spellcheck="false" autocorrect="off" />
+                <p>Enter the access code sent to your registered email.</p>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label"> Student ID </label>
 
-          </div>
+              <div class="input-wrapper readonly">
+                <i class="bi bi-person-vcard"></i>
 
-          <small class="text-danger" *ngIf="
-              studentForm.get('studentId')?.touched &&
-              studentForm.get('studentId')?.hasError('required')
-            ">
-            Student ID is required
-          </small>
+                <input class="form-control" formControlName="studentId" readonly />
+              </div>
+            </div>
 
-          <small class="text-danger" *ngIf="
-              studentForm.get('studentId')?.touched &&
-              studentForm.get('studentId')?.hasError('minlength')
-            ">
-            Student ID is too short
-          </small>
+            <div class="form-group">
+              <label class="form-label"> Access Code </label>
 
-        </div>
+              <div class="input-wrapper">
+                <i class="bi bi-key-fill"></i>
 
-        <div class="form-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  formControlName="accessCode"
+                  placeholder="Enter access code"
+                  maxlength="12"
+                  autocomplete="one-time-code"
+                  autocapitalize="characters"
+                  (input)="forceUppercaseAccessCode()"
+                />
+              </div>
 
-          <label class="form-label">
-            Password
-          </label>
+              <small
+                class="text-danger"
+                *ngIf="
+                  studentForm.get('accessCode')?.touched &&
+                  studentForm.get('accessCode')?.hasError('required')
+                "
+              >
+                Access Code is required
+              </small>
 
-          <div class="input-wrapper">
+              <small
+                class="text-danger"
+                *ngIf="
+                  studentForm.get('accessCode')?.touched &&
+                  studentForm.get('accessCode')?.hasError('minlength')
+                "
+              >
+                Access Code is too short
+              </small>
+            </div>
+          }
+          @if (step == 0) {
+            <div class="sis-password-link">
+              <span> Need your SIS password? </span>
 
-            <i class="bi bi-shield-lock"></i>
+              <a href="https://sis.chmsu.edu.ph" target="_blank" rel="noopener noreferrer">
+                Request it here
+              </a>
+            </div>
+          }
+          <button
+            type="submit"
+            class="login-btn"
+            [disabled]="
+              step === 0
+                ? studentForm.get('studentId')?.invalid || studentForm.get('password')?.invalid
+                : studentForm.invalid
+            "
+          >
+            <i
+              class="bi"
+              [class.bi-envelope-fill]="step === 0"
+              [class.bi-box-arrow-in-right]="step === 1"
+            ></i>
 
-            <input type="password" class="form-control" formControlName="password" placeholder="Enter your Password"
-              autocomplete="current-password" spellcheck="false" autocorrect="off" autocapitalize="off"
-              (keydown)="detectCapsLock($event)" (keyup)="detectCapsLock($event)" (blur)="isCapsLockOn = false" />
-
-          </div>
-
-          <small class="text-warning capslock-warning" *ngIf="isCapsLockOn">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            Caps Lock is ON
-          </small>
-
-          <small class="text-danger" *ngIf="
-              studentForm.get('password')?.touched &&
-              studentForm.get('password')?.hasError('required')
-            ">
-            Password is required
-          </small>
-
-          <small class="text-danger" *ngIf="
-              studentForm.get('password')?.touched &&
-              studentForm.get('password')?.hasError('minlength')
-            ">
-            Password must contain at least 6 characters
-          </small>
-
-        </div>
-
-        }
-
-        @if (step === 1) {
-
-        <div class="verification-message">
-
-          <i class="bi bi-envelope-check-fill"></i>
-
-          <div>
-
-            <h4>
-              Verification Required
-            </h4>
-
-            <p>
-              Enter the access code sent to your registered email.
-            </p>
-
-          </div>
-
-        </div>
-        <div class="form-group">
-
-          <label class="form-label">
-            Student ID
-          </label>
-
-          <div class="input-wrapper readonly">
-
-            <i class="bi bi-person-vcard"></i>
-
-            <input class="form-control" formControlName="studentId" readonly />
-
-          </div>
-
-        </div>
-
-        <div class="form-group">
-
-          <label class="form-label">
-            Access Code
-          </label>
-
-          <div class="input-wrapper">
-
-            <i class="bi bi-key-fill"></i>
-
-            <input type="text" class="form-control" formControlName="accessCode" placeholder="Enter access code"
-              maxlength="12" autocomplete="one-time-code" autocapitalize="characters"
-              (input)="forceUppercaseAccessCode()" />
-
-          </div>
-
-          <small class="text-danger" *ngIf="
-              studentForm.get('accessCode')?.touched &&
-              studentForm.get('accessCode')?.hasError('required')
-            ">
-            Access Code is required
-          </small>
-
-          <small class="text-danger" *ngIf="
-              studentForm.get('accessCode')?.touched &&
-              studentForm.get('accessCode')?.hasError('minlength')
-            ">
-            Access Code is too short
-          </small>
-
-        </div>
-
-        }
-        @if(step == 0){
-          <div class="sis-password-link">
-
-          <span>
-            Need your SIS password?
-          </span>
-
-          <a href="https://sis.chmsu.edu.ph" target="_blank" rel="noopener noreferrer">
-            Request it here
-          </a>
-
-        </div>
-        }
-        <button type="submit" class="login-btn" [disabled]="
-            step === 0
-              ? studentForm.get('studentId')?.invalid ||
-                studentForm.get('password')?.invalid
-              : studentForm.invalid
-          ">
-
-          <i class="bi" [class.bi-envelope-fill]="step === 0" [class.bi-box-arrow-in-right]="step === 1"></i>
-
-          <span>
-            {{ step === 0
-            ? 'Generate Access Code'
-            : 'Login'
-            }}
-          </span>
-
-        </button>
-
-      </form>
-
+            <span>
+              {{ step === 0 ? 'Generate Access Code' : 'Login' }}
+            </span>
+          </button>
+        </form>
       }
-
     </div>
   </section>
 </div>
