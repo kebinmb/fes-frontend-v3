@@ -14,6 +14,7 @@ import { guestGuard } from './utilities/guards/guest/guest-guard';
 import { SettingsComponent } from './core/features/components/settings-component/settings-component';
 import { OauthSuccessComponent } from './shared/components/oauth-success-component/oauth-success-component';
 import { StudentEvaluationsDataTableComponent } from './core/features/components/student-evaluations-data-table/student-evaluations-data-table-component';
+import { FacultyEvaluationPrintComponent } from './shared/components/faculty-evaluation-print-component/faculty-evaluation-print-component';
 
 export const routes: Routes = [
   {
@@ -61,6 +62,10 @@ export const routes: Routes = [
     ],
   },
   {
+    path: 'print/faculty-evaluation',
+    component: FacultyEvaluationPrintComponent,
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
@@ -69,5 +74,5 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'login',
-  },
+  }
 ];

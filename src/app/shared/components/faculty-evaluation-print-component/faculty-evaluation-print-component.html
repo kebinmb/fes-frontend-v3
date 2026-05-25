@@ -1,0 +1,402 @@
+<div class="print-container">
+
+  <!-- ================================================= -->
+  <!-- HEADER -->
+  <!-- ================================================= -->
+
+  <div class="report-header">
+
+    <img
+      src="chmsu-logo.png"
+      class="report-logo"
+      alt="CHMSU Logo"
+    />
+
+    <div class="report-header-content">
+
+      <h1>
+        CHMSU Faculty Evaluation System
+      </h1>
+
+      <h2>
+        Individual Faculty Evaluation Report
+      </h2>
+
+      <p>
+        Carlos Hilado Memorial State University
+      </p>
+
+    </div>
+
+  </div>
+
+  <!-- ================================================= -->
+  <!-- FACULTY INFO -->
+  <!-- ================================================= -->
+
+  <div class="faculty-info">
+
+    <div class="faculty-grid">
+
+      <div class="faculty-item">
+        <span class="faculty-label">
+          Faculty Name
+        </span>
+
+        <span class="faculty-value">
+          {{ faculty?.facultyName || '-' }}
+        </span>
+      </div>
+
+      <div class="faculty-item">
+        <span class="faculty-label">
+          Department / College
+        </span>
+
+        <span class="faculty-value">
+          {{ faculty?.college || '-' }}
+        </span>
+      </div>
+
+      <div class="faculty-item">
+        <span class="faculty-label">
+          Faculty Rank
+        </span>
+
+        <span class="faculty-value">
+          {{ faculty?.position || '-' }}
+        </span>
+      </div>
+
+      <div class="faculty-item">
+        <span class="faculty-label">
+          Academic Term
+        </span>
+
+        <span class="faculty-value">
+          {{ faculty?.semester || '-' }}
+          Semester /
+          {{ faculty?.schoolYear || '-' }}
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================================================= -->
+  <!-- SET -->
+  <!-- ================================================= -->
+
+  <div class="section-title">
+    A. Student Evaluation of Teaching (SET)
+  </div>
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Seq</th>
+        <th>Course Code</th>
+        <th>Year / Section</th>
+        <th>No. of Students</th>
+        <th>SET Rating</th>
+        <th>Weighted Score</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      @for (
+        item of setData;
+        track item.facultyEvaluationScoreId;
+        let i = $index
+      ) {
+
+        <tr>
+          <td>{{ i + 1 }}</td>
+
+          <td>
+            {{ item.subjectCode }}
+          </td>
+
+          <td>
+            {{ item.yearLevel }}
+          </td>
+
+          <td>
+            {{ item.numberOfStudents }}
+          </td>
+
+          <td>
+            {{
+              item.setRating?.toFixed(2)
+            }}
+          </td>
+
+          <td>
+            {{
+              (
+                (item.numberOfStudents ?? 0) *
+                (item.setRating ?? 0)
+              ).toFixed(2)
+            }}
+          </td>
+        </tr>
+      }
+
+      <tr class="total-row">
+
+        <td colspan="3">
+          TOTAL
+        </td>
+
+        <td>
+          {{ totalStudents }}
+        </td>
+
+        <td>
+          -
+        </td>
+
+        <td>
+          {{
+            totalWeightedScore.toFixed(2)
+          }}
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+  <!-- ================================================= -->
+  <!-- SEF -->
+  <!-- ================================================= -->
+
+  <div class="section-title">
+    B. Supervisor Evaluation of Faculty (SEF)
+  </div>
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Seq</th>
+        <th>Course Code</th>
+        <th>Year / Section</th>
+        <th>SEF Rating</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      @for (
+        item of sefData;
+        track item.facultyEvaluationScoreId;
+        let i = $index
+      ) {
+
+        <tr>
+          <td>{{ i + 1 }}</td>
+
+          <td>
+            {{ item.subjectCode }}
+          </td>
+
+          <td>
+            {{ item.yearLevel }}
+          </td>
+
+          <td>
+            {{
+              item.sefRating?.toFixed(2)
+            }}
+          </td>
+        </tr>
+      }
+
+    </tbody>
+
+  </table>
+
+  <!-- ================================================= -->
+  <!-- SUMMARY -->
+  <!-- ================================================= -->
+
+  <div class="section-title">
+    C. Overall Evaluation Summary
+  </div>
+
+  <div class="summary-wrapper">
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Overall SET Rating
+      </div>
+
+      <div class="summary-value">
+        {{
+          overallSetRating.toFixed(2)
+        }}
+      </div>
+
+    </div>
+
+    <div class="summary-card">
+
+      <div class="summary-label">
+        Overall SEF Rating
+      </div>
+
+      <div class="summary-value">
+        {{
+          overallSefRating.toFixed(2)
+        }}
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================================================= -->
+  <!-- STUDENT COMMENTS -->
+  <!-- ================================================= -->
+
+  <div class="section-title">
+    D. Student Comments
+  </div>
+
+  <table>
+
+    <thead>
+      <tr>
+        <th width="80">
+          Seq
+        </th>
+
+        <th>
+          Student Comments
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      @for (
+        item of studentComments;
+        track item.facultyEvaluationScoreId;
+        let i = $index
+      ) {
+
+        <tr>
+
+          <td>
+            {{ i + 1 }}
+          </td>
+
+          <td>
+            {{
+              item.studentComments
+            }}
+          </td>
+
+        </tr>
+      }
+
+    </tbody>
+
+  </table>
+
+  <!-- ================================================= -->
+  <!-- SUPERVISOR COMMENTS -->
+  <!-- ================================================= -->
+
+  <div class="section-title">
+    E. Supervisor Comments
+  </div>
+
+  <table>
+
+    <thead>
+      <tr>
+        <th width="80">
+          Seq
+        </th>
+
+        <th>
+          Supervisor Comments
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      @for (
+        item of supervisorComments;
+        track item.facultyEvaluationScoreId;
+        let i = $index
+      ) {
+
+        <tr>
+
+          <td>
+            {{ i + 1 }}
+          </td>
+
+          <td>
+            {{
+              item.supervisorComments
+            }}
+          </td>
+
+        </tr>
+      }
+
+    </tbody>
+
+  </table>
+
+  <!-- ================================================= -->
+  <!-- APPROVAL -->
+  <!-- ================================================= -->
+
+  <div class="approval-section">
+
+    <div class="approval-card">
+
+      <div class="approval-title">
+        Prepared By
+      </div>
+
+      <div class="signature-line">
+        Signature Over Printed Name
+      </div>
+
+      <div class="signature-line">
+        Date
+      </div>
+
+    </div>
+
+    <div class="approval-card">
+
+      <div class="approval-title">
+        Reviewed By
+      </div>
+
+      <div class="signature-line">
+        Authorized Official
+      </div>
+
+      <div class="signature-line">
+        Date
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

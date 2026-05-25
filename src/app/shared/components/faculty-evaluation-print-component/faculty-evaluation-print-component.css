@@ -1,0 +1,306 @@
+:host {
+  display: block;
+  background: white;
+}
+
+:root {
+  --chmsu-primary: #186443;
+  --chmsu-secondary: #6a9d8a;
+  --chmsu-accent: #e5d413;
+  --chmsu-border: #dbe4de;
+  --chmsu-bg: #f7faf8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.print-container {
+  padding: 32px;
+  color: #1f2937;
+  background: white;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.report-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
+  border-bottom:
+    4px solid var(--chmsu-primary);
+
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.report-logo {
+  width: 82px;
+  height: 82px;
+  object-fit: contain;
+}
+
+.report-header-content h1 {
+  margin: 0;
+
+  color: var(--chmsu-primary);
+
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.report-header-content h2 {
+  margin:
+    6px 0 0;
+
+  font-size: 17px;
+  color: #374151;
+}
+
+.report-header-content p {
+  margin:
+    8px 0 0;
+
+  color: #6b7280;
+
+  font-size: 13px;
+}
+
+/* =====================================================
+   INFO
+===================================================== */
+
+.faculty-info {
+  background: var(--chmsu-bg);
+
+  border:
+    1px solid var(--chmsu-border);
+
+  border-radius: 14px;
+
+  padding: 22px;
+
+  margin-bottom: 28px;
+}
+
+.faculty-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 18px;
+}
+
+.faculty-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.faculty-label {
+  font-size: 12px;
+  font-weight: 700;
+
+  color: #6b7280;
+
+  text-transform: uppercase;
+}
+
+.faculty-value {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* =====================================================
+   TITLES
+===================================================== */
+
+.section-title {
+  margin:
+    34px 0 14px;
+
+  padding-left: 14px;
+
+  border-left:
+    6px solid var(--chmsu-primary);
+
+  color: var(--chmsu-primary);
+
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* =====================================================
+   TABLES
+===================================================== */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+
+  margin-top: 10px;
+
+  border:
+    1px solid var(--chmsu-border);
+}
+
+th {
+  background:
+    linear-gradient(
+      135deg,
+      var(--chmsu-primary),
+      #237552
+    );
+
+  color: white;
+
+  padding: 12px;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+td {
+  border:
+    1px solid var(--chmsu-border);
+
+  padding: 11px 12px;
+
+  font-size: 13px;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafcfa;
+}
+
+.total-row td {
+  background: #eef6f1;
+  font-weight: 700;
+}
+
+/* =====================================================
+   SUMMARY
+===================================================== */
+
+.summary-wrapper {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 18px;
+}
+
+.summary-card {
+  border:
+    1px solid var(--chmsu-border);
+
+  border-radius: 14px;
+
+  padding: 22px;
+
+  text-align: center;
+}
+
+.summary-label {
+  font-size: 13px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  color: #6b7280;
+}
+
+.summary-value {
+  margin-top: 12px;
+
+  font-size: 34px;
+  font-weight: 800;
+
+  color: var(--chmsu-primary);
+}
+
+/* =====================================================
+   APPROVAL
+===================================================== */
+
+.approval-section {
+  margin-top: 70px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 40px;
+}
+
+.approval-title {
+  color: var(--chmsu-primary);
+
+  font-size: 16px;
+  font-weight: 800;
+
+  margin-bottom: 24px;
+}
+
+.signature-line {
+  margin-top: 46px;
+
+  border-top:
+    1px solid #374151;
+
+  padding-top: 8px;
+
+  text-align: center;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* =====================================================
+   PRINT
+===================================================== */
+
+@media print {
+
+  app-sidebar,
+  app-header,
+  .sidebar,
+  .topbar,
+  .dashboard-layout,
+  .admin-layout,
+  nav,
+  aside,
+  header,
+  .no-print {
+    display: none !important;
+  }
+
+  body,
+  html {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  app-faculty-evaluation-print-component {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .print-container {
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+}
