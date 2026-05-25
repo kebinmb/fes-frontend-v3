@@ -7,7 +7,7 @@ export interface StudentClassLoadDTO {
   facultyId: string;
   subjectCode: string;
   sectionId: number;
-  yearLevel:string;
+  yearLevel: string;
   semester: string;
   schoolYear: number;
   studentId: string;
@@ -33,7 +33,7 @@ export class StudentDataService {
     studentId: string,
     page: number = 0,
     size: number = 10,
-    sort: string = 'desc',
+    sort: string = 'primaryStudentLoadId,desc',
   ): Observable<PageResponse<StudentClassLoadDTO>> {
     const params = new HttpParams()
       .set('studentId', studentId)
@@ -46,5 +46,4 @@ export class StudentDataService {
       { params, withCredentials: true },
     );
   }
-
 }
