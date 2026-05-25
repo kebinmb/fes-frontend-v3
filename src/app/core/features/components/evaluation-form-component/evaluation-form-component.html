@@ -1,202 +1,219 @@
 <div class="evaluation-page page-enter-animation">
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid px-4">
-            <div class="d-flex align-items-center">
-                <div class="brand-logo-small me-3">
-                    <img src="chmsu-logo.png" alt="CHMSU Logo" class="logo-image-small">
-                </div>
-                <div class="brand-text">
-                    <div class="university-name">Carlos Hilado Memorial State University</div>
-                    <div class="system-name">Faculty Evaluation System</div>
-                </div>
-            </div>
-            <button class="btn btn-outline-light btn-sm" (click)="cancel()">
-                <i class="bi bi-arrow-left me-1"></i>
-                Back to Dashboard
-            </button>
+  <!-- Header -->
+  <nav class="navbar navbar-expand-lg">
+    <div class="container-fluid px-4">
+      <div class="d-flex align-items-center">
+        <div class="brand-logo-small me-3">
+          <img src="chmsu-logo.png" alt="CHMSU Logo" class="logo-image-small" />
         </div>
-    </nav>
+        <div class="brand-text">
+          <div class="university-name">Carlos Hilado Memorial State University</div>
+          <div class="system-name">Faculty Evaluation System</div>
+        </div>
+      </div>
+      <button class="btn btn-outline-light btn-sm" (click)="cancel()">
+        <i class="bi bi-arrow-left me-1"></i>
+        Back to Dashboard
+      </button>
+    </div>
+  </nav>
 
-    <!-- Loading State -->
-    @if(isLoading()) {
+  <!-- Loading State -->
+  @if (isLoading()) {
     <div class="container-fluid px-4 py-5 text-center">
-        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-        <p class="mt-3 text-muted">Checking evaluation status...</p>
+      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Checking evaluation status...</p>
     </div>
-    }
+  }
 
-    <!-- Already Evaluated Warning -->
-    @else if(hasAlreadyEvaluated()) {
+  <!-- Already Evaluated Warning -->
+  @else if (hasAlreadyEvaluated()) {
     <div class="container-fluid px-4 py-5">
-        <div class="alert alert-warning text-center">
-            <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem;"></i>
-            <h4 class="mt-3">Already Evaluated</h4>
-            <p>You have already submitted an evaluation for this faculty member in this subject.</p>
-            <button class="btn btn-primary mt-2" (click)="cancel()">
-                <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
-            </button>
-        </div>
+      <div class="alert alert-warning text-center">
+        <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem"></i>
+        <h4 class="mt-3">Already Evaluated</h4>
+        <p>You have already submitted an evaluation for this faculty member in this subject.</p>
+        <button class="btn btn-primary mt-2" (click)="cancel()">
+          <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+        </button>
+      </div>
     </div>
-    }
+  }
 
-    <!-- Evaluation Form -->
-    @else {
+  <!-- Evaluation Form -->
+  @else {
     <div class="container-fluid px-4 py-4">
-        <!-- Page Header -->
-        <div class="class-info-card mb-4">
-            <div class="class-info-header">
-                <h2 class="page-title mb-3">
-                    <i class="bi bi-clipboard-check me-2"></i>Faculty Evaluation Form
-                </h2>
-            </div>
-            <div class="class-info-body">
-                <div class="info-row">
-                    <div class="info-card">
-                        <i class="bi bi-person-badge icon"></i>
-                        <div>
-                            <span class="label">Name of Faculty</span>
-                            <span class="value">{{ facultyName() }}</span>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <i class="bi bi-building icon"></i>
-                        <div>
-                            <span class="label">College</span>
-                            <span class="value">{{ college() }}</span>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <i class="bi bi-book icon"></i>
-                        <div>
-                            <span class="label">Course Code</span>
-                            <span class="value">{{ subjectCode() }}</span>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <i class="bi bi-mortarboard icon"></i>
-                        <div>
-                            <span class="label">Year Level</span>
-                            <span class="value">{{ yearLevel() }}</span>
-                        </div>
-                    </div>
-
-                    <div class="info-card">
-                        <i class="bi bi-calendar-event icon"></i>
-                        <div>
-                            <span class="label">Academic Period</span>
-                            <span class="value">
-                                {{ semester() }} Semester, S.Y. {{ schoolYear() }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <!-- Page Header -->
+      <div class="class-info-card mb-4">
+        <div class="class-info-header">
+          <h2 class="page-title mb-3">
+            <i class="bi bi-clipboard-check me-2"></i>Faculty Evaluation Form
+          </h2>
         </div>
+        <div class="class-info-body">
+          <div class="info-row">
+            <div class="info-card">
+              <i class="bi bi-person-badge icon"></i>
+              <div>
+                <span class="label">Name of Faculty</span>
+                <span class="value">{{ facultyName() }}</span>
+              </div>
+            </div>
 
-        <!-- Rating Guide -->
-        <div class="rating-guide-card mb-4">
-            <h5 class="guide-title">
-                <i class="bi bi-info-circle me-2"></i>Rating Guide
+            <div class="info-card">
+              <i class="bi bi-building icon"></i>
+              <div>
+                <span class="label">College</span>
+                <span class="value">{{ college() }}</span>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <i class="bi bi-book icon"></i>
+              <div>
+                <span class="label">Course Code</span>
+                <span class="value">{{ subjectCode() }}</span>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <i class="bi bi-mortarboard icon"></i>
+              <div>
+                <span class="label">Year Level</span>
+                <span class="value">{{ yearLevel() }}</span>
+              </div>
+            </div>
+
+            <div class="info-card">
+              <i class="bi bi-calendar-event icon"></i>
+              <div>
+                <span class="label">Academic Period</span>
+                <span class="value"> {{ semester() }} Semester, S.Y. {{ schoolYear() }} </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rating Guide -->
+      <div class="rating-guide-card mb-4">
+        <h5 class="guide-title"><i class="bi bi-info-circle me-2"></i>Rating Guide</h5>
+        <div class="row g-3">
+          @for (option of ratingOptions(); track option.value) {
+            <div class="col-md-4 col-lg-2">
+              <div class="rating-guide-item">
+                <div class="rating-score">{{ option.score }}</div>
+                <div class="rating-label">{{ option.label }}</div>
+                <small class="rating-desc">{{ option.description }}</small>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Evaluation Form -->
+      <form [formGroup]="evaluationForm" (ngSubmit)="onSubmit()">
+        <!-- Categories -->
+        @for (category of categories(); track category.id) {
+          <div class="category-card mb-4">
+            <div class="category-card-header">
+              <h5 class="category-title">
+                <i class="bi bi-star-fill me-2"></i>{{ category.name }}
+              </h5>
+              <p class="category-description mb-0">{{ category.description }}</p>
+            </div>
+            <div class="category-card-body">
+              @for (criteria of category.criteria; track criteria.id) {
+                <div class="criteria-item mb-4">
+                  <label class="form-label fw-semibold">
+                    {{ criteria.label }}
+                    <span class="text-danger">*</span>
+                  </label>
+                  <div class="rating-options">
+                    @for (option of ratingOptions(); track option.value) {
+                      <label
+                        class="rating-option"
+                        [class.selected]="evaluationForm.get(criteria.name)?.value === option.value"
+                      >
+                        <input
+                          type="radio"
+                          [formControlName]="criteria.name"
+                          [value]="option.value"
+                          class="rating-input"
+                        />
+                        <div class="rating-content">
+                          <div class="rating-value">{{ option.score }}</div>
+                          <div class="rating-text">{{ option.label }}</div>
+                        </div>
+                      </label>
+                    }
+                  </div>
+                  @if (isFieldInvalid(criteria.name)) {
+                    <div class="text-danger small mt-2">
+                      <i class="bi bi-exclamation-circle me-1"></i>Please select a rating
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Comments Section -->
+        <div class="comments-card mb-4">
+          <div class="comments-card-header">
+            <h5 class="comments-title">
+              <i class="bi bi-chat-left-text me-2"></i>Additional Comments / Feedback
             </h5>
-            <div class="row g-3">
-                @for(option of ratingOptions(); track option.value) {
-                <div class="col-md-4 col-lg-2">
-                    <div class="rating-guide-item">
-                        <div class="rating-score">{{ option.score }}</div>
-                        <div class="rating-label">{{ option.label }}</div>
-                        <small class="rating-desc">{{ option.description }}</small>
-                    </div>
-                </div>
-                }
-            </div>
+          </div>
+
+          <div class="comments-card-body">
+            <textarea
+              class="form-control"
+              formControlName="comments"
+              rows="4"
+              maxlength="255"
+              placeholder="Share any additional feedback or suggestions for the faculty member..."
+            ></textarea>
+
+            <small class="text-muted"> Your feedback helps improve teaching quality </small>
+          </div>
         </div>
 
-        <!-- Evaluation Form -->
-        <form [formGroup]="evaluationForm" (ngSubmit)="onSubmit()">
-            <!-- Categories -->
-            @for(category of categories(); track category.id) {
-            <div class="category-card mb-4">
-                <div class="category-card-header">
-                    <h5 class="category-title">
-                        <i class="bi bi-star-fill me-2"></i>{{ category.name }}
-                    </h5>
-                    <p class="category-description mb-0">{{ category.description }}</p>
-                </div>
-                <div class="category-card-body">
-                    @for(criteria of category.criteria; track criteria.id) {
-                    <div class="criteria-item mb-4">
-                        <label class="form-label fw-semibold">
-                            {{ criteria.label }}
-                            <span class="text-danger">*</span>
-                        </label>
-                        <div class="rating-options">
-                            @for(option of ratingOptions(); track option.value) {
-                            <label class="rating-option"
-                                [class.selected]="evaluationForm.get(criteria.name)?.value === option.value">
-                                <input type="radio" [formControlName]="criteria.name" [value]="option.value"
-                                    class="rating-input">
-                                <div class="rating-content">
-                                    <div class="rating-value">{{ option.score }}</div>
-                                    <div class="rating-text">{{ option.label }}</div>
-                                </div>
-                            </label>
-                            }
-                        </div>
-                        @if(isFieldInvalid(criteria.name)) {
-                        <div class="text-danger small mt-2">
-                            <i class="bi bi-exclamation-circle me-1"></i>Please select a rating
-                        </div>
-                        }
-                    </div>
-                    }
-                </div>
-            </div>
+        <!-- Submit Button -->
+        <div class="submit-section mb-4">
+          <button
+            type="submit"
+            class="btn btn-primary btn-lg"
+            [disabled]="isSubmitting() || evaluationForm.invalid"
+          >
+            @if (isSubmitting()) {
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              <span>Submitting Evaluation...</span>
+            } @else {
+              <i class="bi bi-check-circle-fill me-2"></i>
+              <span>Submit Evaluation</span>
             }
-
-            <!-- Comments Section -->
-            <div class="comments-card mb-4">
-                <div class="comments-card-header">
-                    <h5 class="comments-title">
-                        <i class="bi bi-chat-left-text me-2"></i>Additional Comments / Feedback
-                    </h5>
-                </div>
-                <div class="comments-card-body">
-                    <textarea class="form-control" formControlName="comments" rows="4"
-                        placeholder="Share any additional feedback or suggestions for the faculty member..."></textarea>
-                    <small class="text-muted">Your feedback helps improve teaching quality</small>
-                </div>
-            </div>
-
-            <!-- Submit Button -->
-            <div class="submit-section mb-4">
-                <button type="submit" class="btn btn-primary btn-lg"
-                    [disabled]="isSubmitting() || evaluationForm.invalid">
-                    @if(isSubmitting()) {
-                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                    <span>Submitting Evaluation...</span>
-                    } @else {
-                    <i class="bi bi-check-circle-fill me-2"></i>
-                    <span>Submit Evaluation</span>
-                    }
-                </button>
-                <p class="submit-note mt-3 mb-0">
-                    <i class="bi bi-info-circle me-2"></i>
-                    Please ensure all ratings are accurate before submitting
-                </p>
-            </div>
-        </form>
+          </button>
+          <p class="submit-note mt-3 mb-0">
+            <i class="bi bi-info-circle me-2"></i>
+            Please ensure all ratings are accurate before submitting
+          </p>
+        </div>
+      </form>
     </div>
-    }
-    <app-confirmation-modal-component [visible]="showSubmitConfirmation" title="Submit Evaluation"
-        subtitle="Final Confirmation"
-        message="Are you sure you want to submit this evaluation? You will no longer be able to modify your responses after submission."
-        confirmText="Submit Evaluation" cancelText="Review Again" (confirmed)="confirmSubmit()"
-        (closed)="closeSubmitConfirmation()">
-    </app-confirmation-modal-component>
+  }
+  <app-confirmation-modal-component
+    [visible]="showSubmitConfirmation"
+    title="Submit Evaluation"
+    subtitle="Final Confirmation"
+    message="Are you sure you want to submit this evaluation? You will no longer be able to modify your responses after submission."
+    confirmText="Submit Evaluation"
+    cancelText="Review Again"
+    (confirmed)="confirmSubmit()"
+    (closed)="closeSubmitConfirmation()"
+  >
+  </app-confirmation-modal-component>
 </div>
