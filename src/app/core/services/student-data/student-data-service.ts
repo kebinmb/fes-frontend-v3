@@ -30,20 +30,21 @@ export class StudentDataService {
   private http = inject(HttpClient);
 
   getStudentLoads(
-  studentId: string,
-  page: number = 0,
-  size: number = 10,
-): Observable<PageResponse<StudentClassLoadDTO>> {
+    studentId: string,
+    page: number = 0,
+    size: number = 10,
+    sort: string = 'desc',
+  ): Observable<PageResponse<StudentClassLoadDTO>> {
+    const params = new HttpParams()
+      .set('studentId', studentId)
+      .set('page', page)
+      .set('size', size)
+      .set('sort', sort);
 
-  const params = new HttpParams()
-    .set('studentId', studentId)
-    .set('page', page)
-    .set('size', size);
-
-  return this.http.get<PageResponse<StudentClassLoadDTO>>(
-    `${this.STUDENT_DATA_URL}/student-loads`,
-    { params, withCredentials: true },
-  );
-}
+    return this.http.get<PageResponse<StudentClassLoadDTO>>(
+      `${this.STUDENT_DATA_URL}/student-loads`,
+      { params, withCredentials: true },
+    );
+  }
 
 }
