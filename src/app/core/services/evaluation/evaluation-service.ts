@@ -68,6 +68,8 @@ export interface FacultyEvaluationScore {
   college: string;
   position: string;
   classCode: string;
+  programCode: string;
+  sectionCode: string;
   semester: string;
   schoolYear: number;
   overallAverageScore: number;
@@ -382,5 +384,4 @@ export class EvaluationService {
       withCredentials: true,
     });
   }
-  
 }

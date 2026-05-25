@@ -1,23 +1,33 @@
 import { Component, Input } from '@angular/core';
 export interface FacultyEvaluationPrintRecord {
   facultyEvaluationScoreId: number;
+
   facultyId: string;
-  college: string;
-  position: string;
   facultyName?: string;
+
   evaluatorId?: string;
   evaluatorType?: string;
+
+  college: string;
+  position: string;
+
   classCode: string;
+  sectionCode?: string;
+  programCode?: string;
+  subjectCode?: string;
+
   semester?: string;
   schoolYear?: number;
-  subjectCode?: string;
   yearLevel?: string;
-  commentsOrFeedbacks?: string;
+
   overallAverageScore: number;
   overallInterpretation?: string;
+
   numberOfStudents?: number;
+
   setRating?: number;
   sefRating?: number;
+
   studentComments?: string;
   supervisorComments?: string;
 }
@@ -46,37 +56,25 @@ export class FacultyEvaluationPrintComponent {
   overallSefRating = 0;
 
   ngOnInit(): void {
-
-  /* =========================================
+    /* =========================================
      LOAD FROM LOCAL STORAGE
   ========================================= */
 
-  const storedData =
-    localStorage.getItem(
-      'faculty-print-data'
-    );
-  if (
-    storedData &&
-    !this.data.length
-  ) {
-    this.data =
-      JSON.parse(storedData);
+    const storedData = localStorage.getItem('faculty-print-data');
+    if (storedData && !this.data.length) {
+      this.data = JSON.parse(storedData);
+    }
+    if (!this.data.length) {
+      return;
+    }
+    this.faculty = this.data[0];
+    this.setData = this.data.filter((item) => (item.setRating ?? 0) > 0);
+    this.sefData = this.data.filter((item) => (item.sefRating ?? 0) > 0);
+    this.computeTotals();
+    setTimeout(() => {
+      window.print();
+    }, 500);
   }
-  if (!this.data.length) {
-    return;
-  }
-  this.faculty = this.data[0];
-  this.setData = this.data.filter(
-    item => (item.setRating ?? 0) > 0
-  );
-  this.sefData = this.data.filter(
-    item => (item.sefRating ?? 0) > 0
-  );
-  this.computeTotals();
-  setTimeout(() => {
-    window.print();
-  }, 500);
-}
 
   private computeTotals(): void {
     this.totalStudents = this.setData.reduce(
@@ -104,5 +102,13 @@ export class FacultyEvaluationPrintComponent {
 
   get supervisorComments() {
     return this.data.filter((item) => item.supervisorComments && item.supervisorComments !== '-');
+  }
+  cleanSubjectCode(subjectCode: string | null | undefined): string {
+    return (
+      subjectCode
+        ?.replace(/(ALI|TAL|BIN|FT)-?/g, '')
+        .replace(/\s+/g, ' ')
+        .trim() || ''
+    );
   }
 }

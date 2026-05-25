@@ -1,33 +1,18 @@
 <div class="print-container">
-
   <!-- ================================================= -->
   <!-- HEADER -->
   <!-- ================================================= -->
 
   <div class="report-header">
-
-    <img
-      src="chmsu-logo.png"
-      class="report-logo"
-      alt="CHMSU Logo"
-    />
+    <img src="chmsu-logo.png" class="report-logo" alt="CHMSU Logo" />
 
     <div class="report-header-content">
+      <h1>CHMSU Faculty Evaluation System</h1>
 
-      <h1>
-        CHMSU Faculty Evaluation System
-      </h1>
+      <h2>Individual Faculty Evaluation Report</h2>
 
-      <h2>
-        Individual Faculty Evaluation Report
-      </h2>
-
-      <p>
-        Carlos Hilado Memorial State University
-      </p>
-
+      <p>Carlos Hilado Memorial State University</p>
     </div>
-
   </div>
 
   <!-- ================================================= -->
@@ -35,13 +20,9 @@
   <!-- ================================================= -->
 
   <div class="faculty-info">
-
     <div class="faculty-grid">
-
       <div class="faculty-item">
-        <span class="faculty-label">
-          Faculty Name
-        </span>
+        <span class="faculty-label"> Faculty Name </span>
 
         <span class="faculty-value">
           {{ faculty?.facultyName || '-' }}
@@ -49,9 +30,7 @@
       </div>
 
       <div class="faculty-item">
-        <span class="faculty-label">
-          Department / College
-        </span>
+        <span class="faculty-label"> Department / College </span>
 
         <span class="faculty-value">
           {{ faculty?.college || '-' }}
@@ -59,9 +38,7 @@
       </div>
 
       <div class="faculty-item">
-        <span class="faculty-label">
-          Faculty Rank
-        </span>
+        <span class="faculty-label"> Faculty Rank </span>
 
         <span class="faculty-value">
           {{ faculty?.position || '-' }}
@@ -69,9 +46,7 @@
       </div>
 
       <div class="faculty-item">
-        <span class="faculty-label">
-          Academic Term
-        </span>
+        <span class="faculty-label"> Academic Term </span>
 
         <span class="faculty-value">
           {{ faculty?.semester || '-' }}
@@ -79,21 +54,16 @@
           {{ faculty?.schoolYear || '-' }}
         </span>
       </div>
-
     </div>
-
   </div>
 
   <!-- ================================================= -->
   <!-- SET -->
   <!-- ================================================= -->
 
-  <div class="section-title">
-    A. Student Evaluation of Teaching (SET)
-  </div>
+  <div class="section-title">A. Student Evaluation of Teaching (SET)</div>
 
   <table>
-
     <thead>
       <tr>
         <th>Seq</th>
@@ -106,81 +76,53 @@
     </thead>
 
     <tbody>
-
-      @for (
-        item of setData;
-        track item.facultyEvaluationScoreId;
-        let i = $index
-      ) {
-
+      @for (item of setData; track item.facultyEvaluationScoreId; let i = $index) {
         <tr>
           <td>{{ i + 1 }}</td>
 
           <td>
-            {{ item.subjectCode }}
+            {{ cleanSubjectCode(item.subjectCode) }}
           </td>
 
-          <td>
-            {{ item.yearLevel }}
-          </td>
+          <td>{{ item.programCode }} - {{ item.yearLevel }}{{ item.sectionCode }}</td>
 
           <td>
             {{ item.numberOfStudents }}
           </td>
 
           <td>
-            {{
-              item.setRating?.toFixed(2)
-            }}
+            {{ item.setRating?.toFixed(2) }}
           </td>
 
           <td>
-            {{
-              (
-                (item.numberOfStudents ?? 0) *
-                (item.setRating ?? 0)
-              ).toFixed(2)
-            }}
+            {{ ((item.numberOfStudents ?? 0) * (item.setRating ?? 0)).toFixed(2) }}
           </td>
         </tr>
       }
 
       <tr class="total-row">
-
-        <td colspan="3">
-          TOTAL
-        </td>
+        <td colspan="3">TOTAL</td>
 
         <td>
           {{ totalStudents }}
         </td>
 
-        <td>
-          -
-        </td>
+        <td>-</td>
 
         <td>
-          {{
-            totalWeightedScore.toFixed(2)
-          }}
+          {{ totalWeightedScore.toFixed(2) }}
         </td>
-
       </tr>
-
     </tbody>
-
   </table>
 
   <!-- ================================================= -->
   <!-- SEF -->
   <!-- ================================================= -->
 
-  <div class="section-title">
-    B. Supervisor Evaluation of Faculty (SEF)
-  </div>
+  <div class="section-title">B. Supervisor Evaluation of Faculty (SEF)</div>
 
   <table>
-
     <thead>
       <tr>
         <th>Seq</th>
@@ -191,172 +133,106 @@
     </thead>
 
     <tbody>
-
-      @for (
-        item of sefData;
-        track item.facultyEvaluationScoreId;
-        let i = $index
-      ) {
-
+      @for (item of sefData; track item.facultyEvaluationScoreId; let i = $index) {
         <tr>
           <td>{{ i + 1 }}</td>
 
           <td>
-            {{ item.subjectCode }}
+            {{ cleanSubjectCode(item.subjectCode) }}
           </td>
 
-          <td>
-            {{ item.yearLevel }}
-          </td>
+          <td>{{ item.programCode }} - {{ item.yearLevel }} - {{ item.sectionCode }}</td>
 
           <td>
-            {{
-              item.sefRating?.toFixed(2)
-            }}
+            {{ item.sefRating?.toFixed(2) }}
           </td>
         </tr>
       }
-
     </tbody>
-
   </table>
 
   <!-- ================================================= -->
   <!-- SUMMARY -->
   <!-- ================================================= -->
 
-  <div class="section-title">
-    C. Overall Evaluation Summary
-  </div>
+  <div class="section-title">C. Overall Evaluation Summary</div>
 
   <div class="summary-wrapper">
-
     <div class="summary-card">
-
-      <div class="summary-label">
-        Overall SET Rating
-      </div>
+      <div class="summary-label">Overall SET Rating</div>
 
       <div class="summary-value">
-        {{
-          overallSetRating.toFixed(2)
-        }}
+        {{ overallSetRating.toFixed(2) }}
       </div>
-
     </div>
 
     <div class="summary-card">
-
-      <div class="summary-label">
-        Overall SEF Rating
-      </div>
+      <div class="summary-label">Overall SEF Rating</div>
 
       <div class="summary-value">
-        {{
-          overallSefRating.toFixed(2)
-        }}
+        {{ overallSefRating.toFixed(2) }}
       </div>
-
     </div>
-
   </div>
 
   <!-- ================================================= -->
   <!-- STUDENT COMMENTS -->
   <!-- ================================================= -->
 
-  <div class="section-title">
-    D. Student Comments
-  </div>
+  <div class="section-title">D. Student Comments</div>
 
   <table>
-
     <thead>
       <tr>
-        <th width="80">
-          Seq
-        </th>
+        <th width="80">Seq</th>
 
-        <th>
-          Student Comments
-        </th>
+        <th>Student Comments</th>
       </tr>
     </thead>
 
     <tbody>
-
-      @for (
-        item of studentComments;
-        track item.facultyEvaluationScoreId;
-        let i = $index
-      ) {
-
+      @for (item of studentComments; track item.facultyEvaluationScoreId; let i = $index) {
         <tr>
-
           <td>
             {{ i + 1 }}
           </td>
 
           <td>
-            {{
-              item.studentComments
-            }}
+            {{ item.studentComments }}
           </td>
-
         </tr>
       }
-
     </tbody>
-
   </table>
 
   <!-- ================================================= -->
   <!-- SUPERVISOR COMMENTS -->
   <!-- ================================================= -->
 
-  <div class="section-title">
-    E. Supervisor Comments
-  </div>
+  <div class="section-title">E. Supervisor Comments</div>
 
   <table>
-
     <thead>
       <tr>
-        <th width="80">
-          Seq
-        </th>
+        <th width="80">Seq</th>
 
-        <th>
-          Supervisor Comments
-        </th>
+        <th>Supervisor Comments</th>
       </tr>
     </thead>
 
     <tbody>
-
-      @for (
-        item of supervisorComments;
-        track item.facultyEvaluationScoreId;
-        let i = $index
-      ) {
-
+      @for (item of supervisorComments; track item.facultyEvaluationScoreId; let i = $index) {
         <tr>
-
           <td>
             {{ i + 1 }}
           </td>
 
           <td>
-            {{
-              item.supervisorComments
-            }}
+            {{ item.supervisorComments }}
           </td>
-
         </tr>
       }
-
     </tbody>
-
   </table>
 
   <!-- ================================================= -->
@@ -364,39 +240,20 @@
   <!-- ================================================= -->
 
   <div class="approval-section">
-
     <div class="approval-card">
+      <div class="approval-title">Prepared By</div>
 
-      <div class="approval-title">
-        Prepared By
-      </div>
+      <div class="signature-line">Signature Over Printed Name</div>
 
-      <div class="signature-line">
-        Signature Over Printed Name
-      </div>
-
-      <div class="signature-line">
-        Date
-      </div>
-
+      <div class="signature-line">Date</div>
     </div>
 
     <div class="approval-card">
+      <div class="approval-title">Reviewed By</div>
 
-      <div class="approval-title">
-        Reviewed By
-      </div>
+      <div class="signature-line">Authorized Official</div>
 
-      <div class="signature-line">
-        Authorized Official
-      </div>
-
-      <div class="signature-line">
-        Date
-      </div>
-
+      <div class="signature-line">Date</div>
     </div>
-
   </div>
-
 </div>

@@ -135,6 +135,8 @@ export class FacultyDataTableComponent implements OnInit {
           evaluatorType: item.evaluatorType,
 
           classCode: item.classCode,
+          programCode: item.programCode,
+          sectionCode: item.sectionCode,
 
           college: item.college,
 
