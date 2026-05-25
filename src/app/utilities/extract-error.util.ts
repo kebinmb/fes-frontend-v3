@@ -8,30 +8,25 @@ export function extractErrorMessage(
   );
 
   if (!err) {
-
     return 'Something went wrong';
   }
 
-  if (
-    typeof err === 'string'
-  ) {
-
-    return err;
+  if (err?.status === 0) {
+    return 'Cannot connect to server';
   }
 
-  if (
-    typeof err?.error === 'string'
-  ) {
+  if (err?.error?.message) {
+    return err.error.message;
+  }
+
+  if (typeof err?.error === 'string') {
 
     try {
 
       const parsed =
         JSON.parse(err.error);
 
-      return (
-        parsed?.message ||
-        err.error
-      );
+      return parsed?.message || err.error;
 
     } catch {
 
@@ -39,19 +34,27 @@ export function extractErrorMessage(
     }
   }
 
-  if (
-    err?.error?.message
-  ) {
+  switch (err?.status) {
 
-    return err.error.message;
+    case 400:
+      return 'Bad request';
+
+    case 401:
+      return 'Unauthorized access';
+
+    case 403:
+      return 'Access forbidden';
+
+    case 404:
+      return 'Resource not found';
+
+    case 500:
+      return 'Internal server error';
+
+    default:
+      return (
+        err?.message ||
+        'Something went wrong'
+      );
   }
-
-  if (
-    err?.message
-  ) {
-
-    return err.message;
-  }
-
-  return 'Something went wrong';
 }
