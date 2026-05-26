@@ -60,8 +60,9 @@ export interface FacultyLoadDTO {
   // subjectCode: string;
   // programYearSection: string;
   campus: string;
-  loadLimit: number;
-  typeOfLoad: string;
+  // loadLimit: number;
+  // typeOfLoad: string;
+  status:string;
 }
 @Injectable({
   providedIn: 'root',
@@ -118,7 +119,7 @@ export class SupervisorDataService {
       params = params.set('search', search.trim());
     }
 
-    return this.http.get<PageResponse<FacultyLoadDTO>>(`${this.FACULTY_API_URL}/faculty-loads`, {
+    return this.http.get<PageResponse<FacultyLoadDTO>>(`${this.FACULTY_API_URL}/faculty-program-loads`, {
       params,
       withCredentials: true,
     });
