@@ -1,0 +1,177 @@
+<div class="custom-modal-backdrop">
+  <div class="custom-modal">
+    <!-- HEADER -->
+    <div class="modal-profile-wrapper">
+      <div class="modal-profile">
+        <div class="modal-avatar">
+          {{ getFacultyInitials(faculty!) }}
+        </div>
+
+        <div class="modal-profile-content">
+          <div class="modal-badge">Faculty Evaluation</div>
+
+          <h4 class="modal-title">
+            {{ faculty!.firstname }}
+            {{ faculty!.lastname }}
+          </h4>
+
+          <p class="modal-subtitle">
+            <i class="bi bi-briefcase-fill"></i>
+
+            <span>
+              {{ faculty!.position }}
+            </span>
+          </p>
+
+          <div class="modal-meta">
+            <div class="modal-meta-chip">
+              <i class="bi bi-person-vcard-fill"></i>
+
+              <span>
+                {{ faculty!.facultyId }}
+              </span>
+            </div>
+
+            <div class="modal-meta-chip">
+              <i class="bi bi-buildings-fill"></i>
+
+              <span>
+                {{ getCampusName(faculty!.campus) }}
+              </span>
+            </div>
+
+            <!-- OPTIONAL -->
+            <!--
+            <div class="modal-meta-chip">
+
+              <i class="bi bi-mortarboard-fill"></i>
+
+              <span>
+                {{ faculty!.college }}
+              </span>
+
+            </div>
+            -->
+          </div>
+        </div>
+      </div>
+
+      <!-- CLOSE -->
+      <button type="button" class="modal-close-btn" aria-label="Close" (click)="closeModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="custom-modal-body">
+      @if (facultyClasses; as facultyClasses) {
+        @let classes = facultyClasses[faculty!.facultyId]?.classes ?? [];
+
+        @if (classes.length > 0) {
+          <!-- GRID -->
+          <div class="subjects-grid">
+            @for (cls of classes; track trackClass($index, cls)) {
+              @let evaluationKey =
+                buildEvaluationKey(
+                  cls.classCode,
+                  cls.subjectCode,
+                  cls.yearLevel,
+                  cls.semester,
+                  cls.schoolYear
+                );
+
+              @let evaluationState = evaluationStatus?.['BSIS-ACTIVE']?.classes?.[evaluationKey];
+
+              @let isEvaluated = evaluationState?.evaluated ?? false;
+
+              <!-- CARD -->
+              <div class="subject-card-modal" [class.subject-done]="isEvaluated">
+                <!-- TOP -->
+                <div class="subject-card-top">
+                  <div class="subject-main-info">
+                    <div class="subject-code">
+                      <i class="bi bi-book-half"></i>
+
+                      <span>
+                        {{ cls.subjectCode }}
+                      </span>
+                    </div>
+
+                    <div class="subject-description">
+                      {{ cls.subjectDescription }}
+                    </div>
+                  </div>
+
+                  <!-- STATUS -->
+                  <div class="subject-status" [class.status-complete]="isEvaluated">
+                    <i
+                      class="bi"
+                      [ngClass]="isEvaluated ? 'bi-check-circle-fill' : 'bi-clock-history'"
+                    >
+                    </i>
+                  </div>
+                </div>
+
+                <!-- META -->
+                <div class="subject-meta-row">
+                  <span class="subject-chip">
+                    <i class="bi bi-mortarboard-fill"></i>
+
+                    {{ cls.programCode }}
+                  </span>
+
+                  <span class="subject-chip">
+                    <i class="bi bi-bar-chart-fill"></i>
+
+                    {{ cls.yearLevel }}
+                  </span>
+
+                  <span class="subject-chip">
+                    <i class="bi bi-people-fill"></i>
+
+                    {{ cls.sectionCode }}
+                  </span>
+
+                  <span class="subject-chip">
+                    <i class="bi bi-hash"></i>
+
+                    {{ cls.classCode }}
+                  </span>
+                </div>
+
+                <!-- ACTION -->
+                <button
+                  type="button"
+                  class="btn btn-primary btn-subject-action"
+                  [disabled]="isEvaluated"
+                  (click)="onEvaluate(cls, faculty!)"
+                >
+                  <i
+                    class="bi"
+                    [ngClass]="isEvaluated ? 'bi-check-circle-fill' : 'bi-play-circle-fill'"
+                  >
+                  </i>
+
+                  <span>
+                    {{ isEvaluated ? 'Completed' : 'Start Evaluation' }}
+                  </span>
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <!-- EMPTY -->
+          <div class="modal-empty-state">
+            <div class="modal-empty-icon">
+              <i class="bi bi-journal-x"></i>
+            </div>
+
+            <h5>No Subjects Found</h5>
+
+            <p>This faculty currently has no assigned subjects.</p>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

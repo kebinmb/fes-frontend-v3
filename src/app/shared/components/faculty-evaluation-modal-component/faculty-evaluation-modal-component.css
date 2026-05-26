@@ -1,0 +1,578 @@
+/* =========================================
+   MODAL BACKDROP
+========================================= */
+
+.custom-modal-backdrop {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 1.5rem;
+
+  background: rgba(0, 0, 0, 0.52);
+
+  backdrop-filter: blur(8px);
+
+  animation: fadeBackdrop 180ms ease;
+}
+
+/* =========================================
+   MODAL
+========================================= */
+
+.custom-modal {
+  width: 100%;
+  max-width: 1180px;
+
+  max-height: 92vh;
+
+  overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
+
+  border-radius: 30px;
+
+  background: linear-gradient(to bottom, var(--chmsu-surface), #fbfcfb);
+
+  border: 1px solid var(--chmsu-border);
+
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.18);
+
+  animation: modalSlideUp 220ms ease;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.modal-profile-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 1rem;
+
+  padding: 1.7rem 1.9rem;
+
+  border-bottom: 1px solid var(--chmsu-border);
+
+  background: linear-gradient(135deg, rgba(24, 100, 67, 0.08), rgba(229, 212, 19, 0.06));
+}
+
+.modal-profile {
+  display: flex;
+  align-items: center;
+  gap: 1.3rem;
+
+  min-width: 0;
+}
+
+.modal-avatar {
+  width: 74px;
+  height: 74px;
+
+  border-radius: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(145deg, rgba(24, 100, 67, 0.14), rgba(24, 100, 67, 0.05));
+
+  border: 1px solid rgba(24, 100, 67, 0.08);
+
+  color: var(--chmsu-primary);
+
+  font-size: 1.2rem;
+  font-weight: 800;
+
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.65),
+    0 10px 22px rgba(24, 100, 67, 0.08);
+}
+
+.modal-profile-content {
+  min-width: 0;
+}
+
+.modal-badge {
+  display: inline-flex;
+
+  padding: 0.42rem 0.85rem;
+
+  border-radius: 999px;
+
+  background: linear-gradient(135deg, rgba(24, 100, 67, 0.12), rgba(24, 100, 67, 0.05));
+
+  border: 1px solid rgba(24, 100, 67, 0.08);
+
+  color: var(--chmsu-primary);
+
+  font-size: 0.72rem;
+  font-weight: 800;
+
+  letter-spacing: 0.45px;
+
+  text-transform: uppercase;
+}
+
+.modal-title {
+  margin-top: 0.95rem;
+
+  font-size: 1.6rem;
+  font-weight: 800;
+
+  color: var(--chmsu-text);
+
+  letter-spacing: -0.6px;
+}
+
+.modal-title::after {
+  content: '';
+
+  display: block;
+
+  width: 70px;
+  height: 3px;
+
+  margin-top: 0.85rem;
+
+  border-radius: 999px;
+
+  background: linear-gradient(to right, var(--chmsu-accent), transparent);
+}
+
+.modal-subtitle {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+
+  margin-top: 0.7rem;
+
+  color: var(--chmsu-muted);
+
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.modal-subtitle i {
+  color: var(--chmsu-primary);
+}
+
+.modal-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+
+  margin-top: 1rem;
+}
+
+.modal-meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  padding: 0.55rem 0.92rem;
+
+  border-radius: 999px;
+
+  background: rgba(24, 100, 67, 0.06);
+
+  border: 1px solid rgba(24, 100, 67, 0.05);
+
+  color: #4b5563;
+
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.modal-meta-chip i {
+  color: var(--chmsu-primary);
+}
+
+/* =========================================
+   CLOSE BUTTON
+========================================= */
+
+.modal-close-btn {
+  width: 46px;
+  height: 46px;
+
+  border: none;
+
+  border-radius: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(15, 23, 42, 0.04);
+
+  color: #64748b;
+
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    color 160ms ease;
+}
+
+.modal-close-btn:hover {
+  background: rgba(207, 106, 51, 0.12);
+
+  color: var(--chmsu-warning);
+
+  transform: rotate(90deg);
+}
+
+/* =========================================
+   BODY
+========================================= */
+
+.custom-modal-body {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 1.6rem;
+
+  background: linear-gradient(to bottom, rgba(238, 243, 241, 0.5), rgba(255, 255, 255, 1));
+}
+
+/* =========================================
+   GRID
+========================================= */
+
+.subjects-grid {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+
+  gap: 1.25rem;
+}
+
+/* =========================================
+   SUBJECT CARD
+========================================= */
+
+.subject-card-modal {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 260px;
+
+  padding: 1.35rem;
+
+  border-radius: 26px;
+
+  background: linear-gradient(145deg, rgba(255, 255, 255, 1), rgba(247, 248, 244, 0.94));
+
+  border: 1px solid rgba(148, 163, 184, 0.12);
+
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease;
+}
+
+.subject-card-modal:hover {
+  transform: translateY(-4px);
+
+  border-color: rgba(24, 100, 67, 0.16);
+
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+}
+
+.subject-done {
+  border-color: rgba(24, 100, 67, 0.12);
+
+  background: linear-gradient(145deg, rgba(232, 243, 237, 0.95), rgba(255, 255, 255, 1));
+}
+
+/* =========================================
+   CARD TOP
+========================================= */
+
+.subject-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 1rem;
+}
+
+.subject-main-info {
+  min-width: 0;
+}
+
+.subject-code {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  color: var(--chmsu-primary);
+
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.subject-description {
+  margin-top: 0.85rem;
+
+  color: var(--chmsu-text);
+
+  font-size: 0.93rem;
+  font-weight: 600;
+
+  line-height: 1.6;
+}
+
+/* =========================================
+   STATUS
+========================================= */
+
+.subject-status {
+  width: 44px;
+  height: 44px;
+
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(148, 163, 184, 0.08);
+
+  color: #64748b;
+
+  font-size: 1rem;
+}
+
+.status-complete {
+  background: rgba(24, 100, 67, 0.12);
+
+  color: var(--chmsu-primary);
+}
+
+/* =========================================
+   META
+========================================= */
+
+.subject-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+
+  margin-top: 1.2rem;
+}
+
+.subject-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+
+  padding: 0.46rem 0.78rem;
+
+  border-radius: 999px;
+
+  background: rgba(24, 100, 67, 0.06);
+
+  border: 1px solid rgba(24, 100, 67, 0.05);
+
+  color: #475569;
+
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.subject-chip i {
+  color: var(--chmsu-primary);
+}
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.btn-subject-action {
+  width: 100%;
+
+  min-height: 54px;
+
+  margin-top: auto;
+
+  border: none !important;
+
+  border-radius: 18px !important;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+
+  background: linear-gradient(135deg, var(--chmsu-primary), var(--chmsu-primary-dark)) !important;
+
+  color: white !important;
+
+  font-size: 0.84rem;
+  font-weight: 700 !important;
+
+  letter-spacing: 0.2px;
+
+  box-shadow: 0 10px 20px rgba(24, 100, 67, 0.12);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.btn-subject-action:hover:not(:disabled) {
+  transform: translateY(-2px);
+
+  box-shadow: 0 16px 30px rgba(24, 100, 67, 0.18);
+}
+
+.btn-subject-action:disabled {
+  opacity: 0.92;
+
+  cursor: not-allowed;
+
+  background: linear-gradient(135deg, rgba(24, 100, 67, 0.72), rgba(19, 77, 53, 0.72)) !important;
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.modal-empty-state {
+  padding: 4rem 2rem;
+
+  text-align: center;
+}
+
+.modal-empty-icon {
+  width: 92px;
+  height: 92px;
+
+  margin: 0 auto 1rem;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: linear-gradient(145deg, rgba(24, 100, 67, 0.12), rgba(24, 100, 67, 0.05));
+
+  color: var(--chmsu-primary);
+
+  font-size: 2rem;
+}
+
+.modal-empty-state h5 {
+  margin-top: 1rem;
+
+  color: var(--chmsu-text);
+
+  font-weight: 800;
+}
+
+.modal-empty-state p {
+  margin-top: 0.5rem;
+
+  color: var(--chmsu-muted);
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.custom-modal-body::-webkit-scrollbar {
+  width: 10px;
+}
+
+.custom-modal-body::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+
+  background: rgba(24, 100, 67, 0.22);
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+
+    transform: translateY(18px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeBackdrop {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 992px) {
+  .custom-modal {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .custom-modal-backdrop {
+    padding: 0.75rem;
+  }
+
+  .custom-modal {
+    max-height: 96vh;
+
+    border-radius: 24px;
+  }
+
+  .modal-profile-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal-profile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .modal-avatar {
+    width: 66px;
+    height: 66px;
+  }
+
+  .modal-title {
+    font-size: 1.35rem;
+  }
+
+  .subjects-grid {
+    grid-template-columns: 1fr;
+  }
+}

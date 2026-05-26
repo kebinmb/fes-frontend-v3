@@ -151,46 +151,50 @@ export class SupervisorDataFacade {
 
   loadFaculties(
 
-    key: string,
+  key: string,
 
-    program: string,
+  program: string,
 
-    userId: number,
+  userId: number,
 
-    page: number = 0,
+  page: number = 0,
 
-    size: number = 10,
+  size: number = 10,
 
-    sort: string = 'lastname,asc',
+  sort: string = 'lastname,asc',
 
-    search: string = ''
+  search: string = '',
 
-  ): void {
+  campus: string = ''
 
-    this.store.dispatch(
+): void {
 
-      SupervisorActions
-        .loadFaculties({
+  this.store.dispatch(
 
-          key,
+    SupervisorActions
+      .loadFaculties({
 
-          program,
+        key,
 
-          userId,
+        program,
 
-          page,
+        userId,
 
-          size,
+        page,
 
-          sort,
+        size,
 
-          search
+        sort,
 
-        })
+        search,
 
-    );
+        campus
 
-  }
+      })
+
+  );
+
+}
 
   /* ================= LOAD FACULTY CLASSES ================= */
 

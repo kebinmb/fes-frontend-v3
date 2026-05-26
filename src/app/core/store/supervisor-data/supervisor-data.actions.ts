@@ -29,6 +29,8 @@ export const loadFaculties = createAction(
     sort?: string;
 
     search?: string;
+
+    campus?: string;
   }>()
 );
 

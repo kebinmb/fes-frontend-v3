@@ -19,12 +19,14 @@ import { ConfirmationModalComponent } from '../../../../../shared/components/con
 import { selectEvaluationStatusState } from '../../../../store/supervisor-data/supervisor-data.selectors';
 import { Store } from '@ngrx/store';
 import { Tooltip } from 'bootstrap';
+import { FormsModule } from '@angular/forms';
+import { FacultyEvaluationModalComponent } from "../../../../../shared/components/faculty-evaluation-modal-component/faculty-evaluation-modal-component";
 @Component({
   selector: 'app-supervisor-dashboard-component',
 
   standalone: true,
 
-  imports: [AsyncPipe, CommonModule, ConfirmationModalComponent],
+  imports: [AsyncPipe, CommonModule, ConfirmationModalComponent, FormsModule, FacultyEvaluationModalComponent],
 
   templateUrl: './supervisor-dashboard-component.html',
 
@@ -74,7 +76,25 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   selectedFaculty: FacultyLoadDTO | null = null;
 
   selectedClass: FacultyClass | null = null;
-
+  selectedCampus: string = '';
+  campusOptions = [
+    {
+      label: 'TALISAY',
+      value: 'LEGACY_TALISAY',
+    },
+    {
+      label: 'ALIJIS',
+      value: 'LEGACY_ALIJIS',
+    },
+    {
+      label: 'BINALBAGAN',
+      value: 'LEGACY_BINALBAGAN',
+    },
+    {
+      label: 'FT',
+      value: 'LEGACY_FT',
+    },
+  ];
   /* =========================================================
    * SEARCH
    * =======================================================*/
@@ -198,6 +218,8 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
       'lastname,asc',
 
       this.search,
+
+      this.selectedCampus,
     );
   }
 
@@ -274,7 +296,11 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   closeFacultyModal(): void {
     this.selectedFaculty = null;
   }
+  onCampusChange(): void {
+    this.currentPage = 0;
 
+    this.reload();
+  }
   /* =========================================================
    * CONFIRMATION MODAL
    * =======================================================*/

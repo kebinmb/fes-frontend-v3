@@ -102,26 +102,35 @@ export class SupervisorDataService {
   );
 }
 
-  getFacultyLoadsByProgram(
-    userId: number,
-    page: number = 0,
-    size: number = 10,
-    sort: string = 'lastname,asc',
-    search: string = '',
-  ): Observable<PageResponse<FacultyLoadDTO>> {
-    let params = new HttpParams()
-      .set('userId', userId.toString())
-      .set('page', page.toString())
-      .set('size', size.toString())
-      .set('sort', sort);
+ getFacultyLoadsByProgram(
+  userId: number,
+  page: number = 0,
+  size: number = 10,
+  sort: string = 'lastname,asc',
+  search: string = '',
+  campus: string = '',
+): Observable<PageResponse<FacultyLoadDTO>> {
 
-    if (search?.trim()) {
-      params = params.set('search', search.trim());
-    }
+  let params = new HttpParams()
+    .set('userId', userId.toString())
+    .set('page', page.toString())
+    .set('size', size.toString())
+    .set('sort', sort);
 
-    return this.http.get<PageResponse<FacultyLoadDTO>>(`${this.FACULTY_API_URL}/faculty-program-loads`, {
+  if (search?.trim()) {
+    params = params.set('search', search.trim());
+  }
+
+  if (campus?.trim()) {
+    params = params.set('campus', campus.trim());
+  }
+
+  return this.http.get<PageResponse<FacultyLoadDTO>>(
+    `${this.FACULTY_API_URL}/faculty-program-loads`,
+    {
       params,
       withCredentials: true,
-    });
-  }
+    }
+  );
+}
 }

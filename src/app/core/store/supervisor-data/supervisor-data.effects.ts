@@ -67,67 +67,74 @@ export class SupervisorDataEffects {
   /* ================= FACULTIES ================= */
 
   loadFaculties$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ActionsSet.loadFaculties),
+  this.actions$.pipe(
+    ofType(ActionsSet.loadFaculties),
 
-      switchMap(
-        ({
-          key,
+    switchMap(
+      ({
+        key,
 
-          userId,
+        userId,
 
-          page,
+        page,
 
-          size,
+        size,
 
-          sort,
+        sort,
 
-          search,
-        }) => {
-          this.spinner.showSpinner();
+        search,
 
-          return this.api
-            .getFacultyLoadsByProgram(
-              userId,
+        campus,
+      }) => {
 
-              page,
+        this.spinner.showSpinner();
 
-              size,
+        return this.api
+          .getFacultyLoadsByProgram(
+            userId,
 
-              sort,
+            page,
 
-              search,
-            )
-            .pipe(
-              map((response) =>
-                ActionsSet.loadFacultiesSuccess({
+            size,
+
+            sort,
+
+            search,
+
+            campus,
+          )
+          .pipe(
+
+            map((response) =>
+              ActionsSet.loadFacultiesSuccess({
+                key,
+
+                response,
+              }),
+            ),
+
+            catchError((error) => {
+
+              this.toast.showToast(
+                'Failed to load faculties',
+                'error',
+              );
+
+              return of(
+                ActionsSet.loadFacultiesFailure({
                   key,
 
-                  response,
+                  error,
                 }),
-              ),
+              );
+            }),
 
-              catchError((error) => {
-                this.toast.showToast(
-                  'Failed to load faculties',
-                  'error',
-                );
-
-                return of(
-                  ActionsSet.loadFacultiesFailure({
-                    key,
-
-                    error,
-                  }),
-                );
-              }),
-
-              finalize(() => this.spinner.hideSpinner()),
-            );
-        },
-      ),
+            finalize(() => this.spinner.hideSpinner()),
+          );
+      },
     ),
-  );
+  ),
+);
 
   /* ================= FACULTY CLASSES ================= */
 

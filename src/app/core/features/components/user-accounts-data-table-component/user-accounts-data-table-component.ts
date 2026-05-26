@@ -12,6 +12,7 @@ import {
 
 import {
   FormBuilder,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -31,7 +32,7 @@ import {
   imports: [
     AsyncPipe,
     ReactiveFormsModule,
-    NgClass,
+    FormsModule,
   ],
   templateUrl: './user-accounts-data-table-component.html',
   styleUrl: './user-accounts-data-table-component.css',
