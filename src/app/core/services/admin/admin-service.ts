@@ -30,9 +30,9 @@ export interface FetchUserAccountsResponse {
   email: string;
   role: string;
   status: string;
-  college:string;
-  programs:string;
-  majors:string;
+  college: string;
+  programs: string;
+  majors: string;
 }
 export interface FetchFacultyEvaluationScoreResponse {
   facultyEvaluationScoreId: number;
@@ -152,6 +152,21 @@ export interface StudentFacultyEvaluationDTO {
   facultyLastname: string;
 
   createdAt: string;
+}
+
+export interface StudentSectionEvaluationDTO {
+
+  programCode: string;
+
+  yearLevel: string;
+
+  sectionCode: string;
+
+  totalStudents: number;
+
+  evaluatedStudents: number;
+
+  notYetEvaluated: number;
 }
 @Injectable({
   providedIn: 'root',
@@ -343,6 +358,53 @@ export class AdminService {
       payload,
       {
         responseType: 'text',
+        withCredentials: true,
+      },
+    );
+  }
+
+  getStudentSections(
+    page: number = 0,
+    size: number = 10,
+    programCode?: string,
+    yearLevel?: string,
+    sectionCode?: string,
+  ): Observable<PageResponse<StudentSectionEvaluationDTO>> {
+
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (programCode?.trim()) {
+
+      params = params.set(
+        'programCode',
+        programCode,
+      );
+    }
+
+    if (yearLevel?.trim()) {
+
+      params = params.set(
+        'yearLevel',
+        yearLevel,
+      );
+    }
+
+    if (sectionCode?.trim()) {
+
+      params = params.set(
+        'sectionCode',
+        sectionCode,
+      );
+    }
+
+    return this.http.get<
+      PageResponse<StudentSectionEvaluationDTO>
+    >(
+      `${this.ADMIN_API_URL}/student-sections`,
+      {
+        params,
         withCredentials: true,
       },
     );
