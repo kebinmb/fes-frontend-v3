@@ -1,100 +1,157 @@
+:host {
+  display: block;
+
+  width: 100%;
+
+  color: var(--chmsu-text);
+}
+
 /* =========================================
-   CARD LAYOUT
+   LAYOUT
 ========================================= */
 
-.card {
-  background: var(--chmsu-surface);
+.container-fluid {
+  width: 100%;
+}
 
-  border: 1px solid var(--chmsu-border);
+.card-body {
+  padding: 1.5rem;
+}
 
-  border-radius: 16px;
+/* =========================================
+   CARD
+========================================= */
+
+.modern-card {
+  background: #ffffff;
+
+  border: 1px solid #e5e7eb;
+
+  border-radius: 14px;
 
   overflow: hidden;
+}
 
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.04);
+.card-topbar {
+  height: 4px;
+
+  background: #14532d;
 }
 
 /* =========================================
-   CARD HEADER
+   HEADER
 ========================================= */
 
-.card-header {
+.modern-card-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
 
-  padding: 1.4rem 1.6rem;
+  gap: 1.5rem;
 
-  background: var(--chmsu-primary);
+  padding: 1.5rem;
 
-  color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.card-header h4 {
+.header-content {
+  min-width: 0;
+}
+
+.header-content h2 {
   margin: 0;
 
-  color: #ffffff;
+  color: #111827;
 
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 700;
 
   letter-spacing: -0.3px;
 }
 
-.card-header small {
+.header-content span {
   display: block;
 
-  margin-top: 0.3rem;
+  margin-top: 0.35rem;
 
-  color: rgba(255, 255, 255, 0.82);
+  color: #6b7280;
 
-  font-size: 0.85rem;
+  font-size: 0.88rem;
+}
 
-  font-weight: 500;
+.table-count {
+  min-width: 62px;
+  height: 62px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #f3f4f6;
+
+  border: 1px solid #e5e7eb;
+
+  color: #14532d;
+
+  font-size: 1.2rem;
+  font-weight: 700;
+
+  flex-shrink: 0;
 }
 
 /* =========================================
-   CARD BODY
+   FILTERS
 ========================================= */
 
-.card-body {
-  padding: 1.5rem;
+.filter-grid {
+  display: grid;
 
-  background: #ffffff;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 1rem;
+
+  align-items: end;
+
+  margin-top: 1rem;
 }
 
-/* =========================================
-   FILTER FORM
-========================================= */
+.form-group {
+  display: flex;
 
-.form-label {
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+.form-group label {
   margin-bottom: 0.5rem;
 
   color: #374151;
 
-  font-size: 0.8rem;
-  font-weight: 700;
-
-  text-transform: uppercase;
-
-  letter-spacing: 0.03em;
+  font-size: 0.82rem;
+  font-weight: 600;
 }
 
 .form-control {
+  width: 100%;
+
   height: 46px;
 
-  border-radius: 12px;
+  padding: 0 0.95rem;
 
   border: 1px solid #d1d5db;
+  border-radius: 10px;
 
   background: #ffffff;
 
-  color: var(--chmsu-text);
+  color: #111827;
 
-  font-size: 0.92rem;
+  font-size: 0.9rem;
 
-  padding: 0 1rem;
+  outline: none;
 
   transition:
     border-color 0.2s ease,
@@ -106,115 +163,149 @@
 }
 
 .form-control:focus {
-  border-color: var(--chmsu-primary);
+  border-color: #166534;
 
   box-shadow:
-    0 0 0 4px rgba(24, 100, 67, 0.08);
-
-  outline: none;
+    0 0 0 3px rgba(22, 101, 52, 0.08);
 }
 
 /* =========================================
    BUTTONS
 ========================================= */
 
-.btn {
-  height: 46px;
+.btn-group-actions {
+  display: flex;
 
-  border-radius: 12px;
+  align-items: center;
 
-  font-size: 0.88rem;
-  font-weight: 700;
+  gap: 0.75rem;
+
+  width: 100%;
+}
+
+.btn-custom,
+.pagination-btn,
+.btn-print {
+  border: none;
+
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.5rem;
+
+  font-weight: 600;
 
   transition:
     background 0.2s ease,
     border-color 0.2s ease,
-    transform 0.15s ease;
+    color 0.2s ease;
 }
 
-.btn:active {
-  transform: scale(0.98);
-}
+.btn-custom,
+.pagination-btn {
+  height: 44px;
 
-.btn-primary {
-  background: var(--chmsu-primary);
+  padding: 0 1rem;
 
-  border: none;
+  border-radius: 10px;
+
+  background: #14532d;
 
   color: #ffffff;
+
+  font-size: 0.88rem;
 }
 
-.btn-primary:hover {
-  background: var(--chmsu-primary-dark);
+.btn-custom:hover,
+.pagination-btn:hover {
+  background: #166534;
 }
 
-.btn-outline-secondary {
-  background: #ffffff;
+.btn-secondary-custom {
+  background: #ffffff !important;
 
   border: 1px solid #d1d5db;
 
-  color: #374151;
+  color: #374151 !important;
 }
 
-.btn-outline-secondary:hover {
-  background: #f9fafb;
+.btn-secondary-custom:hover {
+  background: #f9fafb !important;
 }
 
-.btn-outline-primary {
+.pagination-btn:disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+.btn-print {
+  height: 42px;
+
+  padding: 0 1rem;
+
+  border-radius: 10px;
+
+  border: 1px solid #d1d5db;
+
   background: #ffffff;
 
-  border: 1px solid var(--chmsu-primary);
+  color: #374151;
 
-  color: var(--chmsu-primary);
+  font-size: 0.88rem;
+
+  white-space: nowrap;
 }
 
-.btn-outline-primary:hover {
-  background: var(--chmsu-primary);
-
-  color: #ffffff;
+.btn-print:hover {
+  background: #f9fafb;
 }
 
 /* =========================================
    TABLE
 ========================================= */
 
+.table-wrapper,
 .table-responsive {
-  border: 1px solid #edf2f7;
+  overflow-x: auto;
 
-  border-radius: 14px;
-
-  overflow: hidden;
-
-  background: #ffffff;
+  margin-top: 1.5rem;
 }
 
-.table {
-  margin: 0;
+.modern-table {
+  width: 100%;
 
-  background: #ffffff;
+  min-width: 980px;
+
+  border-collapse: collapse;
 }
 
-.table thead th {
-  padding: 1rem 1.1rem;
+.modern-table thead th {
+  padding: 0.95rem 1.2rem;
+
+  background: #f9fafb;
 
   border: none;
 
-  background: var(--chmsu-bg-soft);
+  border-bottom: 1px solid #e5e7eb;
 
   color: #374151;
 
-  font-size: 0.74rem;
+  font-size: 0.76rem;
   font-weight: 700;
 
   text-transform: uppercase;
 
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
 
   white-space: nowrap;
 }
 
-.table tbody td {
-  padding: 1rem 1.1rem;
+.modern-table tbody td {
+  padding: 1rem 1.2rem;
 
   border-top: 1px solid #f1f5f9;
 
@@ -223,25 +314,65 @@
   font-size: 0.92rem;
 
   vertical-align: middle;
+
+  white-space: nowrap;
 }
 
-.table tbody tr {
-  transition:
-    background 0.18s ease;
+.modern-table tbody tr {
+  transition: background 0.2s ease;
 }
 
-.table tbody tr:hover {
-  background: #f8faf9;
+.modern-table tbody tr:hover {
+  background: #fafafa;
+}
+
+/* =========================================
+   TABLE COLUMN ALIGNMENT
+========================================= */
+
+.modern-table th:nth-child(1) {
+  width: 16%;
+}
+
+.modern-table th:nth-child(2) {
+  width: 10%;
+}
+
+.modern-table th:nth-child(3) {
+  width: 10%;
+}
+
+.modern-table th:nth-child(4),
+.modern-table th:nth-child(5),
+.modern-table th:nth-child(6) {
+  width: 12%;
+}
+
+.modern-table th:nth-child(7) {
+  width: 18%;
+}
+
+.modern-table th:nth-child(8) {
+  width: 12%;
+}
+
+.modern-table td:last-child,
+.modern-table th:last-child {
+  text-align: center;
 }
 
 /* =========================================
    BADGES
 ========================================= */
 
-.badge {
-  min-width: 60px;
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-  padding: 0.42rem 0.75rem;
+  min-width: 64px;
+
+  padding: 0.42rem 0.78rem;
 
   border-radius: 999px;
 
@@ -249,23 +380,31 @@
   font-weight: 700;
 }
 
-.bg-primary {
-  background: var(--chmsu-primary) !important;
+.status-primary {
+  background: #14532d;
+
+  color: #ffffff;
 }
 
-.bg-success {
-  background: var(--chmsu-secondary) !important;
+.status-success {
+  background: #16a34a;
+
+  color: #ffffff;
 }
 
-.bg-danger {
-  background: var(--chmsu-warning) !important;
+.status-danger {
+  background: #dc2626;
+
+  color: #ffffff;
 }
 
 /* =========================================
-   PROGRESS BAR
+   PROGRESS
 ========================================= */
 
 .progress-custom {
+  width: 100%;
+
   height: 18px;
 
   background: #edf2f7;
@@ -275,69 +414,117 @@
   overflow: hidden;
 }
 
-.progress-bar {
-  background: var(--chmsu-primary);
+.progress-bar-custom {
+  height: 100%;
+
+  min-width: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #14532d;
 
   color: #ffffff;
 
   font-size: 0.68rem;
   font-weight: 700;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  white-space: nowrap;
 
   transition: width 0.35s ease;
-}
-
-/* =========================================
-   PAGINATION
-========================================= */
-
-.text-muted {
-  color: #6b7280 !important;
-}
-
-.text-muted strong {
-  color: var(--chmsu-primary-dark);
-}
-
-.small {
-  font-size: 0.84rem;
 }
 
 /* =========================================
    EMPTY STATE
 ========================================= */
 
-td.text-muted {
+.empty-state {
   padding: 3rem !important;
 
+  text-align: center;
+
+  color: #6b7280;
+
   font-size: 0.92rem;
-  font-weight: 500;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.modern-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 1rem;
+
+  flex-wrap: wrap;
+
+  padding: 1rem 1.5rem;
+
+  border-top: 1px solid #e5e7eb;
+}
+
+.footer-info {
+  color: #6b7280;
+
+  font-size: 0.82rem;
+}
+
+.pagination-group {
+  display: flex;
+  align-items: center;
+
+  gap: 0.75rem;
 }
 
 /* =========================================
    LOADING
 ========================================= */
 
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
+.loading-wrapper {
+  display: flex;
 
-  border-width: 0.3rem;
+  justify-content: center;
 
-  color: var(--chmsu-primary);
+  padding: 4rem 0;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+
+  border:
+    4px solid #e5e7eb;
+
+  border-top:
+    4px solid #14532d;
+
+  border-radius: 50%;
+
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* =========================================
    SCROLLBAR
 ========================================= */
 
+.table-wrapper::-webkit-scrollbar,
 .table-responsive::-webkit-scrollbar {
-  height: 7px;
+  height: 6px;
+  width: 6px;
 }
 
+.table-wrapper::-webkit-scrollbar-thumb,
 .table-responsive::-webkit-scrollbar-thumb {
   background: #d1d5db;
 
@@ -345,42 +532,76 @@ td.text-muted {
 }
 
 /* =========================================
+   HELPERS
+========================================= */
+
+.text-center {
+  text-align: center;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+/* =========================================
    RESPONSIVE
 ========================================= */
 
+@media (max-width: 1200px) {
+
+  .filter-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
 
-  .card-header,
-  .card-body {
-    padding: 1rem;
+  .modern-card-header,
+  .modern-card-footer {
+    flex-direction: column;
+
+    align-items: flex-start;
   }
 
-  .card-header h4 {
-    font-size: 1.05rem;
-  }
-
-  .card-header small {
-    font-size: 0.76rem;
-  }
-
-  .table thead th,
-  .table tbody td {
-    padding: 0.8rem;
-
-    font-size: 0.84rem;
-  }
-
-  .btn {
+  .table-count {
     width: 100%;
+
+    height: 56px;
   }
 
-  .d-flex.gap-2 {
+  .filter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-group-actions {
     width: 100%;
 
     flex-direction: column;
   }
 
-  .form-control {
-    font-size: 0.88rem;
+  .btn-custom,
+  .pagination-btn,
+  .btn-print {
+    width: 100%;
+  }
+
+  .pagination-group {
+    width: 100%;
+
+    flex-direction: column;
+
+    align-items: stretch;
+  }
+
+  .modern-table {
+    min-width: 900px;
+  }
+
+  .modern-table thead th,
+  .modern-table tbody td {
+    padding: 0.85rem;
+
+    font-size: 0.84rem;
   }
 }

@@ -1,19 +1,50 @@
-<div class="container-fluid py-4">
-  <div class="card border-0 shadow-sm">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <div>
-        <h4 class="mb-0 fw-bold">Student Evaluation Summary</h4>
 
-        <small class="text-light opacity-75"> Monitor evaluation participation per section </small>
+<div class="container-fluid py-4">
+
+  <div class="modern-card">
+
+    <div class="card-topbar"></div>
+
+    <!-- HEADER -->
+
+    <div class="modern-card-header">
+
+      <div class="header-content">
+
+        <h2>
+          Student Evaluation Summary
+        </h2>
+
+        <span>
+          Monitor evaluation participation per section
+        </span>
+
       </div>
+
+      <div class="table-count">
+
+        {{ totalElements }}
+
+      </div>
+
     </div>
 
+    <!-- BODY -->
+
     <div class="card-body">
+
       <!-- FILTERS -->
 
-      <form class="row g-3 mb-4" (ngSubmit)="applyFilters()">
-        <div class="col-lg-3 col-md-6">
-          <label class="form-label fw-semibold"> Program Code </label>
+      <form
+        class="filter-grid"
+        (ngSubmit)="applyFilters()"
+      >
+
+        <div class="form-group">
+
+          <label>
+            Program Code
+          </label>
 
           <input
             type="text"
@@ -22,10 +53,14 @@
             name="programCode"
             placeholder="e.g BSIT"
           />
+
         </div>
 
-        <div class="col-lg-3 col-md-6">
-          <label class="form-label fw-semibold"> Year Level </label>
+        <div class="form-group">
+
+          <label>
+            Year Level
+          </label>
 
           <input
             type="text"
@@ -34,10 +69,14 @@
             name="yearLevel"
             placeholder="e.g 3"
           />
+
         </div>
 
-        <div class="col-lg-3 col-md-6">
-          <label class="form-label fw-semibold"> Section Code </label>
+        <div class="form-group">
+
+          <label>
+            Section Code
+          </label>
 
           <input
             type="text"
@@ -46,139 +85,256 @@
             name="sectionCode"
             placeholder="e.g A"
           />
+
         </div>
 
-        <div class="col-lg-3 col-md-6 d-flex align-items-end gap-2">
-          <button type="submit" class="btn btn-primary w-100">Filter</button>
+        <div class="btn-group-actions">
 
-          <button type="button" class="btn btn-outline-secondary w-100" (click)="clearFilters()">
+          <button
+            type="submit"
+            class="btn-custom btn-primary-custom"
+          >
+            Filter
+          </button>
+
+          <button
+            type="button"
+            class="btn-custom btn-secondary-custom"
+            (click)="clearFilters()"
+          >
             Clear
           </button>
+
         </div>
+
       </form>
 
       <!-- LOADING -->
 
       @if (loading) {
-        <div class="text-center py-5">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden"> Loading... </span>
-          </div>
+
+        <div class="loading-wrapper">
+
+          <div class="spinner"></div>
+
         </div>
+
       } @else {
+
         <!-- TABLE -->
 
-        <div class="table-responsive">
-          <table class="table table-hover align-middle">
+        <div class="table-wrapper">
+
+          <table class="modern-table">
+
             <thead>
+
               <tr>
-                <th>Program</th>
 
-                <th>Year Level</th>
+                <th>
+                  Program
+                </th>
 
-                <th>Section</th>
+                <th>
+                  Year Level
+                </th>
 
-                <th class="text-center">Total Students</th>
+                <th>
+                  Section
+                </th>
 
-                <th class="text-center">Evaluated</th>
+                <th class="text-center">
+                  Total Students
+                </th>
 
-                <th class="text-center">Remaining</th>
+                <th class="text-center">
+                  Evaluated
+                </th>
 
-                <th class="text-center">Completion</th>
+                <th class="text-center">
+                  Remaining
+                </th>
 
-                <th class="text-center">Actions</th>
+                <th class="text-center">
+                  Completion
+                </th>
+
+                <th class="text-center">
+                  Actions
+                </th>
+
               </tr>
+
             </thead>
 
             <tbody>
-              @if (studentSections.length === 0) {
+
+              @if (
+                studentSections.length === 0
+              ) {
+
                 <tr>
-                  <td colspan="8" class="text-center py-5 text-muted">No records found.</td>
+
+                  <td
+                    colspan="8"
+                    class="empty-state"
+                  >
+
+                    No records found.
+
+                  </td>
+
                 </tr>
+
               } @else {
+
                 @for (
                   row of studentSections;
-                  track row.programCode + '-' + row.yearLevel + '-' + row.sectionCode
+                  track row.programCode
+                    + '-'
+                    + row.yearLevel
+                    + '-'
+                    + row.sectionCode
                 ) {
+
                   <tr>
-                    <td class="fw-semibold">
+
+                    <td class="font-bold">
+
                       {{ row.programCode }}
+
                     </td>
 
                     <td>
+
                       {{ row.yearLevel }}
+
                     </td>
 
                     <td>
+
                       {{ row.sectionCode }}
+
                     </td>
 
                     <td class="text-center">
-                      <span class="badge bg-primary">
+
+                      <span class="status-badge status-primary">
+
                         {{ row.totalStudents }}
+
                       </span>
+
                     </td>
 
                     <td class="text-center">
-                      <span class="badge bg-success">
+
+                      <span class="status-badge status-success">
+
                         {{ row.evaluatedStudents }}
+
                       </span>
+
                     </td>
 
                     <td class="text-center">
-                      <span class="badge bg-danger">
+
+                      <span class="status-badge status-danger">
+
                         {{ row.notYetEvaluated }}
+
                       </span>
+
                     </td>
 
                     <td class="text-center">
-                      <div class="progress progress-custom">
+
+                      <div class="progress-custom">
+
                         <div
-                          class="progress-bar"
+                          class="progress-bar-custom"
                           role="progressbar"
                           [style.width.%]="
                             row.totalStudents > 0
-                              ? (row.evaluatedStudents / row.totalStudents) * 100
+                              ? (
+                                  row.evaluatedStudents
+                                  / row.totalStudents
+                                ) * 100
                               : 0
                           "
                         >
+
                           {{
                             row.totalStudents > 0
-                              ? ((row.evaluatedStudents / row.totalStudents) * 100).toFixed(0)
+                              ? (
+                                  (
+                                    row.evaluatedStudents
+                                    / row.totalStudents
+                                  ) * 100
+                                ).toFixed(0)
                               : 0
                           }}%
+
                         </div>
+
                       </div>
+
                     </td>
 
                     <td class="text-center">
-                      <button class="btn btn-sm btn-outline-primary" (click)="printSection(row)">
+
+                      <button
+                        class="btn-custom btn-print"
+                        (click)="printSection(row)"
+                      >
+
                         <i class="bi bi-printer"></i>
 
-                        <span> Print </span>
+                        <span>
+                          Print
+                        </span>
+
                       </button>
+
                     </td>
+
                   </tr>
+
                 }
+
               }
+
             </tbody>
+
           </table>
+
         </div>
 
-        <!-- PAGINATION -->
+        <!-- FOOTER -->
 
-        <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-3">
-          <div class="text-muted small">
+        <div class="modern-card-footer">
+
+          <div class="footer-info">
+
             Showing
 
             <strong>
-              {{ totalElements === 0 ? 0 : currentPage * pageSize + 1 }}
+              {{
+                totalElements === 0
+                  ? 0
+                  : currentPage * pageSize + 1
+              }}
             </strong>
 
             to
 
             <strong>
-              {{ Math.min((currentPage + 1) * pageSize, totalElements) }}
+              {{
+                Math.min(
+                  (currentPage + 1) * pageSize,
+                  totalElements
+                )
+              }}
             </strong>
 
             of
@@ -188,11 +344,13 @@
             </strong>
 
             entries
+
           </div>
 
-          <div class="d-flex gap-2">
+          <div class="pagination-group">
+
             <button
-              class="btn btn-outline-primary"
+              class="pagination-btn"
               [disabled]="currentPage === 0"
               (click)="previousPage()"
             >
@@ -200,16 +358,25 @@
             </button>
 
             <button
-              class="btn btn-outline-primary"
-              [disabled]="(currentPage + 1) * pageSize >= totalElements"
+              class="pagination-btn"
+              [disabled]="
+                (currentPage + 1) * pageSize
+                >= totalElements
+              "
               (click)="nextPage()"
             >
               Next
             </button>
+
           </div>
+
         </div>
+
       }
+
     </div>
+
   </div>
+
 </div>
 
