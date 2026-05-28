@@ -4,21 +4,41 @@
   (click)="closeSidebar()"
 ></div>
 
-<aside class="admin-sidebar" [class.mobile-open]="sidebarService.sidebarOpen()">
+<aside
+  class="admin-sidebar"
+  [class.mobile-open]="sidebarService.sidebarOpen()"
+>
+
+  <!-- HEADER -->
   <div class="sidebar-header">
+
     <div class="sidebar-logo">
-      <div class="logo-mark">CH</div>
+
+      <div class="logo-mark">
+        CH
+      </div>
 
       <div class="logo-content">
-        <h2>CHMSU FES</h2>
 
-        <span>Administrator Panel</span>
+        <h2>
+          CHMSU FES
+        </h2>
+
+        <span>
+          Administrator Panel
+        </span>
+
       </div>
+
     </div>
+
   </div>
 
+  <!-- BODY -->
   <div class="sidebar-body">
+
     <nav class="sidebar-nav">
+
       <a
         class="nav-item"
         routerLink="/admin-dashboard"
@@ -26,9 +46,11 @@
         [routerLinkActiveOptions]="{ exact: true }"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-grid-1x2"></i>
+        <i class="bi bi-grid-1x2-fill"></i>
 
-        <span>Dashboard</span>
+        <span>
+          Dashboard
+        </span>
       </a>
 
       <a
@@ -37,9 +59,11 @@
         routerLinkActive="active"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-people"></i>
+        <i class="bi bi-person-workspace"></i>
 
-        <span>Faculty List</span>
+        <span>
+          Faculty List
+        </span>
       </a>
 
       <a
@@ -48,9 +72,11 @@
         routerLinkActive="active"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-person-badge"></i>
+        <i class="bi bi-people-fill"></i>
 
-        <span>User Accounts</span>
+        <span>
+          User Accounts
+        </span>
       </a>
 
       <a
@@ -59,9 +85,11 @@
         routerLinkActive="active"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-bar-chart"></i>
+        <i class="bi bi-clipboard-data"></i>
 
-        <span>Evaluation Scores</span>
+        <span>
+          Evaluation Scores
+        </span>
       </a>
 
       <a
@@ -70,9 +98,11 @@
         routerLinkActive="active"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-bar-chart"></i>
+        <i class="bi bi-journal-check"></i>
 
-        <span>Student Evaluation Scores</span>
+        <span>
+          Student Evaluation Scores
+        </span>
       </a>
 
       <a
@@ -81,9 +111,11 @@
         routerLinkActive="active"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-bar-chart"></i>
+        <i class="bi bi-table"></i>
 
-        <span>Student Evaluation List</span>
+        <span>
+          Student Evaluation List
+        </span>
       </a>
 
       <a
@@ -92,20 +124,15 @@
         routerLinkActive="active"
         (click)="closeSidebar()"
       >
-        <i class="bi bi-gear"></i>
+        <i class="bi bi-gear-fill"></i>
 
-        <span>Settings</span>
+        <span>
+          Settings
+        </span>
       </a>
+
     </nav>
+
   </div>
 
-  <div class="sidebar-footer">
-    <div class="admin-avatar">A</div>
-
-    <div class="footer-content">
-      <h3>Administrator</h3>
-
-      <span>System Manager</span>
-    </div>
-  </div>
 </aside>
