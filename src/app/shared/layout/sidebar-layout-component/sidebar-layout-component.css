@@ -20,11 +20,9 @@
 
   border-right: 1px solid #e5e7eb;
 
-  box-shadow:
-    4px 0 24px rgba(0, 0, 0, 0.04);
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.04);
 
-  transition:
-    transform 0.25s ease;
+  transition: transform 0.25s ease;
 }
 
 /* =========================================
@@ -94,8 +92,7 @@
 
   letter-spacing: 0.05em;
 
-  box-shadow:
-    0 6px 14px rgba(24, 100, 67, 0.15);
+  box-shadow: 0 6px 14px rgba(24, 100, 67, 0.15);
 }
 
 .logo-content h2 {
@@ -182,8 +179,7 @@
 
   color: #6b7280;
 
-  transition:
-    color 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .nav-item span {
@@ -217,8 +213,7 @@
 
   font-weight: 600;
 
-  box-shadow:
-    0 6px 14px rgba(24, 100, 67, 0.15);
+  box-shadow: 0 6px 14px rgba(24, 100, 67, 0.15);
 }
 
 .nav-item.active i {
@@ -244,7 +239,6 @@
 ========================================= */
 
 @media (max-width: 991px) {
-
   .admin-sidebar {
     transform: translateX(-100%);
   }
@@ -259,7 +253,6 @@
 ========================================= */
 
 @media (max-width: 576px) {
-
   .admin-sidebar {
     width: 100%;
     max-width: 300px;

@@ -1,66 +1,38 @@
-import {
-  Component,
-  OnInit,
-  OnDestroy,
-  inject,
-} from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 
-import {
-  CommonModule,
-} from '@angular/common';
+import { CommonModule } from '@angular/common';
 
-import {
-  FormsModule,
-} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
-import {
-  Subject,
-  debounceTime,
-  takeUntil,
-  finalize,
-} from 'rxjs';
+import { Subject, debounceTime, takeUntil, finalize, take } from 'rxjs';
 
-import {
-  AdminDataFacade,
-} from '../../../store/admin-data/admin-data.facade';
+import { AdminDataFacade } from '../../../store/admin-data/admin-data.facade';
 
-import {
-  StudentSectionEvaluationDTO,
-} from '../../../services/admin/admin-service';
-
+import { StudentSectionEvaluationDTO } from '../../../services/admin/admin-service';
+import { StudentEvaluationListPrintComponent } from '../../../../shared/components/student-evaluation-list-print-component/student-evaluation-list-print-component';
+import { Actions, ofType } from '@ngrx/effects';
+import * as AdminDataActions from '../../../store/admin-data/admin-data.actions';
 @Component({
-  selector:
-    'app-student-evaluation-list-component',
+  selector: 'app-student-evaluation-list-component',
 
   standalone: true,
 
-  imports: [
-    CommonModule,
-    FormsModule,
-  ],
+  imports: [CommonModule, FormsModule, StudentEvaluationListPrintComponent],
 
-  templateUrl:
-    './student-evaluation-list-component.html',
+  templateUrl: './student-evaluation-list-component.html',
 
-  styleUrl:
-    './student-evaluation-list-component.css',
+  styleUrl: './student-evaluation-list-component.css',
 })
-export class StudentEvaluationListComponent
-implements OnInit, OnDestroy {
+export class StudentEvaluationListComponent implements OnInit, OnDestroy {
+  private adminFacade = inject(AdminDataFacade);
 
-  private adminFacade =
-    inject(AdminDataFacade);
+  private destroy$ = new Subject<void>();
 
-  private destroy$ =
-    new Subject<void>();
-
-  private filterSubject =
-    new Subject<void>();
-
+  private filterSubject = new Subject<void>();
+  private actions$ = inject(Actions);
   Math = Math;
 
-  studentSections:
-    StudentSectionEvaluationDTO[] = [];
+  studentSections: StudentSectionEvaluationDTO[] = [];
 
   totalElements = 0;
 
@@ -73,16 +45,14 @@ implements OnInit, OnDestroy {
   isRequesting = false;
 
   filters = {
-
     programCode: '',
 
     yearLevel: '',
 
     sectionCode: '',
   };
-
+  selectedRow: StudentSectionEvaluationDTO | null = null;
   ngOnInit(): void {
-
     this.initializeSubscriptions();
 
     this.initializeFilterDebounce();
@@ -91,99 +61,107 @@ implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-
     this.destroy$.next();
 
     this.destroy$.complete();
   }
+  printSection(row: StudentSectionEvaluationDTO): void {
+    this.adminFacade.loadStudentEvaluationStatus(
+      row.programCode,
 
-  private initializeSubscriptions(): void {
+      row.yearLevel,
 
-    this.adminFacade
-      .studentSections$
+      row.sectionCode,
+    );
+
+    this.actions$
       .pipe(
-        takeUntil(this.destroy$),
+        ofType(AdminDataActions.loadStudentEvaluationStatusSuccess),
+
+        take(1),
       )
-      .subscribe((response) => {
+      .subscribe(({ response }) => {
+        const normalizedData = response.map((item) => ({
+          studentId: item.studentId,
 
-        if (!response) {
+          programCode: item.programCode,
 
-          this.studentSections = [];
+          yearLevel: item.yearLevel,
 
-          this.totalElements = 0;
+          sectionCode: item.sectionCode,
 
-          this.isRequesting = false;
+          subjectCode: item.subjectCode,
 
-          return;
-        }
+          createdAt: item.createdAt ?? '-',
 
-        this.studentSections =
-          response.content ?? [];
+          evaluationStatus: item.evaluationStatus,
+        }));
 
-        this.totalElements =
-          response.totalElements ?? 0;
+        localStorage.setItem(
+          'student-evaluation-print-data',
+
+          JSON.stringify(normalizedData),
+        );
+
+        window.open(
+          '/print/student-evaluation',
+
+          '_blank',
+        );
+      });
+  }
+  private initializeSubscriptions(): void {
+    this.adminFacade.studentSections$.pipe(takeUntil(this.destroy$)).subscribe((response) => {
+      if (!response) {
+        this.studentSections = [];
+
+        this.totalElements = 0;
 
         this.isRequesting = false;
-      });
 
-    this.adminFacade
-      .loading$
-      .pipe(
-        takeUntil(this.destroy$),
-      )
-      .subscribe((loading) => {
+        return;
+      }
 
-        this.loading = loading;
+      this.studentSections = response.content ?? [];
 
-        if (!loading) {
+      this.totalElements = response.totalElements ?? 0;
 
-          this.isRequesting = false;
-        }
-      });
+      this.isRequesting = false;
+    });
+
+    this.adminFacade.loading$.pipe(takeUntil(this.destroy$)).subscribe((loading) => {
+      this.loading = loading;
+
+      if (!loading) {
+        this.isRequesting = false;
+      }
+    });
   }
 
   private initializeFilterDebounce(): void {
-
-    this.filterSubject
-      .pipe(
-        debounceTime(300),
-        takeUntil(this.destroy$),
-      )
-      .subscribe(() => {
-
-        this.loadStudentSections();
-      });
+    this.filterSubject.pipe(debounceTime(300), takeUntil(this.destroy$)).subscribe(() => {
+      this.loadStudentSections();
+    });
   }
 
   loadStudentSections(): void {
-
     if (this.isRequesting) {
-
       return;
     }
 
     this.isRequesting = true;
 
-    this.adminFacade
-      .loadStudentSections(
-        this.currentPage,
-        this.pageSize,
-        this.normalizeFilter(
-          this.filters.programCode,
-        ),
-        this.normalizeFilter(
-          this.filters.yearLevel,
-        ),
-        this.normalizeFilter(
-          this.filters.sectionCode,
-        ),
-      );
+    this.adminFacade.loadStudentSections(
+      this.currentPage,
+      this.pageSize,
+      this.normalizeFilter(this.filters.programCode),
+      this.normalizeFilter(this.filters.yearLevel),
+      this.normalizeFilter(this.filters.sectionCode),
+    );
   }
 
   applyFilters(): void {
-
     if (this.isRequesting) {
-
       return;
     }
 
@@ -193,14 +171,11 @@ implements OnInit, OnDestroy {
   }
 
   clearFilters(): void {
-
     if (this.isRequesting) {
-
       return;
     }
 
     this.filters = {
-
       programCode: '',
 
       yearLevel: '',
@@ -214,12 +189,7 @@ implements OnInit, OnDestroy {
   }
 
   previousPage(): void {
-
-    if (
-      this.currentPage <= 0 ||
-      this.isRequesting
-    ) {
-
+    if (this.currentPage <= 0 || this.isRequesting) {
       return;
     }
 
@@ -229,19 +199,9 @@ implements OnInit, OnDestroy {
   }
 
   nextPage(): void {
+    const totalPages = Math.ceil(this.totalElements / this.pageSize);
 
-    const totalPages =
-      Math.ceil(
-        this.totalElements /
-        this.pageSize,
-      );
-
-    if (
-      this.currentPage + 1 >=
-        totalPages ||
-      this.isRequesting
-    ) {
-
+    if (this.currentPage + 1 >= totalPages || this.isRequesting) {
       return;
     }
 
@@ -249,70 +209,41 @@ implements OnInit, OnDestroy {
 
     this.loadStudentSections();
   }
-
-  onPageSizeChange(
-    event: Event,
-  ): void {
-
+  onPageSizeChange(event: Event): void {
     if (this.isRequesting) {
-
       return;
     }
 
-    const target =
-      event.target as HTMLSelectElement;
+    const target = event.target as HTMLSelectElement;
 
-    this.pageSize =
-      Number(target.value);
+    this.pageSize = Number(target.value);
 
     this.currentPage = 0;
 
     this.loadStudentSections();
   }
 
-  private normalizeFilter(
-    value: string,
-  ): string {
-
+  private normalizeFilter(value: string): string {
     return value?.trim() || '';
   }
 
-  trackBySection(
-    index: number,
-    row: StudentSectionEvaluationDTO,
-  ): string {
-
+  trackBySection(index: number, row: StudentSectionEvaluationDTO): string {
     return `${row.programCode}-${row.yearLevel}-${row.sectionCode}`;
   }
 
   get totalPages(): number {
-
-    return Math.ceil(
-      this.totalElements /
-      this.pageSize,
-    );
+    return Math.ceil(this.totalElements / this.pageSize);
   }
 
   get showingStart(): number {
-
     if (this.totalElements === 0) {
-
       return 0;
     }
 
-    return (
-      this.currentPage *
-      this.pageSize
-    ) + 1;
+    return this.currentPage * this.pageSize + 1;
   }
 
   get showingEnd(): number {
-
-    return Math.min(
-      (
-        this.currentPage + 1
-      ) * this.pageSize,
-      this.totalElements,
-    );
+    return Math.min((this.currentPage + 1) * this.pageSize, this.totalElements);
   }
 }

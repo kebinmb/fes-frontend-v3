@@ -5,6 +5,7 @@ import {
   FetchFacultyResponse,
   FetchUserAccountsResponse,
   PageResponse,
+  StudentEvaluationStatusResponse,
   StudentSectionEvaluationDTO,
   UpdateFacultyRequest,
   UpdateUserAccountRequest,
@@ -161,6 +162,25 @@ export const loadStudentSectionsSuccess = createAction(
 );
 export const loadStudentSectionsFailure = createAction(
   '[Admin] Load Student Sections Failure',
+
+  props<{
+    error: any;
+  }>(),
+);
+
+export const loadStudentEvaluationStatus = createAction(
+  '[Admin] Load Student Evaluation Status',
+  props<{ programCode: string; yearLevel: string; sectionCode: string }>(),
+);
+export const loadStudentEvaluationStatusSuccess = createAction(
+  '[Admin] Load Student Evaluation Status Success',
+
+  props<{
+    response: StudentEvaluationStatusResponse[];
+  }>(),
+);
+export const loadStudentEvaluationStatusFailure = createAction(
+  '[Admin] Load Student Evaluation Status Failure',
 
   props<{
     error: any;

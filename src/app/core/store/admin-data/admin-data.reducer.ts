@@ -7,6 +7,7 @@ export const adminDataReducer = createReducer(
     AdminActions.loadFaculties,
     AdminActions.loadUserAccounts,
     AdminActions.loadFacultyEvaluationScores,
+    AdminActions.loadStudentEvaluationStatus,
     (state) => ({
       ...state,
       loading: true,
@@ -33,6 +34,7 @@ export const adminDataReducer = createReducer(
     AdminActions.loadUserAccountsFailure,
     AdminActions.loadFacultyEvaluationScoresFailure,
     AdminActions.loadStudentSectionsFailure,
+    AdminActions.loadStudentEvaluationStatusFailure,
     (state, { error }) => ({
       ...state,
       loading: false,
@@ -95,4 +97,13 @@ export const adminDataReducer = createReducer(
     studentSections: response,
     loading: false,
   })),
+  on(
+    AdminActions.loadStudentEvaluationStatusSuccess,
+
+    (state, { response }) => ({
+      ...state,
+      studentEvaluationStatus: response,
+      loading: false,
+    }),
+  ),
 );

@@ -21,6 +21,7 @@ export class AdminDataFacade {
   facultyEvaluationScoresByFacultyId$ = this.store.select(
     AdminDataSelectors.selectFacultyEvaluationScoresByFacultyId,
   );
+  studentEvaluationStatus$ = this.store.select(AdminDataSelectors.selectStudentEvaluationStatus);
   createUserAccountMessage$ = this.store.select(AdminDataSelectors.selectCreateUserAccountMessage);
 
   updateUserAccountMessage$ = this.store.select(AdminDataSelectors.selectUpdateUserAccountMessage);
@@ -87,6 +88,21 @@ export class AdminDataFacade {
       AdminDataActions.loadStudentSections({
         page,
         size,
+        programCode,
+        yearLevel,
+        sectionCode,
+      }),
+    );
+  }
+  loadStudentEvaluationStatus(
+    programCode: string,
+
+    yearLevel: string,
+
+    sectionCode: string,
+  ): void {
+    this.store.dispatch(
+      AdminDataActions.loadStudentEvaluationStatus({
         programCode,
         yearLevel,
         sectionCode,

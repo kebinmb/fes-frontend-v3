@@ -1,0 +1,553 @@
+:host {
+  display: block;
+  background: white;
+  color: var(--chmsu-text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   CONTAINER
+===================================================== */
+
+.print-container {
+  padding: 18px 28px;
+  background: white;
+  min-height: 100vh;
+}
+
+/* =====================================================
+   FIXED HEADER / FOOTER
+===================================================== */
+
+.fixed-header {
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  background: white;
+
+  z-index: 999;
+
+  padding: 12px 28px 0;
+}
+
+.fixed-footer {
+  position: fixed;
+
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  background: white;
+
+  z-index: 999;
+
+  padding: 0 28px 10px;
+}
+
+.print-content {
+  margin-top: 120px;
+  margin-bottom: 110px;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.report-header {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  padding-bottom: 10px;
+
+  border-bottom: 3px solid var(--chmsu-primary);
+
+  margin-bottom: 14px;
+}
+
+.header-left {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+}
+
+.report-logo {
+  width: 58px;
+  height: 58px;
+
+  object-fit: contain;
+}
+
+.header-right {
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  flex: 1;
+}
+
+.report-header-content {
+  width: 100%;
+}
+
+.report-header h1 {
+  margin: 0;
+
+  color: var(--chmsu-primary);
+
+  font-size: 18px;
+  font-weight: 800;
+
+  line-height: 1.1;
+
+  letter-spacing: 0.2px;
+}
+
+.report-header h2 {
+  margin: 3px 0 0;
+
+  font-size: 11px;
+
+  color: #4b5563;
+
+  font-weight: 700;
+
+  line-height: 1.2;
+}
+
+.report-header p {
+  margin: 2px 0 0;
+
+  font-size: 10px;
+
+  color: #6b7280;
+
+  font-weight: 500;
+
+  line-height: 1.2;
+}
+
+/* =====================================================
+   INFO SECTION
+===================================================== */
+
+.faculty-info {
+  background: var(--chmsu-bg-soft);
+
+  border: 1px solid var(--chmsu-border);
+
+  border-radius: 8px;
+
+  padding: 12px 16px;
+
+  margin-bottom: 12px;
+}
+
+.faculty-grid {
+  display: grid;
+
+  grid-template-columns: repeat(4, 1fr);
+
+  gap: 10px;
+}
+
+.faculty-item {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+.faculty-label {
+  font-size: 10px;
+  font-weight: 700;
+
+  color: #6b7280;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.4px;
+}
+
+.faculty-value {
+  font-size: 12px;
+  font-weight: 700;
+
+  color: var(--chmsu-text);
+}
+
+/* =====================================================
+   TITLES
+===================================================== */
+
+.section-title {
+  margin: 14px 0 8px;
+
+  padding-left: 10px;
+
+  border-left: 4px solid var(--chmsu-primary);
+
+  color: var(--chmsu-primary);
+
+  font-size: 13px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+}
+
+/* =====================================================
+   SUMMARY
+===================================================== */
+
+.summary-wrapper {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 12px;
+
+  margin-bottom: 14px;
+}
+
+.summary-card {
+  border: 1px solid var(--chmsu-border);
+
+  border-radius: 8px;
+
+  padding: 10px;
+
+  text-align: center;
+
+  background: white;
+}
+
+.summary-label {
+  font-size: 10px;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  color: var(--chmsu-muted);
+
+  letter-spacing: 0.5px;
+}
+
+.summary-value {
+  margin-top: 4px;
+
+  font-size: 22px;
+  font-weight: 800;
+
+  color: var(--chmsu-primary);
+}
+
+/* =====================================================
+   TABLE
+===================================================== */
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  table-layout: fixed;
+
+  border: 1px solid var(--chmsu-border);
+}
+
+thead {
+  display: table-header-group;
+}
+
+tbody {
+  display: table-row-group;
+}
+
+th {
+  background: var(--chmsu-primary);
+
+  color: white;
+
+  padding: 7px 8px;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  text-align: left;
+
+  letter-spacing: 0.5px;
+}
+
+td {
+  border: 1px solid var(--chmsu-border);
+
+  padding: 6px 8px;
+
+  font-size: 10px;
+
+  vertical-align: middle;
+
+  word-break: break-word;
+}
+
+tbody tr {
+  height: 28px;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafcfa;
+}
+
+tbody tr:hover {
+  background: #f3f8f5;
+}
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.status-badge {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 90px;
+
+  padding: 4px 8px;
+
+  border-radius: 999px;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  color: white;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.4px;
+}
+
+.status-success {
+  background: #15803d;
+}
+
+.status-danger {
+  background: #dc2626;
+}
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.empty-state {
+  text-align: center;
+
+  padding: 20px;
+
+  color: var(--chmsu-muted);
+
+  font-size: 11px;
+  font-style: italic;
+}
+
+/* =====================================================
+   APPROVAL
+===================================================== */
+
+.approval-section {
+  margin-top: 20px;
+
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 30px;
+}
+
+.approval-title {
+  color: var(--chmsu-primary);
+
+  font-size: 11px;
+  font-weight: 800;
+
+  margin-bottom: 14px;
+
+  text-transform: uppercase;
+}
+
+.signature-line {
+  margin-top: 20px;
+
+  border-top: 1px solid #374151;
+
+  padding-top: 5px;
+
+  text-align: center;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* =====================================================
+   HELPERS
+===================================================== */
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-muted {
+  color: var(--chmsu-muted);
+}
+
+/* =====================================================
+   PRINT
+===================================================== */
+@media print {
+  app-sidebar,
+  app-header,
+  .sidebar,
+  .topbar,
+  .dashboard-layout,
+  .admin-layout,
+  nav,
+  aside,
+  header,
+  .no-print {
+    display: none !important;
+  }
+
+  html,
+  body {
+    background: white !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    width: 100%;
+    height: auto;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  app-student-evaluation-list-print-component,
+  app-student-evaluation-list-print-component * {
+    visibility: visible;
+  }
+
+  app-student-evaluation-list-print-component {
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+  }
+
+  .print-container {
+    padding: 18px 28px !important;
+
+    width: 100%;
+
+    background: white !important;
+  }
+
+  .fixed-header {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    background: white;
+
+    z-index: 999;
+  }
+
+  .fixed-footer {
+    position: fixed;
+
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    background: white;
+
+    z-index: 999;
+  }
+
+  .print-content {
+    margin-top: 120px !important;
+
+    margin-bottom: 100px !important;
+  }
+
+  table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    page-break-inside: auto;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tfoot {
+    display: table-footer-group;
+  }
+
+  tr {
+    page-break-inside: avoid;
+
+    page-break-after: auto;
+  }
+
+  td,
+  th {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  @page {
+    size: A4 portrait;
+
+    margin: 10mm;
+  }
+}

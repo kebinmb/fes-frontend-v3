@@ -168,6 +168,22 @@ export interface StudentSectionEvaluationDTO {
 
   notYetEvaluated: number;
 }
+export interface StudentEvaluationStatusResponse {
+
+  studentId: string;
+
+  programCode: string;
+
+  yearLevel: string;
+
+  sectionCode: string;
+
+  subjectCode: string;
+
+  createdAt: string;
+
+  evaluationStatus: string;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -409,6 +425,43 @@ export class AdminService {
       },
     );
   }
+  getStudentEvaluationStatus(
+
+  programCode: string,
+
+  yearLevel: string,
+
+  sectionCode: string,
+
+): Observable<StudentEvaluationStatusResponse[]> {
+
+  const params = new HttpParams()
+
+    .set(
+      'programCode',
+      programCode,
+    )
+
+    .set(
+      'yearLevel',
+      yearLevel,
+    )
+
+    .set(
+      'sectionCode',
+      sectionCode,
+    );
+
+  return this.http.get<
+    StudentEvaluationStatusResponse[]
+  >(
+    `${this.ADMIN_API_URL}/student-evaluation-status`,
+    {
+      params,
+      withCredentials: true,
+    },
+  );
+}
 }
 
 

@@ -357,4 +357,46 @@ export class AdminEffects {
       ),
     ),
   );
+  loadStudentEvaluationStatus$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AdminDataActions.loadStudentEvaluationStatus),
+
+      tap(() => {
+        this.spinnerFacade.showSpinner();
+      }),
+
+      switchMap(({ programCode, yearLevel, sectionCode }) =>
+        this.adminDataService
+          .getStudentEvaluationStatus(programCode, yearLevel, sectionCode)
+
+          .pipe(
+            tap((response) => {
+              if (!response?.length) {
+                this.toastFacade.showToast('No student evaluation status found.', 'error');
+              }
+            }),
+
+            map((response) =>
+              AdminDataActions.loadStudentEvaluationStatusSuccess({
+                response,
+              }),
+            ),
+
+            catchError((error) => {
+              this.toastFacade.showToast(extractErrorMessage(error), 'error');
+
+              return of(
+                AdminDataActions.loadStudentEvaluationStatusFailure({
+                  error,
+                }),
+              );
+            }),
+
+            finalize(() => {
+              this.spinnerFacade.hideSpinner();
+            }),
+          ),
+      ),
+    ),
+  );
 }

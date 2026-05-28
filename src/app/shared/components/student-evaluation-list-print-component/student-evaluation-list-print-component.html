@@ -1,0 +1,353 @@
+<div class="print-container">
+
+  <!-- FIXED HEADER -->
+
+  <div class="fixed-header">
+
+    <div class="report-header">
+
+  <div class="header-left">
+
+    <img
+      src="/chmsu-logo.png"
+      alt="CHMSU Logo"
+      class="report-logo"
+    />
+
+  </div>
+
+  <div class="header-right">
+
+    <h1>
+      CHMSU Faculty Evaluation System
+    </h1>
+
+    <h2>
+      Individual Faculty Evaluation Report
+    </h2>
+
+    <p>
+      Carlos Hilado Memorial State University
+    </p>
+
+  </div>
+
+</div>
+
+  </div>
+
+  <!-- FIXED FOOTER -->
+
+  <div class="fixed-footer">
+
+    <div class="approval-section">
+
+      <div>
+
+        <div class="approval-title">
+          Prepared By
+        </div>
+
+        <div class="signature-line">
+
+          MIS Office
+
+        </div>
+
+      </div>
+
+      <div>
+
+        <div class="approval-title">
+          Verified By
+        </div>
+
+        <div class="signature-line">
+
+          Administrator
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- MAIN CONTENT -->
+
+  <div class="print-content">
+
+    <!-- INFORMATION -->
+
+    <div class="faculty-info">
+
+      <div class="faculty-grid">
+
+        <div class="faculty-item">
+
+          <span class="faculty-label">
+            Program Code
+          </span>
+
+          <span class="faculty-value">
+
+            {{
+              records.length > 0
+                ? records[0].programCode
+                : '-'
+            }}
+
+          </span>
+
+        </div>
+
+        <div class="faculty-item">
+
+          <span class="faculty-label">
+            Year Level
+          </span>
+
+          <span class="faculty-value">
+
+            {{
+              records.length > 0
+                ? records[0].yearLevel
+                : '-'
+            }}
+
+          </span>
+
+        </div>
+
+        <div class="faculty-item">
+
+          <span class="faculty-label">
+            Section Code
+          </span>
+
+          <span class="faculty-value">
+
+            {{
+              records.length > 0
+                ? records[0].sectionCode
+                : '-'
+            }}
+
+          </span>
+
+        </div>
+
+        <div class="faculty-item">
+
+          <span class="faculty-label">
+            Generated Date
+          </span>
+
+          <span class="faculty-value">
+
+            {{
+              today | date:'MMMM d, y h:mm a'
+            }}
+
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- SUMMARY -->
+
+    <h3 class="section-title">
+
+      Evaluation Summary
+
+    </h3>
+
+    <div class="summary-wrapper">
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+          Total Records
+        </div>
+
+        <div class="summary-value">
+
+          {{ records.length }}
+
+        </div>
+
+      </div>
+
+      <div class="summary-card">
+
+        <div class="summary-label">
+          Evaluated
+        </div>
+
+        <div class="summary-value">
+
+          {{
+            records.filter(
+              r =>
+                r.evaluationStatus
+                === 'EVALUATED'
+            ).length
+          }}
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TABLE -->
+
+    <h3 class="section-title">
+
+      Student Evaluation Records
+
+    </h3>
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th width="70">
+              #
+            </th>
+
+            <th>
+              Student ID
+            </th>
+
+            <th>
+              Subject Code
+            </th>
+
+            <th>
+              Evaluation Date
+            </th>
+
+            <th>
+              Evaluation Status
+            </th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          @if (
+            records.length === 0
+          ) {
+
+            <tr>
+
+              <td
+                colspan="5"
+                class="empty-state"
+              >
+
+                No records found.
+
+              </td>
+
+            </tr>
+
+          } @else {
+
+            @for (
+              row of records;
+              track row.studentId
+                + row.subjectCode;
+
+              let i = $index
+            ) {
+
+              <tr>
+
+                <td class="text-center">
+
+                  {{ i + 1 }}
+
+                </td>
+
+                <td class="font-bold">
+
+                  {{ row.studentId }}
+
+                </td>
+
+                <td>
+
+                  {{ row.subjectCode }}
+
+                </td>
+
+                <td>
+
+                  @if (
+                    row.createdAt ===
+                    'NOT_EVALUATED'
+                  ) {
+
+                    <span class="text-muted">
+                      -
+                    </span>
+
+                  } @else {
+
+                    {{ row.createdAt }}
+
+                  }
+
+                </td>
+
+                <td class="text-center">
+
+                  <span
+                    class="status-badge"
+
+                    [class.status-success]="
+                      row.evaluationStatus
+                      === 'EVALUATED'
+                    "
+
+                    [class.status-danger]="
+                      row.evaluationStatus
+                      === 'NOT_EVALUATED'
+                    "
+                  >
+
+                    {{
+                      row.evaluationStatus
+                    }}
+
+                  </span>
+
+                </td>
+
+              </tr>
+
+            }
+
+          }
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

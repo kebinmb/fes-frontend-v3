@@ -16,6 +16,7 @@ import { OauthSuccessComponent } from './shared/components/oauth-success-compone
 import { StudentEvaluationsDataTableComponent } from './core/features/components/student-evaluations-data-table/student-evaluations-data-table-component';
 import { FacultyEvaluationPrintComponent } from './shared/components/faculty-evaluation-print-component/faculty-evaluation-print-component';
 import { StudentEvaluationListComponent } from './core/features/components/student-evaluation-list-component/student-evaluation-list-component';
+import { StudentEvaluationListPrintComponent } from './shared/components/student-evaluation-list-print-component/student-evaluation-list-print-component';
 
 export const routes: Routes = [
   {
@@ -68,6 +69,11 @@ export const routes: Routes = [
     component: FacultyEvaluationPrintComponent,
   },
   {
+    path: 'print/student-evaluation',
+
+    component: StudentEvaluationListPrintComponent,
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
@@ -76,5 +82,5 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'login',
-  }
+  },
 ];

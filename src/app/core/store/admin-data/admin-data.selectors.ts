@@ -44,3 +44,7 @@ export const selectStudentSections = createSelector(
   selectAdminDataState,
   (state) => state.studentSections,
 );
+export const selectStudentEvaluationStatus = createSelector(
+  selectAdminDataState,
+  (state) => state.studentEvaluationStatus,
+);
