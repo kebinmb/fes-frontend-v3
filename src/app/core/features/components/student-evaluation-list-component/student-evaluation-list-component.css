@@ -12,62 +12,46 @@
   overflow: hidden;
 
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.04);
+    0 8px 24px rgba(0, 0, 0, 0.04);
 }
+
+/* =========================================
+   CARD HEADER
+========================================= */
 
 .card-header {
-  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-  padding: 1.5rem;
+  padding: 1.4rem 1.6rem;
 
-  border-bottom: 1px solid var(--chmsu-border);
+  background: var(--chmsu-primary);
 
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff,
-      #f9fbfa
-    );
-}
-
-.card-header::before {
-  content: '';
-
-  position: absolute;
-
-  top: 0;
-  left: 0;
-
-  width: 100%;
-  height: 4px;
-
-  background:
-    linear-gradient(
-      90deg,
-      var(--chmsu-primary),
-      var(--chmsu-accent)
-    );
+  color: #ffffff;
 }
 
 .card-header h4 {
   margin: 0;
 
-  color: var(--chmsu-text);
+  color: #ffffff;
 
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 700;
 
-  letter-spacing: -0.4px;
+  letter-spacing: -0.3px;
 }
 
 .card-header small {
   display: block;
 
-  margin-top: 0.35rem;
+  margin-top: 0.3rem;
 
-  color: var(--chmsu-muted);
+  color: rgba(255, 255, 255, 0.82);
 
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+
+  font-weight: 500;
 }
 
 /* =========================================
@@ -76,6 +60,8 @@
 
 .card-body {
   padding: 1.5rem;
+
+  background: #ffffff;
 }
 
 /* =========================================
@@ -87,7 +73,7 @@
 
   color: #374151;
 
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
 
   text-transform: uppercase;
@@ -112,8 +98,7 @@
 
   transition:
     border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+    box-shadow 0.2s ease;
 }
 
 .form-control::placeholder {
@@ -126,7 +111,7 @@
   box-shadow:
     0 0 0 4px rgba(24, 100, 67, 0.08);
 
-  background: #ffffff;
+  outline: none;
 }
 
 /* =========================================
@@ -142,10 +127,9 @@
   font-weight: 700;
 
   transition:
-    transform 0.15s ease,
     background 0.2s ease,
     border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    transform 0.15s ease;
 }
 
 .btn:active {
@@ -153,48 +137,33 @@
 }
 
 .btn-primary {
-  border: none;
+  background: var(--chmsu-primary);
 
-  background:
-    linear-gradient(
-      135deg,
-      var(--chmsu-primary),
-      var(--chmsu-primary-light)
-    );
+  border: none;
 
   color: #ffffff;
 }
 
 .btn-primary:hover {
-  background:
-    linear-gradient(
-      135deg,
-      var(--chmsu-primary-dark),
-      var(--chmsu-primary)
-    );
-
-  box-shadow:
-    0 8px 18px rgba(24, 100, 67, 0.18);
+  background: var(--chmsu-primary-dark);
 }
 
 .btn-outline-secondary {
-  border: 1px solid #d1d5db;
-
   background: #ffffff;
+
+  border: 1px solid #d1d5db;
 
   color: #374151;
 }
 
 .btn-outline-secondary:hover {
   background: #f9fafb;
-
-  border-color: #cbd5e1;
 }
 
 .btn-outline-primary {
-  border: 1px solid var(--chmsu-primary);
-
   background: #ffffff;
+
+  border: 1px solid var(--chmsu-primary);
 
   color: var(--chmsu-primary);
 }
@@ -215,6 +184,8 @@
   border-radius: 14px;
 
   overflow: hidden;
+
+  background: #ffffff;
 }
 
 .table {
@@ -224,15 +195,15 @@
 }
 
 .table thead th {
-  padding: 1rem 1.2rem;
+  padding: 1rem 1.1rem;
 
   border: none;
 
-  background: #f8fafc;
+  background: var(--chmsu-bg-soft);
 
   color: #374151;
 
-  font-size: 0.75rem;
+  font-size: 0.74rem;
   font-weight: 700;
 
   text-transform: uppercase;
@@ -243,7 +214,7 @@
 }
 
 .table tbody td {
-  padding: 1rem 1.2rem;
+  padding: 1rem 1.1rem;
 
   border-top: 1px solid #f1f5f9;
 
@@ -256,12 +227,11 @@
 
 .table tbody tr {
   transition:
-    background 0.18s ease,
-    transform 0.18s ease;
+    background 0.18s ease;
 }
 
 .table tbody tr:hover {
-  background: #fafdfb;
+  background: #f8faf9;
 }
 
 /* =========================================
@@ -275,7 +245,7 @@
 
   border-radius: 999px;
 
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
 }
 
@@ -306,16 +276,11 @@
 }
 
 .progress-bar {
-  background:
-    linear-gradient(
-      90deg,
-      var(--chmsu-primary),
-      var(--chmsu-accent)
-    );
+  background: var(--chmsu-primary);
 
-  color: #111827;
+  color: #ffffff;
 
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
 
   display: flex;
@@ -338,7 +303,7 @@
 }
 
 .small {
-  font-size: 0.85rem;
+  font-size: 0.84rem;
 }
 
 /* =========================================
@@ -385,9 +350,17 @@ td.text-muted {
 
 @media (max-width: 768px) {
 
-  .card-body,
-  .card-header {
+  .card-header,
+  .card-body {
     padding: 1rem;
+  }
+
+  .card-header h4 {
+    font-size: 1.05rem;
+  }
+
+  .card-header small {
+    font-size: 0.76rem;
   }
 
   .table thead th,
@@ -409,9 +382,5 @@ td.text-muted {
 
   .form-control {
     font-size: 0.88rem;
-  }
-
-  .card-header h4 {
-    font-size: 1.15rem;
   }
 }
