@@ -32,6 +32,7 @@ export const adminDataReducer = createReducer(
     AdminActions.loadFacultiesFailure,
     AdminActions.loadUserAccountsFailure,
     AdminActions.loadFacultyEvaluationScoresFailure,
+    AdminActions.loadStudentSectionsFailure,
     (state, { error }) => ({
       ...state,
       loading: false,
@@ -73,20 +74,25 @@ export const adminDataReducer = createReducer(
     loading: false,
   })),
   on(AdminActions.createUserAccountSuccess, (state, { response }) => ({
-  ...state,
-  createUserAccountMessage: response,
-  loading: false,
-})),
+    ...state,
+    createUserAccountMessage: response,
+    loading: false,
+  })),
 
-on(AdminActions.updateUserAccountSuccess, (state, { response }) => ({
-  ...state,
-  updateUserAccountMessage: response,
-  loading: false,
-})),
+  on(AdminActions.updateUserAccountSuccess, (state, { response }) => ({
+    ...state,
+    updateUserAccountMessage: response,
+    loading: false,
+  })),
 
-on(AdminActions.updateUserPasswordSuccess, (state, { response }) => ({
-  ...state,
-  updateUserPasswordMessage: response,
-  loading: false,
-})),
+  on(AdminActions.updateUserPasswordSuccess, (state, { response }) => ({
+    ...state,
+    updateUserPasswordMessage: response,
+    loading: false,
+  })),
+  on(AdminActions.loadStudentSectionsSuccess, (state, { response }) => ({
+    ...state,
+    studentSections: response,
+    loading: false,
+  })),
 );

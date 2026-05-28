@@ -1,0 +1,417 @@
+/* =========================================
+   CARD LAYOUT
+========================================= */
+
+.card {
+  background: var(--chmsu-surface);
+
+  border: 1px solid var(--chmsu-border);
+
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.card-header {
+  position: relative;
+
+  padding: 1.5rem;
+
+  border-bottom: 1px solid var(--chmsu-border);
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff,
+      #f9fbfa
+    );
+}
+
+.card-header::before {
+  content: '';
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 4px;
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--chmsu-primary),
+      var(--chmsu-accent)
+    );
+}
+
+.card-header h4 {
+  margin: 0;
+
+  color: var(--chmsu-text);
+
+  font-size: 1.35rem;
+  font-weight: 700;
+
+  letter-spacing: -0.4px;
+}
+
+.card-header small {
+  display: block;
+
+  margin-top: 0.35rem;
+
+  color: var(--chmsu-muted);
+
+  font-size: 0.9rem;
+}
+
+/* =========================================
+   CARD BODY
+========================================= */
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* =========================================
+   FILTER FORM
+========================================= */
+
+.form-label {
+  margin-bottom: 0.5rem;
+
+  color: #374151;
+
+  font-size: 0.82rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.03em;
+}
+
+.form-control {
+  height: 46px;
+
+  border-radius: 12px;
+
+  border: 1px solid #d1d5db;
+
+  background: #ffffff;
+
+  color: var(--chmsu-text);
+
+  font-size: 0.92rem;
+
+  padding: 0 1rem;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-control::placeholder {
+  color: #9ca3af;
+}
+
+.form-control:focus {
+  border-color: var(--chmsu-primary);
+
+  box-shadow:
+    0 0 0 4px rgba(24, 100, 67, 0.08);
+
+  background: #ffffff;
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.btn {
+  height: 46px;
+
+  border-radius: 12px;
+
+  font-size: 0.88rem;
+  font-weight: 700;
+
+  transition:
+    transform 0.15s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn-primary {
+  border: none;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--chmsu-primary),
+      var(--chmsu-primary-light)
+    );
+
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background:
+    linear-gradient(
+      135deg,
+      var(--chmsu-primary-dark),
+      var(--chmsu-primary)
+    );
+
+  box-shadow:
+    0 8px 18px rgba(24, 100, 67, 0.18);
+}
+
+.btn-outline-secondary {
+  border: 1px solid #d1d5db;
+
+  background: #ffffff;
+
+  color: #374151;
+}
+
+.btn-outline-secondary:hover {
+  background: #f9fafb;
+
+  border-color: #cbd5e1;
+}
+
+.btn-outline-primary {
+  border: 1px solid var(--chmsu-primary);
+
+  background: #ffffff;
+
+  color: var(--chmsu-primary);
+}
+
+.btn-outline-primary:hover {
+  background: var(--chmsu-primary);
+
+  color: #ffffff;
+}
+
+/* =========================================
+   TABLE
+========================================= */
+
+.table-responsive {
+  border: 1px solid #edf2f7;
+
+  border-radius: 14px;
+
+  overflow: hidden;
+}
+
+.table {
+  margin: 0;
+
+  background: #ffffff;
+}
+
+.table thead th {
+  padding: 1rem 1.2rem;
+
+  border: none;
+
+  background: #f8fafc;
+
+  color: #374151;
+
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.05em;
+
+  white-space: nowrap;
+}
+
+.table tbody td {
+  padding: 1rem 1.2rem;
+
+  border-top: 1px solid #f1f5f9;
+
+  color: #111827;
+
+  font-size: 0.92rem;
+
+  vertical-align: middle;
+}
+
+.table tbody tr {
+  transition:
+    background 0.18s ease,
+    transform 0.18s ease;
+}
+
+.table tbody tr:hover {
+  background: #fafdfb;
+}
+
+/* =========================================
+   BADGES
+========================================= */
+
+.badge {
+  min-width: 60px;
+
+  padding: 0.42rem 0.75rem;
+
+  border-radius: 999px;
+
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.bg-primary {
+  background: var(--chmsu-primary) !important;
+}
+
+.bg-success {
+  background: var(--chmsu-secondary) !important;
+}
+
+.bg-danger {
+  background: var(--chmsu-warning) !important;
+}
+
+/* =========================================
+   PROGRESS BAR
+========================================= */
+
+.progress-custom {
+  height: 18px;
+
+  background: #edf2f7;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+}
+
+.progress-bar {
+  background:
+    linear-gradient(
+      90deg,
+      var(--chmsu-primary),
+      var(--chmsu-accent)
+    );
+
+  color: #111827;
+
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: width 0.35s ease;
+}
+
+/* =========================================
+   PAGINATION
+========================================= */
+
+.text-muted {
+  color: #6b7280 !important;
+}
+
+.text-muted strong {
+  color: var(--chmsu-primary-dark);
+}
+
+.small {
+  font-size: 0.85rem;
+}
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+td.text-muted {
+  padding: 3rem !important;
+
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+/* =========================================
+   LOADING
+========================================= */
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+
+  border-width: 0.3rem;
+
+  color: var(--chmsu-primary);
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.table-responsive::-webkit-scrollbar {
+  height: 7px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+
+  border-radius: 999px;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+  .card-body,
+  .card-header {
+    padding: 1rem;
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: 0.8rem;
+
+    font-size: 0.84rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .d-flex.gap-2 {
+    width: 100%;
+
+    flex-direction: column;
+  }
+
+  .form-control {
+    font-size: 0.88rem;
+  }
+
+  .card-header h4 {
+    font-size: 1.15rem;
+  }
+}

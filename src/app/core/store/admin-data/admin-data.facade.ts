@@ -2,7 +2,12 @@ import { inject, Injectable } from '@angular/core';
 import * as AdminDataSelectors from './admin-data.selectors';
 import * as AdminDataActions from './admin-data.actions';
 import { Store } from '@ngrx/store';
-import { CreateUserAccountRequest, UpdateFacultyRequest, UpdateUserAccountRequest, UpdateUserPasswordRequest } from '../../services/admin/admin-service';
+import {
+  CreateUserAccountRequest,
+  UpdateFacultyRequest,
+  UpdateUserAccountRequest,
+  UpdateUserPasswordRequest,
+} from '../../services/admin/admin-service';
 @Injectable({ providedIn: 'root' })
 export class AdminDataFacade {
   private store = inject(Store);
@@ -12,16 +17,13 @@ export class AdminDataFacade {
   facultyEvaluationScores$ = this.store.select(AdminDataSelectors.selectFacultyEvaluationScores);
   loading$ = this.store.select(AdminDataSelectors.selectLoading);
   updateFacultyMessage$ = this.store.select(AdminDataSelectors.selectUpdateFacultyMessage);
+  studentSections$ = this.store.select(AdminDataSelectors.selectStudentSections);
   facultyEvaluationScoresByFacultyId$ = this.store.select(
     AdminDataSelectors.selectFacultyEvaluationScoresByFacultyId,
   );
-  createUserAccountMessage$ = this.store.select(
-    AdminDataSelectors.selectCreateUserAccountMessage,
-  );
+  createUserAccountMessage$ = this.store.select(AdminDataSelectors.selectCreateUserAccountMessage);
 
-  updateUserAccountMessage$ = this.store.select(
-    AdminDataSelectors.selectUpdateUserAccountMessage,
-  );
+  updateUserAccountMessage$ = this.store.select(AdminDataSelectors.selectUpdateUserAccountMessage);
 
   updateUserPasswordMessage$ = this.store.select(
     AdminDataSelectors.selectUpdateUserPasswordMessage,
@@ -43,22 +45,17 @@ export class AdminDataFacade {
   loadFacultyEvaluationScores(page: number, size: number) {
     this.store.dispatch(AdminDataActions.loadFacultyEvaluationScores({ page, size }));
   }
-  loadFacultyEvaluationScoresByFacultyId(
-    facultyId: string
-  ): void {
-
+  loadFacultyEvaluationScoresByFacultyId(facultyId: string): void {
     this.store.dispatch(
       AdminDataActions.loadFacultyEvaluationScoresByFacultyId({
         facultyId,
       }),
     );
-
   }
   updateFaculty(payload: UpdateFacultyRequest) {
     this.store.dispatch(AdminDataActions.updateFaculty({ payload }));
   }
   createUserAccount(payload: CreateUserAccountRequest): void {
-
     this.store.dispatch(
       AdminDataActions.createUserAccount({
         payload,
@@ -66,7 +63,6 @@ export class AdminDataFacade {
     );
   }
   updateUserAccount(payload: UpdateUserAccountRequest): void {
-
     this.store.dispatch(
       AdminDataActions.updateUserAccount({
         payload,
@@ -74,10 +70,26 @@ export class AdminDataFacade {
     );
   }
   updateUserPassword(payload: UpdateUserPasswordRequest): void {
-
     this.store.dispatch(
       AdminDataActions.updateUserPassword({
         payload,
+      }),
+    );
+  }
+  loadStudentSections(
+    page: number,
+    size: number,
+    programCode?: string,
+    yearLevel?: string,
+    sectionCode?: string,
+  ): void {
+    this.store.dispatch(
+      AdminDataActions.loadStudentSections({
+        page,
+        size,
+        programCode,
+        yearLevel,
+        sectionCode,
       }),
     );
   }

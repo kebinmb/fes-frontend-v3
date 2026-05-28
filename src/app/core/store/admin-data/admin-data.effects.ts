@@ -1,95 +1,50 @@
-import {
-  inject,
-  Injectable,
-} from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
-import {
-  Actions,
-  createEffect,
-  ofType,
-} from '@ngrx/effects';
+import { Actions, createEffect, ofType } from '@ngrx/effects';
 
-import {
-  catchError,
-  map,
-  mergeMap,
-  of,
-  switchMap,
-  tap,
-} from 'rxjs';
+import { catchError, finalize, map, mergeMap, of, switchMap, tap } from 'rxjs';
 
-import * as AdminDataActions
-from './admin-data.actions';
+import * as AdminDataActions from './admin-data.actions';
 
-import { AdminService }
-from '../../services/admin/admin-service';
+import { AdminService } from '../../services/admin/admin-service';
 
-import { ToastFacade }
-from '../toast/toast.facade';
+import { ToastFacade } from '../toast/toast.facade';
 
-import { extractErrorMessage }
-from '../../../utilities/extract-error.util';
+import { extractErrorMessage } from '../../../utilities/extract-error.util';
+import { SpinnerFacade } from '../spinner/spinner.facade';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminEffects {
+  private actions$ = inject(Actions);
 
-  private actions$ =
-    inject(Actions);
+  private adminDataService = inject(AdminService);
 
-  private adminDataService =
-    inject(AdminService);
-
-  private toastFacade =
-    inject(ToastFacade);
-
+  private toastFacade = inject(ToastFacade);
+  private spinnerFacade = inject(SpinnerFacade);
   loadFaculties$ = createEffect(() =>
-
     this.actions$.pipe(
+      ofType(AdminDataActions.loadFaculties),
 
-      ofType(
-        AdminDataActions.loadFaculties
-      ),
-
-      mergeMap(({
-        page,
-        size,
-        search,
-      }) =>
-
+      mergeMap(({ page, size, search }) =>
         this.adminDataService
-          .getFaculties(
-            page,
-            size,
-            search ?? '',
-          )
+          .getFaculties(page, size, search ?? '')
 
           .pipe(
-
             map((response) =>
-
-              AdminDataActions
-                .loadFacultiesSuccess({
-                  response,
-                })
-
+              AdminDataActions.loadFacultiesSuccess({
+                response,
+              }),
             ),
 
             catchError((error) => {
-
-              this.toastFacade.showToast(
-                extractErrorMessage(error),
-                'error',
-              );
+              this.toastFacade.showToast(extractErrorMessage(error), 'error');
 
               return of(
-
-                AdminDataActions
-                  .loadFacultiesFailure({
-                    error,
-                  })
-
+                AdminDataActions.loadFacultiesFailure({
+                  error,
+                }),
               );
             }),
           ),
@@ -98,49 +53,27 @@ export class AdminEffects {
   );
 
   loadUserAccounts$ = createEffect(() =>
-
     this.actions$.pipe(
+      ofType(AdminDataActions.loadUserAccounts),
 
-      ofType(
-        AdminDataActions.loadUserAccounts
-      ),
-
-      mergeMap(({
-        page,
-        size,
-      }) =>
-
+      mergeMap(({ page, size }) =>
         this.adminDataService
-          .getUserAccounts(
-            page,
-            size,
-          )
+          .getUserAccounts(page, size)
 
           .pipe(
-
             map((response) =>
-
-              AdminDataActions
-                .loadUserAccountsSuccess({
-                  response,
-                })
-
+              AdminDataActions.loadUserAccountsSuccess({
+                response,
+              }),
             ),
 
             catchError((error) => {
-
-              this.toastFacade.showToast(
-                extractErrorMessage(error),
-                'error',
-              );
+              this.toastFacade.showToast(extractErrorMessage(error), 'error');
 
               return of(
-
-                AdminDataActions
-                  .loadUserAccountsFailure({
-                    error,
-                  })
-
+                AdminDataActions.loadUserAccountsFailure({
+                  error,
+                }),
               );
             }),
           ),
@@ -149,50 +82,27 @@ export class AdminEffects {
   );
 
   loadFacultyEvaluationScores$ = createEffect(() =>
-
     this.actions$.pipe(
+      ofType(AdminDataActions.loadFacultyEvaluationScores),
 
-      ofType(
-        AdminDataActions
-          .loadFacultyEvaluationScores
-      ),
-
-      mergeMap(({
-        page,
-        size,
-      }) =>
-
+      mergeMap(({ page, size }) =>
         this.adminDataService
-          .getFacultyEvaluationScores(
-            page,
-            size,
-          )
+          .getFacultyEvaluationScores(page, size)
 
           .pipe(
-
             map((response) =>
-
-              AdminDataActions
-                .loadFacultyEvaluationScoresSuccess({
-                  response,
-                })
-
+              AdminDataActions.loadFacultyEvaluationScoresSuccess({
+                response,
+              }),
             ),
 
             catchError((error) => {
-
-              this.toastFacade.showToast(
-                extractErrorMessage(error),
-                'error',
-              );
+              this.toastFacade.showToast(extractErrorMessage(error), 'error');
 
               return of(
-
-                AdminDataActions
-                  .loadFacultyEvaluationScoresFailure({
-                    error,
-                  })
-
+                AdminDataActions.loadFacultyEvaluationScoresFailure({
+                  error,
+                }),
               );
             }),
           ),
@@ -200,129 +110,80 @@ export class AdminEffects {
     ),
   );
 
-  loadFacultyEvaluationScoresByFacultyId$ =
-    createEffect(() =>
-
-      this.actions$.pipe(
-
-        ofType(
-          AdminDataActions
-            .loadFacultyEvaluationScoresByFacultyId
-        ),
-
-        switchMap(({
-          facultyId,
-        }) =>
-
-          this.adminDataService
-            .getFacultyEvaluationScoresByFacultyId(
-              facultyId
-            )
-
-            .pipe(
-
-              tap((response) => {
-
-                if (!response?.length) {
-
-                  this.toastFacade.showToast(
-                    'No faculty evaluation records found.',
-                    'error',
-                  );
-
-                  return;
-                }
-
-                this.toastFacade.showToast(
-                  'Faculty evaluation records loaded successfully.',
-                  'success',
-                );
-              }),
-
-              map((response) =>
-
-                AdminDataActions
-                  .loadFacultyEvaluationScoresByFacultyIdSuccess({
-                    response,
-                  })
-
-              ),
-
-              catchError((error) => {
-
-                this.toastFacade.showToast(
-                  extractErrorMessage(error),
-                  'error',
-                );
-
-                return of(
-
-                  AdminDataActions
-                    .loadFacultyEvaluationScoresByFacultyIdFailure({
-                      error,
-                    })
-
-                );
-              }),
-            ),
-        ),
-      ),
-    );
-
-  updateFaculty$ = createEffect(() =>
-
+  loadFacultyEvaluationScoresByFacultyId$ = createEffect(() =>
     this.actions$.pipe(
+      ofType(AdminDataActions.loadFacultyEvaluationScoresByFacultyId),
 
-      ofType(
-        AdminDataActions.updateFaculty
-      ),
-
-      mergeMap(({
-        payload,
-      }) =>
-
+      switchMap(({ facultyId }) =>
         this.adminDataService
-          .updateFaculty(payload)
+          .getFacultyEvaluationScoresByFacultyId(facultyId)
 
           .pipe(
+            tap((response) => {
+              if (!response?.length) {
+                this.toastFacade.showToast('No faculty evaluation records found.', 'error');
 
-            tap(() => {
+                return;
+              }
 
               this.toastFacade.showToast(
-                'Faculty updated successfully.',
+                'Faculty evaluation records loaded successfully.',
                 'success',
               );
             }),
 
+            map((response) =>
+              AdminDataActions.loadFacultyEvaluationScoresByFacultyIdSuccess({
+                response,
+              }),
+            ),
+
+            catchError((error) => {
+              this.toastFacade.showToast(extractErrorMessage(error), 'error');
+
+              return of(
+                AdminDataActions.loadFacultyEvaluationScoresByFacultyIdFailure({
+                  error,
+                }),
+              );
+            }),
+          ),
+      ),
+    ),
+  );
+
+  updateFaculty$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AdminDataActions.updateFaculty),
+
+      mergeMap(({ payload }) =>
+        this.adminDataService
+          .updateFaculty(payload)
+
+          .pipe(
+            tap(() => {
+              this.toastFacade.showToast('Faculty updated successfully.', 'success');
+            }),
+
             mergeMap((response) => [
+              AdminDataActions.updateFacultySuccess({
+                response,
+              }),
 
-              AdminDataActions
-                .updateFacultySuccess({
-                  response,
-                }),
-
-              AdminDataActions
-                .loadFaculties({
-                  page: 0,
-                  size: 10,
-                  search: '',
-                }),
+              AdminDataActions.loadFaculties({
+                page: 0,
+                size: 10,
+                search: '',
+              }),
             ]),
 
             catchError((error) => {
-
-              this.toastFacade.showToast(
-                extractErrorMessage(error),
-                'error',
-              );
+              this.toastFacade.showToast(extractErrorMessage(error), 'error');
 
               return of(
-
-                AdminDataActions
-                  .updateFacultyFailure({
-                    error,
-                  })
-
+                AdminDataActions.updateFacultyFailure({
+                  error,
+                }),
               );
             }),
           ),
@@ -331,59 +192,36 @@ export class AdminEffects {
   );
 
   createUserAccount$ = createEffect(() =>
-
     this.actions$.pipe(
+      ofType(AdminDataActions.createUserAccount),
 
-      ofType(
-        AdminDataActions
-          .createUserAccount
-      ),
-
-      mergeMap(({
-        payload,
-      }) =>
-
+      mergeMap(({ payload }) =>
         this.adminDataService
           .createUserAccount(payload)
 
           .pipe(
-
             tap(() => {
-
-              this.toastFacade.showToast(
-                'User account created successfully.',
-                'success',
-              );
+              this.toastFacade.showToast('User account created successfully.', 'success');
             }),
 
             mergeMap((response) => [
+              AdminDataActions.createUserAccountSuccess({
+                response,
+              }),
 
-              AdminDataActions
-                .createUserAccountSuccess({
-                  response,
-                }),
-
-              AdminDataActions
-                .loadUserAccounts({
-                  page: 0,
-                  size: 10,
-                }),
+              AdminDataActions.loadUserAccounts({
+                page: 0,
+                size: 10,
+              }),
             ]),
 
             catchError((error) => {
-
-              this.toastFacade.showToast(
-                extractErrorMessage(error),
-                'error',
-              );
+              this.toastFacade.showToast(extractErrorMessage(error), 'error');
 
               return of(
-
-                AdminDataActions
-                  .createUserAccountFailure({
-                    error,
-                  })
-
+                AdminDataActions.createUserAccountFailure({
+                  error,
+                }),
               );
             }),
           ),
@@ -392,59 +230,36 @@ export class AdminEffects {
   );
 
   updateUserAccount$ = createEffect(() =>
-
     this.actions$.pipe(
+      ofType(AdminDataActions.updateUserAccount),
 
-      ofType(
-        AdminDataActions
-          .updateUserAccount
-      ),
-
-      mergeMap(({
-        payload,
-      }) =>
-
+      mergeMap(({ payload }) =>
         this.adminDataService
           .updateUserAccount(payload)
 
           .pipe(
-
             tap(() => {
-
-              this.toastFacade.showToast(
-                'User account updated successfully.',
-                'success',
-              );
+              this.toastFacade.showToast('User account updated successfully.', 'success');
             }),
 
             mergeMap((response) => [
+              AdminDataActions.updateUserAccountSuccess({
+                response,
+              }),
 
-              AdminDataActions
-                .updateUserAccountSuccess({
-                  response,
-                }),
-
-              AdminDataActions
-                .loadUserAccounts({
-                  page: 0,
-                  size: 10,
-                }),
+              AdminDataActions.loadUserAccounts({
+                page: 0,
+                size: 10,
+              }),
             ]),
 
             catchError((error) => {
-
-              this.toastFacade.showToast(
-                extractErrorMessage(error),
-                'error',
-              );
+              this.toastFacade.showToast(extractErrorMessage(error), 'error');
 
               return of(
-
-                AdminDataActions
-                  .updateUserAccountFailure({
-                    error,
-                  })
-
+                AdminDataActions.updateUserAccountFailure({
+                  error,
+                }),
               );
             }),
           ),
@@ -453,55 +268,90 @@ export class AdminEffects {
   );
 
   updateUserPassword$ = createEffect(() =>
-
     this.actions$.pipe(
+      ofType(AdminDataActions.updateUserPassword),
 
-      ofType(
-        AdminDataActions
-          .updateUserPassword
-      ),
-
-      mergeMap(({
-        payload,
-      }) =>
-
+      mergeMap(({ payload }) =>
         this.adminDataService
           .updateUserPassword(payload)
 
           .pipe(
-
             tap(() => {
-
-              this.toastFacade.showToast(
-                'Password updated successfully.',
-                'success',
-              );
+              this.toastFacade.showToast('Password updated successfully.', 'success');
             }),
 
             map((response) =>
-
-              AdminDataActions
-                .updateUserPasswordSuccess({
-                  response,
-                })
-
+              AdminDataActions.updateUserPasswordSuccess({
+                response,
+              }),
             ),
 
             catchError((error) => {
-
-              this.toastFacade.showToast(
-                extractErrorMessage(error),
-                'error',
-              );
+              this.toastFacade.showToast(extractErrorMessage(error), 'error');
 
               return of(
-
-                AdminDataActions
-                  .updateUserPasswordFailure({
-                    error,
-                  })
-
+                AdminDataActions.updateUserPasswordFailure({
+                  error,
+                }),
               );
+            }),
+          ),
+      ),
+    ),
+  );
+  loadStudentSections$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AdminDataActions.loadStudentSections),
+
+      tap(() => {
+        this.spinnerFacade.showSpinner();
+      }),
+
+      switchMap(({ page, size, programCode, yearLevel, sectionCode }) =>
+        this.adminDataService
+          .getStudentSections(page, size, programCode, yearLevel, sectionCode)
+
+          .pipe(
+            tap((response) => {
+              if (!response?.content?.length) {
+                this.toastFacade.showToast('No student section evaluations found.', 'error');
+              }
+            }),
+
+            map((response) =>
+              AdminDataActions.loadStudentSectionsSuccess({
+                response,
+              }),
+            ),
+
+            catchError((error) => {
+              const message = extractErrorMessage(error);
+
+              /*
+               * Ignore cancelled/aborted requests
+               * caused by switchMap cancellation
+               */
+              if (
+                message?.includes('aborted') ||
+                message?.includes('Unknown Error') ||
+                message?.includes('Http failure')
+              ) {
+                return of({
+                  type: '[Admin] Ignored Cancelled Request',
+                });
+              }
+
+              this.toastFacade.showToast(message, 'error');
+
+              return of(
+                AdminDataActions.loadStudentSectionsFailure({
+                  error,
+                }),
+              );
+            }),
+
+            finalize(() => {
+              this.spinnerFacade.hideSpinner();
             }),
           ),
       ),

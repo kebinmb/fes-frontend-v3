@@ -15,6 +15,7 @@ import { SettingsComponent } from './core/features/components/settings-component
 import { OauthSuccessComponent } from './shared/components/oauth-success-component/oauth-success-component';
 import { StudentEvaluationsDataTableComponent } from './core/features/components/student-evaluations-data-table/student-evaluations-data-table-component';
 import { FacultyEvaluationPrintComponent } from './shared/components/faculty-evaluation-print-component/faculty-evaluation-print-component';
+import { StudentEvaluationListComponent } from './core/features/components/student-evaluation-list-component/student-evaluation-list-component';
 
 export const routes: Routes = [
   {
@@ -58,6 +59,7 @@ export const routes: Routes = [
       { path: 'evaluation-score-list', component: FacultyEvaluationScoresDataTableComponent },
       { path: 'user-accounts', component: UserAccountsDataTableComponent },
       { path: 'student-evaluations', component: StudentEvaluationsDataTableComponent },
+      { path: 'student-evaluation-list', component: StudentEvaluationListComponent },
       { path: 'settings', component: SettingsComponent },
     ],
   },

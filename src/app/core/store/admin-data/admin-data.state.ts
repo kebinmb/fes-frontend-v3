@@ -3,6 +3,7 @@ import {
   FetchFacultyResponse,
   FetchUserAccountsResponse,
   PageResponse,
+  StudentSectionEvaluationDTO,
 } from '../../services/admin/admin-service';
 import { FacultyEvaluationScore } from '../../services/evaluation/evaluation-service';
 
@@ -18,9 +19,10 @@ export interface AdminState {
 
   createUserAccountMessage: string | null;
 
-updateUserAccountMessage: string | null;
+  updateUserAccountMessage: string | null;
 
-updateUserPasswordMessage: string | null;
+  updateUserPasswordMessage: string | null;
+  studentSections: PageResponse<StudentSectionEvaluationDTO> | null;
 }
 export const initialAdminState: AdminState = {
   faculties: null,
@@ -39,4 +41,5 @@ export const initialAdminState: AdminState = {
   loading: false,
 
   error: null,
+  studentSections: null,
 };

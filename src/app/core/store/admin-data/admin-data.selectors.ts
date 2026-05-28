@@ -40,3 +40,7 @@ export const selectUpdateUserPasswordMessage = createSelector(
   selectAdminDataState,
   (state) => state.updateUserPasswordMessage,
 );
+export const selectStudentSections = createSelector(
+  selectAdminDataState,
+  (state) => state.studentSections,
+);
