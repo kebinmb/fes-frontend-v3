@@ -4,7 +4,7 @@ import { AsyncPipe, DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-student-evaluation-list-print-component',
-  imports: [AsyncPipe, DatePipe],
+  imports: [DatePipe],
   templateUrl: './student-evaluation-list-print-component.html',
   styleUrl: './student-evaluation-list-print-component.css',
 })

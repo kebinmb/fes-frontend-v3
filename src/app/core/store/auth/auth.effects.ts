@@ -51,7 +51,10 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.generateAccessCodeForStudentSuccess),
         tap(() => {
-          this.toastFacade.showToast('Access Code Generated', 'success');
+          this.toastFacade.showToast(
+            'Your access code has been sent successfully. Please check your inbox. If you don’t see it, check your Spam or Junk folder.',
+            'success'
+          );
         }),
       ),
     { dispatch: false },
@@ -326,7 +329,7 @@ export class AuthEffects {
           localStorage.clear();
           sessionStorage.clear();
           this.authService.logout().subscribe({
-            error: () => {},
+            error: () => { },
           });
           Promise.resolve().then(() => {
             this.router.navigate(['/login']);
