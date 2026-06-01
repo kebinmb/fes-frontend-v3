@@ -24,7 +24,11 @@
           >
           </i>
 
-          {{ (showEvaluatedStudents$ | async) ? 'Evaluate Faculty Members' : 'Show Evaluated Students' }}
+          {{
+            (showEvaluatedStudents$ | async)
+              ? 'Evaluate Faculty Members'
+              : 'Show Evaluated Students'
+          }}
         </button>
 
         <button class="btn-logout-navbar" (click)="logout()">
@@ -191,8 +195,8 @@
 
                       <div class="faculty-profile-info">
                         <div class="faculty-name">
-                          {{ faculty.firstname }}
-                          {{ faculty.lastname }}
+                          {{ faculty.firstname | uppercase }}
+                          {{ faculty.lastname | uppercase }}
                         </div>
 
                         <div class="faculty-id">

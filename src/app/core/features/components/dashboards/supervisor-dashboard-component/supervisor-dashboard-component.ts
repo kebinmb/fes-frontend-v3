@@ -1,6 +1,6 @@
 import { AfterViewInit, Component, DestroyRef, OnInit, ViewChild, inject } from '@angular/core';
 
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { AsyncPipe, CommonModule, UpperCasePipe } from '@angular/common';
 
 import { Subject, debounceTime, distinctUntilChanged, filter, map, take } from 'rxjs';
 
@@ -34,6 +34,7 @@ import { EvaluatedStudentsComponent } from '../../../../../shared/components/eva
     FormsModule,
     FacultyEvaluationModalComponent,
     EvaluatedStudentsComponent,
+    UpperCasePipe,
   ],
 
   templateUrl: './supervisor-dashboard-component.html',
@@ -430,4 +431,5 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
       }
     });
   }
+  
 }
