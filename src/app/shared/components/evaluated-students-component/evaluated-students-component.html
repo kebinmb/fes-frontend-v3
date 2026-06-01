@@ -1,0 +1,133 @@
+@let students = students$ | async;
+
+@let pagination = pagination$ | async;
+
+<section class="modern-card">
+  <div class="card-topbar"></div>
+
+  <div class="modern-card-header">
+    <div class="header-content">
+      <h2>Evaluated Students</h2>
+
+      <span> Student evaluation submissions </span>
+
+      <div class="search-wrapper">
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search evaluator ID..."
+          (input)="onSearch($any($event.target).value)"
+        />
+      </div>
+    </div>
+
+    <div class="table-count">
+      {{ pagination?.totalElements ?? 0 }}
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table modern-table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>Evaluator ID</th>
+
+          <th>Faculty ID</th>
+
+          <th>Faculty Name</th>
+
+          <th>Subject Code</th>
+
+          <th>Date Submitted</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @if (loading$ | async) {
+          <tr>
+            <td colspan="5">
+              <div class="loading-wrapper">
+                <div class="spinner-border text-success" role="status">
+                  <span class="visually-hidden"> Loading... </span>
+                </div>
+              </div>
+            </td>
+          </tr>
+        } @else if (students?.length) {
+          @for (student of students; track student.evaluatorId) {
+            <tr>
+              <td>
+                <span class="id-badge">
+                  {{ normalize(student.evaluatorId) }}
+                </span>
+              </td>
+
+              <td>
+                {{ normalize(student.facultyId) }}
+              </td>
+
+              <td>
+                {{ student.lastname }},
+                {{ student.firstname }}
+              </td>
+
+              <td>
+                {{ normalize(student.subjectCode) }}
+              </td>
+
+              <td>
+                {{ student.evaluationSubmissionDate | date: 'medium' }}
+              </td>
+            </tr>
+          }
+        } @else {
+          <tr>
+            <td colspan="5" class="empty-state">No evaluated students found</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modern-card-footer">
+    <small>
+      Showing
+
+      {{ students?.length ?? 0 }}
+
+      of
+
+      {{ pagination?.totalElements ?? 0 }}
+
+      records
+    </small>
+
+    <div class="pagination-group">
+      <button
+        class="pagination-btn"
+        [disabled]="(pagination?.page ?? 0) === 0"
+        (click)="previousPage()"
+      >
+        Prev
+      </button>
+
+      <span class="pagination-info">
+        Page
+
+        {{ (pagination?.page ?? 0) + 1 }}
+
+        of
+
+        {{ pagination?.totalPages ?? 1 }}
+      </span>
+
+      <button
+        class="pagination-btn"
+        [disabled]="(pagination?.page ?? 0) + 1 >= (pagination?.totalPages ?? 1)"
+        (click)="nextPage()"
+      >
+        Next
+      </button>
+    </div>
+  </div>
+</section>

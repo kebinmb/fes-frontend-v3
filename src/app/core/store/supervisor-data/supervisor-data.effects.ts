@@ -444,4 +444,76 @@ export class SupervisorDataEffects {
       dispatch: false,
     },
   );
+
+  loadEvaluatedStudents$ = createEffect(() =>
+  this.actions$.pipe(
+
+    ofType(
+      ActionsSet.loadEvaluatedStudents
+    ),
+
+    switchMap(
+      ({
+        key,
+
+        page,
+
+        size,
+
+        sort,
+
+        evaluatorId,
+      }) => {
+
+        this.spinner.showSpinner();
+
+        return this.api
+          .getEvaluatedStudents(
+
+            page,
+
+            size,
+
+            sort,
+
+            evaluatorId
+          )
+          .pipe(
+
+            map(response =>
+              ActionsSet
+                .loadEvaluatedStudentsSuccess({
+
+                  key,
+
+                  response,
+                })
+            ),
+
+            catchError(error => {
+
+              this.toast.showToast(
+                'Failed to load evaluated students',
+                'error'
+              );
+
+              return of(
+                ActionsSet
+                  .loadEvaluatedStudentsFailure({
+
+                    key,
+
+                    error,
+                  })
+              );
+            }),
+
+            finalize(() =>
+              this.spinner.hideSpinner()
+            )
+          );
+      }
+    )
+  )
+);
 }

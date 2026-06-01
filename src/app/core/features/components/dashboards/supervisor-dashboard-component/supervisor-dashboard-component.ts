@@ -20,13 +20,21 @@ import { selectEvaluationStatusState } from '../../../../store/supervisor-data/s
 import { Store } from '@ngrx/store';
 import { Tooltip } from 'bootstrap';
 import { FormsModule } from '@angular/forms';
-import { FacultyEvaluationModalComponent } from "../../../../../shared/components/faculty-evaluation-modal-component/faculty-evaluation-modal-component";
+import { FacultyEvaluationModalComponent } from '../../../../../shared/components/faculty-evaluation-modal-component/faculty-evaluation-modal-component';
+import { EvaluatedStudentsComponent } from '../../../../../shared/components/evaluated-students-component/evaluated-students-component';
 @Component({
   selector: 'app-supervisor-dashboard-component',
 
   standalone: true,
 
-  imports: [AsyncPipe, CommonModule, ConfirmationModalComponent, FormsModule, FacultyEvaluationModalComponent],
+  imports: [
+    AsyncPipe,
+    CommonModule,
+    ConfirmationModalComponent,
+    FormsModule,
+    FacultyEvaluationModalComponent,
+    EvaluatedStudentsComponent,
+  ],
 
   templateUrl: './supervisor-dashboard-component.html',
 
@@ -45,7 +53,11 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   private readonly authFacade = inject(AuthFacade);
 
   private readonly destroyRef = inject(DestroyRef);
+  showEvaluatedStudents$ = this.supervisorDataFacade.showEvaluatedStudents$;
 
+  backToDashboard(): void {
+    this.supervisorDataFacade.showDashboardView();
+  }
   /* =========================================================
    * VIEWCHILD
    * =======================================================*/
@@ -403,5 +415,19 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
 
   logout(): void {
     this.authFacade.logout();
+  }
+
+  openEvaluatedStudents(): void {
+    this.supervisorDataFacade.showEvaluatedStudentsView();
+  }
+
+  toggleEvaluatedStudents(): void {
+    this.showEvaluatedStudents$.pipe(take(1)).subscribe((show) => {
+      if (show) {
+        this.supervisorDataFacade.showDashboardView();
+      } else {
+        this.supervisorDataFacade.showEvaluatedStudentsView();
+      }
+    });
   }
 }

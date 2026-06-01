@@ -416,4 +416,106 @@ export const supervisorDataReducer = createReducer(
 
     () => supervisorDataInitialState,
   ),
+  on(
+    SupervisorDataActions.loadEvaluatedStudents,
+
+    (state, { key }) => ({
+      ...state,
+
+      evaluatedStudents: {
+        ...state.evaluatedStudents,
+
+        [key]: {
+          data: [],
+
+          totalElements: 0,
+
+          totalPages: 0,
+
+          page: 0,
+
+          size: 10,
+
+          loading: true,
+
+          error: null,
+        },
+      },
+    }),
+  ),
+  on(
+    SupervisorDataActions.loadEvaluatedStudentsSuccess,
+
+    (state, { key, response }) => ({
+      ...state,
+
+      evaluatedStudents: {
+        ...state.evaluatedStudents,
+
+        [key]: {
+          data: response.content,
+
+          totalElements: response.totalElements,
+
+          totalPages: response.totalPages,
+
+          page: response.number,
+
+          size: response.size,
+
+          loading: false,
+
+          error: null,
+        },
+      },
+    }),
+  ),
+  on(
+    SupervisorDataActions.loadEvaluatedStudentsFailure,
+
+    (state, { key, error }) => ({
+      ...state,
+
+      evaluatedStudents: {
+        ...state.evaluatedStudents,
+
+        [key]: {
+          data: [],
+
+          totalElements: 0,
+
+          totalPages: 0,
+
+          page: 0,
+
+          size: 10,
+
+          loading: false,
+
+          error,
+        },
+      },
+    }),
+  ),
+  on(
+  SupervisorDataActions.showEvaluatedStudentsView,
+
+  state => ({
+
+    ...state,
+
+    showEvaluatedStudents: true
+  })
+),
+
+on(
+  SupervisorDataActions.showDashboardView,
+
+  state => ({
+
+    ...state,
+
+    showEvaluatedStudents: false
+  })
+),
 );

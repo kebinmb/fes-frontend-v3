@@ -43,7 +43,7 @@ export const routes: Routes = [
     path: 'supervisor-dashboard',
     component: SupervisorDashboardComponent,
     canActivate: [authGuard, roleGuard],
-    data: { role: ['ROLE_DEAN', 'ROLE_PROGRAM_CHAIR'] },
+    data: { role: ['ROLE_DEAN', 'ROLE_PROGRAM_CHAIR'] }
   },
   {
     path: 'evaluation-form',

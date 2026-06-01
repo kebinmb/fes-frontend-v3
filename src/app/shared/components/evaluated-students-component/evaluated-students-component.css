@@ -1,0 +1,303 @@
+/* =========================================
+   CARD
+========================================= */
+
+.modern-card {
+  background: white;
+
+  border-radius: 24px;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(148, 163, 184, 0.12);
+
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+
+  animation: fadeIn 220ms ease;
+}
+
+.card-topbar {
+  height: 5px;
+
+  background: linear-gradient(90deg, var(--chmsu-primary), var(--chmsu-secondary));
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.modern-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 1rem;
+
+  padding: 1.75rem;
+}
+
+.header-content h2 {
+  margin: 0;
+
+  color: #17212b;
+
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.header-content span {
+  display: block;
+
+  margin-top: 0.35rem;
+
+  color: #64748b;
+
+  font-size: 0.9rem;
+}
+
+.table-count {
+  width: 72px;
+  height: 72px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 20px;
+
+  background: rgba(24, 100, 67, 0.08);
+
+  color: var(--chmsu-primary);
+
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+/* =========================================
+   SEARCH
+========================================= */
+
+.search-wrapper {
+  margin-top: 1rem;
+}
+
+.search-input {
+  width: 320px;
+  max-width: 100%;
+
+  height: 52px;
+
+  padding: 0 1rem;
+
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 14px;
+
+  background: white;
+
+  font-size: 0.9rem;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+
+  border-color: rgba(24, 100, 67, 0.25);
+
+  box-shadow: 0 0 0 4px rgba(24, 100, 67, 0.08);
+}
+
+/* =========================================
+   TABLE
+========================================= */
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.modern-table {
+  margin-bottom: 0;
+}
+
+.modern-table thead {
+  background: rgba(24, 100, 67, 0.05);
+}
+
+.modern-table th {
+  padding: 1rem 1.2rem;
+
+  color: #64748b;
+
+  font-size: 0.78rem;
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.5px;
+
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.modern-table td {
+  padding: 1rem 1.2rem;
+
+  vertical-align: middle;
+
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.modern-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.modern-table tbody tr:hover {
+  background: rgba(24, 100, 67, 0.03);
+}
+
+/* =========================================
+   ID BADGE
+========================================= */
+
+.id-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.45rem 0.8rem;
+
+  border-radius: 999px;
+
+  background: rgba(24, 100, 67, 0.08);
+
+  color: var(--chmsu-primary);
+
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* =========================================
+   LOADING
+========================================= */
+
+.loading-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 3rem;
+}
+
+/* =========================================
+   EMPTY
+========================================= */
+
+.empty-state {
+  text-align: center;
+
+  padding: 2rem;
+
+  color: #64748b;
+
+  font-weight: 600;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.modern-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  gap: 1rem;
+
+  padding: 1.25rem 1.5rem;
+
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
+
+  background: #fafafa;
+}
+
+.modern-card-footer small {
+  color: #64748b;
+
+  font-weight: 500;
+}
+
+/* =========================================
+   PAGINATION
+========================================= */
+
+.pagination-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pagination-btn {
+  min-width: 90px;
+  height: 42px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: var(--chmsu-primary);
+
+  color: white;
+
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.45;
+
+  cursor: not-allowed;
+}
+
+.pagination-info {
+  color: #475569;
+
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+  .modern-card-header {
+    flex-direction: column;
+  }
+
+  .table-count {
+    width: 100%;
+    height: 56px;
+  }
+
+  .modern-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-group {
+    justify-content: center;
+  }
+
+  .search-input {
+    width: 100%;
+  }
+}

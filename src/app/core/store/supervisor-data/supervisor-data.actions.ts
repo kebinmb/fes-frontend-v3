@@ -1,14 +1,13 @@
-import { createAction, props } from "@ngrx/store";
+import { createAction, props } from '@ngrx/store';
 import {
   FacultyDTO,
   FacultyClass,
   FacultyLoadDTO,
-  PageResponse
-} from "../../services/supervisor-data/supervisor-data-service";
+  PageResponse,
+  EvaluatedStudentsDTO,
+} from '../../services/supervisor-data/supervisor-data-service';
 
-import {
-  EvaluationClass
-} from "../../services/evaluation/evaluation-service";
+import { EvaluationClass } from '../../services/evaluation/evaluation-service';
 
 /* ================= FACULTIES ================= */
 
@@ -31,7 +30,7 @@ export const loadFaculties = createAction(
     search?: string;
 
     campus?: string;
-  }>()
+  }>(),
 );
 
 export const loadFacultiesSuccess = createAction(
@@ -41,7 +40,7 @@ export const loadFacultiesSuccess = createAction(
     key: string;
 
     response: PageResponse<FacultyLoadDTO>;
-  }>()
+  }>(),
 );
 
 export const loadFacultiesFailure = createAction(
@@ -51,7 +50,7 @@ export const loadFacultiesFailure = createAction(
     key: string;
 
     error: any;
-  }>()
+  }>(),
 );
 
 // /* ================= CLASSES (BATCH) ================= */
@@ -92,7 +91,7 @@ export const loadFacultyClasses = createAction(
     facultyId: string;
 
     program: string;
-  }>()
+  }>(),
 );
 
 export const loadFacultyClassesSuccess = createAction(
@@ -104,7 +103,7 @@ export const loadFacultyClassesSuccess = createAction(
     facultyId: string;
 
     classes: FacultyClass[];
-  }>()
+  }>(),
 );
 
 export const loadFacultyClassesFailure = createAction(
@@ -116,7 +115,7 @@ export const loadFacultyClassesFailure = createAction(
     facultyId: string;
 
     error: any;
-  }>()
+  }>(),
 );
 /* ================= EVALUATION ================= */
 
@@ -155,7 +154,7 @@ export const loadEvaluationStatus = createAction(
     key: string;
     role: 'ROLE_STUDENT' | 'ROLE_DEAN' | null;
     context: EvaluationContext;
-  }>()
+  }>(),
 );
 
 export const loadEvaluationStatusSuccess = createAction(
@@ -164,7 +163,7 @@ export const loadEvaluationStatusSuccess = createAction(
     key: string;
     evaluationKey: string;
     evaluated: boolean;
-  }>()
+  }>(),
 );
 
 export const loadEvaluationStatusFailure = createAction(
@@ -173,7 +172,7 @@ export const loadEvaluationStatusFailure = createAction(
     key: string;
     evaluationKey: string;
     error: string;
-  }>()
+  }>(),
 );
 
 /* ================= LOCAL ================= */
@@ -183,14 +182,14 @@ export const updateEvaluatedClass = createAction(
   props<{
     key: string;
     evaluationKey: string;
-  }>()
+  }>(),
 );
 
 export const selectFacultyClassForEvaluation = createAction(
   '[Evaluation] Select Class',
   props<{
     selectedClass: EvaluationClass | null;
-  }>()
+  }>(),
 );
 
 /* ================= EVALUATION (BATCH) ================= */
@@ -215,7 +214,7 @@ export const loadEvaluationStatusBatch = createAction(
     role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_PROGRAM_CHAIR';
     evaluatorId: string;
     payload: BatchEvaluationPayload[];
-  }>()
+  }>(),
 );
 
 export const loadEvaluationStatusBatchSuccess = createAction(
@@ -223,7 +222,7 @@ export const loadEvaluationStatusBatchSuccess = createAction(
   props<{
     key: string;
     results: EvaluationStatusResult[];
-  }>()
+  }>(),
 );
 
 export const loadEvaluationStatusBatchFailure = createAction(
@@ -231,9 +230,49 @@ export const loadEvaluationStatusBatchFailure = createAction(
   props<{
     key: string;
     error: any;
-  }>()
+  }>(),
 );
 
-export const resetSupervisorState = createAction(
-  '[Supervisor] Reset State'
+export const resetSupervisorState = createAction('[Supervisor] Reset State');
+
+export const loadEvaluatedStudents = createAction(
+  '[Evaluated Students] Load',
+  props<{
+    key: string;
+
+    page: number;
+
+    size: number;
+
+    sort?: string;
+
+    evaluatorId?: string;
+  }>(),
 );
+
+export const loadEvaluatedStudentsSuccess = createAction(
+  '[Evaluated Students] Load Success',
+  props<{
+    key: string;
+
+    response: PageResponse<EvaluatedStudentsDTO>;
+  }>(),
+);
+
+export const loadEvaluatedStudentsFailure = createAction(
+  '[Evaluated Students] Load Failure',
+  props<{
+    key: string;
+
+    error: any;
+  }>(),
+);
+export const showEvaluatedStudentsView =
+  createAction(
+    '[Supervisor UI] Show Evaluated Students View'
+  );
+
+export const showDashboardView =
+  createAction(
+    '[Supervisor UI] Show Dashboard View'
+  );

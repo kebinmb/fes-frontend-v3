@@ -1,0 +1,96 @@
+import { Component, OnInit, inject } from '@angular/core';
+
+import { AsyncPipe, DatePipe } from '@angular/common';
+
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { SupervisorDataFacade } from '../../../core/store/supervisor-data/supervisor-data.facade';
+
+@Component({
+  selector: 'app-evaluated-students-component',
+
+  standalone: true,
+
+  imports: [AsyncPipe, DatePipe],
+
+  templateUrl: './evaluated-students-component.html',
+
+  styleUrl: './evaluated-students-component.css',
+})
+export class EvaluatedStudentsComponent implements OnInit {
+  private facade = inject(SupervisorDataFacade);
+
+  readonly key = 'evaluated-students';
+
+  private searchSubject = new Subject<string>();
+
+  page = 0;
+
+  size = 10;
+
+  sort = 'createdAt,desc';
+
+  search = '';
+
+  students$ = this.facade.evaluatedStudents$(this.key);
+
+  pagination$ = this.facade.evaluatedStudentsPagination$(this.key);
+
+  loading$ = this.facade.evaluatedStudentsLoading$(this.key);
+
+  ngOnInit(): void {
+    this.load();
+
+    this.searchSubject.pipe(debounceTime(500), distinctUntilChanged()).subscribe((value) => {
+      this.search = value;
+
+      this.page = 0;
+
+      this.load();
+    });
+  }
+
+  load(): void {
+    this.facade.loadEvaluatedStudents(
+      this.key,
+
+      this.page,
+
+      this.size,
+
+      this.sort,
+
+      this.search,
+    );
+  }
+
+  onSearch(value: string): void {
+    this.searchSubject.next(value);
+  }
+
+  nextPage(): void {
+    this.page++;
+
+    this.load();
+  }
+
+  previousPage(): void {
+    if (this.page > 0) {
+      this.page--;
+
+      this.load();
+    }
+  }
+  normalize(id: string): string {
+
+  if (!id) {
+    return '';
+  }
+
+  return id
+    .replace(/^ALI-/i, '')
+    .replace(/^TAL-/i, '')
+    .replace(/^BIN-/i, '')
+    .replace(/^FT-/i, '');
+
+}
+}

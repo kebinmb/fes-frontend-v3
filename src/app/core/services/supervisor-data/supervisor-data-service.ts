@@ -25,7 +25,6 @@ export interface FacultyWithClasses {
   classes: any[];
 }
 export interface FacultyClass {
-
   subjectCode: string;
 
   facultyId: string;
@@ -46,8 +45,8 @@ export interface FacultyClass {
 
   loading?: boolean;
 
-  subjectDescription:string;
-  
+  subjectDescription: string;
+
   error?: string | null;
 }
 
@@ -62,7 +61,16 @@ export interface FacultyLoadDTO {
   campus: string;
   // loadLimit: number;
   // typeOfLoad: string;
-  status:string;
+  status: string;
+}
+
+export interface EvaluatedStudentsDTO {
+  evaluationSubmissionDate: string;
+  evaluatorId: string;
+  subjectCode: string;
+  facultyId: string;
+  firstname: string;
+  lastname: string;
 }
 @Injectable({
   providedIn: 'root',
@@ -82,55 +90,71 @@ export class SupervisorDataService {
     });
   }
 
-  loadFacultyClasses(
-  facultyId: string
-): Observable<FacultyClass[]> {
+  loadFacultyClasses(facultyId: string): Observable<FacultyClass[]> {
+    if (!facultyId?.trim()) {
+      throw new Error('Invalid facultyId');
+    }
 
-  if (!facultyId?.trim()) {
-    throw new Error('Invalid facultyId');
-  }
+    const params = new HttpParams().set('facultyId', facultyId.trim());
 
-  const params = new HttpParams()
-    .set('facultyId', facultyId.trim());
-
-  return this.http.get<FacultyClass[]>(
-    `${this.FACULTY_API_URL}/faculty-classes`,
-    {
+    return this.http.get<FacultyClass[]>(`${this.FACULTY_API_URL}/faculty-classes`, {
       params,
       withCredentials: true,
-    }
-  );
-}
-
- getFacultyLoadsByProgram(
-  userId: number,
-  page: number = 0,
-  size: number = 10,
-  sort: string = 'lastname,asc',
-  search: string = '',
-  campus: string = '',
-): Observable<PageResponse<FacultyLoadDTO>> {
-
-  let params = new HttpParams()
-    .set('userId', userId.toString())
-    .set('page', page.toString())
-    .set('size', size.toString())
-    .set('sort', sort);
-
-  if (search?.trim()) {
-    params = params.set('search', search.trim());
+    });
   }
 
-  if (campus?.trim()) {
-    params = params.set('campus', campus.trim());
+  getFacultyLoadsByProgram(
+    userId: number,
+    page: number = 0,
+    size: number = 10,
+    sort: string = 'lastname,asc',
+    search: string = '',
+    campus: string = '',
+  ): Observable<PageResponse<FacultyLoadDTO>> {
+    let params = new HttpParams()
+      .set('userId', userId.toString())
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+
+    if (search?.trim()) {
+      params = params.set('search', search.trim());
+    }
+
+    if (campus?.trim()) {
+      params = params.set('campus', campus.trim());
+    }
+
+    return this.http.get<PageResponse<FacultyLoadDTO>>(
+      `${this.FACULTY_API_URL}/faculty-program-loads`,
+      {
+        params,
+        withCredentials: true,
+      },
+    );
   }
 
-  return this.http.get<PageResponse<FacultyLoadDTO>>(
-    `${this.FACULTY_API_URL}/faculty-program-loads`,
-    {
-      params,
-      withCredentials: true,
+  getEvaluatedStudents(
+    page: number = 0,
+    size: number = 10,
+    sort: string = 'createdAt,desc',
+    evaluatorId: string = '',
+  ): Observable<PageResponse<EvaluatedStudentsDTO>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort);
+
+    if (evaluatorId?.trim()) {
+      params = params.set('evaluatorId', evaluatorId.trim());
     }
-  );
-}
+
+    return this.http.get<PageResponse<EvaluatedStudentsDTO>>(
+      `${this.FACULTY_API_URL}/evaluated-students`,
+      {
+        params,
+        withCredentials: true,
+      },
+    );
+  }
 }
