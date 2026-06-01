@@ -135,12 +135,14 @@ export class SupervisorDataService {
   }
 
   getEvaluatedStudents(
+    userId: string,
     page: number = 0,
     size: number = 10,
     sort: string = 'createdAt,desc',
     evaluatorId: string = '',
   ): Observable<PageResponse<EvaluatedStudentsDTO>> {
     let params = new HttpParams()
+      .set('userId', userId.toString())
       .set('page', page.toString())
       .set('size', size.toString())
       .set('sort', sort);

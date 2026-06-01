@@ -46,19 +46,27 @@ export class SupervisorDataFacade {
     return this.store.select(SupervisorSelectors.selectEvaluatedStudentsPagination(key));
   }
   loadEvaluatedStudents(
-    key: string,
+  key: string,
 
-    page: number = 0,
+  userId: string,
 
-    size: number = 10,
+  page: number = 0,
 
-    sort: string = 'createdAt,desc',
+  size: number = 10,
 
-    evaluatorId: string = '',
-  ): void {
-    this.store.dispatch(
-      SupervisorActions.loadEvaluatedStudents({
+  sort: string = 'createdAt,desc',
+
+  evaluatorId: string = ''
+): void {
+
+  this.store.dispatch(
+
+    SupervisorActions
+      .loadEvaluatedStudents({
+
         key,
+
+        userId,
 
         page,
 
@@ -66,10 +74,11 @@ export class SupervisorDataFacade {
 
         sort,
 
-        evaluatorId,
-      }),
-    );
-  }
+        evaluatorId
+      })
+
+  );
+}
   /* ================= BASICS ================= */
 
   selectedClass$ = this.store.select(SupervisorSelectors.selectSelectedClass);

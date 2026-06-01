@@ -456,6 +456,8 @@ export class SupervisorDataEffects {
       ({
         key,
 
+        userId,
+
         page,
 
         size,
@@ -470,13 +472,15 @@ export class SupervisorDataEffects {
         return this.api
           .getEvaluatedStudents(
 
+            userId,
+
             page,
 
             size,
 
-            sort,
+            sort ?? 'createdAt,desc',
 
-            evaluatorId
+            evaluatorId ?? ''
           )
           .pipe(
 
@@ -516,4 +520,5 @@ export class SupervisorDataEffects {
     )
   )
 );
+
 }

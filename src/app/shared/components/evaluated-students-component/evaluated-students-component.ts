@@ -2,8 +2,11 @@ import { Component, OnInit, inject } from '@angular/core';
 
 import { AsyncPipe, DatePipe } from '@angular/common';
 
-import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject, take } from 'rxjs';
 import { SupervisorDataFacade } from '../../../core/store/supervisor-data/supervisor-data.facade';
+import { AuthFacade } from '../../../core/store/auth/auth.facade';
+import { Store } from '@ngrx/store';
+import { selectEvaluatorId } from '../../../core/store/auth/auth.selector';
 
 @Component({
   selector: 'app-evaluated-students-component',
@@ -18,9 +21,10 @@ import { SupervisorDataFacade } from '../../../core/store/supervisor-data/superv
 })
 export class EvaluatedStudentsComponent implements OnInit {
   private facade = inject(SupervisorDataFacade);
-
+  private authfacade = inject(AuthFacade);
+  private store = inject(Store);
   readonly key = 'evaluated-students';
-
+  evaluatorId$ = this.store.select(selectEvaluatorId);
   private searchSubject = new Subject<string>();
 
   page = 0;
@@ -50,17 +54,25 @@ export class EvaluatedStudentsComponent implements OnInit {
   }
 
   load(): void {
-    this.facade.loadEvaluatedStudents(
-      this.key,
+    this.authfacade.evaluatorId$.pipe(take(1)).subscribe((userId) => {
+      if (!userId) {
+        return;
+      }
 
-      this.page,
+      this.facade.loadEvaluatedStudents(
+        this.key,
 
-      this.size,
+        userId,
 
-      this.sort,
+        this.page,
 
-      this.search,
-    );
+        this.size,
+
+        this.sort,
+
+        this.search,
+      );
+    });
   }
 
   onSearch(value: string): void {
@@ -81,16 +93,14 @@ export class EvaluatedStudentsComponent implements OnInit {
     }
   }
   normalize(id: string): string {
+    if (!id) {
+      return '';
+    }
 
-  if (!id) {
-    return '';
+    return id
+      .replace(/^ALI-/i, '')
+      .replace(/^TAL-/i, '')
+      .replace(/^BIN-/i, '')
+      .replace(/^FT-/i, '');
   }
-
-  return id
-    .replace(/^ALI-/i, '')
-    .replace(/^TAL-/i, '')
-    .replace(/^BIN-/i, '')
-    .replace(/^FT-/i, '');
-
-}
 }

@@ -239,7 +239,7 @@ export const loadEvaluatedStudents = createAction(
   '[Evaluated Students] Load',
   props<{
     key: string;
-
+    userId: string;
     page: number;
 
     size: number;
@@ -267,12 +267,8 @@ export const loadEvaluatedStudentsFailure = createAction(
     error: any;
   }>(),
 );
-export const showEvaluatedStudentsView =
-  createAction(
-    '[Supervisor UI] Show Evaluated Students View'
-  );
+export const showEvaluatedStudentsView = createAction(
+  '[Supervisor UI] Show Evaluated Students View',
+);
 
-export const showDashboardView =
-  createAction(
-    '[Supervisor UI] Show Dashboard View'
-  );
+export const showDashboardView = createAction('[Supervisor UI] Show Dashboard View');
