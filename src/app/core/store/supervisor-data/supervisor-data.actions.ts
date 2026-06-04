@@ -226,18 +226,15 @@ export const loadEvaluationStatusBatchFailure = createAction(
 export const resetSupervisorState = createAction('[Supervisor] Reset State');
 
 export const loadEvaluatedStudents = createAction(
-  '[Evaluated Students] Load',
+  '[Supervisor] Load Evaluated Students',
   props<{
     key: string;
     userId: string;
     page: number;
-
     size: number;
-
     sort?: string;
-
-    evaluatorId?: string;
-  }>(),
+    searchTerm?: string;
+  }>()
 );
 
 export const loadEvaluatedStudentsSuccess = createAction(

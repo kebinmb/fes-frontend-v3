@@ -450,7 +450,7 @@ export class SupervisorDataEffects {
 
         sort,
 
-        evaluatorId,
+        searchTerm,
       }) => {
 
         this.spinner.showSpinner();
@@ -466,7 +466,7 @@ export class SupervisorDataEffects {
 
             sort ?? 'createdAt,desc',
 
-            evaluatorId ?? ''
+            searchTerm ?? ''
           )
           .pipe(
 

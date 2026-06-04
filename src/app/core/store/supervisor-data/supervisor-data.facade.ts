@@ -54,7 +54,7 @@ export class SupervisorDataFacade {
 
   sort: string = 'createdAt,desc',
 
-  evaluatorId: string = ''
+  searchTerm: string = ''
 ): void {
 
   this.store.dispatch(
@@ -72,7 +72,7 @@ export class SupervisorDataFacade {
 
         sort,
 
-        evaluatorId
+        searchTerm
       })
 
   );

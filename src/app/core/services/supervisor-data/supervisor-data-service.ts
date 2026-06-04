@@ -141,7 +141,7 @@ export class SupervisorDataService {
     page: number = 0,
     size: number = 10,
     sort: string = 'createdAt,desc',
-    evaluatorId: string = '',
+    searchTerm: string = '',
   ): Observable<PageResponse<EvaluatedStudentsDTO>> {
     let params = new HttpParams()
       .set('userId', userId.toString())
@@ -149,8 +149,8 @@ export class SupervisorDataService {
       .set('size', size.toString())
       .set('sort', sort);
 
-    if (evaluatorId?.trim()) {
-      params = params.set('evaluatorId', evaluatorId.trim());
+    if (searchTerm?.trim()) {
+      params = params.set('searchTerm', searchTerm.trim());
     }
 
     return this.http.get<PageResponse<EvaluatedStudentsDTO>>(
