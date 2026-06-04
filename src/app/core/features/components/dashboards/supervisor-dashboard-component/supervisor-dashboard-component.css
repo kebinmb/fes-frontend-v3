@@ -27,7 +27,7 @@
 }
 
 .container-fluid {
-  max-width: 1500px;
+  max-width: 100%;
 }
 
 /* =========================================
@@ -385,10 +385,6 @@
 }
 
 .dashboard-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1.2rem;
 
   margin-bottom: 1.7rem;
   padding: 1.2rem;
@@ -417,6 +413,7 @@
 }
 
 .toolbar-info-stack {
+  margin-top:1.7rem;
   width: 100%;
 
   display: flex;

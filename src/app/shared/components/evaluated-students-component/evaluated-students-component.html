@@ -31,7 +31,7 @@
       <thead>
         <tr>
           <th>Evaluator ID</th>
-
+          <th>Evaluator Name</th>
           <th>Faculty ID</th>
 
           <th>Faculty Name</th>
@@ -61,7 +61,10 @@
                   {{ normalize(student.evaluatorId) }}
                 </span>
               </td>
-
+              <td>
+                {{ student.studentLastname }},
+                {{ student.studentFirstname }}
+              </td>
               <td>
                 {{ normalize(student.facultyId) }}
               </td>

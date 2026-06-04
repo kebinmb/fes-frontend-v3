@@ -68,6 +68,8 @@ export interface EvaluatedStudentsDTO {
   evaluationSubmissionDate: string;
   evaluatorId: string;
   subjectCode: string;
+  studentLastname: string;
+  studentFirstname: string;
   facultyId: string;
   firstname: string;
   lastname: string;
