@@ -9,8 +9,6 @@ import {
 
 import { EvaluationClass } from '../../services/evaluation/evaluation-service';
 
-/* ================= FACULTIES ================= */
-
 export const loadFaculties = createAction(
   '[Faculty Data] Load Faculties',
 
@@ -53,9 +51,7 @@ export const loadFacultiesFailure = createAction(
   }>(),
 );
 
-// /* ================= CLASSES (BATCH) ================= */
-
-// export const loadAllFacultyClasses = createAction(
+// // export const loadAllFacultyClasses = createAction(
 //   '[Faculty Classes Data] Load All Faculty Classes',
 //   props<{
 //     key: string;
@@ -117,8 +113,6 @@ export const loadFacultyClassesFailure = createAction(
     error: any;
   }>(),
 );
-/* ================= EVALUATION ================= */
-
 export interface EvaluationContext {
   facultyId: string;
   evaluatorId: string;
@@ -175,8 +169,6 @@ export const loadEvaluationStatusFailure = createAction(
   }>(),
 );
 
-/* ================= LOCAL ================= */
-
 export const updateEvaluatedClass = createAction(
   '[Evaluation] Update Evaluated Class',
   props<{
@@ -191,8 +183,6 @@ export const selectFacultyClassForEvaluation = createAction(
     selectedClass: EvaluationClass | null;
   }>(),
 );
-
-/* ================= EVALUATION (BATCH) ================= */
 
 export interface BatchEvaluationPayload {
   facultyId: string;

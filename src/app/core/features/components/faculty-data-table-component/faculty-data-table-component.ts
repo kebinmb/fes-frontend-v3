@@ -181,18 +181,9 @@ export class FacultyDataTableComponent implements OnInit {
   //     return;
   //   }
   //   const faculty = data[0];
-  //   /* =====================================================
-  //      SET DATA
-  //      ===================================================== */
-  //   const setData = data.filter((item) => (item.setRating ?? 0) > 0);
-  //   /* =====================================================
-  //      SEF DATA
-  //      ===================================================== */
-  //   const sefData = data.filter((item) => (item.sefRating ?? 0) > 0);
-  //   /* =====================================================
-  //      SET ROWS
-  //      ===================================================== */
-  //   const setRows = setData
+  //   //   const setData = data.filter((item) => (item.setRating ?? 0) > 0);
+  //   //   const sefData = data.filter((item) => (item.sefRating ?? 0) > 0);
+  //   //   const setRows = setData
   //     .map((item, index) => {
   //       const students = item.numberOfStudents ?? 0;
   //       const setRating = item.setRating ?? 0;
@@ -219,10 +210,7 @@ export class FacultyDataTableComponent implements OnInit {
   //     `;
   //     })
   //     .join('');
-  //   /* =====================================================
-  //      SEF ROWS
-  //      ===================================================== */
-  //   const sefRows = sefData
+  //   //   const sefRows = sefData
   //     .map(
   //       (item, index) => `
   //     <tr>
@@ -240,10 +228,7 @@ export class FacultyDataTableComponent implements OnInit {
   //   `,
   //     )
   //     .join('');
-  //   /* =====================================================
-  //      STUDENT COMMENTS
-  //      ===================================================== */
-  //   const studentComments = data
+  //   //   const studentComments = data
   //     .filter((item) => item.studentComments && item.studentComments !== '-')
   //     .map(
   //       (item, index) => `
@@ -258,10 +243,7 @@ export class FacultyDataTableComponent implements OnInit {
   //   `,
   //     )
   //     .join('');
-  //   /* =====================================================
-  //      SUPERVISOR COMMENTS
-  //      ===================================================== */
-  //   const supervisorComments = data
+  //   //   const supervisorComments = data
   //     .filter((item) => item.supervisorComments && item.supervisorComments !== '-')
   //     .map(
   //       (item, index) => `
@@ -276,10 +258,7 @@ export class FacultyDataTableComponent implements OnInit {
   //   `,
   //     )
   //     .join('');
-  //   /* =====================================================
-  //      TOTALS
-  //      ===================================================== */
-  //   const totalStudents = setData.reduce((total, item) => total + (item.numberOfStudents ?? 0), 0);
+  //   //   const totalStudents = setData.reduce((total, item) => total + (item.numberOfStudents ?? 0), 0);
   //   const totalWeightedScore = setData.reduce((total, item) => {
   //     const students = item.numberOfStudents ?? 0;
   //     const setRating = item.setRating ?? 0;
@@ -291,10 +270,7 @@ export class FacultyDataTableComponent implements OnInit {
   //     sefData.length > 0
   //       ? sefData.reduce((total, item) => total + (item.sefRating ?? 0), 0) / sefData.length
   //       : 0;
-  //   /* =====================================================
-  //      PRINT
-  //      ===================================================== */
-  //   printWindow.document.write(`
+  //   //   printWindow.document.write(`
   //   <html>
   //     <head>
   //       <title>
@@ -359,10 +335,7 @@ export class FacultyDataTableComponent implements OnInit {
   //           font-size: 16px;
   //           font-weight: 700;
   //         }
-  //         /* ===================================================
-  //            APPROVAL SECTION
-  //            =================================================== */
-  //         .approval-section {
+  //         //         .approval-section {
   //           margin-top: 80px;
   //           display: flex;
   //           flex-direction: column;

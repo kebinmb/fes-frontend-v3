@@ -15,8 +15,6 @@ const buildEvaluationKey = (
 export const supervisorDataReducer = createReducer(
   supervisorDataInitialState,
 
-  /* ================= FACULTIES ================= */
-
   on(
     SupervisorDataActions.loadFaculties,
 
@@ -101,8 +99,6 @@ export const supervisorDataReducer = createReducer(
     }),
   ),
 
-  /* ================= FACULTY CLASSES ================= */
-
   on(
     SupervisorDataActions.loadFacultyClasses,
 
@@ -174,8 +170,6 @@ export const supervisorDataReducer = createReducer(
       },
     }),
   ),
-
-  /* ================= EVALUATION ================= */
 
   on(
     SupervisorDataActions.loadEvaluationStatus,

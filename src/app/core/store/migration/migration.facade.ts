@@ -10,10 +10,6 @@ export class MigrationFacade {
 
   private store = inject(Store);
 
-  /* =========================================
-     SELECTORS
-  ========================================= */
-
   migrationResponse$ = this.store.select(
     MigrationSelectors.selectMigrationResponse,
   );
@@ -25,10 +21,6 @@ export class MigrationFacade {
   migrationError$ = this.store.select(
     MigrationSelectors.selectMigrationError,
   );
-
-  /* =========================================
-     ACTIONS
-  ========================================= */
 
   migrateAll(): void {
 

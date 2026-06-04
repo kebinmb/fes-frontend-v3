@@ -31,8 +31,6 @@ export class EvaluationFormComponent {
   private router = inject(Router);
   private fb = inject(FormBuilder);
 
-  /* ================= STATE ================= */
-
   role$ = this.authFacade.role$;
   evaluatorId$ = this.authFacade.evaluatorId$;
 
@@ -59,8 +57,6 @@ export class EvaluationFormComponent {
   evaluatorId = toSignal(this.evaluatorId$);
   accessCode = toSignal(this.authFacade.accessCode$);
 
-  /* ================= COMPUTED ================= */
-
   facultyId = computed(() => this.selectedClass()?.facultyId || '');
   facultyName = computed(() => this.selectedClass()?.facultyName ?? '');
   classCode = computed(() => this.selectedClass()?.classCode ?? '');
@@ -73,8 +69,6 @@ export class EvaluationFormComponent {
 
   ratingOptions = computed(() => this.template()?.ratingOptions ?? []);
   categories = computed(() => this.template()?.categories ?? []);
-
-  /* ================= FORM ================= */
 
   evaluationForm: FormGroup = this.fb.group({});
   showSubmitConfirmation = false;
@@ -99,8 +93,6 @@ export class EvaluationFormComponent {
       comments: ['', Validators.required],
     });
   }
-
-  /* ================= INIT ================= */
 
   ngOnInit() {
     this.evaluationDataFacade.initialize();
@@ -136,8 +128,6 @@ export class EvaluationFormComponent {
         // ✅ NO redundant supervisor select
       });
   }
-
-  /* ================= SUBMIT ================= */
 
   onSubmit() {
 
@@ -196,8 +186,6 @@ export class EvaluationFormComponent {
       commentsOrFeedbacks: formValue.comments || undefined,
     };
   }
-
-  /* ================= UI ================= */
 
   cancel() {
     if (confirm('Are you sure you want to cancel? Your progress will be lost.')) {

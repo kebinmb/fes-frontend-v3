@@ -1,752 +1,438 @@
 :host {
   display: block;
 }
-
 :root {
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 18px;
-
-  --shadow-sm:
-    0 1px 3px rgba(15, 23, 42, 0.04);
-
-  --shadow-md:
-    0 4px 10px rgba(15, 23, 42, 0.05);
-
-  --shadow-hover:
-    0 6px 16px rgba(15, 23, 42, 0.06);
-
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 10px rgba(15, 23, 42, 0.05);
+  --shadow-hover: 0 6px 16px rgba(15, 23, 42, 0.06);
   --text-primary: #17212b;
   --text-secondary: #6b7280;
-
   --surface-primary: #ffffff;
-
-  --border-soft:
-    rgba(148, 163, 184, 0.14);
-
-  --transition:
-    180ms ease;
+  --border-soft: rgba(148, 163, 184, 0.14);
+  --transition: 180ms ease;
 }
-
-/* =========================
-   GLOBAL
-========================= */
-
 .dashboard-page {
   min-height: 100vh;
-
   background: #f5f5f3;
 }
-
-/* =========================
-   NAVBAR
-========================= */
-
 .navbar {
   position: sticky;
   top: 0;
   z-index: 100;
-
   padding: 0.9rem 0;
-
   background: #165c3d;
-
-  border-bottom:
-    1px solid rgba(255, 255, 255, 0.06);
-
-  box-shadow:
-    0 1px 4px rgba(15, 23, 42, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
 }
-
 .logo-container {
   width: 48px;
   height: 48px;
-
   border-radius: 50%;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   background: #ffffff;
-
-  border:
-    1px solid rgba(15, 23, 42, 0.04);
+  border: 1px solid rgba(15, 23, 42, 0.04);
 }
-
 .logo-image-small {
   width: 30px;
   height: 30px;
-
   object-fit: contain;
 }
-
 .brand-text {
   display: flex;
   flex-direction: column;
 }
-
 .university-name {
   color: white;
-
   font-size: 0.88rem;
   font-weight: 700;
-
   line-height: 1.2;
-
   letter-spacing: 0.2px;
 }
-
 .system-context {
   margin-top: 0.25rem;
-
   color: rgba(255, 255, 255, 0.82);
-
   font-size: 0.72rem;
   font-weight: 600;
-
   letter-spacing: 0.4px;
 }
-
 .system-name {
   margin-top: 0.15rem;
-
-  color:
-    rgba(255, 255, 255, 0.72);
-
+  color: rgba(255, 255, 255, 0.72);
   font-size: 0.72rem;
-
   letter-spacing: 0.3px;
 }
-
-/* =========================
-   USER BADGE
-========================= */
-
 .user-info-badge {
   display: flex;
   align-items: center;
   gap: 0.7rem;
-
   padding: 0.5rem 0.85rem;
-
   border-radius: 999px;
-
-  background:
-    rgba(255, 255, 255, 0.08);
-
-  border:
-    1px solid rgba(255, 255, 255, 0.08);
-
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: white;
 }
-
 .user-icon {
   font-size: 1rem;
 }
-
 .user-details {
   display: flex;
   flex-direction: column;
 }
-
 .user-label {
   font-size: 0.6rem;
-
   text-transform: uppercase;
-
   letter-spacing: 0.45px;
-
   opacity: 0.7;
 }
-
 .user-id-value {
   font-size: 0.8rem;
   font-weight: 700;
 }
-
-/* =========================
-   BUTTONS
-========================= */
-
 .btn-outline-light {
   border-radius: var(--radius-sm) !important;
-
   padding: 0.52rem 0.95rem !important;
-
   font-weight: 600 !important;
-
-  border:
-    1px solid rgba(255, 255, 255, 0.12) !important;
-
-  background:
-    rgba(255, 255, 255, 0.06);
-
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.06);
   box-shadow: none !important;
-
-  transition:
-    background var(--transition);
+  transition: background var(--transition);
 }
-
 .btn-outline-light:hover {
-  background:
-    rgba(255, 255, 255, 0.12) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
 }
-
 .btn-primary {
   min-height: 54px;
-
   border: none !important;
-
   border-radius: 10px !important;
-
-  background:
-    var(--chmsu-primary) !important;
-
+  background: var(--chmsu-primary) !important;
   color: white !important;
-
   font-size: 0.85rem;
   font-weight: 600 !important;
-
-  box-shadow:
-    0 1px 4px rgba(24, 100, 67, 0.12);
-
+  box-shadow: 0 1px 4px rgba(24, 100, 67, 0.12);
   transition:
     transform var(--transition),
     background-color var(--transition),
     box-shadow var(--transition),
     filter var(--transition);
 }
-
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-1px);
-
-  background:
-    var(--chmsu-primary-dark) !important;
-
-  box-shadow:
-    0 4px 10px rgba(24, 100, 67, 0.16);
-
+  background: var(--chmsu-primary-dark) !important;
+  box-shadow: 0 4px 10px rgba(24, 100, 67, 0.16);
   filter: brightness(1.01);
 }
-
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
-
-  box-shadow:
-    0 2px 4px rgba(24, 100, 67, 0.12);
+  box-shadow: 0 2px 4px rgba(24, 100, 67, 0.12);
 }
-
 .btn-primary:disabled {
   opacity: 0.7;
-
   cursor: not-allowed;
-
   box-shadow: none;
 }
-
-/* =========================
-   CONTAINER
-========================= */
-
 .container-fluid {
   max-width: 1500px;
 }
-
-/* =========================
-   STATS
-========================= */
-
 .stat-card-dashboard {
   display: flex;
   align-items: center;
   gap: 1rem;
-
   padding: 1.2rem;
-
   border-radius: var(--radius-md);
-
   background: white;
-
-  border:
-    1px solid var(--border-soft);
-
+  border: 1px solid var(--border-soft);
   box-shadow: var(--shadow-sm);
-
   transition:
     border-color var(--transition),
     box-shadow var(--transition);
 }
-
 .stat-card-dashboard:hover {
   border-color: var(--border-soft);
-
   box-shadow: var(--shadow-sm);
 }
-
 .stat-icon {
   width: 48px;
   height: 48px;
-
   border-radius: 12px;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   font-size: 1rem;
 }
-
 .bg-primary-soft {
-  background:
-    rgba(24, 100, 67, 0.08);
-
+  background: rgba(24, 100, 67, 0.08);
   color: var(--chmsu-primary);
 }
-
 .bg-success-soft {
-  background:
-    rgba(34, 197, 94, 0.08);
-
+  background: rgba(34, 197, 94, 0.08);
   color: #15803d;
 }
-
 .bg-warning-soft {
-  background:
-    rgba(249, 115, 22, 0.08);
-
+  background: rgba(249, 115, 22, 0.08);
   color: #c2410c;
 }
-
 .stat-value-dashboard {
   color: var(--text-primary);
-
   font-size: 1.55rem;
   font-weight: 800;
-
   line-height: 1;
 }
-
 .stat-label-dashboard {
   margin-top: 0.3rem;
-
   color: var(--text-secondary);
-
   font-size: 0.8rem;
 }
-
-/* =========================
-   CLASS CARD
-========================= */
-
 .class-card {
   height: 100%;
-
   display: flex;
   flex-direction: column;
-
   padding: 1.3rem;
-
   border-radius: var(--radius-lg);
-
   background: white;
-
-  border:
-    1px solid var(--border-soft);
-
+  border: 1px solid var(--border-soft);
   box-shadow: var(--shadow-sm);
-
   transition:
     border-color var(--transition),
     box-shadow var(--transition);
-
   cursor: pointer;
 }
-
 .class-card:hover {
-  border-color:
-    rgba(148, 163, 184, 0.18);
-
+  border-color: rgba(148, 163, 184, 0.18);
   box-shadow: var(--shadow-md);
 }
-
 .class-card-header {
   padding-bottom: 0.9rem;
-
-  border-bottom:
-    1px solid rgba(148, 163, 184, 0.12);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
 }
-
 .class-subject {
   margin: 0;
-
   color: var(--text-primary);
-
   font-size: 1rem;
   font-weight: 700;
-
   letter-spacing: -0.2px;
   line-height: 1.35;
 }
-
 .class-card-body {
   flex: 1;
-
   padding-top: 0.9rem;
 }
-
 .info-item {
   display: flex;
   align-items: center;
   gap: 0.7rem;
-
   padding: 0.52rem 0;
-
   color: var(--text-secondary);
-
   font-size: 0.84rem;
 }
-
 .info-item i {
   color: var(--chmsu-primary);
-
   font-size: 0.88rem;
 }
-
 .class-card-footer {
   margin-top: 1rem;
-
   padding-top: 1rem;
-
-  border-top:
-    1px solid rgba(148, 163, 184, 0.08);
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
 }
-
-/* =========================
-   STATUS
-========================= */
-
 .status-badge {
   width: 36px;
   height: 36px;
-
   border-radius: 50%;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  background:
-    rgba(15, 23, 42, 0.04);
-
+  background: rgba(15, 23, 42, 0.04);
   font-size: 0.88rem;
 }
-
 .status-completed {
   color: var(--chmsu-primary);
 }
-
 .status-pending {
   color: #c2410c;
 }
-
-/* =========================
-   EMPTY STATE
-========================= */
-
-/* =========================
-   EMPTY STATE
-========================= */
-
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   text-align: center;
-
   min-height: 420px;
-
   padding: 3rem 2rem;
-
   border-radius: 20px;
-
-  background:
-    linear-gradient(180deg,
-      rgba(255, 255, 255, 0.96),
-      rgba(248, 250, 252, 0.96));
-
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
   border: 1px solid rgba(226, 232, 240, 0.8);
-
-  box-shadow:
-    0 10px 30px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
-
 .empty-state-icon {
   width: 90px;
   height: 90px;
-
   margin-bottom: 1.5rem;
-
   border-radius: 50%;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
-  background:
-    rgba(37, 99, 235, 0.08);
+  background: rgba(37, 99, 235, 0.08);
 }
-
 .empty-state-icon i {
   font-size: 2.5rem;
-
   color: var(--chmsu-primary);
 }
-
 .empty-state h3 {
   margin: 0;
-
   font-size: 1.4rem;
   font-weight: 700;
-
   color: #0f172a;
 }
-
 .empty-state p {
   margin-top: 0.75rem;
-
   max-width: 420px;
-
   color: #64748b;
-
   font-size: 0.96rem;
-
   line-height: 1.7;
 }
-
 .empty-state .btn {
   min-width: 160px;
-
   border-radius: 12px;
-
   font-weight: 600;
 }
-
 .spinner-border {
   color: var(--chmsu-primary);
 }
-
 .spinner-lg {
   width: 2.8rem;
   height: 2.8rem;
 }
-
-/* =========================
-   GRID SPACING
-========================= */
-
 .row.g-4 {
   --bs-gutter-x: 1.2rem;
   --bs-gutter-y: 1.2rem;
 }
-/* =========================
-   DASHBOARD ENTER ANIMATION
-========================= */
-
 .dashboard-enter-animation {
   animation:
     dashboardFadeIn 0.45s ease,
     dashboardSlideUp 0.45s ease;
 }
-
-/* =========================
-   NAVBAR
-========================= */
-
 .navbar {
-  animation:
-    navbarDropIn 0.4s ease;
+  animation: navbarDropIn 0.4s ease;
 }
-
-/* =========================
-   STAT CARDS
-========================= */
-
 .stat-card-dashboard {
-  animation:
-    statCardFadeUp 0.45s ease;
+  animation: statCardFadeUp 0.45s ease;
   animation-fill-mode: both;
-
   transition:
     transform 0.18s ease,
     box-shadow 0.18s ease;
 }
-
 .stat-card-dashboard:nth-child(1) {
   animation-delay: 0.05s;
 }
-
 .col-md-4:nth-child(1) .stat-card-dashboard {
   animation-delay: 0.05s;
 }
-
 .col-md-4:nth-child(2) .stat-card-dashboard {
   animation-delay: 0.1s;
 }
-
 .col-md-4:nth-child(3) .stat-card-dashboard {
   animation-delay: 0.15s;
 }
-
 .stat-card-dashboard:hover {
   transform: translateY(-2px);
-
-  box-shadow:
-    0 16px 36px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
 }
-
-/* =========================
-   CLASS CARDS
-========================= */
-
 .class-card {
-  animation:
-    classCardFadeUp 0.45s ease;
+  animation: classCardFadeUp 0.45s ease;
   animation-fill-mode: both;
-
   transition:
     transform 0.18s ease,
     box-shadow 0.18s ease;
 }
-
 .class-card:hover {
   transform: translateY(-3px);
-
-  box-shadow:
-    0 18px 42px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
 }
-
 .col-lg-6:nth-child(1) .class-card {
   animation-delay: 0.08s;
 }
-
 .col-lg-6:nth-child(2) .class-card {
   animation-delay: 0.12s;
 }
-
 .col-lg-6:nth-child(3) .class-card {
   animation-delay: 0.16s;
 }
-
 .col-lg-6:nth-child(4) .class-card {
   animation-delay: 0.2s;
 }
-
 .col-lg-6:nth-child(5) .class-card {
   animation-delay: 0.24s;
 }
-
 .col-lg-6:nth-child(6) .class-card {
   animation-delay: 0.28s;
 }
-
-/* =========================
-   EMPTY STATE
-========================= */
-
 .empty-state {
-  animation:
-    emptyStateFadeIn 0.45s ease;
+  animation: emptyStateFadeIn 0.45s ease;
 }
-
-/* =========================
-   BUTTON FEEDBACK
-========================= */
-
 .btn:active:not(:disabled) {
   transform: scale(0.985);
 }
-
-/* =========================
-   KEYFRAMES
-========================= */
-
 @keyframes dashboardFadeIn {
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
 }
-
 @keyframes dashboardSlideUp {
   from {
     transform: translateY(10px);
   }
-
   to {
     transform: translateY(0);
   }
 }
-
 @keyframes navbarDropIn {
   from {
     opacity: 0;
     transform: translateY(-8px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
 @keyframes statCardFadeUp {
   from {
     opacity: 0;
     transform: translateY(12px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
 @keyframes classCardFadeUp {
   from {
     opacity: 0;
     transform: translateY(14px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
-
 @keyframes emptyStateFadeIn {
   from {
     opacity: 0;
     transform: scale(0.98);
   }
-
   to {
     opacity: 1;
     transform: scale(1);
   }
 }
-
-/* =========================
-   REDUCED MOTION
-========================= */
-
 @media (prefers-reduced-motion: reduce) {
-
   .dashboard-enter-animation,
   .navbar,
   .stat-card-dashboard,
@@ -754,68 +440,52 @@
   .empty-state {
     animation: none !important;
   }
-
   .class-card:hover,
   .stat-card-dashboard:hover {
     transform: none;
   }
 }
-/* =========================
-   RESPONSIVE
-========================= */
-
 @media (max-width: 992px) {
   .brand-text {
     display: none;
   }
 }
-
 @media (max-width: 768px) {
   .container-fluid {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
-
   .class-card {
     padding: 1.1rem;
   }
-
   .stat-card-dashboard {
     padding: 1rem;
   }
-
   .class-subject {
     font-size: 0.96rem;
   }
-
   .btn-primary {
     min-height: 50px;
   }
-
   .logo-container {
     width: 44px;
     height: 44px;
   }
-
   .logo-image-small {
     width: 28px;
     height: 28px;
   }
 }
-
 @media (max-width: 576px) {
   .navbar {
     padding: 0.8rem 0;
   }
-
   .user-info-badge {
     padding: 0.45rem 0.7rem;
   }
-
   .class-card {
     border-radius: 16px;
   }
-
   .empty-state {
     padding: 4rem 1rem;
   }

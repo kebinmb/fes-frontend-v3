@@ -56,10 +56,6 @@ export class FacultyEvaluationPrintComponent {
   overallSefRating = 0;
 
   ngOnInit(): void {
-    /* =========================================
-     LOAD FROM LOCAL STORAGE
-  ========================================= */
-
     const storedData = localStorage.getItem('faculty-print-data');
     if (storedData && !this.data.length) {
       this.data = JSON.parse(storedData);

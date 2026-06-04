@@ -18,10 +18,6 @@ export class SchoolYearAndSemesterFacade {
 
     private store = inject(Store);
 
-    /* =========================================
-       SELECTORS
-    ========================================= */
-
     response$ =
         this.store.select(
             SchoolYearAndSemesterSelectors
@@ -39,10 +35,6 @@ export class SchoolYearAndSemesterFacade {
             SchoolYearAndSemesterSelectors
                 .selectSchoolYearAndSemesterError,
         );
-
-    /* =========================================
-       ACTIONS
-    ========================================= */
 
     updateSchoolYearAndSemester(
         schoolYear: number,

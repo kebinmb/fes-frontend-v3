@@ -1,20 +1,13 @@
 import { AfterViewInit, Component, DestroyRef, OnInit, ViewChild, inject } from '@angular/core';
-
 import { AsyncPipe, CommonModule, UpperCasePipe } from '@angular/common';
-
 import { Subject, debounceTime, distinctUntilChanged, filter, map, take } from 'rxjs';
-
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
 import { SupervisorDataFacade } from '../../../../store/supervisor-data/supervisor-data.facade';
-
 import { AuthFacade } from '../../../../store/auth/auth.facade';
-
 import {
   FacultyClass,
   FacultyLoadDTO,
 } from '../../../../services/supervisor-data/supervisor-data-service';
-
 import { ConfirmationModalComponent } from '../../../../../shared/components/confirmation-modal-component/confirmation-modal-component';
 import { selectEvaluationStatusState } from '../../../../store/supervisor-data/supervisor-data.selectors';
 import { Store } from '@ngrx/store';
@@ -24,9 +17,7 @@ import { FacultyEvaluationModalComponent } from '../../../../../shared/component
 import { EvaluatedStudentsComponent } from '../../../../../shared/components/evaluated-students-component/evaluated-students-component';
 @Component({
   selector: 'app-supervisor-dashboard-component',
-
   standalone: true,
-
   imports: [
     AsyncPipe,
     CommonModule,
@@ -36,58 +27,30 @@ import { EvaluatedStudentsComponent } from '../../../../../shared/components/eva
     EvaluatedStudentsComponent,
     UpperCasePipe,
   ],
-
   templateUrl: './supervisor-dashboard-component.html',
-
   styleUrl: './supervisor-dashboard-component.css',
 })
 export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   private store = inject(Store);
   isConfirmationVisible = false;
   pendingFaculty: FacultyLoadDTO | null = null;
-  /* =========================================================
-   * DEPENDENCIES
-   * =======================================================*/
   evaluationStatus$ = this.store.select(selectEvaluationStatusState);
   private readonly supervisorDataFacade = inject(SupervisorDataFacade);
-
   private readonly authFacade = inject(AuthFacade);
-
   private readonly destroyRef = inject(DestroyRef);
   showEvaluatedStudents$ = this.supervisorDataFacade.showEvaluatedStudents$;
-
   backToDashboard(): void {
     this.supervisorDataFacade.showDashboardView();
   }
-  /* =========================================================
-   * VIEWCHILD
-   * =======================================================*/
-
   @ViewChild('confirmationModal')
   confirmationModal!: ConfirmationModalComponent;
-
-  /* =========================================================
-   * CONFIG
-   * =======================================================*/
-
   readonly pageSize = 10;
-
   readonly status = 'ACTIVE';
-
   readonly program = sessionStorage.getItem('program') ?? '';
-
   readonly key = `${this.program}-${this.status}`;
-
-  /* =========================================================
-   * STATE
-   * =======================================================*/
-
   currentPage = 0;
-
   search = '';
-
   selectedFaculty: FacultyLoadDTO | null = null;
-
   selectedClass: FacultyClass | null = null;
   selectedCampus: string = '';
   campusOptions = [
@@ -108,320 +71,184 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
       value: 'LEGACY_FT',
     },
   ];
-  /* =========================================================
-   * SEARCH
-   * =======================================================*/
   buildEvaluationKey(
     classCode: string,
-
     subjectCode: string,
-
     yearLevel: string,
-
     semester: string,
-
     schoolYear: number,
   ): string {
     return `${classCode}-${subjectCode}-${yearLevel}-${semester}-${schoolYear}`;
   }
   private readonly searchSubject = new Subject<string>();
-
-  /* =========================================================
-   * OBSERVABLES
-   * =======================================================*/
-
   readonly evaluatorId$ = this.authFacade.evaluatorId$;
-
   readonly faculties$ = this.supervisorDataFacade.faculties$(this.key);
-
   readonly loading$ = this.supervisorDataFacade.facultiesLoading$(this.key);
-
   readonly error$ = this.supervisorDataFacade.facultiesError$(this.key);
-
   readonly pagination$ = this.supervisorDataFacade.facultyPagination$(this.key);
-
   readonly facultyClasses$ = this.supervisorDataFacade.facultyClasses$(this.key);
-
   readonly totalFaculty$ = this.pagination$.pipe(map((pagination) => pagination.totalElements));
-
   readonly totalPages$ = this.pagination$.pipe(map((pagination) => pagination.totalPages));
-
-  /* =========================================================
-   * LIFECYCLE
-   * =======================================================*/
-
   ngOnInit(): void {
     this.initializeSearch();
-
     this.initializeFacultyLoad();
   }
-
   ngAfterViewInit(): void {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-
     tooltipTriggerList.forEach((tooltipTriggerEl) => {
       new Tooltip(tooltipTriggerEl);
     });
   }
-
-  /* =========================================================
-   * INITIALIZATION
-   * =======================================================*/
-
   private initializeFacultyLoad(): void {
     this.evaluatorId$
-      .pipe(
-        filter(Boolean),
-
-        take(1),
-
-        takeUntilDestroyed(this.destroyRef),
-      )
+      .pipe(filter(Boolean), take(1), takeUntilDestroyed(this.destroyRef))
       .subscribe((userId) => {
         this.loadFaculties(Number(userId));
       });
   }
-
   private initializeSearch(): void {
     this.searchSubject
       .pipe(
         map((value) => value.trim()),
-
         debounceTime(300),
-
         distinctUntilChanged(),
-
         takeUntilDestroyed(this.destroyRef),
       )
       .subscribe((search) => {
         this.search = search.toLowerCase();
-
         this.currentPage = 0;
-
         this.reload();
       });
   }
-
-  /* =========================================================
-   * SEARCH
-   * =======================================================*/
-
   onSearch(event: Event): void {
     const value = (event.target as HTMLInputElement)?.value ?? '';
-
     this.searchSubject.next(value);
   }
-
-  /* =========================================================
-   * LOAD
-   * =======================================================*/
-
   private loadFaculties(userId: number): void {
     this.supervisorDataFacade.loadFaculties(
       this.key,
-
       this.program,
-
       userId,
-
       this.currentPage,
-
       this.pageSize,
-
       'lastname,asc',
-
       this.search,
-
       this.selectedCampus,
     );
   }
-
   reload(): void {
-    this.evaluatorId$
-      .pipe(
-        take(1),
-
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe((userId) => {
-        if (!userId) {
-          return;
-        }
-
-        this.loadFaculties(Number(userId));
-      });
+    this.evaluatorId$.pipe(take(1), takeUntilDestroyed(this.destroyRef)).subscribe((userId) => {
+      if (!userId) {
+        return;
+      }
+      this.loadFaculties(Number(userId));
+    });
   }
-
-  /* =========================================================
-   * PAGINATION
-   * =======================================================*/
-
   nextPage(totalPages: number): void {
     if (this.currentPage + 1 >= totalPages) {
       return;
     }
-
     this.currentPage++;
-
     this.reload();
   }
-
   previousPage(): void {
     if (this.currentPage <= 0) {
       return;
     }
-
     this.currentPage--;
-
     this.reload();
   }
-
   goToPage(page: number): void {
     if (page === this.currentPage) {
       return;
     }
-
     this.currentPage = page;
-
     this.reload();
   }
-
   getPageNumbers(totalPages: number): number[] {
-    return Array.from({ length: totalPages }, (_, index) => index);
+    const maxVisiblePages = 5;
+    let start = Math.max(0, this.currentPage - Math.floor(maxVisiblePages / 2));
+    let end = start + maxVisiblePages;
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(0, end - maxVisiblePages);
+    }
+    return Array.from({ length: end - start }, (_, i) => start + i);
   }
-
-  /* =========================================================
-   * FACULTY
-   * =======================================================*/
-
   openFaculty(faculty: FacultyLoadDTO): void {
     this.selectedFaculty = faculty;
-
-    this.supervisorDataFacade.loadFacultyClasses(
-      this.key,
-
-      faculty.facultyId,
-
-      this.program,
-    );
+    this.supervisorDataFacade.loadFacultyClasses(this.key, faculty.facultyId, this.program);
   }
-
   closeFacultyModal(): void {
     this.selectedFaculty = null;
   }
   onCampusChange(): void {
     this.currentPage = 0;
-
     this.reload();
   }
-  /* =========================================================
-   * CONFIRMATION MODAL
-   * =======================================================*/
-
   openFacultyConfirmation(faculty: FacultyLoadDTO): void {
     this.pendingFaculty = faculty;
-
     this.isConfirmationVisible = true;
   }
   confirmFacultyEvaluation(): void {
     if (!this.pendingFaculty) {
       return;
     }
-
     this.isConfirmationVisible = false;
-
     this.openFaculty(this.pendingFaculty);
   }
   closeFacultyConfirmation(): void {
     this.isConfirmationVisible = false;
-
     this.pendingFaculty = null;
   }
-
   confirmEvaluation(): void {
     this.isConfirmationVisible = false;
-
     if (!this.selectedClass || !this.selectedFaculty) {
       return;
     }
-
     this.startEvaluation(this.selectedClass, this.selectedFaculty);
   }
-
-  /* =========================================================
-   * EVALUATION
-   * =======================================================*/
-
   startEvaluation(cls: FacultyClass, faculty: FacultyLoadDTO): void {
     const facultyName = `${faculty.firstname} ${faculty.lastname}`;
-
     this.supervisorDataFacade.selectClass({
       ...cls,
       college: faculty.college,
       facultyId: faculty.facultyId,
-
       facultyName,
     });
   }
-
-  /* =========================================================
-   * HELPERS
-   * =======================================================*/
-
   getCampusName(campus: string): string {
     const campusMap: Record<string, string> = {
       LEGACY_FT: 'Fortune Towne Campus',
-
       LEGACY_ALIJIS: 'Alijis Campus',
-
       LEGACY_BINALBAGAN: 'Binalbagan Campus',
-
       LEGACY_TALISAY: 'Talisay Campus',
     };
-
     return campusMap[campus] || campus;
   }
-
   getFacultyInitials(faculty: FacultyLoadDTO): string {
     const first = faculty.firstname?.charAt(0) ?? '';
-
     const last = faculty.lastname?.charAt(0) ?? '';
-
     return `${first}${last}`;
   }
-
   schoolYear(): number {
     return new Date().getFullYear();
   }
-
   semester(): string {
     return '2nd';
   }
-
-  /* =========================================================
-   * TRACKBY
-   * =======================================================*/
-
   trackFaculty(_: number, faculty: FacultyLoadDTO): string {
     return faculty.facultyId;
   }
-
   trackClass(_: number, cls: FacultyClass): string {
     return cls.classCode;
   }
-
-  /* =========================================================
-   * AUTH
-   * =======================================================*/
-
   logout(): void {
     this.authFacade.logout();
   }
-
   openEvaluatedStudents(): void {
     this.supervisorDataFacade.showEvaluatedStudentsView();
   }
-
   toggleEvaluatedStudents(): void {
     this.showEvaluatedStudents$.pipe(take(1)).subscribe((show) => {
       if (show) {
@@ -431,5 +258,4 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
       }
     });
   }
-  
 }

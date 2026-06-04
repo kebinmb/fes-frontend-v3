@@ -48,8 +48,6 @@ export class SupervisorDataEffects {
 
   private toast = inject(ToastFacade);
 
-  /* ================= HELPERS ================= */
-
   private buildEvaluationKey(
     classCode: string,
 
@@ -63,8 +61,6 @@ export class SupervisorDataEffects {
   ): string {
     return `${classCode}-${subjectCode}-${yearLevel}-${semester}-${schoolYear}`;
   }
-
-  /* ================= FACULTIES ================= */
 
   loadFaculties$ = createEffect(() =>
   this.actions$.pipe(
@@ -136,8 +132,6 @@ export class SupervisorDataEffects {
   ),
 );
 
-  /* ================= FACULTY CLASSES ================= */
-
   loadFacultyClasses$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ActionsSet.loadFacultyClasses),
@@ -180,8 +174,6 @@ export class SupervisorDataEffects {
       ),
     ),
   );
-
-  /* ================= BATCH STATUS DISPATCH ================= */
 
   loadEvaluationStatusBatch$ = createEffect(() =>
     this.actions$.pipe(
@@ -230,8 +222,6 @@ export class SupervisorDataEffects {
       }),
     ),
   );
-
-  /* ================= BATCH STATUS API ================= */
 
   loadEvaluationStatusBatchApi$ = createEffect(() =>
     this.actions$.pipe(
@@ -304,8 +294,6 @@ export class SupervisorDataEffects {
     ),
   );
 
-  /* ================= SINGLE STATUS ================= */
-
   loadEvaluationStatus$ = createEffect(() =>
     this.actions$.pipe(
       ofType(SupervisorDataActions.loadEvaluationStatus),
@@ -372,8 +360,6 @@ export class SupervisorDataEffects {
       ),
     ),
   );
-
-  /* ================= NAVIGATION ================= */
 
   selectClass$ = createEffect(
     () =>

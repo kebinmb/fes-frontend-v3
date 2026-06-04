@@ -21,17 +21,9 @@ export const guestGuard: CanActivateFn = () => {
 
     map((role) => {
 
-      /* =========================================
-         NOT LOGGED IN
-      ========================================= */
-
       if (!role) {
         return true;
       }
-
-      /* =========================================
-         REDIRECT BASED ON ROLE
-      ========================================= */
 
       switch (role) {
 

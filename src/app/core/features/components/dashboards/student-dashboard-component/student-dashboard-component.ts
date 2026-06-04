@@ -5,7 +5,6 @@ import { AuthFacade } from '../../../../store/auth/auth.facade';
 import { filter, map, take } from 'rxjs';
 import { StudentClassLoadDTO } from '../../../../services/student-data/student-data-service';
 import { EvaluationClass } from '../../../../services/evaluation/evaluation-service';
-
 @Component({
   selector: 'app-student-dashboard-component',
   imports: [AsyncPipe, CommonModule],
@@ -15,7 +14,6 @@ import { EvaluationClass } from '../../../../services/evaluation/evaluation-serv
 export class StudentDashboardComponent {
   private studentDataFacade = inject(StudentDataFacade);
   private authFacade = inject(AuthFacade);
-
   isReady$ = this.studentDataFacade.isReady$;
   isLoading$ = this.studentDataFacade.isLoading$;
   studentLoads$ = this.studentDataFacade.studentLoads$;
@@ -23,7 +21,6 @@ export class StudentDashboardComponent {
   evaluatedCount$ = this.studentLoads$.pipe(
     map((loads) => loads?.filter((load) => load.isEvaluated === true).length ?? 0),
   );
-
   unevaluatedCount$ = this.studentLoads$.pipe(
     map((loads) => loads?.filter((load) => load.isEvaluated === false).length ?? 0),
   );
@@ -37,7 +34,6 @@ export class StudentDashboardComponent {
         this.studentDataFacade.loadStudentLoads(id, 0, 20, 'primaryStudentLoadId,desc');
       });
   }
-
   startEvaluation(cls: EvaluationClass, event: Event) {
     event.stopPropagation();
     const selectedClass: EvaluationClass = {

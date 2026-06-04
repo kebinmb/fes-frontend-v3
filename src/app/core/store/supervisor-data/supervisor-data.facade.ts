@@ -21,8 +21,6 @@ import { EvaluationClass } from '../../services/evaluation/evaluation-service';
 export class SupervisorDataFacade {
   private store = inject(Store);
 
-  /* ================= HELPERS ================= */
-
   buildEvaluationKey(
     classCode: string,
 
@@ -79,11 +77,7 @@ export class SupervisorDataFacade {
 
   );
 }
-  /* ================= BASICS ================= */
-
   selectedClass$ = this.store.select(SupervisorSelectors.selectSelectedClass);
-
-  /* ================= FACULTIES ================= */
 
   faculties$(key: string): Observable<FacultyLoadDTO[]> {
     return this.store.select(SupervisorSelectors.selectFacultyDataByKey(key));
@@ -101,8 +95,6 @@ export class SupervisorDataFacade {
     return this.store.select(SupervisorSelectors.selectFacultyPagination(key));
   }
 
-  /* ================= FACULTY CLASSES ================= */
-
   facultyClasses$(key: string) {
     return this.store.select(SupervisorSelectors.selectFacultyClassesDataByKey(key));
   }
@@ -110,8 +102,6 @@ export class SupervisorDataFacade {
   facultyClassesLoading$(key: string) {
     return this.store.select(SupervisorSelectors.selectFacultyClassesDataState);
   }
-
-  /* ================= LOAD FACULTIES ================= */
 
   loadFaculties(
     key: string,
@@ -151,8 +141,6 @@ export class SupervisorDataFacade {
     );
   }
 
-  /* ================= LOAD FACULTY CLASSES ================= */
-
   loadFacultyClasses(
     key: string,
 
@@ -170,8 +158,6 @@ export class SupervisorDataFacade {
       }),
     );
   }
-
-  /* ================= EVALUATION ================= */
 
   evaluationForClass$(
     key: string,
@@ -269,8 +255,6 @@ export class SupervisorDataFacade {
     );
   }
 
-  /* ================= SELECTION ================= */
-
   selectClass(selectedClass: EvaluationClass): void {
     this.store.dispatch(
       SupervisorActions.selectFacultyClassForEvaluation({
@@ -278,8 +262,6 @@ export class SupervisorDataFacade {
       }),
     );
   }
-
-  /* ================= RESET ================= */
 
   resetState(): void {
     this.store.dispatch(SupervisorActions.resetSupervisorState());

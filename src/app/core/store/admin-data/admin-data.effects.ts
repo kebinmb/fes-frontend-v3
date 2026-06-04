@@ -327,10 +327,6 @@ export class AdminEffects {
             catchError((error) => {
               const message = extractErrorMessage(error);
 
-              /*
-               * Ignore cancelled/aborted requests
-               * caused by switchMap cancellation
-               */
               if (
                 message?.includes('aborted') ||
                 message?.includes('Unknown Error') ||
