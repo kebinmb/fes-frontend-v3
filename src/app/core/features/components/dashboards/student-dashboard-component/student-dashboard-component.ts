@@ -34,7 +34,7 @@ export class StudentDashboardComponent {
         take(1),
       )
       .subscribe((id) => {
-        this.studentDataFacade.loadStudentLoads(id, 0, 10, 'primaryStudentLoadId,desc');
+        this.studentDataFacade.loadStudentLoads(id, 0, 20, 'primaryStudentLoadId,desc');
       });
   }
 
