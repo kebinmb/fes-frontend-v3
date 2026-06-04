@@ -32,7 +32,7 @@ export class StudentDataService {
   getStudentLoads(
     studentId: string,
     page: number = 0,
-    size: number = 10,
+    size: number = 20,
     sort: string = 'primaryStudentLoadId,desc',
   ): Observable<PageResponse<StudentClassLoadDTO>> {
     const params = new HttpParams()
