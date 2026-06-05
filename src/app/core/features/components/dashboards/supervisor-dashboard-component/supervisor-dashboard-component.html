@@ -13,16 +13,13 @@
       </div>
       <div class="navbar-actions">
         <button class="btn-evaluated-students" type="button" (click)="toggleEvaluatedStudents()">
-          <i
-            class="bi"
-            [class.bi-table]="!(showEvaluatedStudents$ | async)"
-            [class.bi-arrow-left]="showEvaluatedStudents$ | async"
-          >
+          <i class="bi" [class.bi-table]="!(showEvaluatedStudents$ | async)"
+            [class.bi-arrow-left]="showEvaluatedStudents$ | async">
           </i>
           {{
-            (showEvaluatedStudents$ | async)
-              ? 'Evaluate Faculty Members'
-              : 'Show Evaluated Students'
+          (showEvaluatedStudents$ | async)
+          ? 'Evaluate Faculty Members'
+          : 'Show Evaluated Students'
           }}
         </button>
         <button class="btn-logout-navbar" (click)="logout()">
@@ -57,183 +54,152 @@
       </div>
     </section>
     @if (showEvaluatedStudents$ | async) {
-      <app-evaluated-students-component> </app-evaluated-students-component>
+    <app-evaluated-students-component> </app-evaluated-students-component>
     } @else {
-      <section class="dashboard-toolbar sticky-toolbar">
-        <div class="toolbar-left">
-          <div class="search-wrapper">
-            <i class="bi bi-search search-icon"></i>
-            <input
-              type="text"
-              class="form-control search-input"
-              placeholder="Search faculty..."
-              (input)="onSearch($event)"
-            />
+    <section class="dashboard-toolbar sticky-toolbar">
+      <div class="toolbar-left">
+        <div class="search-wrapper">
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" class="form-control search-input" placeholder="Search faculty..."
+            (input)="onSearch($event)" />
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <div class="toolbar-info-stack">
+          <div class="instruction-chip">
+            <i class="bi bi-info-circle-fill"></i>
+            <span> Verify faculty assignment before evaluation. </span>
+          </div>
+          <div class="instruction-chip secondary-chip">
+            <i class="bi bi-journal-check"></i>
+            <span>
+              The loaded faculty members are those that currently are inside your campus
+              assignment. If problems exists, please report to the administrator.
+            </span>
           </div>
         </div>
-        <div class="toolbar-right">
-          <div class="toolbar-info-stack">
-            <div class="instruction-chip">
-              <i class="bi bi-info-circle-fill"></i>
-              <span> Verify faculty assignment before evaluation. </span>
-            </div>
-            <div class="instruction-chip secondary-chip">
-              <i class="bi bi-journal-check"></i>
-              <span>
-                The loaded faculty members are those that currently are inside your campus
-                assignment. If problems exists, please report to the administrator.
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-      @if (loading$ | async) {
-        <div class="loading-state">
-          <div class="spinner-border spinner-lg"></div>
-          <p>Loading faculty data...</p>
-        </div>
-      }
-      @else if ((faculties$ | async)?.length === 0) {
-        <div class="empty-state">
-          <div class="empty-icon">
-            <i class="bi bi-inbox"></i>
-          </div>
-          <h3>No Faculty Members Found</h3>
-          <p>Try adjusting your search keywords or selected campus.</p>
-        </div>
-      }
-      @else {
-        <div class="faculty-table-wrapper">
-          <table class="faculty-table">
-            <thead>
-              <tr>
-                <th>Faculty</th>
-                <th>Position</th>
-                <th>Campus</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (faculty of (faculties$ | async) ?? []; track trackFaculty($index, faculty)) {
-                <tr class="faculty-row">
-                  <td>
-                    <div class="faculty-cell-profile">
-                      <div class="faculty-avatar">
-                        {{ getFacultyInitials(faculty) }}
-                      </div>
-                      <div class="faculty-profile-info">
-                        <div class="faculty-name">
-                          {{ faculty.firstname | uppercase }}
-                          {{ faculty.lastname | uppercase }}
-                        </div>
-                        <div class="faculty-id">
-                          {{ faculty.facultyId }}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div class="faculty-table-text">
-                      {{ faculty.position }}
-                    </div>
-                  </td>
-                  <td>
-                    <div class="faculty-campus-chip">
-                      <i class="bi bi-buildings-fill"></i>
-                      <span>
-                        {{ getCampusName(faculty.campus) }}
-                      </span>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="faculty-active-badge"> ACTIVE </span>
-                  </td>
-                  <td>
-                    <button
-                      class="btn btn-primary btn-evaluate-table"
-                      (click)="openFacultyConfirmation(faculty)"
-                    >
-                      <i class="bi bi-clipboard-check me-2"></i>
-                      Evaluate
-                    </button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-        @if (pagination$ | async; as pagination) {
-          @if (pagination.totalPages > 1) {
-            <div class="pagination-wrapper" *ngIf="pagination.totalPages > 1">
-              <button
-                class="btn btn-pagination"
-                [disabled]="currentPage === 0"
-                (click)="goToPage(0)"
-              >
-                <i class="bi bi-chevron-double-left"></i>
-              </button>
-              <button
-                class="btn btn-pagination"
-                [disabled]="currentPage === 0"
-                (click)="previousPage()"
-              >
-                <i class="bi bi-chevron-left"></i>
-              </button>
-              @for (page of getPageNumbers(pagination.totalPages); track page) {
-                <button
-                  class="btn btn-pagination"
-                  [class.active-page]="currentPage === page"
-                  (click)="goToPage(page)"
-                >
-                  {{ page + 1 }}
-                </button>
-              }
-              <button
-                class="btn btn-pagination"
-                [disabled]="currentPage + 1 >= pagination.totalPages"
-                (click)="nextPage(pagination.totalPages)"
-              >
-                <i class="bi bi-chevron-right"></i>
-              </button>
-              <button
-                class="btn btn-pagination"
-                [disabled]="currentPage + 1 >= pagination.totalPages"
-                (click)="goToPage(pagination.totalPages - 1)"
-              >
-                <i class="bi bi-chevron-double-right"></i>
-              </button>
-              <div class="page-indicator">
-                Page {{ currentPage + 1 }} of {{ pagination.totalPages }}
+      </div>
+    </section>
+    @if (loading$ | async) {
+    <div class="loading-state">
+      <div class="spinner-border spinner-lg"></div>
+      <p>Loading faculty data...</p>
+    </div>
+    }
+    @else if ((faculties$ | async)?.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="bi bi-inbox"></i>
+      </div>
+      <h3>No Faculty Members Found</h3>
+      <p>Try adjusting your search keywords or selected campus.</p>
+    </div>
+    }
+    @else {
+    <div class="faculty-table-wrapper">
+      <table class="faculty-table">
+        <thead>
+          <tr>
+            <th>Faculty</th>
+            <th>Position</th>
+            <th>Campus</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (faculty of (faculties$ | async) ?? []; track trackFaculty($index, faculty)) {
+          <tr class="faculty-row">
+            <td>
+              <div class="faculty-cell-profile">
+                <div class="faculty-avatar">
+                  {{ getFacultyInitials(faculty) }}
+                </div>
+                <div class="faculty-profile-info">
+                  <div class="faculty-name">
+                    {{ faculty.firstname | uppercase }}
+                    {{ faculty.lastname | uppercase }}
+                  </div>
+                  <div class="faculty-id">
+                    {{ faculty.facultyId }}
+                  </div>
+                </div>
               </div>
-            </div>
+            </td>
+            <td>
+              <div class="faculty-table-text">
+                {{ faculty.position }}
+              </div>
+            </td>
+            <td>
+              <div class="faculty-campus-chip">
+                <i class="bi bi-buildings-fill"></i>
+                <span>
+                  {{ getCampusName(faculty.campus) }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="faculty-active-badge"> ACTIVE </span>
+            </td>
+            <td>
+              <button class="btn btn-primary btn-evaluate-table" (click)="openFacultyConfirmation(faculty)">
+                <i class="bi bi-clipboard-check me-2"></i>
+                Evaluate
+              </button>
+            </td>
+          </tr>
           }
-        }
+        </tbody>
+      </table>
+    </div>
+    @if (pagination$ | async; as pagination) {
+    @if (pagination.totalPages > 1) {
+    <div class="pagination-wrapper" *ngIf="pagination.totalPages > 1">
+      <button class="btn btn-pagination" [disabled]="currentPage === 0" (click)="goToPage(0)">
+        <i class="bi bi-chevron-double-left"></i>
+      </button>
+      <button class="btn btn-pagination" [disabled]="currentPage === 0" (click)="previousPage()">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      @for (page of getPageNumbers(pagination.totalPages); track page) {
+      <button class="btn btn-pagination" [class.active-page]="currentPage === page" (click)="goToPage(page)">
+        {{ page + 1 }}
+      </button>
       }
+      <button class="btn btn-pagination" [disabled]="currentPage + 1 >= pagination.totalPages"
+        (click)="nextPage(pagination.totalPages)">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+      <button class="btn btn-pagination" [disabled]="currentPage + 1 >= pagination.totalPages"
+        (click)="goToPage(pagination.totalPages - 1)">
+        <i class="bi bi-chevron-double-right"></i>
+      </button>
+      <div class="page-indicator">
+        Page {{ currentPage + 1 }} of {{ pagination.totalPages }}
+      </div>
+    </div>
+    }
+    }
+    }
     }
   </div>
-  <app-faculty-evaluation-modal-component
-    *ngIf="selectedFaculty"
-    [faculty]="selectedFaculty"
-    [facultyClasses]="facultyClasses$ | async"
-    [evaluationStatus]="evaluationStatus$ | async"
-    [buildEvaluationKey]="buildEvaluationKey"
-    [getFacultyInitials]="getFacultyInitials"
-    [getCampusName]="getCampusName"
-    [trackClass]="trackClass"
-    (close)="closeFacultyModal()"
-    (evaluate)="startEvaluation($event.cls, $event.faculty)"
-  >
+
+  <app-faculty-evaluation-modal-component *ngIf="selectedFaculty" [faculty]="selectedFaculty"
+    [facultyClasses]="facultyClasses$ | async" [evaluationStatus]="evaluationStatus$ | async"
+    [buildEvaluationKey]="buildEvaluationKey" [getFacultyInitials]="getFacultyInitials" [getCampusName]="getCampusName"
+    [trackClass]="trackClass" (close)="closeFacultyModal()" (evaluate)="startEvaluation($event.cls, $event.faculty)">
   </app-faculty-evaluation-modal-component>
-  <app-confirmation-modal-component
-    [visible]="isConfirmationVisible"
-    [title]="'Confirm Evaluation'"
+  <app-confirmation-modal-component [visible]="isConfirmationVisible" [title]="'Confirm Evaluation'"
     [subtitle]="'Please verify faculty information'"
-    [message]="'Are you sure this faculty is under your program and college?'"
-    [confirmText]="'Continue Evaluation'"
-    [faculty]="pendingFaculty"
-    (confirmed)="confirmFacultyEvaluation()"
-    (closed)="closeFacultyConfirmation()"
-  >
+    [message]="'Are you sure this faculty is under your program and college?'" [confirmText]="'Continue Evaluation'"
+    [faculty]="pendingFaculty" (confirmed)="confirmFacultyEvaluation()" (closed)="closeFacultyConfirmation()">
   </app-confirmation-modal-component>
 </div>
+@if(showChangePasswordModal){
+
+<app-change-password-modal-component [isLoading]="isChangingPassword" (submitted)="changePassword($event)"
+  (closed)="onChangePasswordModalClose()">
+</app-change-password-modal-component>
+
+}

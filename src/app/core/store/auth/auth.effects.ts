@@ -239,6 +239,8 @@ export class AuthEffects {
 
               college: response.college ?? null,
               program: response.program,
+              requiresPasswordChange:
+                response.requiresPasswordChange ?? false,
             });
           }),
 
@@ -338,10 +340,24 @@ export class AuthEffects {
       ),
     { dispatch: false },
   );
-  private handleSupervisorLoginSuccess(response: any) {
-    sessionStorage.setItem('college', response.college);
+  private handleSupervisorLoginSuccess(
+    response: any
+  ) {
 
-    sessionStorage.setItem('program', response.program);
+    sessionStorage.setItem(
+      'college',
+      response.college
+    );
+
+    sessionStorage.setItem(
+      'program',
+      response.program
+    );
+
+    sessionStorage.setItem(
+      'requiresPasswordChange',
+      String(response.requiresPasswordChange)
+    );
 
     this.spinnerFacade.hideSpinner();
 

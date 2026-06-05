@@ -74,6 +74,7 @@ export interface EvaluatedStudentsDTO {
   firstname: string;
   lastname: string;
 }
+
 @Injectable({
   providedIn: 'root',
 })
@@ -161,4 +162,6 @@ export class SupervisorDataService {
       },
     );
   }
+
+  
 }

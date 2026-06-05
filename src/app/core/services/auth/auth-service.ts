@@ -1,10 +1,16 @@
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
-
+import { Observable } from 'rxjs';
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
 @Injectable({
   providedIn: 'root',
 })
+
 export class AuthService {
   private readonly AUTH_URL = `${environment.API_URL}/auth`;
   private http = inject(HttpClient)
@@ -71,6 +77,18 @@ export class AuthService {
       {
         withCredentials: true,
       },
+    );
+  }
+  changePassword(
+    request: ChangePasswordRequest
+  ): Observable<string> {
+    return this.http.put(
+      `${this.AUTH_URL}/change-password`,
+      request,
+      {
+        responseType: 'text',
+        withCredentials: true,
+      }
     );
   }
 }

@@ -67,6 +67,7 @@ export const checkLoggedInUserAuthenticationSuccess = createAction(
     role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN';
     college: string;
     program:string;
+    requiresPasswordChange:boolean;
   }>(),
 );
 

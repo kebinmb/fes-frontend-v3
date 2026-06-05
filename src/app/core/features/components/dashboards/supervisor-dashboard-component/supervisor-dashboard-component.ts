@@ -15,6 +15,9 @@ import { Tooltip } from 'bootstrap';
 import { FormsModule } from '@angular/forms';
 import { FacultyEvaluationModalComponent } from '../../../../../shared/components/faculty-evaluation-modal-component/faculty-evaluation-modal-component';
 import { EvaluatedStudentsComponent } from '../../../../../shared/components/evaluated-students-component/evaluated-students-component';
+import { ChangePasswordModalComponent } from "../../../../../shared/components/change-password-modal-component/change-password-modal-component";
+import { AuthService, ChangePasswordRequest } from '../../../../services/auth/auth-service';
+import { ToastFacade } from '../../../../store/toast/toast.facade';
 @Component({
   selector: 'app-supervisor-dashboard-component',
   standalone: true,
@@ -26,12 +29,15 @@ import { EvaluatedStudentsComponent } from '../../../../../shared/components/eva
     FacultyEvaluationModalComponent,
     EvaluatedStudentsComponent,
     UpperCasePipe,
+    ChangePasswordModalComponent
   ],
   templateUrl: './supervisor-dashboard-component.html',
   styleUrl: './supervisor-dashboard-component.css',
 })
 export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   private store = inject(Store);
+  private authService = inject(AuthService);
+  private toastFacade = inject(ToastFacade);
   isConfirmationVisible = false;
   pendingFaculty: FacultyLoadDTO | null = null;
   evaluationStatus$ = this.store.select(selectEvaluationStatusState);
@@ -80,6 +86,8 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   ): string {
     return `${classCode}-${subjectCode}-${yearLevel}-${semester}-${schoolYear}`;
   }
+  showChangePasswordModal = false;
+  isChangingPassword = false;
   private readonly searchSubject = new Subject<string>();
   readonly evaluatorId$ = this.authFacade.evaluatorId$;
   readonly faculties$ = this.supervisorDataFacade.faculties$(this.key);
@@ -90,6 +98,9 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   readonly totalFaculty$ = this.pagination$.pipe(map((pagination) => pagination.totalElements));
   readonly totalPages$ = this.pagination$.pipe(map((pagination) => pagination.totalPages));
   ngOnInit(): void {
+    const requiresPasswordChange =
+      sessionStorage.getItem('requiresPasswordChange') === 'true';
+    this.showChangePasswordModal = requiresPasswordChange;
     this.initializeSearch();
     this.initializeFacultyLoad();
   }
@@ -258,4 +269,68 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
       }
     });
   }
+  onChangePasswordModalClose(): void {
+
+    const requiresPasswordChange =
+      sessionStorage.getItem(
+        'requiresPasswordChange'
+      ) === 'true';
+
+    if (requiresPasswordChange) {
+
+      this.toastFacade.showToast(
+        'You must change your password before continuing.',
+        'error'
+      );
+
+      return;
+
+    }
+
+    this.showChangePasswordModal = false;
+
+  }
+  changePassword(
+    request: ChangePasswordRequest
+  ): void {
+
+    this.isChangingPassword = true;
+
+    this.authService
+      .changePassword(request)
+      .subscribe({
+
+        next: (response) => {
+
+          this.isChangingPassword = false;
+
+          sessionStorage.removeItem(
+            'requiresPasswordChange'
+          );
+
+          this.toastFacade.showToast(
+            response,
+            'success'
+          );
+
+          this.showChangePasswordModal = false;
+
+        },
+
+        error: (error: any) => {
+
+          this.isChangingPassword = false;
+
+          this.toastFacade.showToast(
+            error?.error?.message ??
+            'Failed to change password.',
+            'error'
+          );
+
+        }
+
+      });
+
+  }
+
 }
