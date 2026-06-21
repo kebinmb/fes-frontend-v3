@@ -4,7 +4,7 @@ import { StudentEvaluationState } from './student-evaluation-data.state';
 
 export const selectStudentEvaluationState =
   createFeatureSelector<StudentEvaluationState>(
-    'studentEvaluationReducer',
+    'studentEvaluationData',
   );
 
 export const selectStudentEvaluations = createSelector(

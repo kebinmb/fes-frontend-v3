@@ -11,7 +11,9 @@
 
   padding: 0 1.5rem;
 
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.96);
+
+  backdrop-filter: blur(12px);
 
   border-bottom: 1px solid #e5e7eb;
 }
@@ -151,9 +153,11 @@
 }
 
 .logout-btn:hover {
-  background: #f9fafb;
+  background: #fff7f5;
 
-  border-color: #9ca3af;
+  border-color: #fecdca;
+
+  color: #b42318;
 }
 
 .logout-btn i {

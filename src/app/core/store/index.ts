@@ -20,5 +20,5 @@ export const reducers = {
   adminData: adminDataReducer,
   migrationData: migrationReducer,
   schoolYearAndSemesterData: schoolYearAndSemesterReducer,
-  studentEvaluationReducer:studentEvaluationReducer
+  studentEvaluationData: studentEvaluationReducer,
 };

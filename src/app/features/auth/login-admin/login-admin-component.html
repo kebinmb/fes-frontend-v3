@@ -1,0 +1,159 @@
+<main class="admin-login-shell">
+  <section class="admin-login-brand" aria-label="Administrator portal information">
+    <div class="brand-content">
+      <img src="chmsu-logo.png" alt="Carlos Hilado Memorial State University logo" class="brand-logo" />
+
+      <div class="system-badge">
+        <i class="bi bi-shield-lock-fill"></i>
+        Administrator Access
+      </div>
+
+      <h1>Faculty Evaluation System</h1>
+
+      <p>
+        Manage user accounts, faculty records, evaluation scores, and system settings from one
+        secure workspace.
+      </p>
+
+      <div class="trust-list" aria-label="Administrator capabilities">
+        <div class="trust-item">
+          <i class="bi bi-person-check"></i>
+          <span>Role-protected admin access</span>
+        </div>
+
+        <div class="trust-item">
+          <i class="bi bi-database-check"></i>
+          <span>Centralized evaluation records</span>
+        </div>
+
+        <div class="trust-item">
+          <i class="bi bi-printer"></i>
+          <span>Ready-to-print reports</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="admin-login-panel" aria-labelledby="adminLoginTitle">
+    <div class="admin-login-card">
+      <div class="card-topbar"></div>
+
+      <div class="login-header">
+        <div class="login-icon" aria-hidden="true">
+          <i class="bi bi-person-lock"></i>
+        </div>
+
+        <div>
+          <p class="eyebrow">Restricted Area</p>
+          <h2 id="adminLoginTitle">Administrator Login</h2>
+          <span>Use your administrator credentials to continue.</span>
+        </div>
+      </div>
+
+      <form [formGroup]="adminForm" (ngSubmit)="onAdminSubmit()" class="login-form"
+        aria-label="Administrator login form">
+        <div class="form-group">
+          <label for="adminUsername">Username or Email</label>
+
+          <div class="input-wrapper"
+            [class.invalid]="adminFormControl.username.touched && adminFormControl.username.invalid">
+            <i class="bi bi-person input-icon"></i>
+
+            <input id="adminUsername" type="text" formControlName="username" class="form-control"
+              placeholder="Enter username or email" autocomplete="username" spellcheck="false" autocorrect="off"
+              autocapitalize="off" maxlength="40" aria-describedby="adminUsernameHelp" />
+          </div>
+
+          <div id="adminUsernameHelp" class="field-feedback">
+            @if (
+            adminFormControl.username.touched &&
+            adminFormControl.username.invalid
+            ) {
+            <span class="error-message">
+              @if (adminFormControl.username.errors?.['required']) {
+              Username is required.
+              }
+
+              @if (adminFormControl.username.errors?.['maxlength']) {
+              Username must be 40 characters or fewer.
+              }
+            </span>
+            } @else {
+            <span>Use the account assigned by the system administrator.</span>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="adminPassword">Password</label>
+
+          <div class="input-wrapper"
+            [class.invalid]="adminFormControl.password.touched && adminFormControl.password.invalid">
+            <i class="bi bi-lock input-icon"></i>
+
+            <input id="adminPassword" type="password" formControlName="password" class="form-control"
+              placeholder="Enter password" autocomplete="current-password" spellcheck="false" autocorrect="off"
+              autocapitalize="off" aria-describedby="adminPasswordHelp" (keydown)="detectCapsLock($event)"
+              (keyup)="detectCapsLock($event)" (blur)="isCapsLockOn = false" />
+          </div>
+
+          <div id="adminPasswordHelp" class="field-feedback">
+            @if (
+            adminFormControl.password.touched &&
+            adminFormControl.password.invalid
+            ) {
+            <span class="error-message">Password is required.</span>
+            } @else if (isCapsLockOn) {
+            <span class="capslock-warning">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              Caps Lock is on
+            </span>
+            } @else {
+            <span>Your session is protected with secure cookies.</span>
+            }
+          </div>
+        </div>
+
+        <button type="submit" class="login-btn" [disabled]="adminForm.invalid || (isLoading$ | async)">
+          @if (isLoading$ | async) {
+          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          <span>Signing in...</span>
+          } @else {
+          <i class="bi bi-box-arrow-in-right"></i>
+          <span>Sign In</span>
+          }
+        </button>
+      </form>
+
+      <div class="divider">
+        <span>or continue with</span>
+      </div>
+
+      <button type="button" class="google-login-btn" (click)="loginWithGoogle()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="google-icon">
+          <path fill="#FFC107"
+            d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z" />
+
+          <path fill="#FF3D00"
+            d="M6.3 14.7l6.6 4.8C14.7 16 19 13 24 13c3 0 5.7 1.1 7.8 2.9l5.7-5.7C34.1 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+
+          <path fill="#4CAF50"
+            d="M24 44c5.2 0 10-2 13.5-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.8-3.3-11.5-8l-6.5 5C9.3 39.6 16.1 44 24 44z" />
+
+          <path fill="#1976D2"
+            d="M43.6 20.5H42V20H24v8h11.3c-1.1 3-3.2 5.4-6 7l6.2 5.2C39.7 36.4 44 30.7 44 24c0-1.3-.1-2.3-.4-3.5z" />
+        </svg>
+
+        <span>Continue with Google</span>
+      </button>
+
+      <div class="support-row">
+        <a routerLink="/login">
+          Student or supervisor login
+        </a>
+
+        <span>Carlos Hilado Memorial State University</span>
+      </div>
+    </div>
+  </section>
+</main>

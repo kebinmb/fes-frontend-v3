@@ -1,5 +1,5 @@
 export const environment = {
-    production: false,
-    API_URL: "https://faculty-evaluation.chmsu.edu.ph/api",
-    oauth:"https://faculty-evaluation.chmsu.edu.ph/api/oauth2/authorization/google"
+  production: false,
+  API_URL: 'http://localhost:8090/api',
+  oauth: 'http://localhost:8090/api/oauth2/authorization/google',
 };

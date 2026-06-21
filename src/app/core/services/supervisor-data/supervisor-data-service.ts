@@ -83,8 +83,6 @@ export class SupervisorDataService {
   private http = inject(HttpClient);
 
   getFaculties(college: string, status: string): Observable<FacultyDTO[]> {
-    console.log('Service Running');
-
     const params = new HttpParams().set('college', college).set('status', status);
 
     return this.http.get<FacultyDTO[]>(`${this.FACULTY_API_URL}/list`, {

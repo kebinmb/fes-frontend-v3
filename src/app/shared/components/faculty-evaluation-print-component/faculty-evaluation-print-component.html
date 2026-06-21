@@ -179,27 +179,33 @@
   <!-- STUDENT COMMENTS -->
   <!-- ================================================= -->
 
-  <div class="section-title">D. Student Comments</div>
+  <div class="section-title">D. Student Feedback and Comments</div>
 
   <table>
     <thead>
       <tr>
         <th width="80">Seq</th>
 
-        <th>Student Comments</th>
+        <th>Student Feedback / Comments</th>
       </tr>
     </thead>
 
     <tbody>
-      @for (item of studentComments; track item.facultyEvaluationScoreId; let i = $index) {
-        <tr>
-          <td>
-            {{ i + 1 }}
-          </td>
+      @if (studentComments.length) {
+        @for (item of studentComments; track item.id; let i = $index) {
+          <tr>
+            <td>
+              {{ i + 1 }}
+            </td>
 
-          <td>
-            {{ item.studentComments }}
-          </td>
+            <td>
+              {{ item.comment }}
+            </td>
+          </tr>
+        }
+      } @else {
+        <tr>
+          <td colspan="2">No student feedback or comments recorded.</td>
         </tr>
       }
     </tbody>
@@ -209,27 +215,33 @@
   <!-- SUPERVISOR COMMENTS -->
   <!-- ================================================= -->
 
-  <div class="section-title">E. Supervisor Comments</div>
+  <div class="section-title">E. Supervisor Feedback and Comments</div>
 
   <table>
     <thead>
       <tr>
         <th width="80">Seq</th>
 
-        <th>Supervisor Comments</th>
+        <th>Supervisor Feedback / Comments</th>
       </tr>
     </thead>
 
     <tbody>
-      @for (item of supervisorComments; track item.facultyEvaluationScoreId; let i = $index) {
-        <tr>
-          <td>
-            {{ i + 1 }}
-          </td>
+      @if (supervisorComments.length) {
+        @for (item of supervisorComments; track item.id; let i = $index) {
+          <tr>
+            <td>
+              {{ i + 1 }}
+            </td>
 
-          <td>
-            {{ item.supervisorComments }}
-          </td>
+            <td>
+              {{ item.comment }}
+            </td>
+          </tr>
+        }
+      } @else {
+        <tr>
+          <td colspan="2">No supervisor feedback or comments recorded.</td>
         </tr>
       }
     </tbody>

@@ -12,7 +12,6 @@ export class SpinnerFacade {
     loading$ = this.store.select(selectLoading);
 
     showSpinner() {
-        console.log("Show spinner")
         this.store.dispatch(SpinnerActions.showSpinner());
     }
 

@@ -31,6 +31,12 @@ export interface FacultyEvaluationPrintRecord {
   studentComments?: string;
   supervisorComments?: string;
 }
+
+interface PrintCommentRow {
+  id: string;
+  comment: string;
+}
+
 @Component({
   selector: 'app-faculty-evaluation-print-component',
   imports: [],
@@ -92,13 +98,46 @@ export class FacultyEvaluationPrintComponent {
         : 0;
   }
 
-  get studentComments() {
-    return this.data.filter((item) => item.studentComments && item.studentComments !== '-');
+  get studentComments(): PrintCommentRow[] {
+    return this.collectUniqueComments('studentComments');
   }
 
-  get supervisorComments() {
-    return this.data.filter((item) => item.supervisorComments && item.supervisorComments !== '-');
+  get supervisorComments(): PrintCommentRow[] {
+    return this.collectUniqueComments('supervisorComments');
   }
+
+  private collectUniqueComments(
+    commentKey: 'studentComments' | 'supervisorComments',
+  ): PrintCommentRow[] {
+    const uniqueComments = new Map<string, string>();
+
+    this.data
+      .flatMap((item) => this.splitComments(item[commentKey]))
+      .forEach((comment) => {
+        const uniqueKey = comment.toLocaleLowerCase();
+
+        if (!uniqueComments.has(uniqueKey)) {
+          uniqueComments.set(uniqueKey, comment);
+        }
+      });
+
+    return Array.from(uniqueComments.values()).map((comment, index) => ({
+      id: `${commentKey}-${index}-${comment}`,
+      comment,
+    }));
+  }
+
+  private splitComments(comments: string | null | undefined): string[] {
+    if (!comments || comments.trim() === '-') {
+      return [];
+    }
+
+    return comments
+      .split(/\r?\n|(?:\s*\|\s*)|(?:\s*;\s*)|(?:\s*•\s*)/)
+      .map((comment) => comment.replace(/[ \t]+/g, ' ').trim())
+      .filter((comment) => comment && comment !== '-');
+  }
+
   cleanSubjectCode(subjectCode: string | null | undefined): string {
     return (
       subjectCode

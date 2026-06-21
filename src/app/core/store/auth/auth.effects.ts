@@ -76,7 +76,6 @@ export class AuthEffects {
         this.spinnerFacade.showSpinner();
 
         return this.authService.studentLogin(evaluatorId, accessCode).pipe(
-          tap((res) => console.log('LOGIN RESPONSE:', res)),
           map((response: any) => {
             this.spinnerFacade.hideSpinner();
             return AuthActions.studentLoginSuccess({
@@ -222,8 +221,6 @@ export class AuthEffects {
 
       exhaustMap(() =>
         this.authService.getCurrentUser().pipe(
-          tap((response) => console.log('CHECK AUTHENTICATION RESPONSE:', response)),
-
           map((response: any) => {
             const resolvedUserId =
               response.studentId ??
@@ -311,8 +308,6 @@ export class AuthEffects {
             }),
 
             catchError((error) => {
-              console.error(error);
-
               return EMPTY;
             }),
           ),

@@ -1,32 +1,50 @@
-export function extractErrorMessage(
-  err: any
-): string {
+type ErrorLike = {
+  status?: number;
+  error?: unknown;
+  message?: string;
+};
 
-  console.log(
-    'FULL HTTP ERROR',
-    err,
-  );
+function isErrorLike(value: unknown): value is ErrorLike {
+  return typeof value === 'object' && value !== null;
+}
 
+function readMessage(value: unknown): string | null {
+  if (!isErrorLike(value)) {
+    return null;
+  }
+
+  return typeof value.message === 'string' && value.message
+    ? value.message
+    : null;
+}
+
+export function extractErrorMessage(err: unknown): string {
   if (!err) {
     return 'Something went wrong';
   }
 
-  if (err?.status === 0) {
+  if (!isErrorLike(err)) {
+    return 'Something went wrong';
+  }
+
+  if (err.status === 0) {
     return 'Cannot connect to server';
   }
 
-  if (err?.error?.message) {
-    return err.error.message;
+  const nestedMessage = readMessage(err.error);
+
+  if (nestedMessage) {
+    return nestedMessage;
   }
 
-  if (typeof err?.error === 'string') {
+  if (typeof err.error === 'string') {
 
     try {
 
       const parsed =
         JSON.parse(err.error);
 
-      return parsed?.message || err.error;
+      return readMessage(parsed) || err.error;
 
     } catch {
 
@@ -34,7 +52,7 @@ export function extractErrorMessage(
     }
   }
 
-  switch (err?.status) {
+  switch (err.status) {
 
     case 400:
       return 'Bad request';
@@ -53,7 +71,7 @@ export function extractErrorMessage(
 
     default:
       return (
-        err?.message ||
+        readMessage(err) ||
         'Something went wrong'
       );
   }

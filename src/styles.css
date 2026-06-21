@@ -11,6 +11,20 @@
   --chmsu-surface: #ffffff;
   --chmsu-border: #e9ecef;
   --chmsu-muted: #6c757d;
+  --ui-text: #111827;
+  --ui-text-muted: #64748b;
+  --ui-border: #dbe3ea;
+  --ui-border-soft: #edf2f7;
+  --ui-surface: #ffffff;
+  --ui-surface-muted: #f8fafc;
+  --ui-danger: #b42318;
+  --ui-success: #167044;
+  --ui-radius-sm: 8px;
+  --ui-radius-md: 10px;
+  --ui-radius-lg: 14px;
+  --ui-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --ui-shadow-md: 0 10px 24px rgba(15, 23, 42, 0.08);
+  --ui-focus-ring: 0 0 0 3px rgba(24, 100, 67, 0.16);
 }
 
 @font-face {
@@ -29,4 +43,138 @@
 body {
   min-height: 100vh;
   font-family: 'Optima', sans-serif !important;
+  color: var(--ui-text);
+  background: var(--chmsu-bg);
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
+  box-shadow: var(--ui-focus-ring);
+}
+
+.modern-card,
+.ui-card {
+  border: 1px solid var(--ui-border-soft);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow-sm);
+}
+
+.modern-table tbody tr {
+  transition:
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.modern-table tbody tr:hover {
+  background: #fbfdfc;
+}
+
+.empty-state {
+  padding: 3rem 1rem !important;
+  color: var(--ui-text-muted) !important;
+  text-align: center;
+}
+
+.empty-state::before {
+  content: attr(data-empty-title);
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--ui-text);
+  font-weight: 700;
+}
+
+.empty-state:not([data-empty-title])::before {
+  content: 'No data';
+}
+
+.status-badge,
+.role-badge,
+.college-badge,
+.id-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ui-btn-primary,
+.edit-btn,
+.save-btn,
+.create-btn {
+  border: 1px solid var(--chmsu-primary) !important;
+  background: var(--chmsu-primary) !important;
+  color: #ffffff !important;
+}
+
+.ui-btn-primary:hover,
+.edit-btn:hover,
+.save-btn:hover,
+.create-btn:hover {
+  background: var(--chmsu-primary-dark) !important;
+  border-color: var(--chmsu-primary-dark) !important;
+}
+
+.ui-btn-secondary,
+.single-print-btn,
+.cancel-btn,
+.pagination-btn {
+  border: 1px solid var(--ui-border) !important;
+  background: #ffffff !important;
+  color: #243142 !important;
+}
+
+.ui-btn-secondary:hover,
+.single-print-btn:hover,
+.cancel-btn:hover,
+.pagination-btn:hover {
+  background: var(--ui-surface-muted) !important;
+}
+
+.ui-btn-primary:disabled,
+.ui-btn-secondary:disabled,
+.edit-btn:disabled,
+.save-btn:disabled,
+.create-btn:disabled,
+.single-print-btn:disabled,
+.cancel-btn:disabled,
+.pagination-btn:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.55 !important;
+}
+
+.form-group small.text-danger,
+.field-error {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--ui-danger) !important;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

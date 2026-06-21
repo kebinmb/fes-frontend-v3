@@ -1,77 +1,123 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './core/features/components/login-component/login-component';
-import { authGuard } from './utilities/guards/auth/auth-guard';
-import { StudentDashboardComponent } from './core/features/components/dashboards/student-dashboard-component/student-dashboard-component';
-import { roleGuard } from './utilities/guards/role/role-guard';
-import { SupervisorDashboardComponent } from './core/features/components/dashboards/supervisor-dashboard-component/supervisor-dashboard-component';
-import { AdminDashboardComponent } from './core/features/components/dashboards/admin-dashboard-component/admin-dashboard-component';
-import { EvaluationFormComponent } from './core/features/components/evaluation-form-component/evaluation-form-component';
-import { LoginAdminComponent } from './core/features/components/login-admin-component/login-admin-component';
-import { FacultyDataTableComponent } from './core/features/components/faculty-data-table-component/faculty-data-table-component';
-import { FacultyEvaluationScoresDataTableComponent } from './core/features/components/faculty-evaluation-scores-data-table-component/faculty-evaluation-scores-data-table-component';
-import { UserAccountsDataTableComponent } from './core/features/components/user-accounts-data-table-component/user-accounts-data-table-component';
-import { guestGuard } from './utilities/guards/guest/guest-guard';
-import { SettingsComponent } from './core/features/components/settings-component/settings-component';
-import { OauthSuccessComponent } from './shared/components/oauth-success-component/oauth-success-component';
-import { StudentEvaluationsDataTableComponent } from './core/features/components/student-evaluations-data-table/student-evaluations-data-table-component';
-import { FacultyEvaluationPrintComponent } from './shared/components/faculty-evaluation-print-component/faculty-evaluation-print-component';
-import { StudentEvaluationListComponent } from './core/features/components/student-evaluation-list-component/student-evaluation-list-component';
-import { StudentEvaluationListPrintComponent } from './shared/components/student-evaluation-list-print-component/student-evaluation-list-print-component';
+import { authGuard } from '@utilities/guards/auth/auth-guard';
+import { guestGuard } from '@utilities/guards/guest/guest-guard';
+import { roleGuard } from '@utilities/guards/role/role-guard';
 
 export const routes: Routes = [
   {
     path: 'oauth-success',
-    component: OauthSuccessComponent,
+    loadComponent: () =>
+      import('@shared/components/oauth-success-component/oauth-success-component').then(
+        (m) => m.OauthSuccessComponent,
+      ),
   },
   {
     path: 'login',
-    component: LoginComponent,
+    loadComponent: () =>
+      import('@features/auth/login/login-component').then((m) => m.LoginComponent),
     canActivate: [guestGuard],
   },
   {
     path: 'admin',
-    component: LoginAdminComponent,
+    loadComponent: () =>
+      import('@features/auth/login-admin/login-admin-component').then(
+        (m) => m.LoginAdminComponent,
+      ),
     canActivate: [guestGuard],
   },
   {
     path: 'student-dashboard',
-    component: StudentDashboardComponent,
+    loadComponent: () =>
+      import('@features/student/pages/student-dashboard/student-dashboard-component').then(
+        (m) => m.StudentDashboardComponent,
+      ),
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_STUDENT' },
   },
   {
     path: 'supervisor-dashboard',
-    component: SupervisorDashboardComponent,
+    loadComponent: () =>
+      import(
+        '@features/supervisor/pages/supervisor-dashboard/supervisor-dashboard-component'
+      ).then((m) => m.SupervisorDashboardComponent),
     canActivate: [authGuard, roleGuard],
-    data: { role: ['ROLE_DEAN', 'ROLE_PROGRAM_CHAIR'] }
+    data: { role: ['ROLE_DEAN', 'ROLE_PROGRAM_CHAIR'] },
   },
   {
     path: 'evaluation-form',
-    component: EvaluationFormComponent,
+    loadComponent: () =>
+      import('@features/evaluation/pages/evaluation-form/evaluation-form-component').then(
+        (m) => m.EvaluationFormComponent,
+      ),
     canActivate: [authGuard],
   },
   {
     path: 'admin-dashboard',
-    component: AdminDashboardComponent,
+    loadComponent: () =>
+      import('@features/admin/pages/admin-dashboard/admin-dashboard-component').then(
+        (m) => m.AdminDashboardComponent,
+      ),
     canActivate: [authGuard, roleGuard],
     data: { role: 'ROLE_ADMIN' },
     children: [
-      { path: 'faculty-list', component: FacultyDataTableComponent },
-      { path: 'evaluation-score-list', component: FacultyEvaluationScoresDataTableComponent },
-      { path: 'user-accounts', component: UserAccountsDataTableComponent },
-      { path: 'student-evaluations', component: StudentEvaluationsDataTableComponent },
-      { path: 'student-evaluation-list', component: StudentEvaluationListComponent },
-      { path: 'settings', component: SettingsComponent },
+      {
+        path: 'faculty-list',
+        loadComponent: () =>
+          import(
+            '@features/admin/components/faculty-data-table/faculty-data-table-component'
+          ).then((m) => m.FacultyDataTableComponent),
+      },
+      {
+        path: 'evaluation-score-list',
+        loadComponent: () =>
+          import(
+            '@features/admin/components/faculty-evaluation-scores-data-table/faculty-evaluation-scores-data-table-component'
+          ).then((m) => m.FacultyEvaluationScoresDataTableComponent),
+      },
+      {
+        path: 'user-accounts',
+        loadComponent: () =>
+          import(
+            '@features/admin/components/user-accounts-data-table/user-accounts-data-table-component'
+          ).then((m) => m.UserAccountsDataTableComponent),
+      },
+      {
+        path: 'student-evaluations',
+        loadComponent: () =>
+          import(
+            '@features/admin/components/student-evaluations-data-table/student-evaluations-data-table-component'
+          ).then((m) => m.StudentEvaluationsDataTableComponent),
+      },
+      {
+        path: 'student-evaluation-list',
+        loadComponent: () =>
+          import(
+            '@features/admin/components/student-evaluation-list/student-evaluation-list-component'
+          ).then((m) => m.StudentEvaluationListComponent),
+      },
+      {
+        path: 'settings',
+        loadComponent: () =>
+          import('@features/admin/components/settings/settings-component').then(
+            (m) => m.SettingsComponent,
+          ),
+      },
     ],
   },
   {
     path: 'print/faculty-evaluation',
-    component: FacultyEvaluationPrintComponent,
+    loadComponent: () =>
+      import('@shared/components/faculty-evaluation-print-component/faculty-evaluation-print-component').then(
+        (m) => m.FacultyEvaluationPrintComponent,
+      ),
   },
   {
     path: 'print/student-evaluation',
 
-    component: StudentEvaluationListPrintComponent,
+    loadComponent: () =>
+      import(
+        '@shared/components/student-evaluation-list-print-component/student-evaluation-list-print-component'
+      ).then((m) => m.StudentEvaluationListPrintComponent),
   },
   {
     path: '',

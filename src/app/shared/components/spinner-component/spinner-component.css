@@ -7,16 +7,35 @@
   align-items: center;
   justify-content: center;
 
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(15, 23, 42, 0.36);
   backdrop-filter: blur(4px); 
 
   z-index: 9999;
+}
+
+.spinner-panel {
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+
+  padding: 1.25rem 1.5rem;
+
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.94);
+
+  color: var(--chmsu-primary-dark);
+  font-weight: 700;
+
+  box-shadow: var(--ui-shadow-md);
 }
 
 .spinner-border {
   width: 3rem;
   height: 3rem;
   border-width: 0.35em;
+  color: var(--chmsu-primary);
 
   animation: spinner-grow-smooth 0.8s linear infinite;
 }

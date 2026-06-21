@@ -7,6 +7,7 @@
 <aside
   class="admin-sidebar"
   [class.mobile-open]="sidebarService.sidebarOpen()"
+  aria-label="Administrator navigation"
 >
 
   <!-- HEADER -->
@@ -37,99 +38,115 @@
   <!-- BODY -->
   <div class="sidebar-body">
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="Primary navigation">
 
-      <a
-        class="nav-item"
-        routerLink="/admin-dashboard"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        (click)="closeSidebar()"
-      >
-        <i class="bi bi-grid-1x2-fill"></i>
+      <div class="nav-section">
+        <span class="nav-section-label">Overview</span>
 
-        <span>
-          Dashboard
-        </span>
-      </a>
+        <a
+          class="nav-item"
+          routerLink="/admin-dashboard"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-grid-1x2-fill"></i>
 
-      <a
-        class="nav-item"
-        routerLink="/admin-dashboard/faculty-list"
-        routerLinkActive="active"
-        (click)="closeSidebar()"
-      >
-        <i class="bi bi-person-workspace"></i>
+          <span>
+            Dashboard
+          </span>
+        </a>
+      </div>
 
-        <span>
-          Faculty List
-        </span>
-      </a>
+      <div class="nav-section">
+        <span class="nav-section-label">Management</span>
 
-      <a
-        class="nav-item"
-        routerLink="/admin-dashboard/user-accounts"
-        routerLinkActive="active"
-        (click)="closeSidebar()"
-      >
-        <i class="bi bi-people-fill"></i>
+        <a
+          class="nav-item"
+          routerLink="/admin-dashboard/faculty-list"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-person-workspace"></i>
 
-        <span>
-          User Accounts
-        </span>
-      </a>
+          <span>
+            Faculty
+          </span>
+        </a>
 
-      <a
-        class="nav-item"
-        routerLink="/admin-dashboard/evaluation-score-list"
-        routerLinkActive="active"
-        (click)="closeSidebar()"
-      >
-        <i class="bi bi-clipboard-data"></i>
+        <a
+          class="nav-item"
+          routerLink="/admin-dashboard/user-accounts"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-people-fill"></i>
 
-        <span>
-          Evaluation Scores
-        </span>
-      </a>
+          <span>
+            User Accounts
+          </span>
+        </a>
+      </div>
 
-      <a
-        class="nav-item"
-        routerLink="/admin-dashboard/student-evaluations"
-        routerLinkActive="active"
-        (click)="closeSidebar()"
-      >
-        <i class="bi bi-journal-check"></i>
+      <div class="nav-section">
+        <span class="nav-section-label">Evaluations</span>
 
-        <span>
-          Student Evaluation Scores
-        </span>
-      </a>
+        <a
+          class="nav-item"
+          routerLink="/admin-dashboard/evaluation-score-list"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-clipboard-data"></i>
 
-      <a
-        class="nav-item"
-        routerLink="/admin-dashboard/student-evaluation-list"
-        routerLinkActive="active"
-        (click)="closeSidebar()"
-      >
-        <i class="bi bi-table"></i>
+          <span>
+            Faculty Scores
+          </span>
+        </a>
 
-        <span>
-          Student Evaluation List
-        </span>
-      </a>
+        <a
+          class="nav-item"
+          routerLink="/admin-dashboard/student-evaluations"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-journal-check"></i>
 
-      <a
-        class="nav-item"
-        routerLink="/admin-dashboard/settings"
-        routerLinkActive="active"
-        (click)="closeSidebar()"
-      >
-        <i class="bi bi-gear-fill"></i>
+          <span>
+            Student Scores
+          </span>
+        </a>
 
-        <span>
-          Settings
-        </span>
-      </a>
+        <a
+          class="nav-item"
+          routerLink="/admin-dashboard/student-evaluation-list"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-table"></i>
+
+          <span>
+            Student List
+          </span>
+        </a>
+      </div>
+
+      <div class="nav-section nav-section-bottom">
+        <span class="nav-section-label">System</span>
+
+        <a
+          class="nav-item"
+          routerLink="/admin-dashboard/settings"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-gear-fill"></i>
+
+          <span>
+            Settings
+          </span>
+        </a>
+      </div>
 
     </nav>
 

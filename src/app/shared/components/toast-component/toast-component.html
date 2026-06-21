@@ -1,4 +1,8 @@
-<div class="toast-container position-fixed top-0 end-0 p-3">
+<div
+  class="toast-container position-fixed top-0 end-0 p-3"
+  aria-live="polite"
+  aria-atomic="true"
+>
 
   @if (toasts$ | async; as toasts) {
 
@@ -6,19 +10,29 @@
 
       <div 
         class="toast show custom-toast"
+        role="status"
         [ngClass]="{
-          'bg-success text-white': toast.toastType === 'success',
-          'bg-danger text-white': toast.toastType === 'error'
+          'toast-success': toast.toastType === 'success',
+          'toast-error': toast.toastType === 'error'
         }"
       >
         <div class="toast-content">
+          <i
+            class="toast-icon bi"
+            [ngClass]="{
+              'bi-check-circle-fill': toast.toastType === 'success',
+              'bi-exclamation-circle-fill': toast.toastType === 'error'
+            }"
+          ></i>
+
           <span class="toast-message">
             {{ toast.message }}
           </span>
 
           <button
             type="button"
-            class="btn-close btn-close-white"
+            class="btn-close"
+            aria-label="Dismiss notification"
             (click)="remove(toast.id)">
           </button>
         </div>

@@ -1,5 +1,13 @@
 @if (loading$ | async) {
-<div class="spinner-overlay">
-    <div class="spinner-border text-warning"></div>
+<div
+  class="spinner-overlay"
+  role="status"
+  aria-live="polite"
+  aria-label="Loading"
+>
+    <div class="spinner-panel">
+      <div class="spinner-border"></div>
+      <span>Loading...</span>
+    </div>
 </div>
 }

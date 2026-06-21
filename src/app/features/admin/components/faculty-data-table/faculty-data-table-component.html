@@ -1,0 +1,285 @@
+@let facultiesData = faculties$ | async;
+<section class="modern-card">
+  <div class="card-topbar"></div>
+  <!-- HEADER -->
+  <div class="modern-card-header">
+    <div class="header-content">
+      <h2>
+        Faculty List
+      </h2>
+      <span>
+        Faculty records overview
+      </span>
+      <form class="search-wrapper" role="search" (ngSubmit)="onSearch()">
+        <label class="visually-hidden" for="facultySearch">
+          Search faculty
+        </label>
+        <div class="search-field">
+          <i class="bi bi-search"></i>
+          <input
+            id="facultySearch"
+            type="search"
+            class="search-input"
+            placeholder="Search by name, ID, college..."
+            [(ngModel)]="searchTerm"
+            name="facultySearch"
+            (ngModelChange)="onSearchChange($event)"
+          />
+        </div>
+        <button type="submit" class="edit-btn">
+          Search
+        </button>
+      </form>
+    </div>
+    <div class="table-count" aria-label="Total faculty records">
+      <strong>{{ facultiesData?.totalElements ?? 0 }}</strong>
+      <span>records</span>
+    </div>
+  </div>
+  <!-- TABLE -->
+  <div class="table-responsive">
+    <table class="table modern-table align-middle mb-0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Faculty Name</th>
+          <th>Position</th>
+          <th>College</th>
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (facultiesData?.content?.length) {
+        @for (faculty of facultiesData?.content; track faculty.facultyId) {
+        <tr>
+          <td data-label="ID">
+            <span class="id-badge">
+              #{{ faculty.facultyId }}
+            </span>
+          </td>
+          <td data-label="Faculty Name">
+            <div class="table-user">
+              <div class="table-avatar">
+                {{ faculty.firstname.charAt(0) }}
+              </div>
+              <div class="fw-semibold">
+                {{ faculty.firstname }}
+                {{ faculty.lastname }}
+              </div>
+            </div>
+          </td>
+          <td data-label="Position">
+            {{ faculty.position }}
+          </td>
+          <td data-label="College">
+            <span class="college-badge">
+              {{ faculty.college }}
+            </span>
+          </td>
+          <td data-label="Actions">
+            <div class="action-group">
+              <button
+                type="button"
+                class="edit-btn"
+                [attr.aria-label]="'Edit ' + faculty.firstname + ' ' + faculty.lastname"
+                (click)="openEditModal(faculty)"
+              >
+                <i class="bi bi-pencil-square"></i>
+                Edit
+              </button>
+              <button
+                type="button"
+                class="single-print-btn"
+                [attr.aria-label]="'Print evaluation report for ' + faculty.firstname + ' ' + faculty.lastname"
+                (click)="printSingle({
+                      facultyEvaluationScoreId: 0,
+                      facultyId: faculty.facultyId,
+                      facultyName: faculty.firstname + ' ' + faculty.lastname,
+                      college: faculty.college,
+                      position: faculty.position,
+                      classCode: '',
+                      overallAverageScore: 0
+                    })">
+                <i class="bi bi-printer"></i>
+                <span>
+                  Print
+                </span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+        } @else {
+        <tr>
+          <td colspan="5" class="empty-state" data-empty-title="No faculties found">
+            Try adjusting the search term or clearing the filter.
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <!-- FOOTER -->
+  <div class="modern-card-footer">
+    <small>
+      Showing
+      {{ facultiesData?.content?.length ?? 0 }}
+      of
+      {{ facultiesData?.totalElements ?? 0 }}
+      faculty records
+    </small>
+    <div class="pagination-group">
+      <button class="pagination-btn" [disabled]="(facultiesData?.page ?? 0) === 0"
+        (click)="onFacultyPageChange((facultiesData?.page ?? 0) - 1)">
+        Prev
+      </button>
+      <span class="pagination-info">
+        Page
+        {{ (facultiesData?.page ?? 0) + 1 }}
+        of
+        {{ facultiesData?.totalPages ?? 1 }}
+      </span>
+      <button class="pagination-btn" [disabled]="(facultiesData?.page ?? 0) >= (facultiesData?.totalPages ?? 1) - 1"
+        (click)="onFacultyPageChange((facultiesData?.page ?? 0) + 1)">
+        Next
+      </button>
+    </div>
+  </div>
+</section>
+@if (selectedFaculty) {
+<div class="modal-backdrop">
+
+  <div class="edit-modal">
+
+    <!-- TOP BAR -->
+    <div class="modal-topbar"></div>
+
+    <!-- HEADER -->
+    <div class="modal-header">
+
+      <div class="modal-title-group">
+        <h2>
+          Edit Faculty
+        </h2>
+
+        <p>
+          Update faculty profile information
+        </p>
+      </div>
+
+      <button type="button" class="close-btn" (click)="closeEditModal()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+
+    </div>
+
+    <!-- FORM -->
+    <form [formGroup]="facultyForm" (ngSubmit)="updateFaculty()" class="modal-form">
+
+      <div class="form-grid">
+
+        <!-- FACULTY ID -->
+        <div class="form-group">
+          <label>
+            Faculty ID
+          </label>
+
+          <input type="text" formControlName="facultyId" placeholder="Enter faculty ID" />
+        </div>
+
+        <!-- FIRSTNAME -->
+        <div class="form-group">
+          <label>
+            Firstname
+          </label>
+
+          <input type="text" formControlName="firstname" placeholder="Enter firstname" />
+        </div>
+
+        <!-- MIDDLENAME -->
+        <div class="form-group">
+          <label>
+            Middlename
+          </label>
+
+          <input type="text" formControlName="middlename" placeholder="Enter middlename" />
+        </div>
+
+        <!-- LASTNAME -->
+        <div class="form-group">
+          <label>
+            Lastname
+          </label>
+
+          <input type="text" formControlName="lastname" placeholder="Enter lastname" />
+        </div>
+
+        <!-- POSITION -->
+        <div class="form-group">
+          <label>
+            Position
+          </label>
+
+          <input type="text" formControlName="position" placeholder="Enter position" />
+        </div>
+
+        <!-- LOAD LIMIT -->
+        <div class="form-group">
+          <label>
+            Load Limit
+          </label>
+
+          <input type="number" formControlName="loadLimit" placeholder="Enter load limit" />
+        </div>
+
+        <!-- COLLEGE -->
+        <div class="form-group">
+          <label>
+            College
+          </label>
+
+          <input type="text" formControlName="college" placeholder="Enter college" />
+        </div>
+
+        <!-- STATUS -->
+        <div class="form-group">
+          <label>
+            Status
+          </label>
+
+          <select formControlName="status">
+            <option value="ACTIVE">
+              ACTIVE
+            </option>
+
+            <option value="INACTIVE">
+              INACTIVE
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="modal-actions">
+
+        <button type="button" class="cancel-btn" (click)="closeEditModal()">
+          Cancel
+        </button>
+
+        <button type="submit" class="save-btn">
+          <i class="bi bi-check-circle-fill"></i>
+
+          <span>
+            Update Faculty
+          </span>
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+}
