@@ -1,5 +1,11 @@
-<div class="custom-modal-backdrop">
-  <div class="custom-modal">
+<div class="custom-modal-backdrop" (click)="closeModal()">
+  <div
+    class="custom-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="facultyEvaluationModalTitle"
+    (click)="$event.stopPropagation()"
+  >
     <!-- HEADER -->
     <div class="modal-profile-wrapper">
       <div class="modal-profile">
@@ -10,7 +16,7 @@
         <div class="modal-profile-content">
           <div class="modal-badge">Faculty Evaluation</div>
 
-          <h4 class="modal-title">
+          <h4 class="modal-title" id="facultyEvaluationModalTitle">
             {{ faculty!.firstname }}
             {{ faculty!.lastname }}
           </h4>

@@ -176,10 +176,6 @@
    LOADING
 ========================= */
 
-.spinner-border {
-  color: var(--chmsu-primary);
-}
-
 /* =========================
    ALERT
 ========================= */
@@ -209,6 +205,7 @@
 .category-card,
 .comments-card,
 .rating-guide-card,
+.completion-card,
 .submit-section {
   overflow: hidden;
 
@@ -258,6 +255,7 @@
 
 .class-info-card,
 .rating-guide-card,
+.completion-card,
 .category-card,
 .comments-card,
 .submit-section {
@@ -272,6 +270,10 @@
 
 .rating-guide-card {
   animation-delay: 0.08s;
+}
+
+.completion-card {
+  animation-delay: 0.1s;
 }
 
 .category-card:nth-of-type(1) {
@@ -341,6 +343,7 @@
 
 .class-info-card,
 .rating-guide-card,
+.completion-card,
 .category-card,
 .comments-card,
 .submit-section {
@@ -399,6 +402,7 @@
   .page-enter-animation,
   .class-info-card,
   .rating-guide-card,
+  .completion-card,
   .category-card,
   .comments-card,
   .submit-section {
@@ -407,6 +411,7 @@
 
   .class-info-card:hover,
   .rating-guide-card:hover,
+  .completion-card:hover,
   .category-card:hover,
   .comments-card:hover {
     transform: none;
@@ -498,6 +503,64 @@
 
 .rating-guide-card {
   padding: 2rem;
+}
+
+.completion-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.45rem 1.65rem;
+}
+
+.completion-eyebrow {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--chmsu-primary);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.completion-card h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.completion-card p {
+  margin: 0.35rem 0 0;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+}
+
+.completion-meter {
+  min-width: min(320px, 45%);
+  display: grid;
+  gap: 0.5rem;
+}
+
+.completion-meter-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-muted);
+}
+
+.completion-meter-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--chmsu-primary);
+  transition: width 0.18s ease;
+}
+
+.completion-meter span {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: right;
 }
 
 .guide-title {
@@ -789,6 +852,7 @@
   .category-card-body,
   .comments-card-body,
   .rating-guide-card,
+  .completion-card,
   .submit-section {
     padding: 1.4rem;
   }
@@ -804,6 +868,15 @@
 
   .info-card {
     padding: 0.9rem;
+  }
+
+  .completion-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .completion-meter {
+    min-width: 100%;
   }
 }
 
@@ -830,6 +903,7 @@
   .category-card-body,
   .comments-card-body,
   .rating-guide-card,
+  .completion-card,
   .submit-section {
     padding: 1rem;
   }

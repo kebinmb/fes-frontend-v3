@@ -13,7 +13,7 @@ import {
   EvaluationCriteria,
   SubjectEvaluationDTO,
 } from '@core/services/evaluation/evaluation-service';
-import { ConfirmationModalComponent } from "@shared/components/confirmation-modal-component/confirmation-modal-component";
+import { ConfirmationModalComponent } from '@shared/components/confirmation-modal-component/confirmation-modal-component';
 
 export type UserRole = 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN' | 'ROLE_PROGRAM_CHAIR';
 
@@ -72,6 +72,8 @@ export class EvaluationFormComponent {
 
   evaluationForm: FormGroup = this.fb.group({});
   showSubmitConfirmation = false;
+  showCancelConfirmation = false;
+
   constructor() {
     effect(() => {
       const categories = this.categories();
@@ -125,7 +127,6 @@ export class EvaluationFormComponent {
           }
         }
 
-        // ✅ NO redundant supervisor select
       });
   }
 
@@ -162,6 +163,33 @@ export class EvaluationFormComponent {
     this.showSubmitConfirmation = false;
 
   }
+
+  requestCancel(): void {
+
+    if (this.evaluationForm.dirty) {
+
+      this.showCancelConfirmation = true;
+      return;
+
+    }
+
+    this.navigateBack();
+
+  }
+
+  confirmCancel(): void {
+
+    this.showCancelConfirmation = false;
+    this.navigateBack();
+
+  }
+
+  closeCancelConfirmation(): void {
+
+    this.showCancelConfirmation = false;
+
+  }
+
   private mapFormToDTO(formValue: any): SubjectEvaluationDTO {
     const ratings: Record<string, string> = {};
 
@@ -185,21 +213,55 @@ export class EvaluationFormComponent {
     };
   }
 
-  cancel() {
-    if (confirm('Are you sure you want to cancel? Your progress will be lost.')) {
-      const role = this.role();
+  totalRequiredCount(): number {
 
-      if (
-        role === 'ROLE_DEAN' ||
-        role === 'ROLE_PROGRAM_CHAIR'
-      ) {
-        this.router.navigate(['/supervisor-dashboard']);
-      } else if (role === 'ROLE_STUDENT') {
-        this.router.navigate(['/student-dashboard']);
-      } else {
-        this.router.navigate(['/login']);
-      }
+    return this.categories().reduce(
+      (total, category) => total + category.criteria.length,
+      1,
+    );
+
+  }
+
+  completedRequiredCount(): number {
+
+    const ratedCriteria = this.categories().reduce((total, category) => {
+      const completedInCategory = category.criteria.filter((criteria) =>
+        !!this.evaluationForm.get(criteria.name)?.value,
+      ).length;
+
+      return total + completedInCategory;
+    }, 0);
+
+    const hasComments =
+      !!this.evaluationForm.get('comments')?.value?.trim();
+
+    return ratedCriteria + (hasComments ? 1 : 0);
+
+  }
+
+  remainingRequiredCount(): number {
+
+    return Math.max(
+      this.totalRequiredCount() - this.completedRequiredCount(),
+      0,
+    );
+
+  }
+
+  completionPercent(): number {
+
+    const total = this.totalRequiredCount();
+
+    if (!total) {
+
+      return 0;
+
     }
+
+    return Math.round(
+      (this.completedRequiredCount() / total) * 100,
+    );
+
   }
 
   isFieldInvalid(fieldName: string): boolean {
@@ -211,5 +273,22 @@ export class EvaluationFormComponent {
     Object.values(this.evaluationForm.controls).forEach((control) => {
       control.markAsTouched();
     });
+  }
+
+  private navigateBack(): void {
+
+    const role = this.role();
+
+    if (
+      role === 'ROLE_DEAN' ||
+      role === 'ROLE_PROGRAM_CHAIR'
+    ) {
+      this.router.navigate(['/supervisor-dashboard']);
+    } else if (role === 'ROLE_STUDENT') {
+      this.router.navigate(['/student-dashboard']);
+    } else {
+      this.router.navigate(['/login']);
+    }
+
   }
 }

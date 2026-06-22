@@ -3,7 +3,11 @@
     <div class="container-fluid px-4">
       <div class="d-flex align-items-center">
         <div class="logo-container me-3">
-          <img src="chmsu-logo.png" class="logo-image-small" />
+          <img
+            src="chmsu-logo.png"
+            alt="Carlos Hilado Memorial State University logo"
+            class="logo-image-small"
+          />
         </div>
         <div class="brand-text">
           <div class="university-name">Carlos Hilado Memorial State University</div>
@@ -22,7 +26,7 @@
           : 'View Completed Evaluations'
           }}
         </button>
-        <button class="btn-logout-navbar" (click)="logout()">
+        <button type="button" class="btn-logout-navbar" (click)="logout()">
           <i class="bi bi-box-arrow-right me-2"></i>
           Logout
         </button>
@@ -81,8 +85,8 @@
       </div>
     </section>
     @if (loading$ | async) {
-    <div class="loading-state">
-      <div class="spinner-border spinner-lg"></div>
+    <div class="ui-loading-state">
+      <span class="ui-spinner ui-spinner-lg" aria-hidden="true"></span>
       <p>Loading faculty data...</p>
     </div>
     }
@@ -143,7 +147,11 @@
               <span class="faculty-active-badge"> ACTIVE </span>
             </td>
             <td>
-              <button class="btn btn-primary btn-evaluate-table" (click)="openFacultyConfirmation(faculty)">
+              <button
+                type="button"
+                class="btn btn-primary btn-evaluate-table"
+                (click)="openFacultyConfirmation(faculty)"
+              >
                 <i class="bi bi-clipboard-check me-2"></i>
                 Evaluate
               </button>
@@ -156,22 +164,22 @@
     @if (pagination$ | async; as pagination) {
     @if (pagination.totalPages > 1) {
     <div class="pagination-wrapper" *ngIf="pagination.totalPages > 1">
-      <button class="btn btn-pagination" [disabled]="currentPage === 0" (click)="goToPage(0)">
+      <button type="button" class="btn btn-pagination" [disabled]="currentPage === 0" (click)="goToPage(0)">
         <i class="bi bi-chevron-double-left"></i>
       </button>
-      <button class="btn btn-pagination" [disabled]="currentPage === 0" (click)="previousPage()">
+      <button type="button" class="btn btn-pagination" [disabled]="currentPage === 0" (click)="previousPage()">
         <i class="bi bi-chevron-left"></i>
       </button>
       @for (page of getPageNumbers(pagination.totalPages); track page) {
-      <button class="btn btn-pagination" [class.active-page]="currentPage === page" (click)="goToPage(page)">
+      <button type="button" class="btn btn-pagination" [class.active-page]="currentPage === page" (click)="goToPage(page)">
         {{ page + 1 }}
       </button>
       }
-      <button class="btn btn-pagination" [disabled]="currentPage + 1 >= pagination.totalPages"
+      <button type="button" class="btn btn-pagination" [disabled]="currentPage + 1 >= pagination.totalPages"
         (click)="nextPage(pagination.totalPages)">
         <i class="bi bi-chevron-right"></i>
       </button>
-      <button class="btn btn-pagination" [disabled]="currentPage + 1 >= pagination.totalPages"
+      <button type="button" class="btn btn-pagination" [disabled]="currentPage + 1 >= pagination.totalPages"
         (click)="goToPage(pagination.totalPages - 1)">
         <i class="bi bi-chevron-double-right"></i>
       </button>

@@ -130,6 +130,7 @@
     <div class="pagination-group">
       <!-- PREVIOUS -->
       <button
+        type="button"
         class="pagination-btn warning-btn"
         [disabled]="(scoresData?.page ?? 0) === 0"
         (click)="onUserPageChange((scoresData?.page ?? 0) - 1)"
@@ -152,6 +153,7 @@
       </span>
       <!-- NEXT -->
       <button
+        type="button"
         class="pagination-btn warning-btn"
         [disabled]="
           (scoresData?.page ?? 0) + 1 >=

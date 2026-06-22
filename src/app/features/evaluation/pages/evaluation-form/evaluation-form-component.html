@@ -11,7 +11,7 @@
           <div class="system-name">Faculty Evaluation System</div>
         </div>
       </div>
-      <button class="btn btn-outline-light btn-sm" (click)="cancel()">
+      <button type="button" class="btn btn-outline-light btn-sm" (click)="requestCancel()">
         <i class="bi bi-arrow-left me-1"></i>
         Back to Dashboard
       </button>
@@ -20,11 +20,11 @@
 
   <!-- Loading State -->
   @if (isLoading()) {
-    <div class="container-fluid px-4 py-5 text-center">
-      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem">
-        <span class="visually-hidden">Loading...</span>
+    <div class="container-fluid px-4 py-5">
+      <div class="ui-loading-state" role="status" aria-live="polite">
+        <span class="ui-spinner ui-spinner-lg" aria-hidden="true"></span>
+        <p>Checking evaluation status...</p>
       </div>
-      <p class="mt-3 text-muted">Checking evaluation status...</p>
     </div>
   }
 
@@ -35,7 +35,7 @@
         <i class="bi bi-exclamation-triangle-fill" style="font-size: 3rem"></i>
         <h4 class="mt-3">Already Evaluated</h4>
         <p>You have already submitted an evaluation for this faculty member in this subject.</p>
-        <button class="btn btn-primary mt-2" (click)="cancel()">
+        <button type="button" class="btn btn-primary mt-2" (click)="requestCancel()">
           <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
         </button>
       </div>
@@ -110,6 +110,28 @@
               </div>
             </div>
           }
+        </div>
+      </div>
+
+      <div class="completion-card mb-4" aria-label="Evaluation completion progress">
+        <div>
+          <span class="completion-eyebrow">Form Progress</span>
+          <h3>{{ completionPercent() }}% complete</h3>
+          <p>
+            {{
+              remainingRequiredCount() === 0
+                ? 'All required responses are complete.'
+                : remainingRequiredCount() + ' required response(s) remaining.'
+            }}
+          </p>
+        </div>
+
+        <div class="completion-meter" aria-hidden="true">
+          <div class="completion-meter-track">
+            <div class="completion-meter-fill" [style.width.%]="completionPercent()"></div>
+          </div>
+
+          <span>{{ completedRequiredCount() }} / {{ totalRequiredCount() }}</span>
         </div>
       </div>
 
@@ -199,7 +221,7 @@
             [disabled]="isSubmitting() || evaluationForm.invalid"
           >
             @if (isSubmitting()) {
-              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              <span class="ui-spinner ui-spinner-inline ui-spinner-on-dark me-2" aria-hidden="true"></span>
               <span>Submitting Evaluation...</span>
             } @else {
               <i class="bi bi-check-circle-fill me-2"></i>
@@ -223,6 +245,18 @@
     cancelText="Review Again"
     (confirmed)="confirmSubmit()"
     (closed)="closeSubmitConfirmation()"
+  >
+  </app-confirmation-modal-component>
+
+  <app-confirmation-modal-component
+    [visible]="showCancelConfirmation"
+    title="Leave Evaluation?"
+    subtitle="Unsaved Progress"
+    message="Your current ratings and comments will be lost if you leave this form."
+    confirmText="Leave Form"
+    cancelText="Keep Editing"
+    (confirmed)="confirmCancel()"
+    (closed)="closeCancelConfirmation()"
   >
   </app-confirmation-modal-component>
 </div>

@@ -13,7 +13,11 @@
       <div class="d-flex align-items-center">
         <div class="brand-logo-small me-3">
           <div class="logo-container">
-            <img src="chmsu-logo.png" class="logo-image-small" />
+            <img
+              src="chmsu-logo.png"
+              alt="Carlos Hilado Memorial State University logo"
+              class="logo-image-small"
+            />
           </div>
         </div>
         <div class="brand-text">
@@ -30,7 +34,7 @@
             <span class="user-id-value">{{ evaluatorId$ | async }}</span>
           </div>
         </div>
-        <button class="btn btn-outline-light btn-sm" (click)="logout()">
+        <button type="button" class="btn btn-outline-light btn-sm" (click)="logout()">
           <i class="bi bi-box-arrow-right me-1"></i>
           Logout
         </button>
@@ -82,9 +86,9 @@
     </div>
     <!-- LOADING -->
     @if (isLoading$ | async) {
-    <div class="text-center py-5">
-      <div class="spinner-border text-primary spinner-lg"></div>
-      <p class="mt-3 text-muted">Loading your classes...</p>
+    <div class="ui-loading-state">
+      <span class="ui-spinner ui-spinner-lg" aria-hidden="true"></span>
+      <p>Loading your classes...</p>
     </div>
     }
     <!-- EMPTY -->
@@ -139,7 +143,12 @@
           </div>
           <!-- FOOTER -->
           <div class="class-card-footer">
-            <button class="btn btn-primary w-100" [disabled]="cls.isEvaluated" (click)="onEvaluateClick(cls, $event)">
+            <button
+              type="button"
+              class="btn btn-primary w-100"
+              [disabled]="cls.isEvaluated"
+              (click)="onEvaluateClick(cls, $event)"
+            >
               <i class="bi me-2" [ngClass]="cls.isEvaluated ? 'bi-check-circle-fill' : 'bi-clipboard-check'">
               </i>
               {{ cls.isEvaluated ? 'Done' : 'Evaluate' }}

@@ -1,0 +1,4 @@
+.dashboard-shell {
+  min-height: 100vh;
+  background: var(--chmsu-bg);
+}

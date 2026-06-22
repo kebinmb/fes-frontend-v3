@@ -160,12 +160,12 @@
 
                 <!-- UPDATE BUTTON -->
 
-                <button class="btn btn-primary btn-modern w-100" (click)="updateSchoolYearAndSemester()"
+                <button type="button" class="btn btn-primary btn-modern w-100" (click)="updateSchoolYearAndSemester()"
                     [disabled]="(schoolYearLoading$ | async) === true">
 
                     @if ((schoolYearLoading$ | async) === true) {
 
-                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span class="ui-spinner ui-spinner-inline ui-spinner-on-dark me-2" aria-hidden="true"></span>
 
                     Updating Academic Term...
 
@@ -223,13 +223,23 @@
                     Create and download a secure database backup.
                 </p>
 
-                <button class="btn btn-success btn-modern mt-auto">
+                <div class="unavailable-action mt-auto">
 
-                    <i class="bi bi-download me-2"></i>
+                    <button
+                        type="button"
+                        class="btn btn-success btn-modern w-100"
+                        disabled
+                        title="Backup is not available yet">
 
-                    Backup Database
+                        <i class="bi bi-download me-2"></i>
 
-                </button>
+                        Backup Database
+
+                    </button>
+
+                    <small>Coming soon: database backup workflow is not connected yet.</small>
+
+                </div>
 
             </div>
 
@@ -255,13 +265,23 @@
                     Temporarily disable evaluation submissions.
                 </p>
 
-                <button class="btn btn-danger btn-modern mt-auto">
+                <div class="unavailable-action mt-auto">
 
-                    <i class="bi bi-shield-lock me-2"></i>
+                    <button
+                        type="button"
+                        class="btn btn-danger btn-modern w-100"
+                        disabled
+                        title="System locking is not available yet">
 
-                    Lock System
+                        <i class="bi bi-shield-lock me-2"></i>
 
-                </button>
+                        Lock System
+
+                    </button>
+
+                    <small>Coming soon: system lock controls need backend support.</small>
+
+                </div>
 
             </div>
 
@@ -273,7 +293,7 @@
 
     <div class="mt-5">
 
-        <button class="btn btn-outline-dark btn-modern" (click)="toggleAdvancedSettings()">
+        <button type="button" class="btn btn-outline-dark btn-modern" (click)="toggleAdvancedSettings()">
 
             <i class="bi bi-sliders me-2"></i>
 
@@ -321,12 +341,12 @@
 
                 </div>
 
-                <button class="btn btn-danger btn-modern" (click)="startMigration()"
+                <button type="button" class="btn btn-danger btn-modern" (click)="startMigration()"
                     [disabled]="(migrationLoading$ | async) === true">
 
                     @if ((migrationLoading$ | async) === true) {
 
-                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    <span class="ui-spinner ui-spinner-inline ui-spinner-on-dark me-2" aria-hidden="true"></span>
 
                     Running...
 
@@ -349,7 +369,7 @@
                     {{ response.status }}
                 </strong>
 
-                —
+                -
 
                 {{ response.message }}
 
@@ -371,3 +391,14 @@
     </div>
 
 </div>
+
+<app-confirmation-modal-component
+    [visible]="showMigrationConfirmation"
+    title="Start Database Migration?"
+    subtitle="Dangerous Operation"
+    message="This will trigger data synchronization and migration. Start only if you are sure the current records are ready."
+    confirmText="Start Migration"
+    cancelText="Cancel"
+    (confirmed)="confirmMigration()"
+    (closed)="closeMigrationConfirmation()">
+</app-confirmation-modal-component>

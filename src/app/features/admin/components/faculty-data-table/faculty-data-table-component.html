@@ -129,7 +129,7 @@
       faculty records
     </small>
     <div class="pagination-group">
-      <button class="pagination-btn" [disabled]="(facultiesData?.page ?? 0) === 0"
+      <button type="button" class="pagination-btn" [disabled]="(facultiesData?.page ?? 0) === 0"
         (click)="onFacultyPageChange((facultiesData?.page ?? 0) - 1)">
         Prev
       </button>
@@ -139,7 +139,7 @@
         of
         {{ facultiesData?.totalPages ?? 1 }}
       </span>
-      <button class="pagination-btn" [disabled]="(facultiesData?.page ?? 0) >= (facultiesData?.totalPages ?? 1) - 1"
+      <button type="button" class="pagination-btn" [disabled]="(facultiesData?.page ?? 0) >= (facultiesData?.totalPages ?? 1) - 1"
         (click)="onFacultyPageChange((facultiesData?.page ?? 0) + 1)">
         Next
       </button>
@@ -147,9 +147,15 @@
   </div>
 </section>
 @if (selectedFaculty) {
-<div class="modal-backdrop">
+<div class="modal-backdrop" (click)="closeEditModal()">
 
-  <div class="edit-modal">
+  <div
+    class="edit-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="editFacultyTitle"
+    (click)="$event.stopPropagation()"
+  >
 
     <!-- TOP BAR -->
     <div class="modal-topbar"></div>
@@ -158,7 +164,7 @@
     <div class="modal-header">
 
       <div class="modal-title-group">
-        <h2>
+        <h2 id="editFacultyTitle">
           Edit Faculty
         </h2>
 
@@ -167,7 +173,7 @@
         </p>
       </div>
 
-      <button type="button" class="close-btn" (click)="closeEditModal()">
+      <button type="button" class="close-btn" aria-label="Close faculty editor" (click)="closeEditModal()">
         <i class="bi bi-x-lg"></i>
       </button>
 

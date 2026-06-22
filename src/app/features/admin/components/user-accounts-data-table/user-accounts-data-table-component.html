@@ -26,7 +26,7 @@
 
       </div>
 
-      <button class="create-btn" (click)="openCreateModal()">
+      <button type="button" class="create-btn" (click)="openCreateModal()">
 
         <i class="bi bi-plus-lg"></i>
 
@@ -145,7 +145,7 @@
 
           <td class="text-end">
 
-            <button class="edit-btn" (click)="openEditModal(user)">
+            <button type="button" class="edit-btn" (click)="openEditModal(user)">
 
               <i class="bi bi-pencil-square"></i>
 
@@ -193,7 +193,7 @@
 
     <div class="pagination-group">
 
-      <button class="pagination-btn" [disabled]="
+      <button type="button" class="pagination-btn" [disabled]="
           (usersData?.page ?? 0) === 0
         " (click)="
           onUserPageChange(
@@ -205,7 +205,7 @@
 
       </button>
 
-      <button class="pagination-btn" [disabled]="
+      <button type="button" class="pagination-btn" [disabled]="
           ((usersData?.page ?? 0) + 1)
           >=
           (usersData?.totalPages ?? 0)
@@ -227,13 +227,19 @@
 
 @if (isModalOpen()) {
 
-<div class="modal-backdrop">
+<div class="modal-backdrop" (click)="closeModal()">
 
-  <div class="user-modal">
+  <div
+    class="user-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="userAccountModalTitle"
+    (click)="$event.stopPropagation()"
+  >
 
     <div class="modal-header">
 
-      <h3>
+      <h3 id="userAccountModalTitle">
 
         {{
         isEditMode()
@@ -243,7 +249,7 @@
 
       </h3>
 
-      <button class="close-btn" (click)="closeModal()">
+      <button type="button" class="close-btn" aria-label="Close user form" (click)="closeModal()">
 
         ✕
 

@@ -5,6 +5,7 @@ import {
 import {
   Component,
   EventEmitter,
+  HostListener,
   Input,
   Output,
   inject
@@ -50,6 +51,17 @@ export class ChangePasswordModalComponent {
   showNew = false;
 
   showConfirm = false;
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+
+    if (!this.isLoading) {
+
+      this.close();
+
+    }
+
+  }
 
   private readonly fb =
     inject(FormBuilder);

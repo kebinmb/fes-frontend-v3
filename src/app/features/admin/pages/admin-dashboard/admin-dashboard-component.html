@@ -4,8 +4,9 @@
     <app-header-layout-component></app-header-layout-component>
     <section class="dashboard-content">
       @if (loading$ | async) {
-        <div class="loading-wrapper">
-          <div class="spinner-border loading-spinner"></div>
+        <div class="ui-loading-state">
+          <span class="ui-spinner ui-spinner-lg" aria-hidden="true"></span>
+          <p>Loading dashboard data...</p>
         </div>
       }
       <router-outlet></router-outlet>

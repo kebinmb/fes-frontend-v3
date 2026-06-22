@@ -22,6 +22,9 @@ import {
   Semester,
 } from '@core/services/admin/admin-service';
 
+import { ConfirmationModalComponent }
+  from '@shared/components/confirmation-modal-component/confirmation-modal-component';
+
 @Component({
   selector: 'app-settings-component',
 
@@ -30,6 +33,7 @@ import {
   imports: [
     AsyncPipe,
     FormsModule,
+    ConfirmationModalComponent,
   ],
 
   templateUrl: './settings-component.html',
@@ -61,6 +65,9 @@ export class SettingsComponent
     'FIRST_SEMESTER';
   showAdvancedSettings =
     false;
+  showMigrationConfirmation =
+    false;
+
   ngOnInit(): void {
     this.schoolYearFacade
       .fetchCurrentSchoolYearAndSemester();
@@ -88,8 +95,25 @@ export class SettingsComponent
 
   startMigration(): void {
 
+    this.showMigrationConfirmation =
+      true;
+
+  }
+
+  confirmMigration(): void {
+
+    this.showMigrationConfirmation =
+      false;
+
     this.migrationFacade
       .migrateAll();
+  }
+
+  closeMigrationConfirmation(): void {
+
+    this.showMigrationConfirmation =
+      false;
+
   }
 
   updateSchoolYearAndSemester():

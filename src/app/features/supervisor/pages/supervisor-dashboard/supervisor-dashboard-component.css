@@ -568,20 +568,8 @@
 /* =========================================
    STATES
 ========================================= */
-.loading-state,
 .empty-state {
   text-align: center;
-}
-.loading-state {
-  padding: 5rem 1rem;
-}
-.loading-state p {
-  margin-top: 1rem;
-  color: var(--text-secondary);
-}
-.spinner-lg {
-  width: 3.5rem;
-  height: 3.5rem;
 }
 .empty-state {
   max-width: 700px;

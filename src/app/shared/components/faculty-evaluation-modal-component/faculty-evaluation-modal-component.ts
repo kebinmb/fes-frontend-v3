@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import {
   FacultyLoadDTO,
   FacultyClass,
@@ -47,6 +47,11 @@ export class FacultyEvaluationModalComponent {
     cls: FacultyClass;
     faculty: FacultyLoadDTO;
   }>();
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.closeModal();
+  }
 
   onEvaluate(cls: FacultyClass, faculty: FacultyLoadDTO): void {
     this.evaluate.emit({

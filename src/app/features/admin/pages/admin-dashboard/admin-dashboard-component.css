@@ -57,28 +57,6 @@
 }
 
 /* =========================================
-   LOADING
-========================================= */
-
-.loading-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  padding:
-    3rem
-    0;
-}
-
-.loading-spinner {
-  width: 3rem;
-  height: 3rem;
-
-  color:
-    var(--chmsu-primary);
-}
-
-/* =========================================
    RESPONSIVE
 ========================================= */
 

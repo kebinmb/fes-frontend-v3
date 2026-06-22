@@ -168,6 +168,62 @@ textarea:focus-visible {
   font-weight: 600;
 }
 
+.ui-spinner {
+  --ui-spinner-size: 2.75rem;
+  --ui-spinner-stroke: 0.28rem;
+
+  width: var(--ui-spinner-size);
+  height: var(--ui-spinner-size);
+  display: inline-block;
+  border: var(--ui-spinner-stroke) solid rgba(24, 100, 67, 0.16);
+  border-top-color: var(--chmsu-primary);
+  border-radius: 50%;
+  animation: ui-spinner-rotate 0.75s linear infinite;
+}
+
+.ui-spinner-sm,
+.ui-spinner-inline {
+  --ui-spinner-size: 1rem;
+  --ui-spinner-stroke: 0.14rem;
+}
+
+.ui-spinner-lg {
+  --ui-spinner-size: 3rem;
+  --ui-spinner-stroke: 0.34rem;
+}
+
+.ui-spinner-on-dark {
+  border-color: rgba(255, 255, 255, 0.36);
+  border-top-color: #ffffff;
+}
+
+.ui-loading-state {
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+  padding: 3rem 1rem;
+  color: var(--ui-text-muted);
+  text-align: center;
+}
+
+.ui-loading-state p {
+  margin: 0;
+  color: var(--ui-text-muted);
+  font-size: 0.9rem;
+}
+
+.ui-loading-label {
+  color: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+@keyframes ui-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -176,5 +232,9 @@ textarea:focus-visible {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+  }
+
+  .ui-spinner {
+    animation-duration: 1.4s !important;
   }
 }

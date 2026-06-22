@@ -299,13 +299,6 @@
   border-radius: 12px;
   font-weight: 600;
 }
-.spinner-border {
-  color: var(--chmsu-primary);
-}
-.spinner-lg {
-  width: 2.8rem;
-  height: 2.8rem;
-}
 .row.g-4 {
   --bs-gutter-x: 1.2rem;
   --bs-gutter-y: 1.2rem;

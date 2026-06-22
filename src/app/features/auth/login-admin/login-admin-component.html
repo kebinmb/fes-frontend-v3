@@ -116,7 +116,7 @@
 
         <button type="submit" class="login-btn" [disabled]="adminForm.invalid || (isLoading$ | async)">
           @if (isLoading$ | async) {
-          <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+          <span class="ui-spinner ui-spinner-inline ui-spinner-on-dark" aria-hidden="true"></span>
           <span>Signing in...</span>
           } @else {
           <i class="bi bi-box-arrow-in-right"></i>

@@ -1,0 +1,67 @@
+.oauth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at top, rgba(24, 100, 67, 0.08), transparent 34rem),
+    var(--chmsu-bg);
+}
+
+.oauth-card {
+  width: min(100%, 420px);
+  padding: 2rem;
+  border: 1px solid var(--ui-border-soft);
+  border-radius: var(--ui-radius-lg);
+  background: var(--ui-surface);
+  box-shadow: var(--ui-shadow-md);
+  text-align: center;
+}
+
+.oauth-logo-wrap {
+  width: 76px;
+  height: 76px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+  border: 1px solid var(--ui-border-soft);
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.oauth-logo {
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+}
+
+.oauth-spinner {
+  margin-bottom: 1rem;
+  color: var(--chmsu-primary);
+}
+
+.oauth-eyebrow {
+  margin: 0 0 0.45rem;
+  color: var(--chmsu-primary);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.oauth-card h1 {
+  margin: 0;
+  color: var(--ui-text);
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.oauth-message {
+  margin: 0.75rem auto 0;
+  max-width: 310px;
+  color: var(--ui-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
