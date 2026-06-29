@@ -197,6 +197,37 @@
   color: var(--chmsu-primary);
 }
 
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.modal-evidence-btn {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  border: 1px solid rgba(24, 100, 67, 0.12);
+  border-radius: 16px;
+  background: #ffffff;
+  color: var(--chmsu-primary);
+  font-size: 0.82rem;
+  font-weight: 800;
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    border-color 160ms ease;
+}
+
+.modal-evidence-btn:hover {
+  border-color: rgba(24, 100, 67, 0.22);
+  background: rgba(24, 100, 67, 0.07);
+  transform: translateY(-1px);
+}
+
 /* =========================================
    CLOSE BUTTON
 ========================================= */
@@ -398,15 +429,20 @@
 }
 
 /* =========================================
-   BUTTON
+   BUTTONS
 ========================================= */
+
+.subject-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.7rem;
+  margin-top: auto;
+}
 
 .btn-subject-action {
   width: 100%;
 
   min-height: 54px;
-
-  margin-top: auto;
 
   border: none !important;
 
@@ -505,6 +541,74 @@
 }
 
 /* =========================================
+   EVIDENCE MODAL
+========================================= */
+
+.evidence-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(15, 23, 42, 0.56);
+  backdrop-filter: blur(8px);
+  animation: fadeBackdrop 180ms ease;
+}
+
+.evidence-modal {
+  width: min(1080px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--chmsu-border);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: 0 30px 70px rgba(15, 23, 42, 0.24);
+  animation: modalSlideUp 220ms ease;
+}
+
+.evidence-modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--chmsu-border);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+}
+
+.evidence-modal-header p {
+  margin: 0 0 0.25rem;
+  color: var(--chmsu-primary);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.evidence-modal-header h5 {
+  margin: 0;
+  color: var(--chmsu-text);
+  font-weight: 800;
+}
+
+.evidence-modal app-faculty-evidence-upload-component {
+  display: block;
+  padding: 1.25rem;
+}
+
+.evidence-modal .evidence-panel {
+  margin-top: 0;
+  border: none;
+  box-shadow: none;
+}
+
+/* =========================================
    ANIMATIONS
 ========================================= */
 
@@ -556,6 +660,15 @@
   .modal-profile-wrapper {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .modal-header-actions {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .modal-evidence-btn {
+    flex: 1;
   }
 
   .modal-profile {

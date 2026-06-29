@@ -3,7 +3,7 @@ import {
   FacultyLoadDTO,
   FacultyClass,
 } from '../../../core/services/supervisor-data/supervisor-data-service';
-import { AsyncPipe, CommonModule } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FacultyEvidenceUploadComponent } from '@shared/components/faculty-evidence-upload-component/faculty-evidence-upload-component';
 
 @Component({
@@ -13,6 +13,8 @@ import { FacultyEvidenceUploadComponent } from '@shared/components/faculty-evide
   styleUrl: './faculty-evaluation-modal-component.css',
 })
 export class FacultyEvaluationModalComponent {
+  isEvidenceUploadOpen = false;
+
   @Input()
   faculty!: FacultyLoadDTO | null;
 
@@ -61,7 +63,20 @@ export class FacultyEvaluationModalComponent {
     });
   }
 
+  openEvidenceUpload(): void {
+    this.isEvidenceUploadOpen = true;
+  }
+
+  closeEvidenceUpload(): void {
+    this.isEvidenceUploadOpen = false;
+  }
+
   closeModal(): void {
+    if (this.isEvidenceUploadOpen) {
+      this.closeEvidenceUpload();
+      return;
+    }
+
     this.close.emit();
   }
 }

@@ -1,11 +1,13 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import {
   EvidenceCriterion,
   FacultyEvidence,
   PageResponse,
+  SliceResponse,
 } from '@app/models/faculty-evidence.model';
 
 export interface UploadEvidencePayload {
@@ -37,12 +39,55 @@ export interface EvidenceListFilters {
 export class FacultyEvidenceService {
   private readonly baseUrl = `${environment.API_URL}/faculty/evidences`;
   private readonly http = inject(HttpClient);
+  private readonly criteria$ = this.http
+    .get<EvidenceCriterion[]>(`${this.baseUrl}/criteria`)
+    .pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
   getCriteria(): Observable<EvidenceCriterion[]> {
-    return this.http.get<EvidenceCriterion[]>(`${this.baseUrl}/criteria`);
+    return this.criteria$;
   }
 
   uploadEvidence(payload: UploadEvidencePayload): Observable<FacultyEvidence> {
+    const formData = this.buildEvidenceFormData(payload);
+
+    return this.http.post<FacultyEvidence>(this.baseUrl, formData);
+  }
+
+  uploadEvidenceWithProgress(
+    payload: UploadEvidencePayload
+  ): Observable<HttpEvent<FacultyEvidence>> {
+    const formData = this.buildEvidenceFormData(payload);
+
+    return this.http.post<FacultyEvidence>(this.baseUrl, formData, {
+      observe: 'events',
+      reportProgress: true,
+    });
+  }
+
+  getEvidenceList(filters: EvidenceListFilters): Observable<PageResponse<FacultyEvidence>> {
+    const params = this.buildEvidenceListParams(filters, 10);
+
+    return this.http.get<PageResponse<FacultyEvidence>>(this.baseUrl, { params });
+  }
+
+  getEvidenceSlice(filters: EvidenceListFilters): Observable<SliceResponse<FacultyEvidence>> {
+    const params = this.buildEvidenceListParams(filters, 12);
+
+    return this.http.get<SliceResponse<FacultyEvidence>>(`${this.baseUrl}/slice`, { params });
+  }
+
+  downloadEvidence(evidenceId: number) {
+    return this.http.get(`${this.baseUrl}/${evidenceId}/download`, {
+      responseType: 'blob',
+      observe: 'response',
+    });
+  }
+
+  deleteEvidence(evidenceId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${evidenceId}`);
+  }
+
+  private buildEvidenceFormData(payload: UploadEvidencePayload): FormData {
     const formData = new FormData();
 
     formData.append('facultyId', payload.facultyId);
@@ -56,14 +101,14 @@ export class FacultyEvidenceService {
     if (payload.schoolYear) formData.append('schoolYear', String(payload.schoolYear));
     if (payload.description) formData.append('description', payload.description);
 
-    return this.http.post<FacultyEvidence>(this.baseUrl, formData);
+    return formData;
   }
 
-  getEvidenceList(filters: EvidenceListFilters): Observable<PageResponse<FacultyEvidence>> {
+  private buildEvidenceListParams(filters: EvidenceListFilters, defaultSize: number): HttpParams {
     let params = new HttpParams()
       .set('facultyId', filters.facultyId)
       .set('page', String(filters.page ?? 0))
-      .set('size', String(filters.size ?? 10))
+      .set('size', String(filters.size ?? defaultSize))
       .set('sort', 'createdAt,desc');
 
     if (filters.classCode) params = params.set('classCode', filters.classCode);
@@ -72,17 +117,6 @@ export class FacultyEvidenceService {
     if (filters.schoolYear) params = params.set('schoolYear', String(filters.schoolYear));
     if (filters.criterion) params = params.set('criterion', filters.criterion);
 
-    return this.http.get<PageResponse<FacultyEvidence>>(this.baseUrl, { params });
-  }
-
-  downloadEvidence(evidenceId: number) {
-    return this.http.get(`${this.baseUrl}/${evidenceId}/download`, {
-      responseType: 'blob',
-      observe: 'response',
-    });
-  }
-
-  deleteEvidence(evidenceId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${evidenceId}`);
+    return params;
   }
 }

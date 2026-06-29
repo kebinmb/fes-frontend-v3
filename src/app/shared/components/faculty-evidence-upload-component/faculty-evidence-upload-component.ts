@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse, HttpEventType } from '@angular/common/http';
 import {
+  ChangeDetectorRef,
   Component,
+  DestroyRef,
   ElementRef,
   Input,
   OnChanges,
@@ -14,11 +17,17 @@ import { FacultyClass, FacultyLoadDTO } from '@core/services/supervisor-data/sup
 import {
   EvidenceCriterion,
   FacultyEvidence,
-  PageResponse,
+  SliceResponse,
 } from '@app/models/faculty-evidence.model';
-import { FacultyEvidenceService } from '@app/services/faculty-evidence.service';
+import {
+  EvidenceListFilters,
+  FacultyEvidenceService,
+  UploadEvidencePayload,
+} from '@app/services/faculty-evidence.service';
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal-component/confirmation-modal-component';
 import { ToastFacade } from '@core/store/toast/toast.facade';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { debounceTime } from 'rxjs/operators';
 
 interface CriteriaGroup {
   category: string;
@@ -43,14 +52,27 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
   @Input()
   classes: FacultyClass[] = [];
 
+  @Input()
+  selectedClass: FacultyClass | null = null;
+
+  @Input()
+  allowClassSelection = true;
+
+  @Input()
+  scopeToSelectedClass = false;
+
   @ViewChild('fileInput')
   fileInput?: ElementRef<HTMLInputElement>;
 
   private readonly fb = inject(FormBuilder);
   private readonly evidenceService = inject(FacultyEvidenceService);
   private readonly toastFacade = inject(ToastFacade);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private evidenceLoadRequestId = 0;
+  private isDestroyed = false;
 
-  readonly maxFileSizeMb = 10;
+  readonly maxFileSizeMb = 15;
   readonly acceptedFileExtensions = '.pdf,.jpg,.jpeg,.png,.doc,.docx';
   readonly acceptedMimeTypes = new Set([
     'application/pdf',
@@ -65,14 +87,17 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
   selectedFile?: File;
   pendingDeleteEvidence?: FacultyEvidence;
   currentPage = 0;
-  pageSize = 5;
-  totalPages = 0;
-  totalElements = 0;
+  pageSize = 12;
+  hasNextEvidencePage = false;
   isCriteriaLoading = false;
   isEvidenceLoading = false;
+  isLoadingMore = false;
   isUploading = false;
   isDeleting = false;
+  uploadProgress = 0;
   errorMessage = '';
+  successMessage = '';
+  uploadStatusMessage = '';
   showDeleteConfirmation = false;
 
   readonly form = this.fb.group({
@@ -95,12 +120,15 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
   });
 
   ngOnInit(): void {
+    this.destroyRef.onDestroy(() => {
+      this.isDestroyed = true;
+    });
     this.loadCriteria();
+    this.watchFilterChanges();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['faculty'] && this.faculty?.facultyId) {
-      this.currentPage = 0;
+    if ((changes['faculty'] || changes['selectedClass']) && this.faculty?.facultyId) {
       this.resetFormContext();
       this.loadEvidences();
     }
@@ -110,49 +138,86 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
     this.isCriteriaLoading = true;
     this.errorMessage = '';
 
-    this.evidenceService.getCriteria().subscribe({
-      next: (criteria) => {
-        this.criteria = criteria;
-        this.isCriteriaLoading = false;
-      },
-      error: () => {
-        this.errorMessage = 'Unable to load evidence criteria.';
-        this.isCriteriaLoading = false;
-      },
-    });
-  }
-
-  loadEvidences(): void {
-    if (!this.faculty?.facultyId) {
-      return;
-    }
-
-    this.isEvidenceLoading = true;
-
     this.evidenceService
-      .getEvidenceList({
-        facultyId: this.faculty.facultyId,
-        criterion: this.filterForm.controls.criterion.value || undefined,
-        classCode: this.filterForm.controls.classCode.value || undefined,
-        subjectCode: this.filterForm.controls.subjectCode.value || undefined,
-        semester: this.filterForm.controls.semester.value || undefined,
-        schoolYear: this.filterForm.controls.schoolYear.value ?? undefined,
-        page: this.currentPage,
-        size: this.pageSize,
-      })
+      .getCriteria()
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (page) => {
-          this.setPage(page);
-          this.isEvidenceLoading = false;
+        next: (criteria) => {
+          this.criteria = criteria;
+          this.isCriteriaLoading = false;
+          this.scheduleViewRefresh();
         },
-        error: () => {
-          this.errorMessage = 'Unable to load evidence records.';
-          this.isEvidenceLoading = false;
+        error: (error) => {
+          this.errorMessage = this.extractApiMessage(error, 'Unable to load evidence criteria.');
+          this.isCriteriaLoading = false;
+          this.scheduleViewRefresh();
         },
       });
   }
 
+  loadEvidences(append = false): void {
+    if (!this.faculty?.facultyId) {
+      return;
+    }
+
+    if (append && (!this.hasNextEvidencePage || this.isLoadingMore || this.isEvidenceLoading)) {
+      return;
+    }
+
+    const requestId = ++this.evidenceLoadRequestId;
+
+    if (append) {
+      this.isLoadingMore = true;
+    } else {
+      this.currentPage = 0;
+      this.evidences = [];
+      this.hasNextEvidencePage = false;
+      this.isEvidenceLoading = true;
+      this.isLoadingMore = false;
+    }
+
+    this.errorMessage = '';
+    this.scheduleViewRefresh();
+
+    this.evidenceService
+      .getEvidenceSlice(this.buildEvidenceFilters(append ? this.currentPage + 1 : 0))
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (slice) => {
+          if (requestId !== this.evidenceLoadRequestId) {
+            return;
+          }
+
+          this.setSlice(slice, append);
+          this.isEvidenceLoading = false;
+          this.isLoadingMore = false;
+          this.scheduleViewRefresh();
+        },
+        error: (error) => {
+          if (requestId !== this.evidenceLoadRequestId) {
+            return;
+          }
+
+          this.errorMessage = this.extractApiMessage(error, 'Unable to load evidence records.');
+          this.isEvidenceLoading = false;
+          this.isLoadingMore = false;
+          this.scheduleViewRefresh();
+        },
+      });
+  }
+
+  loadMoreEvidences(): void {
+    this.loadEvidences(true);
+  }
+
   onClassContextChange(): void {
+    this.successMessage = '';
+
+    if (!this.allowClassSelection || this.selectedClass) {
+      this.applySelectedClassContext();
+      return;
+    }
+
     const classIndex = this.form.controls.classIndex.value;
 
     if (classIndex === '') {
@@ -201,6 +266,7 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
     }
 
     this.errorMessage = '';
+    this.successMessage = '';
     this.selectedFile = file;
   }
 
@@ -217,38 +283,80 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
     }
 
     const value = this.form.getRawValue();
+    const selectedFile = this.selectedFile;
 
     this.isUploading = true;
     this.errorMessage = '';
+    this.successMessage = '';
+
+    const uploadPayload: UploadEvidencePayload = {
+      facultyId: this.faculty.facultyId,
+      criterion: value.criterion ?? '',
+      file: selectedFile,
+      classCode: value.classCode || undefined,
+      subjectCode: value.subjectCode || undefined,
+      yearLevel: value.yearLevel || undefined,
+      semester: value.semester || undefined,
+      schoolYear: value.schoolYear ?? undefined,
+      description: value.description || undefined,
+    };
+
+    this.uploadProgress = 0;
+    this.uploadStatusMessage = 'Preparing evidence upload...';
+    this.toastFacade.showToast('Submitting evidence. Please keep this window open.', 'info');
 
     this.evidenceService
-      .uploadEvidence({
-        facultyId: this.faculty.facultyId,
-        criterion: value.criterion ?? '',
-        file: this.selectedFile,
-        classCode: value.classCode || undefined,
-        subjectCode: value.subjectCode || undefined,
-        yearLevel: value.yearLevel || undefined,
-        semester: value.semester || undefined,
-        schoolYear: value.schoolYear ?? undefined,
-        description: value.description || undefined,
-      })
+      .uploadEvidenceWithProgress(uploadPayload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
+        next: (event) => {
+          if (event.type === HttpEventType.Sent) {
+            this.uploadStatusMessage = 'Sending evidence to the server...';
+            this.scheduleViewRefresh();
+            return;
+          }
+
+          if (event.type === HttpEventType.UploadProgress) {
+            this.uploadProgress = event.total
+              ? Math.round((event.loaded / event.total) * 100)
+              : this.uploadProgress;
+            this.uploadStatusMessage = this.uploadProgress
+              ? `Uploading evidence... ${this.uploadProgress}%`
+              : 'Uploading evidence...';
+            this.scheduleViewRefresh();
+            return;
+          }
+
+          if (event.type !== HttpEventType.Response) {
+            return;
+          }
+
+          const response = event.body;
+          const message = response
+            ? this.buildUploadSuccessMessage(response)
+            : 'Evidence uploaded successfully.';
+
           this.isUploading = false;
-          this.toastFacade.showToast('Evidence uploaded successfully.', 'success');
+          this.uploadProgress = 100;
+          this.uploadStatusMessage = '';
+          this.successMessage = message;
+          this.toastFacade.showToast(message, 'success');
           this.resetAfterUpload();
           this.loadEvidences();
+          this.scheduleViewRefresh();
         },
-        error: () => {
+        error: (error) => {
           this.isUploading = false;
-          this.errorMessage = 'Evidence upload failed.';
+          this.uploadProgress = 0;
+          this.uploadStatusMessage = '';
+          this.errorMessage = this.extractApiMessage(error, 'Evidence upload failed.');
+          this.toastFacade.showToast(this.errorMessage, 'error');
+          this.scheduleViewRefresh();
         },
       });
   }
 
   applyFilters(): void {
-    this.currentPage = 0;
     this.loadEvidences();
   }
 
@@ -259,34 +367,38 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
       subjectCode: '',
       semester: '',
       schoolYear: null,
-    });
-    this.currentPage = 0;
+    }, { emitEvent: false });
     this.loadEvidences();
   }
 
   download(evidence: FacultyEvidence): void {
-    this.evidenceService.downloadEvidence(evidence.evidenceId).subscribe({
-      next: (response) => {
-        const blob = response.body;
+    this.evidenceService
+      .downloadEvidence(evidence.evidenceId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const blob = response.body;
 
-        if (!blob) {
-          this.errorMessage = 'Downloaded file is empty.';
-          return;
-        }
+          if (!blob) {
+            this.errorMessage = 'Downloaded file is empty.';
+            this.scheduleViewRefresh();
+            return;
+          }
 
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
 
-        link.href = url;
-        link.download = evidence.originalFilename;
-        link.click();
+          link.href = url;
+          link.download = evidence.originalFilename;
+          link.click();
 
-        window.URL.revokeObjectURL(url);
-      },
-      error: () => {
-        this.errorMessage = 'Evidence download failed.';
-      },
-    });
+          window.URL.revokeObjectURL(url);
+        },
+        error: (error) => {
+          this.errorMessage = this.extractApiMessage(error, 'Evidence download failed.');
+          this.scheduleViewRefresh();
+        },
+      });
   }
 
   requestDelete(evidence: FacultyEvidence): void {
@@ -304,41 +416,30 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
     this.isDeleting = true;
     this.showDeleteConfirmation = false;
 
-    this.evidenceService.deleteEvidence(evidenceId).subscribe({
-      next: () => {
-        this.isDeleting = false;
-        this.pendingDeleteEvidence = undefined;
-        this.toastFacade.showToast('Evidence deleted.', 'success');
-        this.loadEvidences();
-      },
-      error: () => {
-        this.isDeleting = false;
-        this.errorMessage = 'Unable to delete evidence.';
-      },
-    });
+    this.evidenceService
+      .deleteEvidence(evidenceId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.isDeleting = false;
+          this.pendingDeleteEvidence = undefined;
+          this.successMessage = 'Evidence deleted.';
+          this.toastFacade.showToast('Evidence deleted.', 'success');
+          this.loadEvidences();
+          this.scheduleViewRefresh();
+        },
+        error: (error) => {
+          this.isDeleting = false;
+          this.errorMessage = this.extractApiMessage(error, 'Unable to delete evidence.');
+          this.toastFacade.showToast(this.errorMessage, 'error');
+          this.scheduleViewRefresh();
+        },
+      });
   }
 
   closeDeleteConfirmation(): void {
     this.pendingDeleteEvidence = undefined;
     this.showDeleteConfirmation = false;
-  }
-
-  previousPage(): void {
-    if (this.currentPage <= 0) {
-      return;
-    }
-
-    this.currentPage--;
-    this.loadEvidences();
-  }
-
-  nextPage(): void {
-    if (this.currentPage + 1 >= this.totalPages) {
-      return;
-    }
-
-    this.currentPage++;
-    this.loadEvidences();
   }
 
   groupedCriteria(): CriteriaGroup[] {
@@ -353,6 +454,26 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
       category,
       items,
     }));
+  }
+
+  panelTitle(): string {
+    if (this.selectedClass) {
+      return `${this.selectedClass.subjectCode} Evidence`;
+    }
+
+    return 'Faculty Evidence';
+  }
+
+  panelSubtitle(): string {
+    if (this.selectedClass) {
+      return `${this.selectedClass.sectionCode} (${this.selectedClass.classCode}) evidence files`;
+    }
+
+    return 'Upload supporting files for evaluation criteria.';
+  }
+
+  isClassContextLocked(): boolean {
+    return Boolean(this.selectedClass && !this.allowClassSelection);
   }
 
   uniqueClassCodes(): string[] {
@@ -391,16 +512,50 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
     return `${index}-${cls.classCode}-${cls.subjectCode}`;
   }
 
-  private setPage(page: PageResponse<FacultyEvidence>): void {
-    this.evidences = page.content;
-    this.totalElements = page.totalElements;
-    this.totalPages = page.totalPages;
-    this.currentPage = page.number;
-    this.pageSize = page.size;
+  private setSlice(slice: SliceResponse<FacultyEvidence>, append: boolean): void {
+    this.evidences = append ? [...this.evidences, ...slice.content] : slice.content;
+    this.currentPage = slice.page;
+    this.pageSize = slice.size;
+    this.hasNextEvidencePage = slice.hasNext;
+  }
+
+  private buildEvidenceFilters(page: number): EvidenceListFilters {
+    const scopedClass = this.scopeToSelectedClass ? this.selectedClass : null;
+
+    return {
+      facultyId: this.faculty.facultyId,
+      criterion: this.filterForm.controls.criterion.value || undefined,
+      classCode: scopedClass?.classCode || this.filterForm.controls.classCode.value || undefined,
+      subjectCode: scopedClass?.subjectCode || this.filterForm.controls.subjectCode.value || undefined,
+      semester: scopedClass?.semester || this.filterForm.controls.semester.value || undefined,
+      schoolYear: this.filterForm.controls.schoolYear.value ?? undefined,
+      page,
+      size: this.pageSize,
+    };
+  }
+
+  private watchFilterChanges(): void {
+    this.filterForm.valueChanges
+      .pipe(
+        debounceTime(300),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(() => {
+        this.loadEvidences();
+      });
+  }
+
+  private scheduleViewRefresh(): void {
+    queueMicrotask(() => {
+      if (!this.isDestroyed) {
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   private rejectSelectedFile(input: HTMLInputElement, message: string): void {
     this.errorMessage = message;
+    this.successMessage = '';
     input.value = '';
     this.selectedFile = undefined;
   }
@@ -416,6 +571,7 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
       criterion: '',
       description: '',
     });
+    this.applySelectedClassContext();
     this.form.markAsPristine();
   }
 
@@ -432,7 +588,7 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
       subjectCode: '',
       semester: '',
       schoolYear: null,
-    });
+    }, { emitEvent: false });
     this.form.reset({
       criterion: '',
       classIndex: '',
@@ -443,6 +599,7 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
       schoolYear: new Date().getFullYear(),
       description: '',
     });
+    this.applySelectedClassContext();
   }
 
   private uniqueClassValues(key: 'classCode' | 'subjectCode' | 'semester'): string[] {
@@ -453,5 +610,85 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
           .filter((value): value is string => Boolean(value))
       )
     );
+  }
+
+  private applySelectedClassContext(): void {
+    if (!this.selectedClass) {
+      return;
+    }
+
+    this.form.patchValue({
+      classIndex: '',
+      classCode: this.selectedClass.classCode,
+      subjectCode: this.selectedClass.subjectCode,
+      yearLevel: this.selectedClass.yearLevel,
+      semester: this.selectedClass.semester,
+      schoolYear: this.selectedClass.schoolYear,
+    });
+  }
+
+  private buildUploadSuccessMessage(response: FacultyEvidence): string {
+    const apiMessage = (response as FacultyEvidence & { message?: string }).message;
+
+    if (apiMessage) {
+      return apiMessage;
+    }
+
+    const filename = response.originalFilename || 'Evidence file';
+    const criterion = response.criterionLabel || response.criterion || 'selected criterion';
+
+    return `${filename} uploaded for ${criterion}.`;
+  }
+
+  private extractApiMessage(error: unknown, fallback: string): string {
+    if (!(error instanceof HttpErrorResponse)) {
+      return fallback;
+    }
+
+    const body = error.error;
+
+    if (typeof body === 'string') {
+      return body || fallback;
+    }
+
+    if (body && typeof body === 'object') {
+      const apiError = body as {
+        message?: unknown;
+        error?: unknown;
+        detail?: unknown;
+        title?: unknown;
+        errors?: unknown;
+      };
+      const validationMessage = this.extractValidationErrors(apiError.errors);
+
+      if (validationMessage) {
+        return validationMessage;
+      }
+
+      for (const key of ['message', 'error', 'detail', 'title'] as const) {
+        const value = apiError[key];
+
+        if (typeof value === 'string' && value.trim()) {
+          return value;
+        }
+      }
+    }
+
+    return error.message || fallback;
+  }
+
+  private extractValidationErrors(errors: unknown): string {
+    if (!errors || typeof errors !== 'object') {
+      return '';
+    }
+
+    if (Array.isArray(errors)) {
+      return errors.filter((error): error is string => typeof error === 'string').join(' ');
+    }
+
+    return Object.values(errors)
+      .flatMap((value) => Array.isArray(value) ? value : [value])
+      .filter((value): value is string => typeof value === 'string')
+      .join(' ');
   }
 }

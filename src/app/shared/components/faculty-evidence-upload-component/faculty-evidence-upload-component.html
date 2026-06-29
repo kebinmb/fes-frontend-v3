@@ -3,14 +3,14 @@
     <div>
       <p class="evidence-eyebrow">Supervisor Evidence</p>
 
-      <h5 id="facultyEvidenceTitle">Faculty Evidence</h5>
+      <h5 id="facultyEvidenceTitle">{{ panelTitle() }}</h5>
 
-      <span>Upload supporting files for evaluation criteria.</span>
+      <span>{{ panelSubtitle() }}</span>
     </div>
 
-    <div class="evidence-count" aria-label="Total evidence records">
-      <strong>{{ totalElements }}</strong>
-      <span>files</span>
+    <div class="evidence-count" aria-label="Loaded evidence records">
+      <strong>{{ evidences.length }}</strong>
+      <span>loaded</span>
     </div>
   </div>
 
@@ -18,6 +18,26 @@
     <div class="evidence-alert" role="alert">
       <i class="bi bi-exclamation-circle-fill"></i>
       <span>{{ errorMessage }}</span>
+    </div>
+  }
+
+  @if (successMessage) {
+    <div class="evidence-alert evidence-alert-success" role="status">
+      <i class="bi bi-check-circle-fill"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+  }
+
+  @if (isUploading) {
+    <div class="upload-status" role="status" aria-live="polite">
+      <div class="upload-status-copy">
+        <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+        <span>{{ uploadStatusMessage || 'Uploading evidence...' }}</span>
+      </div>
+
+      <div class="upload-progress" aria-hidden="true">
+        <span [style.width.%]="uploadProgress || 12"></span>
+      </div>
     </div>
   }
 
@@ -45,23 +65,38 @@
         }
       </div>
 
-      <div class="form-group">
-        <label for="evidenceClassContext">Related Class</label>
+      @if (isClassContextLocked()) {
+        <div class="form-group">
+          <label>Related Class</label>
 
-        <select
-          id="evidenceClassContext"
-          formControlName="classIndex"
-          (change)="onClassContextChange()"
-        >
-          <option value="">No class context</option>
+          <div class="locked-context">
+            <i class="bi bi-lock-fill"></i>
 
-          @for (cls of classes; track trackClass($index, cls); let index = $index) {
-            <option [value]="index">
-              {{ cls.subjectCode }} - {{ cls.sectionCode }} ({{ cls.classCode }})
-            </option>
-          }
-        </select>
-      </div>
+            <span>
+              {{ selectedClass?.subjectCode }} - {{ selectedClass?.sectionCode }}
+              <small>{{ selectedClass?.classCode }}</small>
+            </span>
+          </div>
+        </div>
+      } @else {
+        <div class="form-group">
+          <label for="evidenceClassContext">Related Class</label>
+
+          <select
+            id="evidenceClassContext"
+            formControlName="classIndex"
+            (change)="onClassContextChange()"
+          >
+            <option value="">No class context</option>
+
+            @for (cls of classes; track trackClass($index, cls); let index = $index) {
+              <option [value]="index">
+                {{ cls.subjectCode }} - {{ cls.sectionCode }} ({{ cls.classCode }})
+              </option>
+            }
+          </select>
+        </div>
+      }
 
       <div class="form-group">
         <label for="evidenceFile">Evidence File</label>
@@ -132,13 +167,14 @@
         type="submit"
         class="upload-btn"
         [disabled]="form.invalid || !selectedFile || isUploading"
+        [attr.aria-busy]="isUploading"
       >
         @if (isUploading) {
           <span class="ui-spinner ui-spinner-inline ui-spinner-on-dark" aria-hidden="true"></span>
-          <span>Uploading...</span>
+          <span>Submitting...</span>
         } @else {
           <i class="bi bi-cloud-arrow-up-fill"></i>
-          <span>Upload Evidence</span>
+          <span>Submit Evidence</span>
         }
       </button>
     </div>
@@ -156,7 +192,12 @@
       }
     </div>
 
-    <form class="evidence-filter-form" [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+    <form
+      class="evidence-filter-form"
+      [class.scoped-filter]="isClassContextLocked()"
+      [formGroup]="filterForm"
+      (ngSubmit)="applyFilters()"
+    >
       <div class="filter-field">
         <label for="filterCriterion">Criterion</label>
 
@@ -175,47 +216,49 @@
         </select>
       </div>
 
-      <div class="filter-field">
-        <label for="filterClass">Class</label>
+      @if (!isClassContextLocked()) {
+        <div class="filter-field">
+          <label for="filterClass">Class</label>
 
-        <select id="filterClass" formControlName="classCode">
-          <option value="">All classes</option>
+          <select id="filterClass" formControlName="classCode">
+            <option value="">All classes</option>
 
-          @for (classCode of uniqueClassCodes(); track classCode) {
-            <option [value]="classCode">
-              {{ classCode }}
-            </option>
-          }
-        </select>
-      </div>
+            @for (classCode of uniqueClassCodes(); track classCode) {
+              <option [value]="classCode">
+                {{ classCode }}
+              </option>
+            }
+          </select>
+        </div>
 
-      <div class="filter-field">
-        <label for="filterSubject">Subject</label>
+        <div class="filter-field">
+          <label for="filterSubject">Subject</label>
 
-        <select id="filterSubject" formControlName="subjectCode">
-          <option value="">All subjects</option>
+          <select id="filterSubject" formControlName="subjectCode">
+            <option value="">All subjects</option>
 
-          @for (subjectCode of uniqueSubjectCodes(); track subjectCode) {
-            <option [value]="subjectCode">
-              {{ subjectCode }}
-            </option>
-          }
-        </select>
-      </div>
+            @for (subjectCode of uniqueSubjectCodes(); track subjectCode) {
+              <option [value]="subjectCode">
+                {{ subjectCode }}
+              </option>
+            }
+          </select>
+        </div>
 
-      <div class="filter-field">
-        <label for="filterSemester">Semester</label>
+        <div class="filter-field">
+          <label for="filterSemester">Semester</label>
 
-        <select id="filterSemester" formControlName="semester">
-          <option value="">All semesters</option>
+          <select id="filterSemester" formControlName="semester">
+            <option value="">All semesters</option>
 
-          @for (semester of uniqueSemesters(); track semester) {
-            <option [value]="semester">
-              {{ semester }}
-            </option>
-          }
-        </select>
-      </div>
+            @for (semester of uniqueSemesters(); track semester) {
+              <option [value]="semester">
+                {{ semester }}
+              </option>
+            }
+          </select>
+        </div>
+      }
 
       <div class="filter-field">
         <label for="filterSchoolYear">School Year</label>
@@ -234,7 +277,7 @@
       </div>
     </form>
 
-    @if (isEvidenceLoading) {
+    @if (isEvidenceLoading && !evidences.length) {
       <div class="ui-loading-state">
         <span class="ui-spinner" aria-hidden="true"></span>
         <p>Loading evidence files...</p>
@@ -301,22 +344,21 @@
 
       <div class="evidence-footer">
         <small>
-          Showing {{ evidences.length }} of {{ totalElements }} files
+          Showing {{ evidences.length }} loaded file{{ evidences.length === 1 ? '' : 's' }}
         </small>
 
         <div class="pagination-actions">
-          <button type="button" [disabled]="currentPage === 0" (click)="previousPage()">
-            Prev
-          </button>
-
-          <span>Page {{ currentPage + 1 }} of {{ totalPages || 1 }}</span>
-
           <button
             type="button"
-            [disabled]="currentPage + 1 >= totalPages"
-            (click)="nextPage()"
+            [disabled]="!hasNextEvidencePage || isLoadingMore"
+            (click)="loadMoreEvidences()"
           >
-            Next
+            @if (isLoadingMore) {
+              <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+              <span>Loading...</span>
+            } @else {
+              <span>{{ hasNextEvidencePage ? 'Load more' : 'All evidence loaded' }}</span>
+            }
           </button>
         </div>
       </div>

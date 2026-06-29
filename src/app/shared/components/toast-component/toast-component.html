@@ -13,7 +13,8 @@
         role="status"
         [ngClass]="{
           'toast-success': toast.toastType === 'success',
-          'toast-error': toast.toastType === 'error'
+          'toast-error': toast.toastType === 'error',
+          'toast-info': toast.toastType === 'info'
         }"
       >
         <div class="toast-content">
@@ -21,7 +22,8 @@
             class="toast-icon bi"
             [ngClass]="{
               'bi-check-circle-fill': toast.toastType === 'success',
-              'bi-exclamation-circle-fill': toast.toastType === 'error'
+              'bi-exclamation-circle-fill': toast.toastType === 'error',
+              'bi-info-circle-fill': toast.toastType === 'info'
             }"
           ></i>
 

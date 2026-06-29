@@ -62,10 +62,17 @@
         </div>
       </div>
 
-      <!-- CLOSE -->
-      <button type="button" class="modal-close-btn" aria-label="Close" (click)="closeModal()">
-        <i class="bi bi-x-lg"></i>
-      </button>
+      <div class="modal-header-actions">
+        <button type="button" class="modal-evidence-btn" (click)="openEvidenceUpload()">
+          <i class="bi bi-cloud-arrow-up-fill"></i>
+          <span>Upload Evidence</span>
+        </button>
+
+        <!-- CLOSE -->
+        <button type="button" class="modal-close-btn" aria-label="Close" (click)="closeModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
     </div>
 
     <!-- BODY -->
@@ -146,22 +153,24 @@
                 </div>
 
                 <!-- ACTION -->
-                <button
-                  type="button"
-                  class="btn btn-primary btn-subject-action"
-                  [disabled]="isEvaluated"
-                  (click)="onEvaluate(cls, faculty!)"
-                >
-                  <i
-                    class="bi"
-                    [ngClass]="isEvaluated ? 'bi-check-circle-fill' : 'bi-play-circle-fill'"
+                <div class="subject-actions">
+                  <button
+                    type="button"
+                    class="btn btn-primary btn-subject-action"
+                    [disabled]="isEvaluated"
+                    (click)="onEvaluate(cls, faculty!)"
                   >
-                  </i>
+                    <i
+                      class="bi"
+                      [ngClass]="isEvaluated ? 'bi-check-circle-fill' : 'bi-play-circle-fill'"
+                    >
+                    </i>
 
-                  <span>
-                    {{ isEvaluated ? 'Completed' : 'Start Evaluation' }}
-                  </span>
-                </button>
+                    <span>
+                      {{ isEvaluated ? 'Completed' : 'Start Evaluation' }}
+                    </span>
+                  </button>
+                </div>
               </div>
             }
           </div>
@@ -178,11 +187,42 @@
           </div>
         }
 
-        <app-faculty-evidence-upload-component
-          [faculty]="faculty!"
-          [classes]="classes"
-        >
-        </app-faculty-evidence-upload-component>
+        @if (isEvidenceUploadOpen) {
+          <div class="evidence-modal-backdrop" (click)="closeEvidenceUpload()">
+            <div
+              class="evidence-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="facultyEvidenceUploadTitle"
+              (click)="$event.stopPropagation()"
+            >
+              <div class="evidence-modal-header">
+                <div>
+                  <p>Evidence Upload</p>
+
+                  <h5 id="facultyEvidenceUploadTitle">
+                    Faculty Evidence
+                  </h5>
+                </div>
+
+                <button
+                  type="button"
+                  class="modal-close-btn"
+                  aria-label="Close evidence upload"
+                  (click)="closeEvidenceUpload()"
+                >
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+
+              <app-faculty-evidence-upload-component
+                [faculty]="faculty!"
+                [classes]="classes"
+              >
+              </app-faculty-evidence-upload-component>
+            </div>
+          </div>
+        }
       }
     </div>
   </div>

@@ -80,3 +80,12 @@
 .custom-toast.toast-error .toast-icon {
   color: var(--ui-danger);
 }
+
+.custom-toast.toast-info {
+  background: #eff6ff;
+  border-left: 4px solid #2563eb;
+}
+
+.custom-toast.toast-info .toast-icon {
+  color: #2563eb;
+}

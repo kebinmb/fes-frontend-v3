@@ -31,3 +31,14 @@ export interface PageResponse<T> {
   number: number;
   size: number;
 }
+
+export interface SliceResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
