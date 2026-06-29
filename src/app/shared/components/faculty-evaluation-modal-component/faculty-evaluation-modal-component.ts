@@ -4,10 +4,11 @@ import {
   FacultyClass,
 } from '../../../core/services/supervisor-data/supervisor-data-service';
 import { AsyncPipe, CommonModule } from '@angular/common';
+import { FacultyEvidenceUploadComponent } from '@shared/components/faculty-evidence-upload-component/faculty-evidence-upload-component';
 
 @Component({
   selector: 'app-faculty-evaluation-modal-component',
-  imports: [CommonModule],
+  imports: [CommonModule, FacultyEvidenceUploadComponent],
   templateUrl: './faculty-evaluation-modal-component.html',
   styleUrl: './faculty-evaluation-modal-component.css',
 })
