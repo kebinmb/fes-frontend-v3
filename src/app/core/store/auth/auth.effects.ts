@@ -101,9 +101,15 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.studentLoginSuccess),
         tap(() => {
-          this.toastFacade.showToast(`Login successful`, 'success');
+          if (this.shouldAnnounceLoginSuccess('/login')) {
+            this.toastFacade.showToast(`Login successful`, 'success');
+          }
+
           this.spinnerFacade.hideSpinner();
-          Promise.resolve().then(() => this.router.navigate(['/student-dashboard']));
+
+          if (this.shouldNavigateAfterLogin('/student-dashboard')) {
+            Promise.resolve().then(() => this.router.navigate(['/student-dashboard']));
+          }
         }),
       ),
     { dispatch: false },
@@ -146,8 +152,13 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.supervisorLoginSuccess),
         tap(() => {
-          this.toastFacade.showToast(`Login successful`, 'success');
-          Promise.resolve().then(() => this.router.navigate(['/supervisor-dashboard']));
+          if (this.shouldAnnounceLoginSuccess('/login')) {
+            this.toastFacade.showToast(`Login successful`, 'success');
+          }
+
+          if (this.shouldNavigateAfterLogin('/supervisor-dashboard')) {
+            Promise.resolve().then(() => this.router.navigate(['/supervisor-dashboard']));
+          }
         }),
       ),
     { dispatch: false },
@@ -197,8 +208,13 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.administratorLoginSuccess),
         tap(() => {
-          this.toastFacade.showToast(`Login successful`, 'success');
-          Promise.resolve().then(() => this.router.navigate(['/admin-dashboard']));
+          if (this.shouldAnnounceLoginSuccess('/admin')) {
+            this.toastFacade.showToast(`Login successful`, 'success');
+          }
+
+          if (this.shouldNavigateAfterLogin('/admin-dashboard')) {
+            Promise.resolve().then(() => this.router.navigate(['/admin-dashboard']));
+          }
         }),
       ),
     { dispatch: false },
@@ -362,5 +378,17 @@ export class AuthEffects {
       college: response.college,
       program: response.program,
     });
+  }
+
+  private shouldAnnounceLoginSuccess(loginRoute: string): boolean {
+    const currentRoute = this.router.url.split('?')[0];
+
+    return currentRoute === loginRoute || currentRoute === '/oauth-success';
+  }
+
+  private shouldNavigateAfterLogin(targetRoute: string): boolean {
+    const currentRoute = this.router.url.split('?')[0];
+
+    return currentRoute !== targetRoute;
   }
 }

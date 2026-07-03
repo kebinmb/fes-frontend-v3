@@ -28,6 +28,7 @@ import { ConfirmationModalComponent } from '@shared/components/confirmation-moda
 import { ToastFacade } from '@core/store/toast/toast.facade';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { debounceTime } from 'rxjs/operators';
+import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 
 interface CriteriaGroup {
   category: string;
@@ -41,6 +42,7 @@ interface CriteriaGroup {
     CommonModule,
     ReactiveFormsModule,
     ConfirmationModalComponent,
+    UnicodeTextPipe,
   ],
   templateUrl: './faculty-evidence-upload-component.html',
   styleUrl: './faculty-evidence-upload-component.css',
@@ -81,6 +83,7 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   ]);
+  readonly evidenceSkeletonRows = [1, 2, 3, 4];
 
   criteria: EvidenceCriterion[] = [];
   evidences: FacultyEvidence[] = [];
@@ -208,6 +211,30 @@ export class FacultyEvidenceUploadComponent implements OnInit, OnChanges {
 
   loadMoreEvidences(): void {
     this.loadEvidences(true);
+  }
+
+  evidenceLoadLabel(): string {
+    if (this.isLoadingMore) {
+      return 'Loading more';
+    }
+
+    if (this.isEvidenceLoading && this.evidences.length) {
+      return 'Refreshing';
+    }
+
+    return 'Loading';
+  }
+
+  evidenceFooterLabel(): string {
+    if (!this.evidences.length) {
+      return 'No evidence loaded';
+    }
+
+    const fileWord = this.evidences.length === 1 ? 'file' : 'files';
+
+    return this.hasNextEvidencePage
+      ? `${this.evidences.length} ${fileWord} loaded`
+      : `All ${this.evidences.length} ${fileWord} loaded`;
   }
 
   onClassContextChange(): void {

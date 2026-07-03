@@ -1,0 +1,299 @@
+<section class="admin-overview" [attr.aria-busy]="isLoading()">
+  <div class="overview-hero">
+    <div class="hero-copy">
+      <p class="overview-eyebrow">Administrator Dashboard</p>
+      <h1>System Overview</h1>
+      <span>Live backend analytics for {{ dashboard()?.termLabel || 'the active term' }}.</span>
+
+      <div class="hero-meta" aria-label="Dashboard data source">
+        <span>
+          <i class="bi bi-broadcast-pin"></i>
+          Active term
+        </span>
+        <span>
+          <i class="bi bi-database-check"></i>
+          Backend optimized
+        </span>
+      </div>
+    </div>
+
+    <button type="button" class="refresh-btn" [disabled]="isLoading()" (click)="loadDashboard(true)">
+      @if (isLoading()) {
+        <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+        <span>Refreshing</span>
+      } @else {
+        <i class="bi bi-arrow-clockwise"></i>
+        <span>Refresh</span>
+      }
+    </button>
+  </div>
+
+  @if (isRefreshing()) {
+    <div class="refresh-strip" role="status" aria-live="polite">
+      <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+      <span>Updating dashboard metrics while keeping the current view visible.</span>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="overview-alert" role="alert">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (isInitialLoading()) {
+    <div class="metric-grid" aria-label="Loading dashboard metrics">
+      @for (item of metricSkeletonItems; track item) {
+        <div class="metric-card skeleton-card">
+          <span></span>
+          <strong></strong>
+          <small></small>
+        </div>
+      }
+    </div>
+
+    <div class="overview-grid" aria-label="Loading dashboard summaries">
+      @for (item of panelSkeletonItems; track item) {
+        <section class="overview-panel skeleton-panel">
+          <span></span>
+          <strong></strong>
+          <small></small>
+          <small></small>
+        </section>
+      }
+    </div>
+
+    <div class="activity-grid" aria-label="Loading dashboard lists">
+      @for (panel of [1, 2]; track panel) {
+        <section class="overview-panel">
+          <div class="skeleton-heading"></div>
+
+          <div class="activity-list">
+            @for (row of rowSkeletonItems; track row) {
+              <div class="activity-row skeleton-row">
+                <span></span>
+                <small></small>
+              </div>
+            }
+          </div>
+        </section>
+      }
+    </div>
+  } @else if (dashboard(); as data) {
+    <div class="metric-grid">
+      @for (metric of data.metrics; track trackMetric($index, metric)) {
+        <a class="metric-card" [class]="'tone-' + metric.tone" [routerLink]="metric.route">
+          <div class="metric-icon">
+            <i class="bi" [ngClass]="metric.icon"></i>
+          </div>
+
+          <div class="metric-copy">
+            <span>{{ metric.label }}</span>
+            <strong>{{ metric.value }}</strong>
+            <small>{{ metric.detail }}</small>
+          </div>
+
+          <i class="bi bi-arrow-up-right metric-arrow" aria-hidden="true"></i>
+        </a>
+      }
+    </div>
+
+    <div class="overview-grid">
+      <section class="overview-panel completion-panel">
+        <div class="panel-header">
+          <div>
+            <h2>Evaluation Completion</h2>
+            <span>
+              {{ data.summary.totalPrograms | number }} programs &middot;
+              {{ data.summary.totalSections | number }} sections
+            </span>
+          </div>
+
+          <strong>{{ formatPercent(data.summary.evaluationCompletionRate) }}%</strong>
+        </div>
+
+        <div class="completion-bar" aria-hidden="true">
+          <span [style.width.%]="completionWidth(data.summary.evaluationCompletionRate)"></span>
+        </div>
+
+        <div class="completion-stats">
+          <div>
+            <strong>{{ data.summary.expectedEvaluations | number }}</strong>
+            <span>Expected</span>
+          </div>
+
+          <div>
+            <strong>{{ data.summary.completedEvaluations | number }}</strong>
+            <span>Completed</span>
+          </div>
+
+          <div>
+            <strong>{{ data.summary.pendingEvaluations | number }}</strong>
+            <span>Pending</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="overview-panel">
+        <div class="panel-header compact">
+          <div>
+            <h2>Academic Coverage</h2>
+            <span>Current term scope</span>
+          </div>
+        </div>
+
+        <div class="breakdown-list">
+          <div class="breakdown-row">
+            <span>Classes</span>
+            <strong>{{ data.summary.totalClasses | number }}</strong>
+          </div>
+
+          <div class="breakdown-row">
+            <span>Subjects</span>
+            <strong>{{ data.summary.totalSubjects | number }}</strong>
+          </div>
+
+          <div class="breakdown-row">
+            <span>Evaluated Students</span>
+            <strong>{{ data.summary.evaluatedStudents | number }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="overview-panel score-panel">
+        <div class="panel-header compact">
+          <div>
+            <h2>Overall Score</h2>
+            <span>Average across completed evaluations</span>
+          </div>
+        </div>
+
+        <div class="score-summary">
+          <strong>{{ formatScore(data.summary.averageOverallScore) || '-' }}</strong>
+          <span>Average overall score</span>
+        </div>
+      </section>
+    </div>
+
+    <div class="activity-grid">
+      <section class="overview-panel">
+        <div class="panel-header compact">
+          <div>
+            <h2>Program Breakdown</h2>
+            <span>Completion and score by program</span>
+          </div>
+        </div>
+
+        <div class="activity-list">
+          @for (program of paginatedPrograms(); track trackProgram($index, program)) {
+            <div class="activity-row">
+              <div class="activity-main">
+                <strong>{{ program.programCode }}</strong>
+                <span>
+                  {{ program.completedEvaluations | number }} /
+                  {{ program.expectedEvaluations | number }} completed &middot;
+                  {{ program.totalStudents | number }} students
+                </span>
+                <div class="row-progress" aria-hidden="true">
+                  <span [style.width.%]="completionWidth(program.completionRate)"></span>
+                </div>
+              </div>
+
+              <div class="score-pill">
+                {{ formatPercent(program.completionRate) }}%
+              </div>
+            </div>
+          } @empty {
+            <p class="empty-copy">No program analytics available for this term.</p>
+          }
+        </div>
+
+        <div class="pagination-footer">
+          <span>{{ programPaginationLabel() }}</span>
+
+          <div class="pagination-actions" aria-label="Program breakdown pagination">
+            <button
+              type="button"
+              [disabled]="programPage() === 1"
+              (click)="previousProgramPage()"
+              aria-label="Previous program breakdown page"
+            >
+              <i class="bi bi-chevron-left"></i>
+            </button>
+
+            <strong>{{ programPage() }} / {{ programTotalPages() }}</strong>
+
+            <button
+              type="button"
+              [disabled]="programPage() === programTotalPages()"
+              (click)="nextProgramPage()"
+              aria-label="Next program breakdown page"
+            >
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="overview-panel">
+        <div class="panel-header compact">
+          <div>
+            <h2>Top Faculty Loads</h2>
+            <span>Faculty with the highest active load</span>
+          </div>
+
+          <a routerLink="/admin-dashboard/evaluation-score-list">View scores</a>
+        </div>
+
+        <div class="activity-list">
+          @for (faculty of paginatedFacultyLoads(); track trackFacultyLoad($index, faculty)) {
+            <div class="activity-row faculty-row">
+              <div class="activity-main">
+                <strong>{{ (faculty.facultyName || faculty.facultyId) | unicodeText }}</strong>
+                <span>
+                  {{ faculty.totalClasses | number }} classes &middot;
+                  {{ faculty.totalSubjects | number }} subjects &middot;
+                  {{ faculty.totalStudents | number }} students
+                </span>
+                <small>{{ faculty.completedEvaluations | number }} completed evaluations</small>
+              </div>
+
+              <div class="score-pill">
+                {{ formatScore(faculty.averageOverallScore) || '-' }}
+              </div>
+            </div>
+          } @empty {
+            <p class="empty-copy">No faculty load analytics available for this term.</p>
+          }
+        </div>
+
+        <div class="pagination-footer">
+          <span>{{ facultyLoadPaginationLabel() }}</span>
+
+          <div class="pagination-actions" aria-label="Top faculty loads pagination">
+            <button
+              type="button"
+              [disabled]="facultyLoadPage() === 1"
+              (click)="previousFacultyLoadPage()"
+              aria-label="Previous faculty loads page"
+            >
+              <i class="bi bi-chevron-left"></i>
+            </button>
+
+            <strong>{{ facultyLoadPage() }} / {{ facultyLoadTotalPages() }}</strong>
+
+            <button
+              type="button"
+              [disabled]="facultyLoadPage() === facultyLoadTotalPages()"
+              (click)="nextFacultyLoadPage()"
+              aria-label="Next faculty loads page"
+            >
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  }
+</section>

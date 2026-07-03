@@ -60,11 +60,11 @@
           <td data-label="Faculty Name">
             <div class="table-user">
               <div class="table-avatar">
-                {{ faculty.firstname.charAt(0) }}
+                {{ facultyInitial(faculty) }}
               </div>
               <div class="fw-semibold">
-                {{ faculty.firstname }}
-                {{ faculty.lastname }}
+                {{ faculty.firstname | unicodeText }}
+                {{ faculty.lastname | unicodeText }}
               </div>
             </div>
           </td>
@@ -81,7 +81,7 @@
               <button
                 type="button"
                 class="edit-btn"
-                [attr.aria-label]="'Edit ' + faculty.firstname + ' ' + faculty.lastname"
+                [attr.aria-label]="'Edit ' + facultyName(faculty)"
                 (click)="openEditModal(faculty)"
               >
                 <i class="bi bi-pencil-square"></i>
@@ -90,11 +90,11 @@
               <button
                 type="button"
                 class="single-print-btn"
-                [attr.aria-label]="'Print evaluation report for ' + faculty.firstname + ' ' + faculty.lastname"
+                [attr.aria-label]="'Print evaluation report for ' + facultyName(faculty)"
                 (click)="printSingle({
                       facultyEvaluationScoreId: 0,
                       facultyId: faculty.facultyId,
-                      facultyName: faculty.firstname + ' ' + faculty.lastname,
+                      facultyName: facultyName(faculty),
                       college: faculty.college,
                       position: faculty.position,
                       classCode: '',

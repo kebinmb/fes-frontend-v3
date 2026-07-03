@@ -21,12 +21,15 @@ import {
 import {
   StudentEvaluationFacade,
 } from '@core/store/student-evaluation-data/student-evaluation-data.facade';
+import { repairSpecialCharacters } from '@utilities/normalize-text';
+import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 
 @Component({
   selector: 'app-student-evaluations-data-table',
   imports: [
     AsyncPipe,
     DatePipe,
+    UnicodeTextPipe,
   ],
   templateUrl:
     './student-evaluations-data-table-component.html',
@@ -131,5 +134,11 @@ export class StudentEvaluationsDataTableComponent
     this.page.update(v => v - 1);
 
     this.loadStudentEvaluations();
+  }
+
+  initial(value: string | null | undefined): string {
+    return repairSpecialCharacters(value ?? '')
+      .charAt(0)
+      .toLocaleUpperCase('en-PH');
   }
 }

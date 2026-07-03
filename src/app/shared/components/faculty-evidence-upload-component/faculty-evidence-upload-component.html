@@ -3,9 +3,9 @@
     <div>
       <p class="evidence-eyebrow">Supervisor Evidence</p>
 
-      <h5 id="facultyEvidenceTitle">{{ panelTitle() }}</h5>
+      <h5 id="facultyEvidenceTitle">{{ panelTitle() | unicodeText }}</h5>
 
-      <span>{{ panelSubtitle() }}</span>
+      <span>{{ panelSubtitle() | unicodeText }}</span>
     </div>
 
     <div class="evidence-count" aria-label="Loaded evidence records">
@@ -50,10 +50,10 @@
           <option value="">Select criterion</option>
 
           @for (group of groupedCriteria(); track group.category) {
-            <optgroup [label]="group.category">
+              <optgroup [label]="group.category | unicodeText">
               @for (criterion of group.items; track trackCriterion($index, criterion)) {
                 <option [value]="criterion.name">
-                  {{ criterion.label }}
+                  {{ criterion.label | unicodeText }}
                 </option>
               }
             </optgroup>
@@ -187,7 +187,7 @@
       @if (isEvidenceLoading || isCriteriaLoading) {
         <span class="list-loading">
           <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
-          Loading
+          {{ evidenceLoadLabel() }}
         </span>
       }
     </div>
@@ -205,10 +205,10 @@
           <option value="">All criteria</option>
 
           @for (group of groupedCriteria(); track group.category) {
-            <optgroup [label]="group.category">
+              <optgroup [label]="group.category | unicodeText">
               @for (criterion of group.items; track trackCriterion($index, criterion)) {
                 <option [value]="criterion.name">
-                  {{ criterion.label }}
+                  {{ criterion.label | unicodeText }}
                 </option>
               }
             </optgroup>
@@ -278,12 +278,17 @@
     </form>
 
     @if (isEvidenceLoading && !evidences.length) {
-      <div class="ui-loading-state">
-        <span class="ui-spinner" aria-hidden="true"></span>
-        <p>Loading evidence files...</p>
+      <div class="evidence-skeleton-list" aria-label="Loading evidence files">
+        @for (row of evidenceSkeletonRows; track row) {
+          <div class="evidence-skeleton-row">
+            <span></span>
+            <strong></strong>
+            <small></small>
+          </div>
+        }
       </div>
     } @else if (evidences.length) {
-      <div class="evidence-table-wrap">
+      <div class="evidence-table-wrap" [class.is-refreshing]="isEvidenceLoading">
         <table class="evidence-table">
           <thead>
             <tr>
@@ -299,8 +304,8 @@
             @for (evidence of evidences; track trackEvidence($index, evidence)) {
               <tr>
                 <td data-label="Criterion">
-                  <strong>{{ evidence.criterionLabel }}</strong>
-                  <small>{{ evidence.criterionCategory }}</small>
+                  <strong>{{ evidence.criterionLabel | unicodeText }}</strong>
+                  <small>{{ evidence.criterionCategory | unicodeText }}</small>
                 </td>
 
                 <td data-label="File">
@@ -343,9 +348,7 @@
       </div>
 
       <div class="evidence-footer">
-        <small>
-          Showing {{ evidences.length }} loaded file{{ evidences.length === 1 ? '' : 's' }}
-        </small>
+        <small>{{ evidenceFooterLabel() }}</small>
 
         <div class="pagination-actions">
           <button

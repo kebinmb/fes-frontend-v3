@@ -5,10 +5,11 @@ import {
 } from '../../../core/services/supervisor-data/supervisor-data-service';
 import { CommonModule } from '@angular/common';
 import { FacultyEvidenceUploadComponent } from '@shared/components/faculty-evidence-upload-component/faculty-evidence-upload-component';
+import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 
 @Component({
   selector: 'app-faculty-evaluation-modal-component',
-  imports: [CommonModule, FacultyEvidenceUploadComponent],
+  imports: [CommonModule, FacultyEvidenceUploadComponent, UnicodeTextPipe],
   templateUrl: './faculty-evaluation-modal-component.html',
   styleUrl: './faculty-evaluation-modal-component.css',
 })

@@ -12,6 +12,8 @@ import { FetchFacultyResponse } from '@core/services/admin/admin-service';
 import { debounceTime, Subject, take } from 'rxjs';
 import * as AdminDataActions from '@core/store/admin-data/admin-data.actions';
 import { Actions, ofType } from '@ngrx/effects';
+import { repairSpecialCharacters } from '@utilities/normalize-text';
+import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 export interface FacultyEvaluationPrintRecord {
   facultyEvaluationScoreId: number;
   facultyId: string;
@@ -50,9 +52,9 @@ type SeparatedEvaluationComments = {
 @Component({
   selector: 'app-faculty-data-table-component',
   standalone: true,
-  imports: [AsyncPipe, ReactiveFormsModule, FormsModule],
   templateUrl: './faculty-data-table-component.html',
   styleUrl: './faculty-data-table-component.css',
+  imports: [AsyncPipe, ReactiveFormsModule, FormsModule, UnicodeTextPipe],
 })
 export class FacultyDataTableComponent implements OnInit {
   private adminDataFacade = inject(AdminDataFacade);
@@ -125,6 +127,19 @@ export class FacultyDataTableComponent implements OnInit {
     this.adminDataFacade.updateFaculty(this.facultyForm.value);
     this.closeEditModal();
   }
+
+  facultyName(faculty: FetchFacultyResponse): string {
+    return repairSpecialCharacters(
+      `${faculty.firstname ?? ''} ${faculty.lastname ?? ''}`.trim(),
+    );
+  }
+
+  facultyInitial(faculty: FetchFacultyResponse): string {
+    return repairSpecialCharacters(faculty.firstname ?? '')
+      .charAt(0)
+      .toLocaleUpperCase('en-PH');
+  }
+
   get f() {
     return this.facultyForm.controls;
   }

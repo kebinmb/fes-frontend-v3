@@ -109,14 +109,14 @@
 
                   <div class="table-avatar">
 
-                    {{ evaluation.studentFirstname.charAt(0) }}
+                    {{ initial(evaluation.studentFirstname) }}
 
                   </div>
 
                   <div class="fw-semibold">
 
-                    {{ evaluation.studentLastname }},
-                    {{ evaluation.studentFirstname }}
+                    {{ evaluation.studentLastname | unicodeText }},
+                    {{ evaluation.studentFirstname | unicodeText }}
 
                   </div>
 
@@ -152,8 +152,8 @@
 
                   <span class="faculty-name">
 
-                    {{ evaluation.facultyLastname }},
-                    {{ evaluation.facultyFirstname }}
+                    {{ evaluation.facultyLastname | unicodeText }},
+                    {{ evaluation.facultyFirstname | unicodeText }}
 
                   </span>
 

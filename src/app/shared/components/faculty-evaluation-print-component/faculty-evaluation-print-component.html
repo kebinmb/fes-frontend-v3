@@ -25,7 +25,7 @@
         <span class="faculty-label"> Faculty Name </span>
 
         <span class="faculty-value">
-          {{ faculty?.facultyName || '-' }}
+          {{ (faculty?.facultyName || '-') | unicodeText }}
         </span>
       </div>
 
@@ -33,7 +33,7 @@
         <span class="faculty-label"> Department / College </span>
 
         <span class="faculty-value">
-          {{ faculty?.college || '-' }}
+          {{ (faculty?.college || '-') | unicodeText }}
         </span>
       </div>
 
@@ -41,7 +41,7 @@
         <span class="faculty-label"> Faculty Rank </span>
 
         <span class="faculty-value">
-          {{ faculty?.position || '-' }}
+          {{ (faculty?.position || '-') | unicodeText }}
         </span>
       </div>
 
@@ -199,7 +199,7 @@
             </td>
 
             <td>
-              {{ item.comment }}
+            {{ item.comment | unicodeText }}
             </td>
           </tr>
         }
@@ -235,7 +235,7 @@
             </td>
 
             <td>
-              {{ item.comment }}
+              {{ item.comment | unicodeText }}
             </td>
           </tr>
         }

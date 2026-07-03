@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 
 @Component({
   selector: 'app-confirmation-modal-component',
-  imports: [CommonModule],
+  imports: [CommonModule, UnicodeTextPipe],
   templateUrl: './confirmation-modal-component.html',
   styleUrl: './confirmation-modal-component.css',
 })

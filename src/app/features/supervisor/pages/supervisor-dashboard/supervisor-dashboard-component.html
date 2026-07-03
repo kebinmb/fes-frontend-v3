@@ -121,8 +121,8 @@
                 </div>
                 <div class="faculty-profile-info">
                   <div class="faculty-name">
-                    {{ faculty.firstname | uppercase }}
-                    {{ faculty.lastname | uppercase }}
+                    {{ faculty.firstname | unicodeText: 'upper' }}
+                    {{ faculty.lastname | unicodeText: 'upper' }}
                   </div>
                   <div class="faculty-id">
                     {{ faculty.facultyId }}

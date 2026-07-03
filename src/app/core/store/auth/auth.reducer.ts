@@ -67,6 +67,7 @@ export const authReducer = createReducer(
     userId: action.administratorId,
     role: action.role,
     isAuthenticated: true,
+    isAuthChecked: true,
     isLoading: false,
     error: null,
   })),

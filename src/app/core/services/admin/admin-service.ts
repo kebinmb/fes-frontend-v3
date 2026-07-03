@@ -1,8 +1,10 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
+import { map, shareReplay, tap } from 'rxjs/operators';
 import { FacultyEvaluationScore, Page } from '../evaluation/evaluation-service';
+import { repairSpecialCharacters } from '@utilities/normalize-text';
 export interface PageResponse<T> {
   content: T[];
 
@@ -184,6 +186,50 @@ export interface StudentEvaluationStatusResponse {
 
   evaluationStatus: string;
 }
+
+export interface AdminDashboardSummaryResponse {
+  schoolYear: number;
+  semester: string;
+  totalStudents: number;
+  totalFaculty: number;
+  totalClasses: number;
+  totalSubjects: number;
+  totalPrograms: number;
+  totalSections: number;
+  expectedEvaluations: number;
+  completedEvaluations: number;
+  evaluatedStudents: number;
+  pendingEvaluations: number;
+  evaluationCompletionRate: number;
+  averageOverallScore: number;
+}
+
+export interface AdminDashboardProgramBreakdownResponse {
+  programCode: string;
+  totalStudents: number;
+  totalClasses: number;
+  totalSections: number;
+  expectedEvaluations: number;
+  completedEvaluations: number;
+  completionRate: number;
+  averageOverallScore: number;
+}
+
+export interface AdminDashboardFacultyLoadResponse {
+  facultyId: string;
+  facultyName: string;
+  totalClasses: number;
+  totalSubjects: number;
+  totalStudents: number;
+  completedEvaluations: number;
+  averageOverallScore: number;
+}
+
+export interface AdminDashboardResponse {
+  summary: AdminDashboardSummaryResponse;
+  programs: AdminDashboardProgramBreakdownResponse[];
+  facultyLoads: AdminDashboardFacultyLoadResponse[];
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -191,6 +237,60 @@ export class AdminService {
   private http = inject(HttpClient);
   private readonly ADMIN_API_URL = `${environment.API_URL}/admin`;
   private readonly MIGRATION_API_URL = `${environment.API_URL}/migration/all`;
+  private readonly DASHBOARD_CACHE_TTL_MS = 30_000;
+  private readonly DASHBOARD_FACULTY_LOAD_LIMIT = 50;
+  private readonly CURRENT_TERM_CACHE_TTL_MS = 5 * 60_000;
+  private dashboardCache$?: Observable<AdminDashboardResponse>;
+  private dashboardCacheCreatedAt = 0;
+  private currentTermCache$?: Observable<CurrentSchoolYearAndSemesterResponse>;
+  private currentTermCacheCreatedAt = 0;
+
+  getDashboard(forceRefresh = false): Observable<AdminDashboardResponse> {
+    const isExpired =
+      Date.now() - this.dashboardCacheCreatedAt > this.DASHBOARD_CACHE_TTL_MS;
+
+    if (forceRefresh || !this.dashboardCache$ || isExpired) {
+      this.dashboardCacheCreatedAt = Date.now();
+      this.dashboardCache$ = forkJoin({
+        summary: this.getDashboardSummary(),
+        programs: this.getDashboardProgramBreakdown(),
+        facultyLoads: this.getDashboardFacultyLoads(this.DASHBOARD_FACULTY_LOAD_LIMIT),
+      }).pipe(shareReplay({ bufferSize: 1, refCount: false }));
+    }
+
+    return this.dashboardCache$;
+  }
+
+  getDashboardSummary(): Observable<AdminDashboardSummaryResponse> {
+    return this.http.get<AdminDashboardSummaryResponse>(`${this.ADMIN_API_URL}/dashboard/summary`, {
+      withCredentials: true,
+    });
+  }
+
+  getDashboardProgramBreakdown(): Observable<AdminDashboardProgramBreakdownResponse[]> {
+    return this.http.get<AdminDashboardProgramBreakdownResponse[]>(
+      `${this.ADMIN_API_URL}/dashboard/programs`,
+      { withCredentials: true },
+    );
+  }
+
+  getDashboardFacultyLoads(limit = 10): Observable<AdminDashboardFacultyLoadResponse[]> {
+    const params = new HttpParams().set('limit', limit);
+
+    return this.http.get<AdminDashboardFacultyLoadResponse[]>(
+      `${this.ADMIN_API_URL}/dashboard/faculty-loads`,
+      {
+        params,
+        withCredentials: true,
+      },
+    );
+  }
+
+  clearDashboardCache(): void {
+    this.dashboardCache$ = undefined;
+    this.dashboardCacheCreatedAt = 0;
+  }
+
   getFaculties(
     page: number = 0,
     size: number = 10,
@@ -205,7 +305,7 @@ export class AdminService {
     return this.http.get<PageResponse<FetchFacultyResponse>>(`${this.ADMIN_API_URL}/faculties`, {
       params,
       withCredentials: true,
-    });
+    }).pipe(map((response) => repairSpecialCharacters(response)));
   }
 
   getUserAccounts(
@@ -251,6 +351,10 @@ export class AdminService {
         responseType: 'text',
         withCredentials: true,
       },
+    ).pipe(
+      tap(() => {
+        this.clearDashboardCache();
+      }),
     );
   }
 
@@ -299,20 +403,38 @@ export class AdminService {
         params,
         withCredentials: true,
       },
+    ).pipe(
+      tap(() => {
+        this.clearDashboardCache();
+        this.clearCurrentTermCache();
+      }),
     );
   }
 
   fetchCurrentSchoolYearAndSemester():
     Observable<CurrentSchoolYearAndSemesterResponse> {
+    const isExpired =
+      Date.now() - this.currentTermCacheCreatedAt >
+      this.CURRENT_TERM_CACHE_TTL_MS;
 
-    return this.http.get<
-      CurrentSchoolYearAndSemesterResponse
-    >(
-      `${this.ADMIN_API_URL}/school-year-semester`,
-      {
-        withCredentials: true,
-      },
-    );
+    if (!this.currentTermCache$ || isExpired) {
+      this.currentTermCacheCreatedAt = Date.now();
+      this.currentTermCache$ = this.http.get<
+        CurrentSchoolYearAndSemesterResponse
+      >(
+        `${this.ADMIN_API_URL}/school-year-semester`,
+        {
+          withCredentials: true,
+        },
+      ).pipe(shareReplay({ bufferSize: 1, refCount: false }));
+    }
+
+    return this.currentTermCache$;
+  }
+
+  clearCurrentTermCache(): void {
+    this.currentTermCache$ = undefined;
+    this.currentTermCacheCreatedAt = 0;
   }
 
   getStudentEvaluations(

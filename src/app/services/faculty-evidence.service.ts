@@ -40,7 +40,7 @@ export class FacultyEvidenceService {
   private readonly baseUrl = `${environment.API_URL}/faculty/evidences`;
   private readonly http = inject(HttpClient);
   private readonly criteria$ = this.http
-    .get<EvidenceCriterion[]>(`${this.baseUrl}/criteria`)
+    .get<EvidenceCriterion[]>(`${this.baseUrl}/criteria`, { withCredentials: true })
     .pipe(shareReplay({ bufferSize: 1, refCount: true }));
 
   getCriteria(): Observable<EvidenceCriterion[]> {
@@ -50,7 +50,7 @@ export class FacultyEvidenceService {
   uploadEvidence(payload: UploadEvidencePayload): Observable<FacultyEvidence> {
     const formData = this.buildEvidenceFormData(payload);
 
-    return this.http.post<FacultyEvidence>(this.baseUrl, formData);
+    return this.http.post<FacultyEvidence>(this.baseUrl, formData, { withCredentials: true });
   }
 
   uploadEvidenceWithProgress(
@@ -61,30 +61,38 @@ export class FacultyEvidenceService {
     return this.http.post<FacultyEvidence>(this.baseUrl, formData, {
       observe: 'events',
       reportProgress: true,
+      withCredentials: true,
     });
   }
 
   getEvidenceList(filters: EvidenceListFilters): Observable<PageResponse<FacultyEvidence>> {
     const params = this.buildEvidenceListParams(filters, 10);
 
-    return this.http.get<PageResponse<FacultyEvidence>>(this.baseUrl, { params });
+    return this.http.get<PageResponse<FacultyEvidence>>(this.baseUrl, {
+      params,
+      withCredentials: true,
+    });
   }
 
   getEvidenceSlice(filters: EvidenceListFilters): Observable<SliceResponse<FacultyEvidence>> {
     const params = this.buildEvidenceListParams(filters, 12);
 
-    return this.http.get<SliceResponse<FacultyEvidence>>(`${this.baseUrl}/slice`, { params });
+    return this.http.get<SliceResponse<FacultyEvidence>>(`${this.baseUrl}/slice`, {
+      params,
+      withCredentials: true,
+    });
   }
 
   downloadEvidence(evidenceId: number) {
     return this.http.get(`${this.baseUrl}/${evidenceId}/download`, {
       responseType: 'blob',
       observe: 'response',
+      withCredentials: true,
     });
   }
 
   deleteEvidence(evidenceId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${evidenceId}`);
+    return this.http.delete<void>(`${this.baseUrl}/${evidenceId}`, { withCredentials: true });
   }
 
   private buildEvidenceFormData(payload: UploadEvidencePayload): FormData {

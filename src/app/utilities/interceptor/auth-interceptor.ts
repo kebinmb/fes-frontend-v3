@@ -1,11 +1,12 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+import { HttpInterceptorFn, HttpParams, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, map, throwError } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 
 import * as AuthActions from './../../core/store/auth/auth.action';
+import { normalizeUnicode, repairSpecialCharacters } from '../normalize-text';
 
 let isHandlingAuthError = false;
 
@@ -19,10 +20,21 @@ export const authInterceptor: HttpInterceptorFn = (
   const store = inject(Store);
 
   const cloned = req.clone({
+    body: normalizeRequestBody(req.body),
+    params: normalizeRequestParams(req.params),
     withCredentials: true,
   });
 
   return next(cloned).pipe(
+    map((event) => {
+      if (event instanceof HttpResponse) {
+        return event.clone({
+          body: repairSpecialCharacters(event.body),
+        });
+      }
+
+      return event;
+    }),
 
     catchError((error) => {
 
@@ -57,3 +69,31 @@ export const authInterceptor: HttpInterceptorFn = (
     }),
   );
 };
+
+function normalizeRequestBody<T>(body: T): T {
+  if (
+    !body ||
+    body instanceof FormData ||
+    body instanceof Blob ||
+    body instanceof ArrayBuffer
+  ) {
+    return body;
+  }
+
+  return repairSpecialCharacters(body);
+}
+
+function normalizeRequestParams(params: HttpParams): HttpParams {
+  let normalized = new HttpParams();
+
+  for (const key of params.keys()) {
+    const normalizedKey = normalizeUnicode(key);
+    const values = params.getAll(key) ?? [];
+
+    for (const value of values) {
+      normalized = normalized.append(normalizedKey, normalizeUnicode(value));
+    }
+  }
+
+  return normalized;
+}

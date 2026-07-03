@@ -1,4 +1,6 @@
 import { Component, Input } from '@angular/core';
+import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
+import { repairSpecialCharacters } from '@utilities/normalize-text';
 export interface FacultyEvaluationPrintRecord {
   facultyEvaluationScoreId: number;
 
@@ -39,7 +41,7 @@ interface PrintCommentRow {
 
 @Component({
   selector: 'app-faculty-evaluation-print-component',
-  imports: [],
+  imports: [UnicodeTextPipe],
   templateUrl: './faculty-evaluation-print-component.html',
   styleUrl: './faculty-evaluation-print-component.css',
 })
@@ -64,7 +66,7 @@ export class FacultyEvaluationPrintComponent {
   ngOnInit(): void {
     const storedData = localStorage.getItem('faculty-print-data');
     if (storedData && !this.data.length) {
-      this.data = JSON.parse(storedData);
+      this.data = repairSpecialCharacters(JSON.parse(storedData));
     }
     if (!this.data.length) {
       return;
@@ -132,7 +134,7 @@ export class FacultyEvaluationPrintComponent {
       return [];
     }
 
-    return comments
+    return repairSpecialCharacters(comments)
       .split(/\r?\n|(?:\s*\|\s*)|(?:\s*;\s*)|(?:\s*•\s*)/)
       .map((comment) => comment.replace(/[ \t]+/g, ' ').trim())
       .filter((comment) => comment && comment !== '-');

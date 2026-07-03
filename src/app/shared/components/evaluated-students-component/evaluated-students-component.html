@@ -60,16 +60,16 @@
                 </span>
               </td>
               <td>
-                {{ student.studentLastname }},
-                {{ student.studentFirstname }}
+                {{ student.studentLastname | unicodeText }},
+                {{ student.studentFirstname | unicodeText }}
               </td>
               <td>
                 {{ normalize(student.facultyId) }}
               </td>
 
               <td>
-                {{ student.lastname }},
-                {{ student.firstname }}
+                {{ student.lastname | unicodeText }},
+                {{ student.firstname | unicodeText }}
               </td>
 
               <td>

@@ -3,11 +3,13 @@ import { Component, inject, OnInit } from '@angular/core';
 import { take } from 'rxjs';
 import { AdminDataFacade } from '@core/store/admin-data/admin-data.facade';
 import { Actions, ofType } from '@ngrx/effects';
+import { repairSpecialCharacters } from '@utilities/normalize-text';
+import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 
 @Component({
   selector: 'app-faculty-evaluation-scores-data-table-component',
   standalone: true,
-  imports: [DecimalPipe, AsyncPipe],
+  imports: [DecimalPipe, AsyncPipe, UnicodeTextPipe],
   templateUrl: './faculty-evaluation-scores-data-table-component.html',
   styleUrl: './faculty-evaluation-scores-data-table-component.css',
 })
@@ -29,5 +31,11 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
   }
   printBulk(data:any){
 
+  }
+
+  initial(value: string | null | undefined): string {
+    return repairSpecialCharacters(value ?? '')
+      .charAt(0)
+      .toLocaleUpperCase('en-PH');
   }
 }

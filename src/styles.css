@@ -29,9 +29,30 @@
 
 @font-face {
   font-family: 'Optima';
-  src: url('/assets/fonts/OPTIMA.TTF') format('truetype');
+  src:
+    local('Segoe UI'),
+    local('Arial');
   font-weight: normal;
   font-style: normal;
+  unicode-range: U+00D1, U+00F1;
+}
+
+@font-face {
+  font-family: 'Optima';
+  src:
+    local('Segoe UI Bold'),
+    local('Arial Bold');
+  font-weight: bold;
+  font-style: normal;
+  unicode-range: U+00D1, U+00F1;
+}
+
+@font-face {
+  font-family: 'Optima';
+  src: url('/assets/fonts/Optima%20Medium.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  unicode-range: U+0000-00D0, U+00D2-00F0, U+00F2-10FFFF;
 }
 
 @font-face {
@@ -39,6 +60,7 @@
   src: url('/assets/fonts/OPTIMA_B.TTF') format('truetype');
   font-weight: bold;
   font-style: normal;
+  unicode-range: U+0000-00D0, U+00D2-00F0, U+00F2-10FFFF;
 }
 body {
   min-height: 100vh;

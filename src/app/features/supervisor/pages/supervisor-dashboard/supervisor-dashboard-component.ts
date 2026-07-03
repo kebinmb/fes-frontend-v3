@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, DestroyRef, OnInit, ViewChild, inject } from '@angular/core';
-import { AsyncPipe, CommonModule, UpperCasePipe } from '@angular/common';
+import { AsyncPipe, CommonModule } from '@angular/common';
 import { Subject, debounceTime, distinctUntilChanged, filter, map, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SupervisorDataFacade } from '@core/store/supervisor-data/supervisor-data.facade';
@@ -18,6 +18,8 @@ import { EvaluatedStudentsComponent } from '@shared/components/evaluated-student
 import { ChangePasswordModalComponent } from "@shared/components/change-password-modal-component/change-password-modal-component";
 import { AuthService, ChangePasswordRequest } from '@core/services/auth/auth-service';
 import { ToastFacade } from '@core/store/toast/toast.facade';
+import { repairSpecialCharacters } from '@utilities/normalize-text';
+import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 @Component({
   selector: 'app-supervisor-dashboard-component',
   standalone: true,
@@ -28,7 +30,7 @@ import { ToastFacade } from '@core/store/toast/toast.facade';
     FormsModule,
     FacultyEvaluationModalComponent,
     EvaluatedStudentsComponent,
-    UpperCasePipe,
+    UnicodeTextPipe,
     ChangePasswordModalComponent
   ],
   templateUrl: './supervisor-dashboard-component.html',
@@ -220,7 +222,9 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
     this.startEvaluation(this.selectedClass, this.selectedFaculty);
   }
   startEvaluation(cls: FacultyClass, faculty: FacultyLoadDTO): void {
-    const facultyName = `${faculty.firstname} ${faculty.lastname}`;
+    const facultyName = repairSpecialCharacters(
+      `${faculty.firstname ?? ''} ${faculty.lastname ?? ''}`.trim(),
+    );
     this.supervisorDataFacade.selectClass({
       ...cls,
       college: faculty.college,
@@ -238,8 +242,8 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
     return campusMap[campus] || campus;
   }
   getFacultyInitials(faculty: FacultyLoadDTO): string {
-    const first = faculty.firstname?.charAt(0) ?? '';
-    const last = faculty.lastname?.charAt(0) ?? '';
+    const first = repairSpecialCharacters(faculty.firstname ?? '').charAt(0);
+    const last = repairSpecialCharacters(faculty.lastname ?? '').charAt(0);
     return `${first}${last}`;
   }
   schoolYear(): number {

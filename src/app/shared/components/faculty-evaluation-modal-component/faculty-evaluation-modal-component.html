@@ -17,15 +17,15 @@
           <div class="modal-badge">Faculty Evaluation</div>
 
           <h4 class="modal-title" id="facultyEvaluationModalTitle">
-            {{ faculty!.firstname }}
-            {{ faculty!.lastname }}
+            {{ faculty!.firstname | unicodeText }}
+            {{ faculty!.lastname | unicodeText }}
           </h4>
 
           <p class="modal-subtitle">
             <i class="bi bi-briefcase-fill"></i>
 
             <span>
-              {{ faculty!.position }}
+              {{ faculty!.position | unicodeText }}
             </span>
           </p>
 
@@ -106,12 +106,12 @@
                       <i class="bi bi-book-half"></i>
 
                       <span>
-                        {{ cls.subjectCode }}
+                        {{ cls.subjectCode | unicodeText }}
                       </span>
                     </div>
 
                     <div class="subject-description">
-                      {{ cls.subjectDescription }}
+                      {{ cls.subjectDescription | unicodeText }}
                     </div>
                   </div>
 

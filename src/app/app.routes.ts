@@ -61,6 +61,20 @@ export const routes: Routes = [
     data: { role: 'ROLE_ADMIN' },
     children: [
       {
+        path: '',
+        loadComponent: () =>
+          import(
+            '@features/admin/components/admin-dashboard-overview/admin-dashboard-overview-component'
+          ).then((m) => m.AdminDashboardOverviewComponent),
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import(
+            '@features/admin/components/admin-dashboard-overview/admin-dashboard-overview-component'
+          ).then((m) => m.AdminDashboardOverviewComponent),
+      },
+      {
         path: 'faculty-list',
         loadComponent: () =>
           import(

@@ -7,13 +7,14 @@ import { SupervisorDataFacade } from '../../../core/store/supervisor-data/superv
 import { AuthFacade } from '../../../core/store/auth/auth.facade';
 import { Store } from '@ngrx/store';
 import { selectEvaluatorId } from '../../../core/store/auth/auth.selector';
+import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 
 @Component({
   selector: 'app-evaluated-students-component',
 
   standalone: true,
 
-  imports: [AsyncPipe, DatePipe],
+  imports: [AsyncPipe, DatePipe, UnicodeTextPipe],
 
   templateUrl: './evaluated-students-component.html',
 

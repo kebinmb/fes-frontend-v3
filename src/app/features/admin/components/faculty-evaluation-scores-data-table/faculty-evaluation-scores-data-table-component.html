@@ -43,15 +43,11 @@
               <td data-label="Faculty">
                 <div class="table-user">
                   <div class="table-avatar warning-avatar">
-                    {{
-                      score.facultyName
-                        .charAt(0)
-                        .toUpperCase()
-                    }}
+                    {{ initial(score.facultyName) }}
                   </div>
                   <div class="table-user-content">
                     <div class="fw-semibold">
-                      {{ score.facultyName }}
+                      {{ score.facultyName | unicodeText }}
                     </div>
                     <small>
                       {{ score.facultyId }}
