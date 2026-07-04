@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { forkJoin, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, shareReplay, tap } from 'rxjs/operators';
 import { FacultyEvaluationScore, Page } from '../evaluation/evaluation-service';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
@@ -63,6 +63,47 @@ export interface UpdateFacultyRequest {
   loadLimit: number;
   college: string;
   status: string;
+}
+
+export type FacultyWorkloadSource = 'MANUAL' | 'IMPORTED' | 'SYSTEM';
+export type FacultyLoadStatus = 'REGULAR_LOAD' | 'OVERLOAD';
+export type FacultyWorkloadNumber = number | string | null;
+
+export interface FacultyWorkloadRequest {
+  facultyWorkloadId?: number | null;
+  facultyId: string;
+  schoolYear: number;
+  semester: string;
+  courseCode: string;
+  programCode: string;
+  yearLevel: string;
+  sectionCode: string;
+  totalTeachingLoad?: FacultyWorkloadNumber;
+  numberOfPreparations?: number | null;
+  designationEtu?: FacultyWorkloadNumber;
+  totalWorkload?: FacultyWorkloadNumber;
+  overloadHours?: FacultyWorkloadNumber;
+  source?: FacultyWorkloadSource;
+  remarks?: string | null;
+}
+
+export interface FacultyWorkloadResponse extends FacultyWorkloadRequest {
+  facultyWorkloadId: number;
+  facultyName: string;
+  college?: string | null;
+  loadLimit?: number | null;
+  courseCode: string;
+  programCode: string;
+  yearLevel: string;
+  sectionCode: string;
+  totalTeachingLoad: FacultyWorkloadNumber;
+  numberOfPreparations: number | null;
+  designationEtu: FacultyWorkloadNumber;
+  totalWorkload: FacultyWorkloadNumber;
+  overloadHours: FacultyWorkloadNumber;
+  loadStatus: FacultyLoadStatus;
+  source: FacultyWorkloadSource;
+  remarks: string | null;
 }
 export interface CreateUserAccountRequest {
   username: string;
@@ -238,8 +279,7 @@ export class AdminService {
   private http = inject(HttpClient);
   private readonly ADMIN_API_URL = `${environment.API_URL}/admin`;
   private readonly MIGRATION_API_URL = `${environment.API_URL}/migration/all`;
-  private readonly DASHBOARD_CACHE_TTL_MS = 30_000;
-  private readonly DASHBOARD_FACULTY_LOAD_LIMIT = 50;
+  private readonly DASHBOARD_CACHE_TTL_MS = 5 * 60_000;
   private readonly CURRENT_TERM_CACHE_TTL_MS = 5 * 60_000;
   private dashboardCache$?: Observable<AdminDashboardResponse>;
   private dashboardCacheCreatedAt = 0;
@@ -252,11 +292,12 @@ export class AdminService {
 
     if (forceRefresh || !this.dashboardCache$ || isExpired) {
       this.dashboardCacheCreatedAt = Date.now();
-      this.dashboardCache$ = forkJoin({
-        summary: this.getDashboardSummary(),
-        programs: this.getDashboardProgramBreakdown(),
-        facultyLoads: this.getDashboardFacultyLoads(this.DASHBOARD_FACULTY_LOAD_LIMIT),
-      }).pipe(shareReplay({ bufferSize: 1, refCount: false }));
+      this.dashboardCache$ = this.http.get<AdminDashboardResponse>(
+        `${this.ADMIN_API_URL}/dashboard`,
+        {
+          withCredentials: true,
+        },
+      ).pipe(shareReplay({ bufferSize: 1, refCount: false }));
     }
 
     return this.dashboardCache$;
@@ -312,6 +353,79 @@ export class AdminService {
       params,
       withCredentials: true,
     }).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  getFacultyWorkloads(
+    page: number = 0,
+    size: number = 10,
+    search: string = '',
+    schoolYear?: number | null,
+    semester: string = '',
+  ): Observable<PageResponse<FacultyWorkloadResponse>> {
+    let params = new HttpParams().set('page', page).set('size', size);
+
+    if (search.trim()) {
+      params = params.set('search', search.trim());
+    }
+
+    if (schoolYear) {
+      params = params.set('schoolYear', schoolYear);
+    }
+
+    if (semester.trim()) {
+      params = params.set('semester', semester.trim());
+    }
+
+    return this.http.get<PageResponse<FacultyWorkloadResponse>>(
+      `${this.ADMIN_API_URL}/faculty-workloads`,
+      {
+        params,
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  getFacultyWorkload(
+    facultyId: string,
+    schoolYear: number,
+    semester: string,
+    courseCode: string,
+    programCode: string,
+    yearLevel: string,
+    sectionCode: string,
+  ): Observable<FacultyWorkloadResponse> {
+    const params = new HttpParams()
+      .set('facultyId', facultyId)
+      .set('schoolYear', schoolYear)
+      .set('semester', semester)
+      .set('courseCode', courseCode)
+      .set('programCode', programCode)
+      .set('yearLevel', yearLevel)
+      .set('sectionCode', sectionCode);
+
+    return this.http.get<FacultyWorkloadResponse>(
+      `${this.ADMIN_API_URL}/faculty-workloads/record`,
+      {
+        params,
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  upsertFacultyWorkload(
+    payload: FacultyWorkloadRequest,
+  ): Observable<FacultyWorkloadResponse> {
+    return this.http.put<FacultyWorkloadResponse>(
+      `${this.ADMIN_API_URL}/faculty-workloads`,
+      payload,
+      {
+        withCredentials: true,
+      },
+    ).pipe(
+      tap(() => {
+        this.clearDashboardCache();
+      }),
+    );
   }
 
   getUserAccounts(

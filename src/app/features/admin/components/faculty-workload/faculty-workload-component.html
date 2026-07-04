@@ -1,0 +1,261 @@
+<section class="workload-page">
+  <div class="workload-editor modern-card">
+    <div class="card-topbar"></div>
+
+    <div class="modern-card-header">
+      <div class="header-content">
+        <h2>Faculty Workload</h2>
+        <span>Encode teaching load, preparations, designation ETU, and overload hours.</span>
+
+        <div class="search-wrapper">
+          <label class="visually-hidden" for="facultyWorkloadSearch">Search faculty</label>
+          <div class="search-field">
+            <i class="bi bi-search"></i>
+            <input
+              id="facultyWorkloadSearch"
+              type="search"
+              class="search-input"
+              placeholder="Search faculty by name or ID"
+              [(ngModel)]="facultySearchTerm"
+              (ngModelChange)="onFacultySearchChange($event)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="status-card" [class.status-overload]="selectedLoadStatus === 'OVERLOAD'">
+        <span>Status</span>
+        <strong>{{ statusLabel(selectedLoadStatus) }}</strong>
+      </div>
+    </div>
+
+    @if (facultyResults.length || isLoadingFaculties) {
+      <div class="faculty-results" aria-label="Faculty search results">
+        @if (isLoadingFaculties) {
+          <span class="result-muted">Searching faculty records...</span>
+        } @else {
+          @for (faculty of facultyResults; track faculty.facultyId) {
+            <button type="button" class="faculty-result" (click)="selectFaculty(faculty)">
+              <span>
+                <strong>{{ facultyName(faculty) | unicodeText }}</strong>
+                <small>#{{ faculty.facultyId }} · {{ faculty.college || 'No college' }}</small>
+              </span>
+              <i class="bi bi-plus-circle"></i>
+            </button>
+          }
+        }
+      </div>
+    }
+
+    <form class="workload-form" [formGroup]="workloadForm" (ngSubmit)="saveWorkload()">
+      <div class="selected-faculty">
+        <div>
+          <span>Selected Faculty</span>
+          <strong>
+            {{ selectedFaculty ? (facultyName(selectedFaculty) | unicodeText) : 'No faculty selected' }}
+          </strong>
+        </div>
+        <small>
+          Load limit:
+          {{ selectedFaculty?.loadLimit || '0' }}
+        </small>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="workloadFacultyId">Faculty ID</label>
+          <input id="workloadFacultyId" type="text" formControlName="facultyId" placeholder="Select or enter faculty ID" />
+        </div>
+
+        <div class="form-group">
+          <label for="workloadSchoolYear">School Year</label>
+          <input id="workloadSchoolYear" type="number" formControlName="schoolYear" />
+        </div>
+
+        <div class="form-group">
+          <label for="workloadSemester">Semester</label>
+          <select id="workloadSemester" formControlName="semester">
+            @for (option of semesterOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="workloadCourseCode">Course Code</label>
+          <input id="workloadCourseCode" type="text" formControlName="courseCode" placeholder="Example: IT 101" />
+        </div>
+
+        <div class="form-group">
+          <label for="workloadProgramCode">Program</label>
+          <input id="workloadProgramCode" type="text" formControlName="programCode" placeholder="Example: BSIT" />
+        </div>
+
+        <div class="form-group">
+          <label for="workloadYearLevel">Year Level</label>
+          <input id="workloadYearLevel" type="text" formControlName="yearLevel" placeholder="Example: 1st Year" />
+        </div>
+
+        <div class="form-group">
+          <label for="workloadSectionCode">Section</label>
+          <input id="workloadSectionCode" type="text" formControlName="sectionCode" placeholder="Example: A" />
+        </div>
+
+        <div class="form-group">
+          <label for="totalTeachingLoad">Total Teaching Load</label>
+          <input id="totalTeachingLoad" type="number" min="0" step="0.01" formControlName="totalTeachingLoad" />
+        </div>
+
+        <div class="form-group">
+          <label for="numberOfPreparations">No. of Preparations</label>
+          <input id="numberOfPreparations" type="number" min="0" formControlName="numberOfPreparations" />
+        </div>
+
+        <div class="form-group">
+          <label for="designationEtu">Designation ETU</label>
+          <input id="designationEtu" type="number" min="0" step="0.01" formControlName="designationEtu" />
+        </div>
+
+        <div class="form-group">
+          <label for="totalWorkload">Total Workload</label>
+          <input id="totalWorkload" type="number" min="0" step="0.01" formControlName="totalWorkload" />
+        </div>
+
+        <div class="form-group">
+          <label for="overloadHours">Overload Hours</label>
+          <input id="overloadHours" type="number" min="0" step="0.01" formControlName="overloadHours" />
+        </div>
+
+        <div class="form-group">
+          <label for="workloadSource">Source</label>
+          <select id="workloadSource" formControlName="source">
+            @for (source of sourceOptions; track source) {
+              <option [value]="source">{{ source }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group form-group-wide">
+          <label for="workloadRemarks">Remarks</label>
+          <textarea id="workloadRemarks" rows="3" formControlName="remarks" placeholder="Optional notes"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-btn" (click)="clearForm()">Clear</button>
+        <button type="submit" class="save-btn" [disabled]="isSaving">
+          @if (isSaving) {
+            <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+            Saving
+          } @else {
+            <i class="bi bi-check-circle-fill"></i>
+            Save Workload
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="workload-list modern-card">
+    <div class="modern-card-header compact-header">
+      <div class="header-content">
+        <h2>Encoded Workloads</h2>
+        <span>{{ totalElements }} records for the selected term</span>
+      </div>
+
+      <div class="search-field list-search">
+        <i class="bi bi-search"></i>
+        <input
+          type="search"
+          class="search-input"
+          placeholder="Search encoded workloads"
+          [(ngModel)]="workloadSearchTerm"
+          (ngModelChange)="onWorkloadSearchChange($event)"
+        />
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table modern-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Faculty</th>
+            <th>Course Code</th>
+            <th>Program/Year/Section</th>
+            <th>Term</th>
+            <th>Teaching</th>
+            <th>Prep</th>
+            <th>Designation</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoadingWorkloads) {
+            <tr>
+              <td colspan="10" class="empty-state" data-empty-title="Loading workloads">
+                Please wait while records are refreshed.
+              </td>
+            </tr>
+          } @else if (workloads.length) {
+            @for (workload of workloads; track workload.facultyWorkloadId) {
+              <tr>
+                <td data-label="Faculty">
+                  <strong>{{ workload.facultyName | unicodeText }}</strong>
+                  <small>#{{ workload.facultyId }}</small>
+                </td>
+                <td data-label="Course Code">{{ workload.courseCode || '-' }}</td>
+                <td data-label="Program/Year/Section">
+                  {{ workload.programCode || '-' }} /
+                  {{ workload.yearLevel || '-' }} /
+                  {{ workload.sectionCode || '-' }}
+                </td>
+                <td data-label="Term">
+                  {{ semesterLabel(workload.semester) }} · {{ workload.schoolYear }}
+                </td>
+                <td data-label="Teaching">{{ workload.totalTeachingLoad || 0 }}</td>
+                <td data-label="Prep">{{ workload.numberOfPreparations || 0 }}</td>
+                <td data-label="Designation">{{ workload.designationEtu || 0 }}</td>
+                <td data-label="Total">{{ workload.totalWorkload || 0 }}</td>
+                <td data-label="Status">
+                  <span class="workload-status" [class.overload]="workload.loadStatus === 'OVERLOAD'">
+                    {{ statusLabel(workload.loadStatus) }}
+                  </span>
+                </td>
+                <td data-label="Action">
+                  <button type="button" class="single-print-btn" (click)="editWorkload(workload)">
+                    <i class="bi bi-pencil-square"></i>
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            }
+          } @else {
+            <tr>
+              <td colspan="10" class="empty-state" data-empty-title="No workload records">
+                Select a faculty above and encode the workload for this term.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modern-card-footer">
+      <small>Showing {{ workloads.length }} of {{ totalElements }} workload records</small>
+      <div class="pagination-group">
+        <button type="button" class="pagination-btn" [disabled]="page === 0" (click)="previousPage()">Prev</button>
+        <span class="pagination-info">Page {{ page + 1 }} of {{ totalPages }}</span>
+        <button
+          type="button"
+          class="pagination-btn"
+          [disabled]="page >= totalPages - 1"
+          (click)="nextPage()"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

@@ -82,6 +82,13 @@ export const routes: Routes = [
           ).then((m) => m.FacultyDataTableComponent),
       },
       {
+        path: 'faculty-workloads',
+        loadComponent: () =>
+          import(
+            '@features/admin/components/faculty-workload/faculty-workload-component'
+          ).then((m) => m.FacultyWorkloadComponent),
+      },
+      {
         path: 'evaluation-score-list',
         loadComponent: () =>
           import(
