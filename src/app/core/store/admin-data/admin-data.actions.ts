@@ -19,6 +19,7 @@ export const loadFaculties = createAction(
     page: number;
     size: number;
     search?: string;
+    legacyDatabase?: string;
   }>(),
 );
 

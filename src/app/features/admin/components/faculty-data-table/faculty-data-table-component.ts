@@ -65,6 +65,13 @@ export class FacultyDataTableComponent implements OnInit {
   updateFacultyMessage$ = this.adminDataFacade.updateFacultyMessage$;
   selectedFaculty: FetchFacultyResponse | null = null;
   searchTerm = '';
+  selectedLegacyDatabase = '';
+  readonly legacyDatabaseOptions = [
+    { label: 'Talisay', value: 'LEGACY_TALISAY' },
+    { label: 'Alijis', value: 'LEGACY_ALIJIS' },
+    { label: 'Fortune-Towne', value: 'LEGACY_FT' },
+    { label: 'Binalbagan', value: 'LEGACY_BINALBAGAN' },
+  ];
   currentPage = 0;
   pageSize = 10;
   facultyForm: FormGroup = this.fb.group({
@@ -86,12 +93,22 @@ export class FacultyDataTableComponent implements OnInit {
     });
   }
   loadFaculties(): void {
-    this.adminDataFacade.loadFaculties(this.currentPage, this.pageSize, this.searchTerm);
+    this.adminDataFacade.loadFaculties(
+      this.currentPage,
+      this.pageSize,
+      this.searchTerm,
+      this.selectedLegacyDatabase,
+    );
   }
   onSearchChange(value: string): void {
     this.searchSubject.next(value);
   }
   onSearch(): void {
+    this.currentPage = 0;
+    this.loadFaculties();
+  }
+  onLegacyDatabaseChange(value: string): void {
+    this.selectedLegacyDatabase = value;
     this.currentPage = 0;
     this.loadFaculties();
   }
@@ -138,6 +155,13 @@ export class FacultyDataTableComponent implements OnInit {
     return repairSpecialCharacters(faculty.firstname ?? '')
       .charAt(0)
       .toLocaleUpperCase('en-PH');
+  }
+
+  legacyDatabaseLabel(legacyDatabase?: string): string {
+    return (
+      this.legacyDatabaseOptions.find((option) => option.value === legacyDatabase)?.label ??
+      'Unassigned'
+    );
   }
 
   get f() {

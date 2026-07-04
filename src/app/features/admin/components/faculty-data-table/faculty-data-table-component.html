@@ -29,6 +29,23 @@
         <button type="submit" class="edit-btn">
           Search
         </button>
+        <label class="visually-hidden" for="legacyDatabaseFilter">
+          Filter by campus
+        </label>
+        <select
+          id="legacyDatabaseFilter"
+          class="filter-select"
+          [(ngModel)]="selectedLegacyDatabase"
+          name="legacyDatabaseFilter"
+          (ngModelChange)="onLegacyDatabaseChange($event)"
+        >
+          <option value="">All Campuses</option>
+          @for (option of legacyDatabaseOptions; track option.value) {
+          <option [value]="option.value">
+            {{ option.label }}
+          </option>
+          }
+        </select>
       </form>
     </div>
     <div class="table-count" aria-label="Total faculty records">
@@ -45,6 +62,7 @@
           <th>Faculty Name</th>
           <th>Position</th>
           <th>College</th>
+          <th>Campus</th>
           <th class="text-center">Actions</th>
         </tr>
       </thead>
@@ -75,6 +93,9 @@
             <span class="college-badge">
               {{ faculty.college }}
             </span>
+          </td>
+          <td data-label="Campus">
+            {{ legacyDatabaseLabel(faculty.legacyDatabase) }}
           </td>
           <td data-label="Actions">
             <div class="action-group">
@@ -111,7 +132,7 @@
         }
         } @else {
         <tr>
-          <td colspan="5" class="empty-state" data-empty-title="No faculties found">
+          <td colspan="6" class="empty-state" data-empty-title="No faculties found">
             Try adjusting the search term or clearing the filter.
           </td>
         </tr>

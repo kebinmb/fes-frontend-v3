@@ -27,9 +27,9 @@ export class AdminEffects {
     this.actions$.pipe(
       ofType(AdminDataActions.loadFaculties),
 
-      mergeMap(({ page, size, search }) =>
+      mergeMap(({ page, size, search, legacyDatabase }) =>
         this.adminDataService
-          .getFaculties(page, size, search ?? '')
+          .getFaculties(page, size, search ?? '', legacyDatabase ?? '')
 
           .pipe(
             map((response) =>

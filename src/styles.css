@@ -240,6 +240,58 @@ textarea:focus-visible {
   font-weight: 700;
 }
 
+.dashboard-content .modern-card,
+.dashboard-content .ui-card,
+.dashboard-content .settings-card,
+.dashboard-content .advanced-settings-card {
+  border-radius: 12px !important;
+}
+
+.dashboard-content .modern-card-header,
+.dashboard-content .modern-card-footer {
+  gap: 0.8rem !important;
+  padding: 1rem !important;
+}
+
+.dashboard-content .card-body,
+.dashboard-content .modal-form,
+.dashboard-content .settings-card,
+.dashboard-content .advanced-settings-card {
+  padding: 1rem !important;
+}
+
+.dashboard-content .search-wrapper {
+  gap: 0.55rem !important;
+  margin-top: 0.75rem !important;
+}
+
+.dashboard-content .table-count {
+  min-height: 52px !important;
+  min-width: 64px !important;
+}
+
+.dashboard-content .modern-table thead th {
+  padding: 0.68rem 0.9rem !important;
+}
+
+.dashboard-content .modern-table tbody td {
+  padding: 0.72rem 0.9rem !important;
+}
+
+.dashboard-content .table-avatar {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 8px !important;
+}
+
+.dashboard-content .modern-card-footer {
+  min-height: unset !important;
+}
+
+.dashboard-content .empty-state {
+  padding: 2rem 1rem !important;
+}
+
 @keyframes ui-spinner-rotate {
   to {
     transform: rotate(360deg);

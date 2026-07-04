@@ -29,12 +29,18 @@ export class AdminDataFacade {
   updateUserPasswordMessage$ = this.store.select(
     AdminDataSelectors.selectUpdateUserPasswordMessage,
   );
-  loadFaculties(page: number, size: number, search: string = ''): void {
+  loadFaculties(
+    page: number,
+    size: number,
+    search: string = '',
+    legacyDatabase: string = '',
+  ): void {
     this.store.dispatch(
       AdminDataActions.loadFaculties({
         page,
         size,
         search,
+        legacyDatabase,
       }),
     );
   }

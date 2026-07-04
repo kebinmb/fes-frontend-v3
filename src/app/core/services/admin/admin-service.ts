@@ -25,6 +25,7 @@ export interface FetchFacultyResponse {
   loadLimit: string;
   status: string;
   college: string;
+  legacyDatabase?: string;
 }
 export interface FetchUserAccountsResponse {
   userId: string;
@@ -295,11 +296,16 @@ export class AdminService {
     page: number = 0,
     size: number = 10,
     search: string = '',
+    legacyDatabase: string = '',
   ): Observable<PageResponse<FetchFacultyResponse>> {
     let params = new HttpParams().set('page', page).set('size', size);
 
     if (search.trim()) {
       params = params.set('search', search);
+    }
+
+    if (legacyDatabase.trim()) {
+      params = params.set('legacyDatabase', legacyDatabase.trim());
     }
 
     return this.http.get<PageResponse<FetchFacultyResponse>>(`${this.ADMIN_API_URL}/faculties`, {

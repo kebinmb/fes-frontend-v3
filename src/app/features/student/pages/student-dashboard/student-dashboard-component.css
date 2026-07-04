@@ -22,14 +22,14 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 0.9rem 0;
+  padding: 0.7rem 0;
   background: #165c3d;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
 }
 .logo-container {
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -106,7 +106,7 @@
   background: rgba(255, 255, 255, 0.12) !important;
 }
 .btn-primary {
-  min-height: 54px;
+  min-height: 42px;
   border: none !important;
   border-radius: 10px !important;
   background: var(--chmsu-primary) !important;
@@ -137,13 +137,20 @@
 }
 .container-fluid {
   max-width: 1500px;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.dashboard-page > .container-fluid {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
 }
 .stat-card-dashboard {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1.2rem;
-  border-radius: var(--radius-md);
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border-radius: 12px;
   background: white;
   border: 1px solid var(--border-soft);
   box-shadow: var(--shadow-sm);
@@ -156,9 +163,9 @@
   box-shadow: var(--shadow-sm);
 }
 .stat-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -178,7 +185,7 @@
 }
 .stat-value-dashboard {
   color: var(--text-primary);
-  font-size: 1.55rem;
+  font-size: 1.35rem;
   font-weight: 800;
   line-height: 1;
 }
@@ -191,8 +198,8 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  padding: 1.3rem;
-  border-radius: var(--radius-lg);
+  padding: 1rem;
+  border-radius: 12px;
   background: white;
   border: 1px solid var(--border-soft);
   box-shadow: var(--shadow-sm);
@@ -206,7 +213,7 @@
   box-shadow: var(--shadow-md);
 }
 .class-card-header {
-  padding-bottom: 0.9rem;
+  padding-bottom: 0.7rem;
   border-bottom: 1px solid rgba(148, 163, 184, 0.12);
 }
 .class-subject {
@@ -219,13 +226,13 @@
 }
 .class-card-body {
   flex: 1;
-  padding-top: 0.9rem;
+  padding-top: 0.7rem;
 }
 .info-item {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding: 0.52rem 0;
+  gap: 0.55rem;
+  padding: 0.38rem 0;
   color: var(--text-secondary);
   font-size: 0.84rem;
 }
@@ -234,8 +241,8 @@
   font-size: 0.88rem;
 }
 .class-card-footer {
-  margin-top: 1rem;
-  padding-top: 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
   border-top: 1px solid rgba(148, 163, 184, 0.08);
 }
 .status-badge {
@@ -260,17 +267,17 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  min-height: 420px;
-  padding: 3rem 2rem;
-  border-radius: 20px;
+  min-height: 300px;
+  padding: 2rem 1rem;
+  border-radius: 14px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
   border: 1px solid rgba(226, 232, 240, 0.8);
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
 }
 .empty-state-icon {
-  width: 90px;
-  height: 90px;
-  margin-bottom: 1.5rem;
+  width: 68px;
+  height: 68px;
+  margin-bottom: 1rem;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -300,8 +307,17 @@
   font-weight: 600;
 }
 .row.g-4 {
-  --bs-gutter-x: 1.2rem;
-  --bs-gutter-y: 1.2rem;
+  --bs-gutter-x: 0.9rem;
+  --bs-gutter-y: 0.9rem;
+}
+
+.row.g-3 {
+  --bs-gutter-x: 0.9rem;
+  --bs-gutter-y: 0.9rem;
+}
+
+.row.mb-4 {
+  margin-bottom: 1rem !important;
 }
 .dashboard-enter-animation {
   animation:
@@ -458,7 +474,7 @@
     font-size: 0.96rem;
   }
   .btn-primary {
-    min-height: 50px;
+    min-height: 42px;
   }
   .logo-container {
     width: 44px;
