@@ -78,6 +78,7 @@ export interface FacultyWorkloadRequest {
   programCode: string;
   yearLevel: string;
   sectionCode: string;
+  totalHoursPerWeek?: FacultyWorkloadNumber;
   totalTeachingLoad?: FacultyWorkloadNumber;
   numberOfPreparations?: number | null;
   designationEtu?: FacultyWorkloadNumber;
@@ -96,6 +97,7 @@ export interface FacultyWorkloadResponse extends FacultyWorkloadRequest {
   programCode: string;
   yearLevel: string;
   sectionCode: string;
+  totalHoursPerWeek: FacultyWorkloadNumber;
   totalTeachingLoad: FacultyWorkloadNumber;
   numberOfPreparations: number | null;
   designationEtu: FacultyWorkloadNumber;
@@ -104,6 +106,22 @@ export interface FacultyWorkloadResponse extends FacultyWorkloadRequest {
   loadStatus: FacultyLoadStatus;
   source: FacultyWorkloadSource;
   remarks: string | null;
+}
+
+export interface FacultyWorkloadSectionOptionResponse {
+  sectionId: number;
+  programCode: string;
+  yearLevel: string;
+  sectionCode: string;
+}
+
+export interface FacultyWorkloadClassOptionResponse {
+  classCode: string;
+  courseCode: string;
+  sectionId: number;
+  programCode: string;
+  yearLevel: string;
+  sectionCode: string;
 }
 export interface CreateUserAccountRequest {
   username: string;
@@ -425,6 +443,42 @@ export class AdminService {
       tap(() => {
         this.clearDashboardCache();
       }),
+    );
+  }
+
+  getFacultyWorkloadSectionOptions(
+    schoolYear: number,
+    semester: string,
+  ): Observable<FacultyWorkloadSectionOptionResponse[]> {
+    const params = new HttpParams()
+      .set('schoolYear', schoolYear)
+      .set('semester', semester);
+
+    return this.http.get<FacultyWorkloadSectionOptionResponse[]>(
+      `${this.ADMIN_API_URL}/faculty-workloads/section-options`,
+      {
+        params,
+        withCredentials: true,
+      },
+    );
+  }
+
+  getFacultyWorkloadClassOptions(
+    facultyId: string,
+    schoolYear: number,
+    semester: string,
+  ): Observable<FacultyWorkloadClassOptionResponse[]> {
+    const params = new HttpParams()
+      .set('facultyId', facultyId)
+      .set('schoolYear', schoolYear)
+      .set('semester', semester);
+
+    return this.http.get<FacultyWorkloadClassOptionResponse[]>(
+      `${this.ADMIN_API_URL}/faculty-workloads/class-options`,
+      {
+        params,
+        withCredentials: true,
+      },
     );
   }
 

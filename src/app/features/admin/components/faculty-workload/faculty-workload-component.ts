@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+  inject,
+} from '@angular/core';
 import {
   FormBuilder,
   FormsModule,
@@ -9,6 +15,7 @@ import {
 import {
   AdminService,
   FacultyLoadStatus,
+  FacultyWorkloadClassOptionResponse,
   FacultyWorkloadRequest,
   FacultyWorkloadResponse,
   FacultyWorkloadSource,
@@ -20,9 +27,12 @@ import { extractErrorMessage } from '@utilities/extract-error.util';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 import {
   Subject,
+  catchError,
   debounceTime,
   distinctUntilChanged,
   finalize,
+  of,
+  switchMap,
   takeUntil,
 } from 'rxjs';
 
@@ -42,9 +52,21 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   private readonly adminService = inject(AdminService);
   private readonly toastFacade = inject(ToastFacade);
   private readonly fb = inject(FormBuilder);
+  private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
   private readonly facultySearch$ = new Subject<string>();
   private readonly workloadSearch$ = new Subject<string>();
+  private facultySearchRequestId = 0;
+  private classOptionsRequestId = 0;
+  private workloadRequestId = 0;
+  private recalculationTimer: ReturnType<typeof setTimeout> | null = null;
+  private currentClassOptionsKey = '';
+  private readonly classOptionsCache = new Map<
+    string,
+    FacultyWorkloadClassOptionResponse[]
+  >();
+  private viewRefreshPending = false;
+  private isDestroyed = false;
 
   readonly semesterOptions: Array<{ label: string; value: Semester }> = [
     { label: 'First Semester', value: 'FIRST_SEMESTER' },
@@ -55,7 +77,9 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
   facultyResults: FetchFacultyResponse[] = [];
   workloads: FacultyWorkloadResponse[] = [];
+  classOptions: FacultyWorkloadClassOptionResponse[] = [];
   selectedFaculty: FetchFacultyResponse | null = null;
+  selectedClassKey = '';
   facultySearchTerm = '';
   workloadSearchTerm = '';
   page = 0;
@@ -64,8 +88,16 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   totalPages = 1;
   isLoadingFaculties = false;
   isLoadingWorkloads = false;
+  isLoadingClasses = false;
   isSaving = false;
   selectedLoadStatus: FacultyLoadStatus = 'REGULAR_LOAD';
+  selectedFacultyWorkloadCount = 0;
+  projectedTeachingLoadValue = 0;
+  projectedTotalWorkloadValue = 0;
+  projectedOverloadHoursValue = 0;
+  visibleHoursPerWeekTotalValue = 0;
+  showFacultySearchResults = false;
+  canSaveWorkloadValue = false;
 
   workloadForm = this.fb.group({
     facultyWorkloadId: [null as number | null],
@@ -76,6 +108,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     programCode: ['', Validators.required],
     yearLevel: ['', Validators.required],
     sectionCode: ['', Validators.required],
+    totalHoursPerWeek: [0, [Validators.required, Validators.min(0)]],
     totalTeachingLoad: [0, [Validators.required, Validators.min(0)]],
     numberOfPreparations: [0, [Validators.required, Validators.min(0)]],
     designationEtu: [0, [Validators.required, Validators.min(0)]],
@@ -88,11 +121,19 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeCurrentTerm();
     this.initializeSearch();
+    this.initializeFacultyIdLookup();
     this.initializeWorkloadCalculation();
+    this.searchFaculties('');
     this.loadWorkloads();
   }
 
   ngOnDestroy(): void {
+    this.isDestroyed = true;
+
+    if (this.recalculationTimer) {
+      clearTimeout(this.recalculationTimer);
+    }
+
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -105,13 +146,13 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     this.workloadSearch$.next(value);
   }
 
+  refreshWorkloads(): void {
+    this.page = 0;
+    this.loadWorkloads();
+  }
+
   selectFaculty(faculty: FetchFacultyResponse): void {
-    this.selectedFaculty = faculty;
-    this.workloadForm.patchValue({
-      facultyId: faculty.facultyId,
-      facultyWorkloadId: null,
-    });
-    this.recalculateWorkload();
+    this.applySelectedFaculty(faculty);
   }
 
   editWorkload(workload: FacultyWorkloadResponse): void {
@@ -125,6 +166,8 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       status: '',
       college: workload.college ?? '',
     };
+    this.facultySearchTerm = this.facultySearchLabel(this.selectedFaculty);
+    this.workloadSearchTerm = workload.facultyId;
     this.patchWorkload(workload);
   }
 
@@ -134,6 +177,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
     this.selectedFaculty = null;
     this.selectedLoadStatus = 'REGULAR_LOAD';
+    this.workloadSearchTerm = '';
     this.workloadForm.reset({
       facultyId: '',
       facultyWorkloadId: null,
@@ -143,6 +187,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       programCode: '',
       yearLevel: '',
       sectionCode: '',
+      totalHoursPerWeek: 0,
       totalTeachingLoad: 0,
       numberOfPreparations: 0,
       designationEtu: 0,
@@ -151,6 +196,11 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       source: 'MANUAL',
       remarks: '',
     });
+    this.selectedClassKey = '';
+    this.classOptions = [];
+    this.searchFaculties('');
+    this.loadWorkloads();
+    this.updateDashboardState(0, 0, 0);
   }
 
   saveWorkload(): void {
@@ -160,16 +210,22 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     }
 
     this.isSaving = true;
+    this.updateDashboardState();
     this.adminService
       .upsertFacultyWorkload(this.buildPayload())
       .pipe(
         finalize(() => {
           this.isSaving = false;
+          this.updateDashboardState();
         }),
         takeUntil(this.destroy$),
       )
       .subscribe({
         next: (response) => {
+          this.workloadSearchTerm = response.facultyId;
+          this.page = 0;
+          this.mergeSavedWorkload(response);
+          this.syncSelectedFacultyFromWorkload(response);
           this.patchWorkload(response);
           this.toastFacade.showToast('Faculty workload saved successfully.', 'success');
           this.loadWorkloads();
@@ -214,6 +270,108 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     return `${faculty.firstname ?? ''} ${faculty.lastname ?? ''}`.trim() || faculty.facultyId;
   }
 
+  facultySearchLabel(faculty: FetchFacultyResponse): string {
+    const name = this.facultyName(faculty);
+
+    return name === faculty.facultyId ? faculty.facultyId : `${name} (${faculty.facultyId})`;
+  }
+
+  isSelectedFaculty(faculty: FetchFacultyResponse): boolean {
+    return this.selectedFaculty?.facultyId === faculty.facultyId;
+  }
+
+  classOptionLabel(option: FacultyWorkloadClassOptionResponse): string {
+    return `${option.courseCode} - ${option.programCode} / ${option.yearLevel} / ${option.sectionCode}`;
+  }
+
+  get selectedFacultyWorkloads(): FacultyWorkloadResponse[] {
+    const facultyId = this.workloadForm.controls.facultyId.value;
+
+    if (!facultyId) {
+      return [];
+    }
+
+    return this.workloads.filter((workload) => workload.facultyId === facultyId);
+  }
+
+  get projectedTeachingLoad(): number {
+    return this.toNumber(this.workloadForm.controls.totalTeachingLoad.value);
+  }
+
+  get projectedTotalWorkload(): number {
+    return this.toNumber(this.workloadForm.controls.totalWorkload.value);
+  }
+
+  get projectedOverloadHours(): number {
+    return this.toNumber(this.workloadForm.controls.overloadHours.value);
+  }
+
+  get visibleHoursPerWeekTotal(): number {
+    return this.workloads.reduce(
+      (total, workload) => total + this.toNumber(workload.totalHoursPerWeek),
+      0,
+    );
+  }
+
+  get selectedFacultyInitials(): string {
+    if (!this.selectedFaculty) {
+      return '--';
+    }
+
+    const parts = this.facultyName(this.selectedFaculty)
+      .split(/\s+/)
+      .filter(Boolean);
+    const first = parts[0]?.[0] ?? '';
+    const last = parts.length > 1 ? parts[parts.length - 1][0] : '';
+
+    return `${first}${last}`.toUpperCase() || '--';
+  }
+
+  get selectedFacultyMeta(): string {
+    if (!this.selectedFaculty) {
+      return 'Search and select a faculty to begin encoding.';
+    }
+
+    return [
+      `#${this.selectedFaculty.facultyId}`,
+      this.selectedFaculty.college || 'No college',
+    ].join(' · ');
+  }
+
+  get selectedFacultyLoadLimit(): string {
+    return String(this.selectedFaculty?.loadLimit || '0');
+  }
+
+  get canSaveWorkload(): boolean {
+    return this.workloadForm.valid && !this.isSaving && !this.isLoadingClasses;
+  }
+
+  onClassOptionChange(classKey: string): void {
+    this.selectedClassKey = classKey;
+    const option = this.classOptions.find(
+      (item) => this.classOptionKey(item) === classKey,
+    );
+
+    if (!option) {
+      this.workloadForm.patchValue({
+        courseCode: '',
+        programCode: '',
+        yearLevel: '',
+        sectionCode: '',
+      });
+      this.recalculateWorkload();
+      return;
+    }
+
+    this.workloadForm.patchValue({
+      courseCode: option.courseCode,
+      programCode: option.programCode,
+      yearLevel: option.yearLevel,
+      sectionCode: option.sectionCode,
+    });
+    this.recalculateWorkload();
+  }
+
   private initializeCurrentTerm(): void {
     this.adminService
       .fetchCurrentSchoolYearAndSemester()
@@ -224,6 +382,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
             schoolYear: term.schoolYear,
             semester: term.semester as Semester,
           });
+          this.loadClassOptions();
           this.loadWorkloads();
         },
         error: () => {
@@ -238,12 +397,31 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   private initializeSearch(): void {
     this.facultySearch$
       .pipe(
-        debounceTime(300),
+        debounceTime(250),
         distinctUntilChanged(),
+        switchMap((value) => {
+          const requestId = ++this.facultySearchRequestId;
+          this.isLoadingFaculties = true;
+          this.updateFacultySearchVisibility();
+
+          return this.adminService.getFaculties(0, 10, value.trim()).pipe(
+            catchError((error) => {
+              this.toastFacade.showToast(extractErrorMessage(error), 'error');
+              return of({ content: [] as FetchFacultyResponse[] });
+            }),
+            finalize(() => {
+              if (requestId === this.facultySearchRequestId) {
+                this.isLoadingFaculties = false;
+                this.updateFacultySearchVisibility();
+              }
+            }),
+          );
+        }),
         takeUntil(this.destroy$),
       )
-      .subscribe((value) => {
-        this.searchFaculties(value);
+      .subscribe((response) => {
+        this.facultyResults = response.content ?? [];
+        this.updateFacultySearchVisibility();
       });
 
     this.workloadSearch$
@@ -259,14 +437,26 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       });
   }
 
+  private initializeFacultyIdLookup(): void {
+    this.workloadForm.controls.facultyId.valueChanges
+      .pipe(
+        debounceTime(350),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((value) => {
+        this.resolveFacultyFromInput(value ?? '');
+      });
+  }
+
   private initializeWorkloadCalculation(): void {
-    this.workloadForm.controls.totalTeachingLoad.valueChanges
+    this.workloadForm.controls.totalHoursPerWeek.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.recalculateWorkload());
+      .subscribe(() => this.scheduleRecalculateWorkload());
 
     this.workloadForm.controls.designationEtu.valueChanges
       .pipe(takeUntil(this.destroy$))
-      .subscribe(() => this.recalculateWorkload());
+      .subscribe(() => this.scheduleRecalculateWorkload());
 
     this.workloadForm.controls.schoolYear.valueChanges
       .pipe(debounceTime(250), takeUntil(this.destroy$))
@@ -278,34 +468,15 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   }
 
   private searchFaculties(search: string): void {
-    const normalizedSearch = search.trim();
-
-    if (!normalizedSearch) {
-      this.facultyResults = [];
-      return;
-    }
-
-    this.isLoadingFaculties = true;
-    this.adminService
-      .getFaculties(0, 8, normalizedSearch)
-      .pipe(
-        finalize(() => {
-          this.isLoadingFaculties = false;
-        }),
-        takeUntil(this.destroy$),
-      )
-      .subscribe({
-        next: (response) => {
-          this.facultyResults = response.content ?? [];
-        },
-        error: (error) => {
-          this.toastFacade.showToast(extractErrorMessage(error), 'error');
-        },
-      });
+    this.updateFacultySearchVisibility();
+    this.facultySearch$.next(search);
   }
 
   private loadWorkloads(): void {
+    const requestId = ++this.workloadRequestId;
+
     this.isLoadingWorkloads = true;
+    this.updateDashboardState();
     this.adminService
       .getFacultyWorkloads(
         this.page,
@@ -316,17 +487,29 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       )
       .pipe(
         finalize(() => {
-          this.isLoadingWorkloads = false;
+          if (requestId === this.workloadRequestId) {
+            this.isLoadingWorkloads = false;
+            this.updateDashboardState();
+          }
         }),
         takeUntil(this.destroy$),
       )
       .subscribe({
         next: (response) => {
+          if (requestId !== this.workloadRequestId) {
+            return;
+          }
+
           this.workloads = response.content ?? [];
           this.totalElements = response.totalElements ?? 0;
           this.totalPages = Math.max(response.totalPages ?? 1, 1);
+          this.recalculateWorkload();
         },
         error: (error) => {
+          if (requestId !== this.workloadRequestId) {
+            return;
+          }
+
           this.toastFacade.showToast(extractErrorMessage(error), 'error');
         },
       });
@@ -334,8 +517,184 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
   private refreshTermWorkloads(): void {
     this.page = 0;
+    this.clearClassSelection();
+    this.loadClassOptions();
     this.loadWorkloads();
 
+  }
+
+  private loadClassOptions(): void {
+    const facultyId = this.workloadForm.controls.facultyId.value?.trim() ?? '';
+    const schoolYear = this.workloadForm.controls.schoolYear.value;
+    const semester = this.workloadForm.controls.semester.value?.trim() ?? '';
+
+    if (!facultyId || !schoolYear || !semester) {
+      this.classOptionsRequestId += 1;
+      this.currentClassOptionsKey = '';
+      this.classOptions = [];
+      this.selectedClassKey = '';
+      this.isLoadingClasses = false;
+      this.updateDashboardState();
+      return;
+    }
+
+    const cacheKey = this.classOptionsCacheKey(facultyId, schoolYear, semester);
+
+    if (cacheKey === this.currentClassOptionsKey && this.isLoadingClasses) {
+      return;
+    }
+
+    const cachedOptions = this.classOptionsCache.get(cacheKey);
+    if (cachedOptions) {
+      this.classOptionsRequestId += 1;
+      this.currentClassOptionsKey = cacheKey;
+      this.classOptions = cachedOptions;
+      this.isLoadingClasses = false;
+      this.syncSelectedClassOption();
+      this.updateDashboardState();
+      return;
+    }
+
+    const requestId = ++this.classOptionsRequestId;
+    this.currentClassOptionsKey = cacheKey;
+    this.classOptions = [];
+    this.isLoadingClasses = true;
+    this.updateDashboardState();
+    this.adminService
+      .getFacultyWorkloadClassOptions(facultyId, schoolYear, semester)
+      .pipe(
+        finalize(() => {
+          if (requestId === this.classOptionsRequestId) {
+            this.isLoadingClasses = false;
+            this.updateDashboardState();
+          }
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: (options) => {
+          if (requestId !== this.classOptionsRequestId) {
+            return;
+          }
+
+          this.classOptions = options ?? [];
+          this.classOptionsCache.set(cacheKey, this.classOptions);
+          this.syncSelectedClassOption();
+        },
+        error: (error) => {
+          if (requestId !== this.classOptionsRequestId) {
+            return;
+          }
+
+          this.classOptions = [];
+          this.selectedClassKey = '';
+          this.currentClassOptionsKey = '';
+          this.toastFacade.showToast(extractErrorMessage(error), 'error');
+        },
+      });
+  }
+
+  private classOptionsCacheKey(
+    facultyId: string,
+    schoolYear: number,
+    semester: string,
+  ): string {
+    return `${facultyId.toLowerCase()}|${schoolYear}|${semester.toUpperCase()}`;
+  }
+
+  private resolveFacultyFromInput(value: string): void {
+    const facultyId = value.trim();
+
+    if (!facultyId) {
+      this.selectedFaculty = null;
+      this.selectedClassKey = '';
+      this.classOptions = [];
+      this.recalculateWorkload();
+      this.updateDashboardState();
+      return;
+    }
+
+    if (this.selectedFaculty?.facultyId === facultyId) {
+      return;
+    }
+
+    const localMatch = this.facultyResults.find(
+      (faculty) => faculty.facultyId === facultyId,
+    );
+
+    if (localMatch) {
+      this.applySelectedFaculty(localMatch);
+      return;
+    }
+
+    this.adminService
+      .getFaculties(0, 5, facultyId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          const matches = response.content ?? [];
+          const exactMatch = matches.find(
+            (faculty) => faculty.facultyId === facultyId,
+          );
+          const onlyMatch = matches.length === 1 ? matches[0] : null;
+          const faculty = exactMatch ?? onlyMatch;
+
+          if (faculty) {
+            this.facultyResults = matches;
+            this.applySelectedFaculty(faculty);
+            return;
+          }
+
+          this.selectedFaculty = null;
+          this.selectedClassKey = '';
+          this.classOptions = [];
+          this.workloadSearchTerm = facultyId;
+          this.page = 0;
+          this.loadWorkloads();
+          this.recalculateWorkload();
+          this.updateDashboardState();
+        },
+        error: (error) => {
+          this.toastFacade.showToast(extractErrorMessage(error), 'error');
+        },
+      });
+  }
+
+  private applySelectedFaculty(
+    faculty: FetchFacultyResponse,
+    updateSearchTerm = true,
+  ): void {
+    this.selectedFaculty = faculty;
+
+    if (updateSearchTerm) {
+      this.facultySearchTerm = this.facultySearchLabel(faculty);
+    }
+
+    this.workloadSearchTerm = faculty.facultyId;
+    this.page = 0;
+    this.workloadForm.patchValue(
+      {
+        facultyId: faculty.facultyId,
+        facultyWorkloadId: null,
+        courseCode: '',
+        programCode: '',
+        yearLevel: '',
+        sectionCode: '',
+        totalHoursPerWeek: 0,
+        totalTeachingLoad: 0,
+        numberOfPreparations: 0,
+        designationEtu: 0,
+        totalWorkload: 0,
+        overloadHours: 0,
+        source: 'MANUAL',
+        remarks: '',
+      },
+      { emitEvent: false },
+    );
+    this.selectedClassKey = '';
+    this.loadClassOptions();
+    this.loadWorkloads();
+    this.recalculateWorkload();
   }
 
   private patchWorkload(workload: FacultyWorkloadResponse): void {
@@ -350,6 +709,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         programCode: workload.programCode ?? '',
         yearLevel: workload.yearLevel ?? '',
         sectionCode: workload.sectionCode ?? '',
+        totalHoursPerWeek: this.toNumber(workload.totalHoursPerWeek),
         totalTeachingLoad: this.toNumber(workload.totalTeachingLoad),
         numberOfPreparations: workload.numberOfPreparations ?? 0,
         designationEtu: this.toNumber(workload.designationEtu),
@@ -360,10 +720,60 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       },
       { emitEvent: false },
     );
+    this.loadClassOptions();
+    this.syncSelectedClassOption();
+  }
+
+  private mergeSavedWorkload(workload: FacultyWorkloadResponse): void {
+    const matchingIndex = this.workloads.findIndex(
+      (item) =>
+        item.facultyWorkloadId === workload.facultyWorkloadId ||
+        (
+          item.facultyId === workload.facultyId &&
+          item.schoolYear === workload.schoolYear &&
+          item.semester === workload.semester &&
+          item.courseCode === workload.courseCode &&
+          item.programCode === workload.programCode &&
+          item.yearLevel === workload.yearLevel &&
+          item.sectionCode === workload.sectionCode
+        ),
+    );
+
+    if (matchingIndex >= 0) {
+      this.workloads = this.workloads.map((item, index) =>
+        index === matchingIndex ? workload : item,
+      );
+      this.updateDashboardState();
+      return;
+    }
+
+    this.workloads = [workload, ...this.workloads].slice(0, this.pageSize);
+    this.totalElements += 1;
+    this.totalPages = Math.max(Math.ceil(this.totalElements / this.pageSize), 1);
+    this.updateDashboardState();
+  }
+
+  private syncSelectedFacultyFromWorkload(workload: FacultyWorkloadResponse): void {
+    if (this.selectedFaculty?.facultyId === workload.facultyId) {
+      return;
+    }
+
+    this.selectedFaculty = {
+      facultyId: workload.facultyId,
+      firstname: workload.facultyName ?? workload.facultyId,
+      lastname: '',
+      middlename: '',
+      position: '',
+      loadLimit: String(workload.loadLimit ?? ''),
+      status: '',
+      college: workload.college ?? '',
+    };
+    this.facultySearchTerm = this.facultySearchLabel(this.selectedFaculty);
   }
 
   private recalculateWorkload(): void {
-    const teachingLoad = this.toNumber(this.workloadForm.controls.totalTeachingLoad.value);
+    const totalHoursPerWeek = this.toNumber(this.workloadForm.controls.totalHoursPerWeek.value);
+    const teachingLoad = this.projectedTotalTeachingLoad(totalHoursPerWeek);
     const designationEtu = this.toNumber(this.workloadForm.controls.designationEtu.value);
     const loadLimit = this.toNumber(this.selectedFaculty?.loadLimit);
     const totalWorkload = teachingLoad + designationEtu;
@@ -372,11 +782,70 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     this.selectedLoadStatus = overloadHours > 0 ? 'OVERLOAD' : 'REGULAR_LOAD';
     this.workloadForm.patchValue(
       {
+        totalTeachingLoad: teachingLoad,
         totalWorkload,
         overloadHours,
       },
       { emitEvent: false },
     );
+    this.updateDashboardState(teachingLoad, totalWorkload, overloadHours);
+  }
+
+  private scheduleRecalculateWorkload(): void {
+    if (this.recalculationTimer) {
+      clearTimeout(this.recalculationTimer);
+    }
+
+    this.recalculationTimer = setTimeout(() => {
+      this.recalculationTimer = null;
+      this.recalculateWorkload();
+    });
+  }
+
+  private updateDashboardState(
+    teachingLoad = this.toNumber(this.workloadForm.controls.totalTeachingLoad.value),
+    totalWorkload = this.toNumber(this.workloadForm.controls.totalWorkload.value),
+    overloadHours = this.toNumber(this.workloadForm.controls.overloadHours.value),
+  ): void {
+    const facultyId = this.workloadForm.controls.facultyId.value;
+
+    this.selectedFacultyWorkloadCount = facultyId
+      ? this.workloads.filter((workload) => workload.facultyId === facultyId).length
+      : 0;
+    this.projectedTeachingLoadValue = teachingLoad;
+    this.projectedTotalWorkloadValue = totalWorkload;
+    this.projectedOverloadHoursValue = overloadHours;
+    this.visibleHoursPerWeekTotalValue = this.workloads.reduce(
+      (total, workload) => total + this.toNumber(workload.totalHoursPerWeek),
+      0,
+    );
+    this.canSaveWorkloadValue =
+      this.workloadForm.valid && !this.isSaving && !this.isLoadingClasses;
+    this.updateFacultySearchVisibility();
+    this.requestViewRefresh();
+  }
+
+  private updateFacultySearchVisibility(): void {
+    this.showFacultySearchResults =
+      this.facultyResults.length > 0 ||
+      this.isLoadingFaculties ||
+      this.facultySearchTerm.trim().length > 0;
+    this.requestViewRefresh();
+  }
+
+  private requestViewRefresh(): void {
+    if (this.viewRefreshPending || this.isDestroyed) {
+      return;
+    }
+
+    this.viewRefreshPending = true;
+    queueMicrotask(() => {
+      this.viewRefreshPending = false;
+
+      if (!this.isDestroyed) {
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   private buildPayload(): FacultyWorkloadRequest {
@@ -391,6 +860,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       programCode: value.programCode?.trim() ?? '',
       yearLevel: value.yearLevel?.trim() ?? '',
       sectionCode: value.sectionCode?.trim() ?? '',
+      totalHoursPerWeek: this.toNumber(value.totalHoursPerWeek),
       totalTeachingLoad: this.toNumber(value.totalTeachingLoad),
       numberOfPreparations: value.numberOfPreparations ?? 0,
       designationEtu: this.toNumber(value.designationEtu),
@@ -403,5 +873,99 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
   private toNumber(value: string | number | null | undefined): number {
     return Number(value ?? 0) || 0;
+  }
+
+  private projectedTotalTeachingLoad(currentHoursPerWeek: number): number {
+    const facultyId = this.workloadForm.controls.facultyId.value;
+    const schoolYear = this.workloadForm.controls.schoolYear.value;
+    const semester = this.workloadForm.controls.semester.value;
+    const currentWorkloadId = this.workloadForm.controls.facultyWorkloadId.value;
+    const courseCode = this.workloadForm.controls.courseCode.value;
+    const programCode = this.workloadForm.controls.programCode.value;
+    const yearLevel = this.workloadForm.controls.yearLevel.value;
+    const sectionCode = this.workloadForm.controls.sectionCode.value;
+
+    if (!facultyId || !schoolYear || !semester) {
+      return currentHoursPerWeek;
+    }
+
+    const termWorkloads = this.workloads.filter(
+      (workload) =>
+        workload.facultyId === facultyId &&
+        workload.schoolYear === schoolYear &&
+        workload.semester === semester,
+    );
+    const savedAggregate = termWorkloads.length
+      ? Math.max(
+          ...termWorkloads.map((workload) =>
+            this.toNumber(workload.totalTeachingLoad),
+          ),
+        )
+      : 0;
+    const existingCurrentHours = termWorkloads
+      .filter(
+        (workload) =>
+          workload.facultyWorkloadId === currentWorkloadId ||
+          (
+            workload.courseCode === courseCode &&
+            workload.programCode === programCode &&
+            workload.yearLevel === yearLevel &&
+            workload.sectionCode === sectionCode
+          ),
+      )
+      .reduce(
+        (total, workload) => total + this.toNumber(workload.totalHoursPerWeek),
+        0,
+      );
+
+    if (savedAggregate > 0 || currentWorkloadId) {
+      return Math.max(savedAggregate - existingCurrentHours, 0) + currentHoursPerWeek;
+    }
+
+    const visibleSavedHours = termWorkloads.reduce(
+      (total, workload) => total + this.toNumber(workload.totalHoursPerWeek),
+      0,
+    );
+
+    return visibleSavedHours + currentHoursPerWeek;
+  }
+
+  private syncSelectedClassOption(): void {
+    const courseCode = this.workloadForm.controls.courseCode.value;
+    const programCode = this.workloadForm.controls.programCode.value;
+    const yearLevel = this.workloadForm.controls.yearLevel.value;
+    const sectionCode = this.workloadForm.controls.sectionCode.value;
+    const matchingOption = this.classOptions.find(
+      (option) =>
+        option.courseCode === courseCode &&
+        option.programCode === programCode &&
+        option.yearLevel === yearLevel &&
+        option.sectionCode === sectionCode,
+    );
+
+    this.selectedClassKey = matchingOption
+      ? this.classOptionKey(matchingOption)
+      : '';
+  }
+
+  classOptionKey(option: FacultyWorkloadClassOptionResponse): string {
+    return [
+      option.classCode,
+      option.courseCode,
+      option.sectionId,
+      option.programCode,
+      option.yearLevel,
+      option.sectionCode,
+    ].join('|');
+  }
+
+  private clearClassSelection(): void {
+    this.selectedClassKey = '';
+    this.workloadForm.patchValue({
+      courseCode: '',
+      programCode: '',
+      yearLevel: '',
+      sectionCode: '',
+    });
   }
 }
