@@ -3,16 +3,12 @@
     <div class="hero-copy">
       <p class="overview-eyebrow">Administrator Dashboard</p>
       <h1>System Overview</h1>
-      <span>Live backend analytics for {{ dashboard()?.termLabel || 'the active term' }}.</span>
+      <span>Current evaluation activity for {{ dashboard()?.termLabel || 'the active term' }}.</span>
 
       <div class="hero-meta" aria-label="Dashboard data source">
         <span>
           <i class="bi bi-broadcast-pin"></i>
           Active term
-        </span>
-        <span>
-          <i class="bi bi-database-check"></i>
-          Backend optimized
         </span>
       </div>
     </div>
@@ -31,7 +27,7 @@
   @if (isRefreshing()) {
     <div class="refresh-strip" role="status" aria-live="polite">
       <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
-      <span>Updating dashboard metrics while keeping the current view visible.</span>
+      <span>Updating dashboard metrics...</span>
     </div>
   }
 

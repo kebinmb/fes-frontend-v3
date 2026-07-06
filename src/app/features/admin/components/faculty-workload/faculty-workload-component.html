@@ -139,7 +139,7 @@
             <option value="">
               {{ !selectedFaculty ? 'Select a faculty first' : (isLoadingClasses ? 'Loading classes...' : 'Select an available class') }}
             </option>
-            @for (option of classOptions; track classOptionKey(option)) {
+            @for (option of availableClassOptions; track classOptionKey(option)) {
               <option [value]="classOptionKey(option)">
                 {{ classOptionLabel(option) }}
               </option>
@@ -151,6 +151,11 @@
               Loading available classes for the selected faculty.
             </small>
           }
+        </div>
+
+        <div class="form-group">
+          <label for="workloadClassCode">Class Code</label>
+          <input id="workloadClassCode" type="text" formControlName="classCode" readonly />
         </div>
 
         <div class="form-group">
@@ -174,12 +179,16 @@
         </div>
 
         <div class="form-section-title">
-          <span>Workload Values</span>
+          <span>Subject-Specific Hours</span>
         </div>
 
         <div class="form-group">
-          <label for="totalHoursPerWeek">Total Hours/Week</label>
+          <label for="totalHoursPerWeek">Subject Total Hours/Week</label>
           <input id="totalHoursPerWeek" type="number" min="0" step="0.01" formControlName="totalHoursPerWeek" />
+        </div>
+
+        <div class="form-section-title">
+          <span>Common Faculty-Term Values</span>
         </div>
 
         <div class="form-group">
@@ -276,6 +285,37 @@
       </div>
     </div>
 
+    <div class="workload-summary-grid" aria-label="Common encoded workload values">
+      <div class="summary-card">
+        <i class="bi bi-collection"></i>
+        <div>
+          <span>No. of Preparations</span>
+          <strong>{{ workloadForm.controls.numberOfPreparations.value || 0 }}</strong>
+        </div>
+      </div>
+      <div class="summary-card">
+        <i class="bi bi-person-workspace"></i>
+        <div>
+          <span>Designation ETU</span>
+          <strong>{{ workloadForm.controls.designationEtu.value || 0 }}</strong>
+        </div>
+      </div>
+      <div class="summary-card summary-card-primary">
+        <i class="bi bi-speedometer2"></i>
+        <div>
+          <span>Total Workload</span>
+          <strong>{{ projectedTotalWorkloadValue | number: '1.0-2' }}</strong>
+        </div>
+      </div>
+      <div class="summary-card" [class.summary-card-warning]="projectedOverloadHoursValue > 0">
+        <i class="bi bi-exclamation-triangle"></i>
+        <div>
+          <span>Overload</span>
+          <strong>{{ projectedOverloadHoursValue | number: '1.0-2' }}</strong>
+        </div>
+      </div>
+    </div>
+
     <div class="table-responsive">
       @if (isLoadingWorkloads && workloads.length) {
         <div class="table-loading-banner">
@@ -290,19 +330,14 @@
             <th>Course Code</th>
             <th>Program/Year/Section</th>
             <th>Term</th>
-            <th>Hours/Week</th>
-            <th>Teaching Load</th>
-            <th>Prep</th>
-            <th>Designation</th>
-            <th>Total Workload</th>
-            <th>Status</th>
+            <th>Subject Hours/Week</th>
             <th class="text-center">Action</th>
           </tr>
         </thead>
         <tbody>
           @if (isLoadingWorkloads && !workloads.length) {
             <tr>
-              <td colspan="11" class="empty-state" data-empty-title="Loading workloads">
+              <td colspan="6" class="empty-state" data-empty-title="Loading workloads">
                 Please wait while records are refreshed.
               </td>
             </tr>
@@ -313,7 +348,10 @@
                   <strong>{{ workload.facultyName | unicodeText }}</strong>
                   <small>#{{ workload.facultyId }}</small>
                 </td>
-                <td data-label="Course Code">{{ workload.courseCode || '-' }}</td>
+                <td data-label="Course Code">
+                  {{ workload.courseCode || '-' }}
+                  <small>#{{ workload.classCode || '-' }}</small>
+                </td>
                 <td data-label="Program/Year/Section">
                   {{ workload.programCode || '-' }} /
                   {{ workload.yearLevel || '-' }} /
@@ -322,16 +360,7 @@
                 <td data-label="Term">
                   {{ semesterLabel(workload.semester) }} · {{ workload.schoolYear }}
                 </td>
-                <td data-label="Hours/Week">{{ workload.totalHoursPerWeek || 0 }}</td>
-                <td data-label="Teaching Load">{{ workload.totalTeachingLoad || 0 }}</td>
-                <td data-label="Prep">{{ workload.numberOfPreparations || 0 }}</td>
-                <td data-label="Designation">{{ workload.designationEtu || 0 }}</td>
-                <td data-label="Total Workload">{{ workload.totalWorkload || 0 }}</td>
-                <td data-label="Status">
-                  <span class="workload-status" [class.overload]="workload.loadStatus === 'OVERLOAD'">
-                    {{ statusLabel(workload.loadStatus) }}
-                  </span>
-                </td>
+                <td data-label="Subject Hours/Week">{{ workload.totalHoursPerWeek || 0 }}</td>
                 <td data-label="Action">
                   <button type="button" class="single-print-btn" (click)="editWorkload(workload)">
                     <i class="bi bi-pencil-square"></i>
@@ -342,7 +371,7 @@
             }
           } @else {
             <tr>
-              <td colspan="11" class="empty-state" data-empty-title="No workload records">
+              <td colspan="6" class="empty-state" data-empty-title="No workload records">
                 Select a faculty above and encode the workload for this term.
               </td>
             </tr>

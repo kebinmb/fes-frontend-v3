@@ -1,7 +1,7 @@
 :host {
   display: block;
 }
-:root {
+:host {
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 18px;
@@ -17,6 +17,12 @@
 .dashboard-page {
   min-height: 100vh;
   background: #f5f5f3;
+}
+
+.preparing-state {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
 }
 .navbar {
   position: sticky;
@@ -121,10 +127,8 @@
     filter var(--transition);
 }
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-1px);
   background: var(--chmsu-primary-dark) !important;
-  box-shadow: 0 4px 10px rgba(24, 100, 67, 0.16);
-  filter: brightness(1.01);
+  box-shadow: 0 2px 6px rgba(24, 100, 67, 0.14);
 }
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
@@ -221,7 +225,7 @@
   color: var(--text-primary);
   font-size: 1rem;
   font-weight: 700;
-  letter-spacing: -0.2px;
+  letter-spacing: 0;
   line-height: 1.35;
 }
 .class-card-body {
@@ -270,9 +274,9 @@
   min-height: 300px;
   padding: 2rem 1rem;
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
+  background: #ffffff;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+  box-shadow: var(--shadow-sm);
 }
 .empty-state-icon {
   width: 68px;
@@ -320,18 +324,14 @@
   margin-bottom: 1rem !important;
 }
 .dashboard-enter-animation {
-  animation:
-    dashboardFadeIn 0.45s ease,
-    dashboardSlideUp 0.45s ease;
+  animation: none;
 }
 .navbar {
-  animation: navbarDropIn 0.4s ease;
+  animation: none;
 }
 .stat-card-dashboard {
-  animation: statCardFadeUp 0.45s ease;
-  animation-fill-mode: both;
   transition:
-    transform 0.18s ease,
+    border-color 0.18s ease,
     box-shadow 0.18s ease;
 }
 .stat-card-dashboard:nth-child(1) {
@@ -347,19 +347,17 @@
   animation-delay: 0.15s;
 }
 .stat-card-dashboard:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+  border-color: rgba(24, 100, 67, 0.18);
+  box-shadow: var(--shadow-sm);
 }
 .class-card {
-  animation: classCardFadeUp 0.45s ease;
-  animation-fill-mode: both;
   transition:
-    transform 0.18s ease,
+    border-color 0.18s ease,
     box-shadow 0.18s ease;
 }
 .class-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+  border-color: rgba(24, 100, 67, 0.18);
+  box-shadow: var(--shadow-md);
 }
 .col-lg-6:nth-child(1) .class-card {
   animation-delay: 0.08s;
@@ -379,67 +377,8 @@
 .col-lg-6:nth-child(6) .class-card {
   animation-delay: 0.28s;
 }
-.empty-state {
-  animation: emptyStateFadeIn 0.45s ease;
-}
 .btn:active:not(:disabled) {
-  transform: scale(0.985);
-}
-@keyframes dashboardFadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes dashboardSlideUp {
-  from {
-    transform: translateY(10px);
-  }
-  to {
-    transform: translateY(0);
-  }
-}
-@keyframes navbarDropIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes statCardFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes classCardFadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes emptyStateFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+  transform: none;
 }
 @media (prefers-reduced-motion: reduce) {
   .dashboard-enter-animation,

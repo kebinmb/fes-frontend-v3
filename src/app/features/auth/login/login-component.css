@@ -94,25 +94,6 @@
   object-fit: contain;
 }
 
-.brand-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  margin-bottom: 1rem;
-
-  padding: 0.42rem 0.9rem;
-
-  border-radius: 999px;
-
-  background: rgba(255, 255, 255, 0.08);
-
-  border: 1px solid rgba(255, 255, 255, 0.14);
-
-  font-size: 0.76rem;
-  font-weight: 600;
-}
-
 .brand-title {
   margin: 0;
 
@@ -121,7 +102,7 @@
 
   font-weight: 600;
 
-  letter-spacing: -0.3px;
+  letter-spacing: 0;
 }
 
 .brand-subtitle {
@@ -132,29 +113,6 @@
   line-height: 1.7;
 
   opacity: 0.92;
-}
-
-.brand-features {
-  margin-top: 2rem;
-
-  display: grid;
-  gap: 0.75rem;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-
-  padding: 0.85rem 1rem;
-
-  border-radius: 12px;
-
-  background: rgba(255, 255, 255, 0.08);
-
-  border: 1px solid rgba(255, 255, 255, 0.1);
-
-  font-size: 0.88rem;
 }
 
 /* =========================
@@ -662,18 +620,12 @@
   font-weight: 600;
   transition:
     background-color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.15s ease;
+    border-color 0.2s ease;
 }
 
 .google-login-btn:hover {
   background: #f9fafb;
   border-color: rgba(0, 0, 0, 0.18);
-  transform: translateY(-1px);
-}
-
-.google-login-btn:active {
-  transform: translateY(0);
 }
 
 .google-icon {
@@ -729,10 +681,6 @@
   font-size: 0.92rem;
 }
 
-.login-btn:active:not(:disabled) {
-  transform: scale(0.99);
-}
-
 .role-toggle-btn button:hover:not(.active) {
   border-color: var(--chmsu-primary);
   background: #f1f5f9;
@@ -742,47 +690,10 @@
   opacity: 0.96;
 }
 
-.form-group small {
-  animation: fadeInValidation 0.15s ease;
-}
-
-@keyframes fadeInValidation {
-  from {
-    opacity: 0;
-    transform: translateY(-2px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.verification-message {
-  animation: fadeInVerification 0.2s ease;
-}
-
-@keyframes fadeInVerification {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .step-circle {
   transition:
     background-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.step-item.active .step-circle {
-  transform: scale(1.03);
+    color 0.2s ease;
 }
 
 .google-login-btn svg {
@@ -793,22 +704,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.login-card {
-  animation: fadeInCard 0.25s ease;
-}
-
-@keyframes fadeInCard {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 @media (max-width: 576px) {

@@ -25,9 +25,19 @@ export const authInterceptor: HttpInterceptorFn = (
     withCredentials: true,
   });
 
+  const isAuthRequest =
+    req.url.includes('/auth/student/login') ||
+    req.url.includes('/auth/supervisor/login') ||
+    req.url.includes('/auth/administrator/login') ||
+    req.url.includes('/auth/access-code/generate');
+
   return next(cloned).pipe(
     map((event) => {
       if (event instanceof HttpResponse) {
+        if (isAuthRequest) {
+          isHandlingAuthError = false;
+        }
+
         return event.clone({
           body: repairSpecialCharacters(event.body),
         });
@@ -37,16 +47,6 @@ export const authInterceptor: HttpInterceptorFn = (
     }),
 
     catchError((error) => {
-
-      const isAuthRequest =
-
-        req.url.includes('/auth/student/login') ||
-
-        req.url.includes('/auth/supervisor/login') ||
-
-        req.url.includes('/auth/administrator/login') ||
-
-        req.url.includes('/auth/access-code/generate');
 
       // Allow login page to handle its own errors
       if (isAuthRequest) {
@@ -59,6 +59,11 @@ export const authInterceptor: HttpInterceptorFn = (
         error?.status === 401 ||
         error?.status === 403
       ) {
+        if (isHandlingAuthError) {
+          return throwError(() => error);
+        }
+
+        isHandlingAuthError = true;
 
         store.dispatch(
           AuthActions.sessionExpired()

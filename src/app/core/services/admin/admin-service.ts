@@ -74,6 +74,7 @@ export interface FacultyWorkloadRequest {
   facultyId: string;
   schoolYear: number;
   semester: string;
+  classCode?: string | null;
   courseCode: string;
   programCode: string;
   yearLevel: string;
@@ -93,6 +94,7 @@ export interface FacultyWorkloadResponse extends FacultyWorkloadRequest {
   facultyName: string;
   college?: string | null;
   loadLimit?: number | null;
+  classCode?: string | null;
   courseCode: string;
   programCode: string;
   yearLevel: string;
@@ -407,6 +409,7 @@ export class AdminService {
     facultyId: string,
     schoolYear: number,
     semester: string,
+    classCode: string | null | undefined,
     courseCode: string,
     programCode: string,
     yearLevel: string,
@@ -420,11 +423,14 @@ export class AdminService {
       .set('programCode', programCode)
       .set('yearLevel', yearLevel)
       .set('sectionCode', sectionCode);
+    const requestParams = classCode
+      ? params.set('classCode', classCode)
+      : params;
 
     return this.http.get<FacultyWorkloadResponse>(
       `${this.ADMIN_API_URL}/faculty-workloads/record`,
       {
-        params,
+        params: requestParams,
         withCredentials: true,
       },
     ).pipe(map((response) => repairSpecialCharacters(response)));

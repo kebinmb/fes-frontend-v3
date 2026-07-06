@@ -1,6 +1,7 @@
 @if (!(isReady$ | async)) {
 <div class="dashboard-page d-flex justify-content-center align-items-center full-height">
-  <div class="text-center">
+  <div class="text-center preparing-state">
+    <span class="ui-spinner ui-spinner-lg" aria-hidden="true"></span>
     <h5 class="text-muted">Preparing your dashboard...</h5>
     <p class="text-muted small">Please wait while we load your data</p>
   </div>
@@ -42,9 +43,7 @@
     </div>
   </nav>
   @let loads = studentLoads$ | async;
-  <!-- CONTENT -->
   <div class="container-fluid px-4 py-4">
-    <!-- STATS -->
     <div class="row g-3 mb-4">
       <div class="col-md-4">
         <div class="stat-card-dashboard">
@@ -84,14 +83,12 @@
         </div>
       </div>
     </div>
-    <!-- LOADING -->
     @if (isLoading$ | async) {
     <div class="ui-loading-state">
       <span class="ui-spinner ui-spinner-lg" aria-hidden="true"></span>
       <p>Loading your classes...</p>
     </div>
     }
-    <!-- EMPTY -->
     @else if (loads?.length === 0) {
     <div class="empty-state">
       <div class="empty-state-icon">
@@ -105,19 +102,16 @@
       </p>
     </div>
     }
-    <!-- DATA -->
     @else {
     <div class="row g-4">
       @for (cls of loads; track cls.classCode; let i = $index) {
       <div class="col-lg-6">
         <div class="class-card">
-          <!-- HEADER -->
           <div class="class-card-header">
             <div class="d-flex justify-content-between">
               <div>
                 <h5 class="class-subject">{{ cls.subjectCode }}</h5>
                 <span class="badge bg-secondary-soft">
-                  <!-- Section {{ class.sectionId }} -->
                 </span>
               </div>
               <div class="status-badge" [ngClass]="cls.isEvaluated ? 'status-completed' : 'status-pending'">
@@ -126,7 +120,6 @@
               </div>
             </div>
           </div>
-          <!-- BODY -->
           <div class="class-card-body">
             <div class="info-item">
               <i class="bi bi-person-badge"></i>
@@ -141,7 +134,6 @@
               <span>{{ cls.schoolYear }} - {{ cls.schoolYear + 1 }}</span>
             </div>
           </div>
-          <!-- FOOTER -->
           <div class="class-card-footer">
             <button
               type="button"

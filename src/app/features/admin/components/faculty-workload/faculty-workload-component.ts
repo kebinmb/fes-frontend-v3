@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectorRef,
   Component,
@@ -65,6 +66,9 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     string,
     FacultyWorkloadClassOptionResponse[]
   >();
+  private readonly standardPreparationLoadLimit = 21;
+  private readonly highPreparationLoadLimit = 18;
+  private readonly highPreparationThreshold = 3;
   private viewRefreshPending = false;
   private isDestroyed = false;
 
@@ -104,6 +108,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     facultyId: ['', Validators.required],
     schoolYear: [new Date().getFullYear(), [Validators.required, Validators.min(2000)]],
     semester: ['FIRST_SEMESTER' as Semester, Validators.required],
+    classCode: [''],
     courseCode: ['', Validators.required],
     programCode: ['', Validators.required],
     yearLevel: ['', Validators.required],
@@ -183,6 +188,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       facultyWorkloadId: null,
       schoolYear,
       semester,
+      classCode: '',
       courseCode: '',
       programCode: '',
       yearLevel: '',
@@ -225,8 +231,9 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
           this.workloadSearchTerm = response.facultyId;
           this.page = 0;
           this.mergeSavedWorkload(response);
+          this.applyCommonFieldsToLocalTerm(response);
           this.syncSelectedFacultyFromWorkload(response);
-          this.patchWorkload(response);
+          this.clearSubjectSpecificWorkloadFields();
           this.toastFacade.showToast('Faculty workload saved successfully.', 'success');
           this.loadWorkloads();
         },
@@ -281,7 +288,13 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   }
 
   classOptionLabel(option: FacultyWorkloadClassOptionResponse): string {
-    return `${option.courseCode} - ${option.programCode} / ${option.yearLevel} / ${option.sectionCode}`;
+    return `${option.classCode} - ${option.courseCode} / ${option.programCode} / ${option.yearLevel} / ${option.sectionCode}`;
+  }
+
+  get availableClassOptions(): FacultyWorkloadClassOptionResponse[] {
+    return this.classOptions.filter(
+      (option) => !this.isClassOptionAlreadyEncoded(option),
+    );
   }
 
   get selectedFacultyWorkloads(): FacultyWorkloadResponse[] {
@@ -339,7 +352,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   }
 
   get selectedFacultyLoadLimit(): string {
-    return String(this.selectedFaculty?.loadLimit || '0');
+    return String(this.effectiveLoadLimit());
   }
 
   get canSaveWorkload(): boolean {
@@ -354,6 +367,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
     if (!option) {
       this.workloadForm.patchValue({
+        classCode: '',
         courseCode: '',
         programCode: '',
         yearLevel: '',
@@ -364,6 +378,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     }
 
     this.workloadForm.patchValue({
+      classCode: option.classCode,
       courseCode: option.courseCode,
       programCode: option.programCode,
       yearLevel: option.yearLevel,
@@ -385,7 +400,11 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
           this.loadClassOptions();
           this.loadWorkloads();
         },
-        error: () => {
+        error: (error) => {
+          if (this.isSessionExpiredError(error)) {
+            return;
+          }
+
           this.toastFacade.showToast(
             'Using the current year because no active term was loaded.',
             'error',
@@ -437,6 +456,10 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       });
   }
 
+  private isSessionExpiredError(error: unknown): boolean {
+    return error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403);
+  }
+
   private initializeFacultyIdLookup(): void {
     this.workloadForm.controls.facultyId.valueChanges
       .pipe(
@@ -455,6 +478,10 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       .subscribe(() => this.scheduleRecalculateWorkload());
 
     this.workloadForm.controls.designationEtu.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.scheduleRecalculateWorkload());
+
+    this.workloadForm.controls.numberOfPreparations.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.scheduleRecalculateWorkload());
 
@@ -503,6 +530,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
           this.workloads = response.content ?? [];
           this.totalElements = response.totalElements ?? 0;
           this.totalPages = Math.max(response.totalPages ?? 1, 1);
+          this.syncCommonTermFieldsFromWorkloads();
           this.recalculateWorkload();
         },
         error: (error) => {
@@ -676,6 +704,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       {
         facultyId: faculty.facultyId,
         facultyWorkloadId: null,
+        classCode: '',
         courseCode: '',
         programCode: '',
         yearLevel: '',
@@ -692,6 +721,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       { emitEvent: false },
     );
     this.selectedClassKey = '';
+    this.markCommonWorkloadControlsPristine();
     this.loadClassOptions();
     this.loadWorkloads();
     this.recalculateWorkload();
@@ -705,6 +735,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         facultyId: workload.facultyId,
         schoolYear: workload.schoolYear,
         semester: workload.semester as Semester,
+        classCode: workload.classCode ?? '',
         courseCode: workload.courseCode ?? '',
         programCode: workload.programCode ?? '',
         yearLevel: workload.yearLevel ?? '',
@@ -732,6 +763,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
           item.facultyId === workload.facultyId &&
           item.schoolYear === workload.schoolYear &&
           item.semester === workload.semester &&
+          this.sameClassCodeOrLegacyMatch(item, workload) &&
           item.courseCode === workload.courseCode &&
           item.programCode === workload.programCode &&
           item.yearLevel === workload.yearLevel &&
@@ -771,11 +803,75 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     this.facultySearchTerm = this.facultySearchLabel(this.selectedFaculty);
   }
 
+  private clearSubjectSpecificWorkloadFields(): void {
+    this.workloadForm.patchValue(
+      {
+        facultyWorkloadId: null,
+        classCode: '',
+        courseCode: '',
+        programCode: '',
+        yearLevel: '',
+        sectionCode: '',
+        totalHoursPerWeek: 0,
+        totalTeachingLoad: this.projectedTeachingLoadValue,
+        totalWorkload: this.projectedTotalWorkloadValue,
+        overloadHours: this.projectedOverloadHoursValue,
+      },
+      { emitEvent: false },
+    );
+    this.selectedClassKey = '';
+    this.workloadForm.controls.totalHoursPerWeek.markAsPristine();
+    this.recalculateWorkload();
+  }
+
+  private applyCommonFieldsToLocalTerm(savedWorkload: FacultyWorkloadResponse): void {
+    this.workloads = this.workloads.map((workload) => {
+      if (
+        workload.facultyId !== savedWorkload.facultyId ||
+        workload.schoolYear !== savedWorkload.schoolYear ||
+        workload.semester !== savedWorkload.semester
+      ) {
+        return workload;
+      }
+
+      return {
+        ...workload,
+        totalTeachingLoad: savedWorkload.totalTeachingLoad,
+        numberOfPreparations: savedWorkload.numberOfPreparations,
+        designationEtu: savedWorkload.designationEtu,
+        totalWorkload: savedWorkload.totalWorkload,
+        overloadHours: savedWorkload.overloadHours,
+        loadStatus: savedWorkload.loadStatus,
+        loadLimit: savedWorkload.loadLimit,
+      };
+    });
+  }
+
+  private isClassOptionAlreadyEncoded(
+    option: FacultyWorkloadClassOptionResponse,
+  ): boolean {
+    const selectedClassCode =
+      this.workloadForm.controls.classCode.value?.trim() ?? '';
+    const currentWorkloadId =
+      this.workloadForm.controls.facultyWorkloadId.value;
+
+    return this.currentFacultyTermWorkloads().some((workload) => {
+      if (currentWorkloadId && workload.facultyWorkloadId === currentWorkloadId) {
+        return false;
+      }
+
+      const workloadClassCode = workload.classCode?.trim() ?? '';
+
+      return workloadClassCode === option.classCode &&
+        workloadClassCode !== selectedClassCode;
+    });
+  }
+
   private recalculateWorkload(): void {
     const totalHoursPerWeek = this.toNumber(this.workloadForm.controls.totalHoursPerWeek.value);
     const teachingLoad = this.projectedTotalTeachingLoad(totalHoursPerWeek);
     const designationEtu = this.toNumber(this.workloadForm.controls.designationEtu.value);
-    const loadLimit = this.toNumber(this.selectedFaculty?.loadLimit);
+    const loadLimit = this.effectiveLoadLimit();
     const totalWorkload = teachingLoad + designationEtu;
     const overloadHours = Math.max(totalWorkload - loadLimit, 0);
 
@@ -789,6 +885,64 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       { emitEvent: false },
     );
     this.updateDashboardState(teachingLoad, totalWorkload, overloadHours);
+  }
+
+  private syncCommonTermFieldsFromWorkloads(): void {
+    const commonWorkload = this.currentFacultyTermWorkloads()[0];
+
+    if (!commonWorkload) {
+      return;
+    }
+
+    const patch: Partial<{
+      numberOfPreparations: number;
+      designationEtu: number;
+    }> = {};
+
+    if (!this.workloadForm.controls.numberOfPreparations.dirty) {
+      patch.numberOfPreparations =
+        commonWorkload.numberOfPreparations ?? 0;
+    }
+
+    if (!this.workloadForm.controls.designationEtu.dirty) {
+      patch.designationEtu = this.toNumber(commonWorkload.designationEtu);
+    }
+
+    if (Object.keys(patch).length > 0) {
+      this.workloadForm.patchValue(patch, { emitEvent: false });
+    }
+  }
+
+  private markCommonWorkloadControlsPristine(): void {
+    this.workloadForm.controls.numberOfPreparations.markAsPristine();
+    this.workloadForm.controls.designationEtu.markAsPristine();
+  }
+
+  private currentFacultyTermWorkloads(): FacultyWorkloadResponse[] {
+    const facultyId = this.workloadForm.controls.facultyId.value;
+    const schoolYear = this.workloadForm.controls.schoolYear.value;
+    const semester = this.workloadForm.controls.semester.value;
+
+    if (!facultyId || !schoolYear || !semester) {
+      return [];
+    }
+
+    return this.workloads.filter(
+      (workload) =>
+        workload.facultyId === facultyId &&
+        workload.schoolYear === schoolYear &&
+        workload.semester === semester,
+    );
+  }
+
+  private effectiveLoadLimit(
+    numberOfPreparations = this.toNumber(
+      this.workloadForm.controls.numberOfPreparations.value,
+    ),
+  ): number {
+    return numberOfPreparations >= this.highPreparationThreshold
+      ? this.highPreparationLoadLimit
+      : this.standardPreparationLoadLimit;
   }
 
   private scheduleRecalculateWorkload(): void {
@@ -856,6 +1010,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       facultyId: value.facultyId ?? '',
       schoolYear: value.schoolYear ?? new Date().getFullYear(),
       semester: value.semester ?? 'FIRST_SEMESTER',
+      classCode: value.classCode?.trim() || null,
       courseCode: value.courseCode?.trim() ?? '',
       programCode: value.programCode?.trim() ?? '',
       yearLevel: value.yearLevel?.trim() ?? '',
@@ -880,6 +1035,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     const schoolYear = this.workloadForm.controls.schoolYear.value;
     const semester = this.workloadForm.controls.semester.value;
     const currentWorkloadId = this.workloadForm.controls.facultyWorkloadId.value;
+    const classCode = this.workloadForm.controls.classCode.value;
     const courseCode = this.workloadForm.controls.courseCode.value;
     const programCode = this.workloadForm.controls.programCode.value;
     const yearLevel = this.workloadForm.controls.yearLevel.value;
@@ -907,6 +1063,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         (workload) =>
           workload.facultyWorkloadId === currentWorkloadId ||
           (
+            this.sameClassCodeOrLegacyValue(workload.classCode, classCode) &&
             workload.courseCode === courseCode &&
             workload.programCode === programCode &&
             workload.yearLevel === yearLevel &&
@@ -931,12 +1088,17 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   }
 
   private syncSelectedClassOption(): void {
+    const classCode = this.workloadForm.controls.classCode.value;
     const courseCode = this.workloadForm.controls.courseCode.value;
     const programCode = this.workloadForm.controls.programCode.value;
     const yearLevel = this.workloadForm.controls.yearLevel.value;
     const sectionCode = this.workloadForm.controls.sectionCode.value;
     const matchingOption = this.classOptions.find(
       (option) =>
+        (
+          option.classCode === classCode ||
+          (!classCode && option.courseCode === courseCode)
+        ) &&
         option.courseCode === courseCode &&
         option.programCode === programCode &&
         option.yearLevel === yearLevel &&
@@ -946,6 +1108,25 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     this.selectedClassKey = matchingOption
       ? this.classOptionKey(matchingOption)
       : '';
+  }
+
+  private sameClassCodeOrLegacyMatch(
+    first: FacultyWorkloadResponse,
+    second: FacultyWorkloadResponse,
+  ): boolean {
+    return this.sameClassCodeOrLegacyValue(first.classCode, second.classCode);
+  }
+
+  private sameClassCodeOrLegacyValue(
+    first: string | null | undefined,
+    second: string | null | undefined,
+  ): boolean {
+    const normalizedFirst = first?.trim() ?? '';
+    const normalizedSecond = second?.trim() ?? '';
+
+    return !normalizedFirst
+      || !normalizedSecond
+      || normalizedFirst === normalizedSecond;
   }
 
   classOptionKey(option: FacultyWorkloadClassOptionResponse): string {
@@ -962,6 +1143,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   private clearClassSelection(): void {
     this.selectedClassKey = '';
     this.workloadForm.patchValue({
+      classCode: '',
       courseCode: '',
       programCode: '',
       yearLevel: '',

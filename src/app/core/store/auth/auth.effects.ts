@@ -341,6 +341,7 @@ export class AuthEffects {
           this.store.dispatch(resetEvaluationState());
           localStorage.clear();
           sessionStorage.clear();
+          this.toastFacade.showToast('Your session has expired. Please sign in again.', 'error');
           this.authService.logout().subscribe({
             error: () => { },
           });
