@@ -234,7 +234,9 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
           this.applyCommonFieldsToLocalTerm(response);
           this.syncSelectedFacultyFromWorkload(response);
           this.clearSubjectSpecificWorkloadFields();
+          this.invalidateCurrentClassOptionsCache();
           this.toastFacade.showToast('Faculty workload saved successfully.', 'success');
+          this.loadClassOptions();
           this.loadWorkloads();
         },
         error: (error) => {
@@ -292,9 +294,36 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   }
 
   get availableClassOptions(): FacultyWorkloadClassOptionResponse[] {
-    return this.classOptions.filter(
+    const options = this.classOptions.filter(
       (option) => !this.isClassOptionAlreadyEncoded(option),
     );
+    const selectedOption = this.selectedClassOptionFromForm();
+
+    if (
+      selectedOption &&
+      !options.some(
+        (option) =>
+          this.classOptionKey(option) === this.classOptionKey(selectedOption),
+      )
+    ) {
+      return [selectedOption, ...options];
+    }
+
+    return options;
+  }
+
+  get classOptionPlaceholder(): string {
+    if (!this.selectedFaculty) {
+      return 'Select a faculty first';
+    }
+
+    if (this.isLoadingClasses) {
+      return 'Loading classes...';
+    }
+
+    return this.availableClassOptions.length === 0
+      ? 'All teaching assignments are already encoded'
+      : 'Select an available class';
   }
 
   get selectedFacultyWorkloads(): FacultyWorkloadResponse[] {
@@ -348,7 +377,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     return [
       `#${this.selectedFaculty.facultyId}`,
       this.selectedFaculty.college || 'No college',
-    ].join(' · ');
+    ].join(' - ');
   }
 
   get selectedFacultyLoadLimit(): string {
@@ -361,7 +390,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
   onClassOptionChange(classKey: string): void {
     this.selectedClassKey = classKey;
-    const option = this.classOptions.find(
+    const option = this.availableClassOptions.find(
       (item) => this.classOptionKey(item) === classKey,
     );
 
@@ -630,6 +659,21 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     return `${facultyId.toLowerCase()}|${schoolYear}|${semester.toUpperCase()}`;
   }
 
+  private invalidateCurrentClassOptionsCache(): void {
+    const facultyId = this.workloadForm.controls.facultyId.value?.trim() ?? '';
+    const schoolYear = this.workloadForm.controls.schoolYear.value;
+    const semester = this.workloadForm.controls.semester.value?.trim() ?? '';
+
+    if (!facultyId || !schoolYear || !semester) {
+      return;
+    }
+
+    this.classOptionsCache.delete(
+      this.classOptionsCacheKey(facultyId, schoolYear, semester),
+    );
+    this.currentClassOptionsKey = '';
+  }
+
   private resolveFacultyFromInput(value: string): void {
     const facultyId = value.trim();
 
@@ -865,6 +909,44 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       return workloadClassCode === option.classCode &&
         workloadClassCode !== selectedClassCode;
     });
+  }
+
+  private selectedClassOptionFromForm(): FacultyWorkloadClassOptionResponse | null {
+    const facultyWorkloadId = this.workloadForm.controls.facultyWorkloadId.value;
+    const classCode = this.workloadForm.controls.classCode.value?.trim() ?? '';
+    const courseCode = this.workloadForm.controls.courseCode.value?.trim() ?? '';
+    const programCode = this.workloadForm.controls.programCode.value?.trim() ?? '';
+    const yearLevel = this.workloadForm.controls.yearLevel.value?.trim() ?? '';
+    const sectionCode = this.workloadForm.controls.sectionCode.value?.trim() ?? '';
+
+    if (
+      !facultyWorkloadId ||
+      !classCode ||
+      !courseCode ||
+      !programCode ||
+      !yearLevel ||
+      !sectionCode
+    ) {
+      return null;
+    }
+
+    const existingOption = this.classOptions.find(
+      (option) =>
+        option.classCode === classCode &&
+        option.courseCode === courseCode &&
+        option.programCode === programCode &&
+        option.yearLevel === yearLevel &&
+        option.sectionCode === sectionCode,
+    );
+
+    return existingOption ?? {
+      classCode,
+      courseCode,
+      sectionId: 0,
+      programCode,
+      yearLevel,
+      sectionCode,
+    };
   }
 
   private recalculateWorkload(): void {
@@ -1104,10 +1186,13 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         option.yearLevel === yearLevel &&
         option.sectionCode === sectionCode,
     );
+    const selectedOption = this.selectedClassOptionFromForm();
 
     this.selectedClassKey = matchingOption
       ? this.classOptionKey(matchingOption)
-      : '';
+      : selectedOption
+        ? this.classOptionKey(selectedOption)
+        : '';
   }
 
   private sameClassCodeOrLegacyMatch(

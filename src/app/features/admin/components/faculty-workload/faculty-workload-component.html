@@ -137,7 +137,7 @@
             (change)="onClassOptionChange($any($event.target).value)"
           >
             <option value="">
-              {{ !selectedFaculty ? 'Select a faculty first' : (isLoadingClasses ? 'Loading classes...' : 'Select an available class') }}
+              {{ classOptionPlaceholder }}
             </option>
             @for (option of availableClassOptions; track classOptionKey(option)) {
               <option [value]="classOptionKey(option)">
