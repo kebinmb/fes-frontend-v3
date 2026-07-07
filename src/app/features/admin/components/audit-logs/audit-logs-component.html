@@ -1,0 +1,202 @@
+<section class="audit-page">
+  <div class="audit-hero">
+    <div class="hero-copy">
+      <span class="eyebrow">System Activity</span>
+      <div class="hero-title-row">
+        <h2>Audit Logs</h2>
+        @if (hasActiveFilters) {
+          <span class="filter-count">{{ activeFilterCount }} active filters</span>
+        }
+      </div>
+      <p>Monitor user activity, request status, endpoint access, and processing time across the system.</p>
+    </div>
+
+    <div class="hero-actions">
+      @if (loadedAt) {
+        <small>Last updated {{ loadedAt | date: 'shortTime' }}</small>
+      }
+
+      <select
+        class="form-select compact-select"
+        [(ngModel)]="size"
+        (ngModelChange)="onSizeChange()"
+        aria-label="Rows per page">
+        @for (option of sizeOptions; track option) {
+          <option [ngValue]="option">{{ option }} rows</option>
+        }
+      </select>
+
+      <button type="button" class="btn-secondary-action" [disabled]="loading" (click)="refresh()">
+        @if (loading) {
+          <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+          Loading
+        } @else {
+          <i class="bi bi-arrow-clockwise"></i>
+          Refresh
+        }
+      </button>
+    </div>
+  </div>
+
+  <div class="audit-metrics">
+    <div class="metric-card">
+      <span>Visible Rows</span>
+      <strong>{{ logs.length }}</strong>
+    </div>
+    <div class="metric-card success">
+      <span>Success</span>
+      <strong>{{ successCount }}</strong>
+    </div>
+    <div class="metric-card danger">
+      <span>Failed</span>
+      <strong>{{ failedCount }}</strong>
+    </div>
+    <div class="metric-card warning">
+      <span>Slow Requests</span>
+      <strong>{{ slowCount }}</strong>
+    </div>
+  </div>
+
+  <div class="audit-panel">
+    <div class="panel-heading">
+      <div>
+        <h3>Activity Feed</h3>
+        <p>{{ rangeLabel }} records shown for the current view</p>
+      </div>
+      <span class="page-chip">Page {{ page + 1 }}</span>
+    </div>
+
+    <div class="filters-grid">
+      <div class="filter-wide">
+        <label for="auditSearch">Search</label>
+        <input id="auditSearch" type="search" placeholder="User, action, entity, method, or endpoint" [(ngModel)]="search" (ngModelChange)="onFilterChange()" (keyup.enter)="searchNow()" />
+      </div>
+
+      <div>
+        <label for="auditUsername">Username</label>
+        <input id="auditUsername" type="text" placeholder="User" [(ngModel)]="username" (ngModelChange)="onFilterChange()" (keyup.enter)="searchNow()" />
+      </div>
+
+      <div>
+        <label for="auditAction">Action</label>
+        <select id="auditAction" [(ngModel)]="action" (ngModelChange)="onFilterChange()">
+          @for (option of quickActions; track option) {
+            <option [ngValue]="option">{{ option || 'All actions' }}</option>
+          }
+        </select>
+      </div>
+
+      <div>
+        <label for="auditEntity">Entity</label>
+        <input id="auditEntity" type="text" placeholder="FACULTY_WORKLOAD" [(ngModel)]="entityType" (ngModelChange)="onFilterChange()" (keyup.enter)="searchNow()" />
+      </div>
+
+      <div>
+        <label for="auditStart">From</label>
+        <input id="auditStart" type="date" [(ngModel)]="startDate" (ngModelChange)="onFilterChange()" />
+      </div>
+
+      <div>
+        <label for="auditEnd">To</label>
+        <input id="auditEnd" type="date" [(ngModel)]="endDate" (ngModelChange)="onFilterChange()" />
+      </div>
+
+      <div class="filter-actions">
+        <button type="button" class="btn-primary-action" [disabled]="loading" (click)="searchNow()">Search</button>
+        <button type="button" class="btn-secondary-action" [disabled]="loading" (click)="resetFilters()">Reset</button>
+      </div>
+    </div>
+
+    @if (error) {
+      <div class="audit-alert">{{ error }}</div>
+    }
+
+    <div class="audit-table-wrap desktop-table">
+      <table>
+        <thead>
+          <tr>
+            <th class="date-column">Date</th>
+            <th>User</th>
+            <th>Action</th>
+            <th>Entity</th>
+            <th>Endpoint</th>
+            <th class="center-column">Status</th>
+            <th class="runtime-column">Runtime</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading && !logs.length) {
+            <tr>
+              <td colspan="7" class="empty-cell">Loading audit logs...</td>
+            </tr>
+          } @else if (logs.length) {
+            @for (log of logs; track trackLog($index, log)) {
+              <tr>
+                <td class="date-cell">{{ log.createdAt | date: 'medium' }}</td>
+                <td class="user-cell">
+                  <strong>{{ log.username || 'Unknown' }}</strong>
+                  <small>#{{ log.userId || '-' }}</small>
+                </td>
+                <td class="action-cell"><code>{{ actionLabel(log.action) }}</code></td>
+                <td class="entity-cell">{{ entityLabel(log) }}</td>
+                <td class="endpoint-cell">
+                  <span class="method-pill">{{ log.requestMethod || '-' }}</span>
+                  <span class="path-text">{{ log.requestPath || '-' }}</span>
+                </td>
+                <td class="status-cell">
+                  <span class="status-pill" [class.success]="statusClass(log.status) === 'success'" [class.failed]="statusClass(log.status) === 'failed'">
+                    {{ log.status || 'UNKNOWN' }}
+                  </span>
+                </td>
+                <td class="runtime-cell">{{ log.executionTimeMs || 0 }} ms</td>
+              </tr>
+            }
+          } @else {
+            <tr>
+              <td colspan="7" class="empty-cell">No audit logs found for the selected filters.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mobile-list">
+      @if (loading && !logs.length) {
+        <div class="mobile-empty">Loading audit logs...</div>
+      } @else if (logs.length) {
+        @for (log of logs; track trackLog($index, log)) {
+          <article class="audit-card">
+            <div class="card-head">
+              <div>
+                <strong>{{ actionLabel(log.action) }}</strong>
+                <span>{{ log.createdAt | date: 'medium' }}</span>
+              </div>
+              <span class="status-pill" [class.success]="statusClass(log.status) === 'success'" [class.failed]="statusClass(log.status) === 'failed'">
+                {{ log.status || 'UNKNOWN' }}
+              </span>
+            </div>
+            <div class="card-meta">
+              <span>{{ log.username || 'Unknown' }} #{{ log.userId || '-' }}</span>
+              <span>{{ log.executionTimeMs || 0 }} ms</span>
+            </div>
+            <div class="card-entity">{{ log.entityType || '-' }}</div>
+            <div class="card-path">
+              <span class="method-pill">{{ log.requestMethod || '-' }}</span>
+              <span>{{ log.requestPath || '-' }}</span>
+            </div>
+          </article>
+        }
+      } @else {
+        <div class="mobile-empty">No audit logs found for the selected filters.</div>
+      }
+    </div>
+
+    <div class="audit-footer">
+      <small>Showing {{ logs.length }} records for this page.</small>
+      <div>
+        <button type="button" class="page-btn" [disabled]="!hasPrevious || loading" (click)="previousPage()">Prev</button>
+        <button type="button" class="page-btn" [disabled]="!hasNext || loading" (click)="nextPage()">Next</button>
+      </div>
+    </div>
+  </div>
+</section>

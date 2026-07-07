@@ -87,6 +87,7 @@ export class SettingsComponent
           response.semester as Semester;
       });
   }
+
   toggleAdvancedSettings(): void {
 
     this.showAdvancedSettings =
@@ -125,6 +126,7 @@ export class SettingsComponent
         this.semester,
       );
   }
+
   formatSemester(
   semester: string | null | undefined,
 ): string {

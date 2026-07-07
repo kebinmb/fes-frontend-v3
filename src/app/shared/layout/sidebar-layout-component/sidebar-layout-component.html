@@ -149,6 +149,19 @@
 
         <a
           class="nav-item"
+          routerLink="/admin-dashboard/audit-logs"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-shield-check"></i>
+
+          <span>
+            Audit Logs
+          </span>
+        </a>
+
+        <a
+          class="nav-item"
           routerLink="/admin-dashboard/settings"
           routerLinkActive="active"
           (click)="closeSidebar()"

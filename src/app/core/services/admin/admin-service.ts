@@ -292,6 +292,43 @@ export interface AdminDashboardResponse {
   programs: AdminDashboardProgramBreakdownResponse[];
   facultyLoads: AdminDashboardFacultyLoadResponse[];
 }
+
+export interface AuditLogResponse {
+  id: number;
+  userId: number | null;
+  username: string | null;
+  entityType: string | null;
+  entityId: number | null;
+  action: string | null;
+  ipAddress: string | null;
+  userAgent: string | null;
+  requestMethod: string | null;
+  requestPath: string | null;
+  executionTimeMs: number | null;
+  status: 'SUCCESS' | 'FAILED' | 'RECORDED' | 'UNKNOWN' | string;
+  createdAt: string;
+}
+
+export interface AuditLogFilter {
+  userId?: number | null;
+  username?: string;
+  action?: string;
+  entityType?: string;
+  search?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
+export interface AuditLogSliceResponse {
+  content: AuditLogResponse[];
+  page: number;
+  size: number;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  hasNext: boolean;
+  hasPrevious: boolean;
+}
 @Injectable({
   providedIn: 'root',
 })
@@ -346,6 +383,98 @@ export class AdminService {
         withCredentials: true,
       },
     );
+  }
+
+  getAuditLogs(
+    page: number = 0,
+    size: number = 25,
+    filters: AuditLogFilter = {},
+  ): Observable<PageResponse<AuditLogResponse>> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+
+    if (filters.userId !== undefined && filters.userId !== null) {
+      params = params.set('userId', filters.userId);
+    }
+
+    if (filters.username?.trim()) {
+      params = params.set('username', filters.username.trim());
+    }
+
+    if (filters.action?.trim()) {
+      params = params.set('action', filters.action.trim());
+    }
+
+    if (filters.entityType?.trim()) {
+      params = params.set('entityType', filters.entityType.trim());
+    }
+
+    if (filters.search?.trim()) {
+      params = params.set('search', filters.search.trim());
+    }
+
+    if (filters.startDate?.trim()) {
+      params = params.set('startDate', filters.startDate.trim());
+    }
+
+    if (filters.endDate?.trim()) {
+      params = params.set('endDate', filters.endDate.trim());
+    }
+
+    return this.http.get<PageResponse<AuditLogResponse>>(
+      `${this.ADMIN_API_URL}/audit-logs`,
+      {
+        params,
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  getAuditLogSlice(
+    page: number = 0,
+    size: number = 25,
+    filters: AuditLogFilter = {},
+  ): Observable<AuditLogSliceResponse> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+
+    if (filters.userId !== undefined && filters.userId !== null) {
+      params = params.set('userId', filters.userId);
+    }
+
+    if (filters.username?.trim()) {
+      params = params.set('username', filters.username.trim());
+    }
+
+    if (filters.action?.trim()) {
+      params = params.set('action', filters.action.trim());
+    }
+
+    if (filters.entityType?.trim()) {
+      params = params.set('entityType', filters.entityType.trim());
+    }
+
+    if (filters.search?.trim()) {
+      params = params.set('search', filters.search.trim());
+    }
+
+    if (filters.startDate?.trim()) {
+      params = params.set('startDate', filters.startDate.trim());
+    }
+
+    if (filters.endDate?.trim()) {
+      params = params.set('endDate', filters.endDate.trim());
+    }
+
+    return this.http.get<AuditLogSliceResponse>(
+      `${this.ADMIN_API_URL}/audit-logs/slice`,
+      {
+        params,
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
   }
 
   clearDashboardCache(): void {

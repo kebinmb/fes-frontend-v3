@@ -123,6 +123,13 @@ export const routes: Routes = [
             (m) => m.SettingsComponent,
           ),
       },
+      {
+        path: 'audit-logs',
+        loadComponent: () =>
+          import('@features/admin/components/audit-logs/audit-logs-component').then(
+            (m) => m.AuditLogsComponent,
+          ),
+      },
     ],
   },
   {
