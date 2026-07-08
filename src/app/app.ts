@@ -2,10 +2,11 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastComponent } from './shared/components/toast-component/toast-component';
 import { SpinnerComponent } from './shared/components/spinner-component/spinner-component';
+import { PatchNotesComponent } from './shared/components/patch-notes-component/patch-notes-component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet,ToastComponent,SpinnerComponent],
+  imports: [RouterOutlet, ToastComponent, SpinnerComponent, PatchNotesComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

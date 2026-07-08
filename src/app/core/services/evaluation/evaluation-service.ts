@@ -36,26 +36,6 @@ export interface EvaluationResponse {
   submittedAt?: string;
   error?: string;
 }
-export interface SubjectEvaluationSummary {
-  facultyId: string;
-  subjectCode: string;
-  semester: string;
-  schoolYear: number;
-
-  totalEvaluations: number;
-  averageScore: number;
-  overallInterpretation: string;
-
-  categoryAverages: {
-    categoryId: number;
-    categoryName: string;
-    averageScore: number;
-  }[];
-
-  passRate: number;
-  ratingDistribution: Record<string, number>;
-}
-
 export interface FacultyEvaluationScore {
   facultyEvaluationScoreId: number;
   evaluatorId: string;
@@ -333,55 +313,4 @@ export class EvaluationService {
     return this.http.get<EvaluationCheckResponse>(url, { params, withCredentials: true });
   }
 
-  getSubjectSummary(
-    facultyId: string,
-    subjectCode: string,
-    semester: string,
-    schoolYear: number,
-  ): Observable<SubjectEvaluationSummary> {
-    const params = new HttpParams()
-      .set('facultyId', facultyId)
-      .set('subjectCode', subjectCode)
-      .set('semester', semester)
-      .set('schoolYear', schoolYear.toString());
-
-    return this.http.get<SubjectEvaluationSummary>(`${this.STUDENT_BASE_URL}/summary`, {
-      params,
-      withCredentials: true,
-    });
-  }
-
-  getEvaluations(
-    facultyId: string,
-    subjectCode: string,
-    semester: string,
-    schoolYear: number,
-  ): Observable<FacultyEvaluationScore[]> {
-    const params = new HttpParams()
-      .set('facultyId', facultyId)
-      .set('subjectCode', subjectCode)
-      .set('semester', semester)
-      .set('schoolYear', schoolYear.toString());
-
-    return this.http.get<FacultyEvaluationScore[]>(`${this.STUDENT_BASE_URL}/list`, {
-      params,
-      withCredentials: true,
-    });
-  }
-
-  getRatingDistribution(
-    facultyId: string,
-    semester: string,
-    schoolYear: number,
-  ): Observable<Record<string, number>> {
-    const params = new HttpParams()
-      .set('facultyId', facultyId)
-      .set('semester', semester)
-      .set('schoolYear', schoolYear.toString());
-
-    return this.http.get<Record<string, number>>(`${this.STUDENT_BASE_URL}/distribution`, {
-      params,
-      withCredentials: true,
-    });
-  }
 }

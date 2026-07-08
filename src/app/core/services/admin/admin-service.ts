@@ -662,6 +662,17 @@ export class AdminService {
     ).pipe(map((response) => repairSpecialCharacters(response)));
   }
 
+  getFacultyWorkloadById(
+    facultyWorkloadId: number,
+  ): Observable<FacultyWorkloadResponse> {
+    return this.http.get<FacultyWorkloadResponse>(
+      `${this.ADMIN_API_URL}/faculty-workloads/${facultyWorkloadId}`,
+      {
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
   upsertFacultyWorkload(
     payload: FacultyWorkloadRequest,
   ): Observable<FacultyWorkloadResponse> {

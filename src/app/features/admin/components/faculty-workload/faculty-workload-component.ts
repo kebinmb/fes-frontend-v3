@@ -164,6 +164,32 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   }
 
   editWorkload(workload: FacultyWorkloadResponse): void {
+    if (!workload.facultyWorkloadId) {
+      this.applyWorkloadForEditing(workload);
+      return;
+    }
+
+    this.isLoadingWorkloads = true;
+    this.adminService
+      .getFacultyWorkloadById(workload.facultyWorkloadId)
+      .pipe(
+        finalize(() => {
+          this.isLoadingWorkloads = false;
+          this.updateDashboardState();
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: (response) => {
+          this.applyWorkloadForEditing(response);
+        },
+        error: (error) => {
+          this.toastFacade.showToast(extractErrorMessage(error), 'error');
+        },
+      });
+  }
+
+  private applyWorkloadForEditing(workload: FacultyWorkloadResponse): void {
     this.selectedFaculty = {
       facultyId: workload.facultyId,
       firstname: workload.facultyName ?? workload.facultyId,

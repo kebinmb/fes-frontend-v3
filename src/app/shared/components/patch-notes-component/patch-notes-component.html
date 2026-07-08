@@ -1,0 +1,76 @@
+@if (visible) {
+  <div class="patch-backdrop">
+    <section
+      class="patch-notes"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="patchNotesTitle"
+      aria-describedby="patchNotesSummary"
+    >
+      <div class="patch-accent-bar" aria-hidden="true"></div>
+
+      <div class="patch-header">
+        <div class="patch-title-row">
+          <div class="patch-logo" aria-hidden="true">
+            <span>FES</span>
+          </div>
+          <div>
+            <span class="patch-kicker">System Update</span>
+            <h2 id="patchNotesTitle">{{ release.title }}</h2>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="patch-icon-btn"
+          aria-label="Review update later"
+          (click)="remindLater()"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="patch-body">
+        <div class="patch-meta" aria-label="Release information">
+          <span><i class="bi bi-tag" aria-hidden="true"></i> Version {{ release.version }}</span>
+          <span><i class="bi bi-calendar3" aria-hidden="true"></i> {{ release.date }}</span>
+        </div>
+
+        <p id="patchNotesSummary" class="patch-summary">
+          {{ release.summary }}
+        </p>
+
+        <div class="patch-section-list">
+          @for (section of release.sections; track section.title) {
+            <article class="patch-section">
+              <div class="patch-section-heading">
+                <span class="patch-section-icon" aria-hidden="true">
+                  <i class="bi bi-check2-circle"></i>
+                </span>
+                <div>
+                  <h3>{{ section.title }}</h3>
+                  <p>{{ section.description }}</p>
+                </div>
+              </div>
+
+              <ul>
+                @for (item of section.items; track item) {
+                  <li>{{ item }}</li>
+                }
+              </ul>
+            </article>
+          }
+        </div>
+      </div>
+
+      <div class="patch-actions">
+        <button type="button" class="patch-secondary-btn" (click)="remindLater()">
+          Review Later
+        </button>
+        <button type="button" class="patch-primary-btn" (click)="dismiss()">
+          Mark as Read
+        </button>
+      </div>
+    </section>
+  </div>
+}
