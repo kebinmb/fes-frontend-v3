@@ -1,0 +1,147 @@
+<section class="coverage-page">
+  <header class="coverage-hero">
+    <div>
+      <p class="eyebrow">Faculty Workload Coverage</p>
+      <h1>Active Faculty Workload Status</h1>
+      <p>
+        Current term:
+        <strong>{{ coverage()?.schoolYear || '-' }}</strong>
+        <span>-</span>
+        <strong>{{ semesterLabel(coverage()?.semester) }}</strong>
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-btn"
+      [disabled]="isLoading()"
+      (click)="loadCoverage(true)"
+    >
+      <i class="bi bi-arrow-clockwise" [class.spin]="isRefreshing()"></i>
+      Refresh
+    </button>
+  </header>
+
+  <div class="summary-grid" *ngIf="coverage() as data; else loadingState">
+    <article class="summary-card">
+      <span>Total Active</span>
+      <strong>{{ data.totalActiveFaculty }}</strong>
+      <small>Faculty in current evaluation scope</small>
+    </article>
+
+    <article class="summary-card success">
+      <span>With Workload</span>
+      <strong>{{ data.withWorkloadCount }}</strong>
+      <small>{{ data.coverageRate | number: '1.0-2' }}% encoded</small>
+    </article>
+
+    <article class="summary-card warning">
+      <span>Without Workload</span>
+      <strong>{{ data.withoutWorkloadCount }}</strong>
+      <small>Needs workload encoding</small>
+    </article>
+  </div>
+
+  <section class="coverage-panel" *ngIf="coverage() as data">
+    <div class="panel-toolbar">
+      <div class="tab-group" role="tablist" aria-label="Workload coverage filter">
+        <button
+          type="button"
+          [class.active]="activeTab() === 'without'"
+          (click)="setActiveTab('without')"
+        >
+          Without workload
+          <span>{{ data.withoutWorkloadCount }}</span>
+        </button>
+
+        <button
+          type="button"
+          [class.active]="activeTab() === 'with'"
+          (click)="setActiveTab('with')"
+        >
+          With workload
+          <span>{{ data.withWorkloadCount }}</span>
+        </button>
+      </div>
+
+      <label class="search-box">
+        <i class="bi bi-search"></i>
+        <input
+          type="search"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="updateSearchTerm($event)"
+          placeholder="Search faculty, ID, college, position"
+        />
+        <button
+          *ngIf="searchTerm()"
+          type="button"
+          aria-label="Clear search"
+          (click)="clearSearch()"
+        >
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </label>
+    </div>
+
+    <div class="table-shell">
+      <table>
+        <thead>
+          <tr>
+            <th>Faculty</th>
+            <th>Position</th>
+            <th>College</th>
+            <th class="num">Load Limit</th>
+            <th class="num">Workloads</th>
+            <th class="num">Hours</th>
+            <th class="num">Preparations</th>
+            <th class="actions">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let row of activeRows(); trackBy: trackByFacultyId">
+            <td data-label="Faculty">
+              <strong>{{ row.facultyName | unicodeText }}</strong>
+              <span>#{{ row.facultyId }}</span>
+            </td>
+            <td data-label="Position">{{ row.position || '-' }}</td>
+            <td data-label="College">
+              <span class="pill">{{ row.college || 'Unassigned' }}</span>
+            </td>
+            <td data-label="Load Limit" class="num">{{ row.loadLimit ?? '-' }}</td>
+            <td data-label="Workloads" class="num">{{ row.workloadCount }}</td>
+            <td data-label="Hours" class="num">
+              {{ numberValue(row.totalHoursPerWeek) | number: '1.0-2' }}
+            </td>
+            <td data-label="Preparations" class="num">
+              {{ row.numberOfPreparations ?? '-' }}
+            </td>
+            <td class="actions" data-label="Action">
+              <a
+                class="encode-link"
+                routerLink="/admin-dashboard/faculty-workloads"
+                [queryParams]="{ facultyId: row.facultyId }"
+              >
+                {{ row.hasWorkload ? 'View' : 'Encode' }}
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="empty-state" *ngIf="!isLoading() && activeRows().length === 0">
+        <i class="bi bi-check2-circle"></i>
+        <strong>No matching faculty found</strong>
+        <span>Try changing the search or switch workload status.</span>
+      </div>
+    </div>
+  </section>
+
+  <ng-template #loadingState>
+    <div class="summary-grid skeleton-grid">
+      <div class="summary-card skeleton"></div>
+      <div class="summary-card skeleton"></div>
+      <div class="summary-card skeleton"></div>
+    </div>
+  </ng-template>
+</section>

@@ -1,306 +1,586 @@
 :host {
-  display: block;
-  background: white;
+    display: block;
+    background: #fff
 }
 
 :root {
-  --chmsu-primary: #186443;
-  --chmsu-secondary: #6a9d8a;
-  --chmsu-accent: #e5d413;
-  --chmsu-border: #dbe4de;
-  --chmsu-bg: #f7faf8;
+    --chmsu-primary: #186443;
+    --chmsu-border: #dbe4de;
+    --chmsu-bg: #f7faf8
 }
 
 * {
-  box-sizing: border-box;
+    box-sizing: border-box
 }
 
 .print-container {
-  padding: 32px;
-  color: #1f2937;
-  background: white;
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: 32px;
+    border: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    color: #1f2937;
+    background: #fff
 }
 
-/* =====================================================
-   HEADER
-===================================================== */
+.print-body,
+.print-content-row,
+.print-content-cell {
+    display: block
+}
+
+.print-content-cell {
+    padding: 0;
+    border: 0
+}
 
 .report-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-
-  border-bottom:
-    4px solid var(--chmsu-primary);
-
-  padding-bottom: 20px;
-  margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    border-bottom: 4px solid var(--chmsu-primary)
 }
 
 .report-logo {
-  width: 82px;
-  height: 82px;
-  object-fit: contain;
+    width: 82px;
+    height: 82px;
+    object-fit: contain
 }
 
 .report-header-content h1 {
-  margin: 0;
-
-  color: var(--chmsu-primary);
-
-  font-size: 30px;
-  font-weight: 800;
+    margin: 0;
+    color: var(--chmsu-primary);
+    font-size: 30px;
+    font-weight: 800
 }
 
 .report-header-content h2 {
-  margin:
-    6px 0 0;
-
-  font-size: 17px;
-  color: #374151;
+    margin: 6px 0 0;
+    color: #374151;
+    font-size: 17px
 }
 
 .report-header-content p {
-  margin:
-    8px 0 0;
-
-  color: #6b7280;
-
-  font-size: 13px;
+    margin: 8px 0 0;
+    color: #6b7280;
+    font-size: 13px
 }
 
-/* =====================================================
-   INFO
-===================================================== */
-
 .faculty-info {
-  background: var(--chmsu-bg);
+    padding: 22px;
+    margin-bottom: 28px;
+    border: 1px solid var(--chmsu-border);
+    border-radius: 14px;
+    background: var(--chmsu-bg)
+}
 
-  border:
-    1px solid var(--chmsu-border);
+.faculty-grid,
+.summary-wrapper,
+.approval-section,
+.verification-grid {
+    display: grid
+}
 
-  border-radius: 14px;
-
-  padding: 22px;
-
-  margin-bottom: 28px;
+.faculty-grid,
+.summary-wrapper,
+.approval-section {
+    grid-template-columns: repeat(2, 1fr)
 }
 
 .faculty-grid {
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 18px;
+    gap: 18px
 }
 
 .faculty-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px
 }
 
-.faculty-label {
-  font-size: 12px;
-  font-weight: 700;
-
-  color: #6b7280;
-
-  text-transform: uppercase;
+.faculty-label,
+.summary-label {
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase
 }
 
 .faculty-value {
-  font-size: 15px;
-  font-weight: 600;
+    font-size: 15px;
+    font-weight: 600
 }
-
-/* =====================================================
-   TITLES
-===================================================== */
 
 .section-title {
-  margin:
-    34px 0 14px;
-
-  padding-left: 14px;
-
-  border-left:
-    6px solid var(--chmsu-primary);
-
-  color: var(--chmsu-primary);
-
-  font-size: 18px;
-  font-weight: 800;
+    margin: 34px 0 14px;
+    padding-left: 14px;
+    border-left: 6px solid var(--chmsu-primary);
+    color: var(--chmsu-primary);
+    font-size: 18px;
+    font-weight: 800
 }
 
-/* =====================================================
-   TABLES
-===================================================== */
-
 table {
-  width: 100%;
-  border-collapse: collapse;
-
-  margin-top: 10px;
-
-  border:
-    1px solid var(--chmsu-border);
+    width: 100%;
+    margin-top: 10px;
+    border: 1px solid var(--chmsu-border);
+    border-collapse: collapse
 }
 
 th {
-  background:
-    linear-gradient(
-      135deg,
-      var(--chmsu-primary),
-      #237552
-    );
-
-  color: white;
-
-  padding: 12px;
-
-  font-size: 13px;
-  font-weight: 700;
+    padding: 12px;
+    background: linear-gradient(135deg, var(--chmsu-primary), #237552);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700
 }
 
 td {
-  border:
-    1px solid var(--chmsu-border);
-
-  padding: 11px 12px;
-
-  font-size: 13px;
+    padding: 11px 12px;
+    border: 1px solid var(--chmsu-border);
+    font-size: 13px
 }
 
 tbody tr:nth-child(even) {
-  background: #fafcfa;
+    background: #fafcfa
 }
 
 .total-row td {
-  background: #eef6f1;
-  font-weight: 700;
+    background: #eef6f1;
+    font-weight: 700
 }
 
-/* =====================================================
-   SUMMARY
-===================================================== */
-
 .summary-wrapper {
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 18px;
+    gap: 18px
 }
 
 .summary-card {
-  border:
-    1px solid var(--chmsu-border);
-
-  border-radius: 14px;
-
-  padding: 22px;
-
-  text-align: center;
-}
-
-.summary-label {
-  font-size: 13px;
-  font-weight: 700;
-
-  text-transform: uppercase;
-
-  color: #6b7280;
+    padding: 22px;
+    border: 1px solid var(--chmsu-border);
+    border-radius: 14px;
+    text-align: center
 }
 
 .summary-value {
-  margin-top: 12px;
-
-  font-size: 34px;
-  font-weight: 800;
-
-  color: var(--chmsu-primary);
+    margin-top: 12px;
+    color: var(--chmsu-primary);
+    font-size: 34px;
+    font-weight: 800
 }
 
-/* =====================================================
-   APPROVAL
-===================================================== */
-
 .approval-section {
-  margin-top: 70px;
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(2, 1fr);
-
-  gap: 40px;
+    gap: 64px;
+    margin-top: 76px;
+    padding: 0 20px
 }
 
 .approval-title {
-  color: var(--chmsu-primary);
-
-  font-size: 16px;
-  font-weight: 800;
-
-  margin-bottom: 24px;
+    margin-bottom: 34px;
+    color: var(--chmsu-primary);
+    font-size: 16px;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase
 }
 
 .signature-line {
-  margin-top: 46px;
-
-  border-top:
-    1px solid #374151;
-
-  padding-top: 8px;
-
-  text-align: center;
-
-  font-size: 13px;
-  font-weight: 600;
+    height: 34px;
+    border-top: 1px solid #374151;
+    width: 100%
 }
 
-/* =====================================================
-   PRINT
-===================================================== */
+.date-line {
+    width: 46%;
+    margin: 20px auto 0;
+    border-top: 1px solid #374151
+}
+
+.signature-caption {
+    margin-top: 6px;
+    color: #374151;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700
+}
+
+.verification-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 34px;
+    padding: 12px 14px;
+    border: 1px solid #dbe4de;
+    border-left: 4px solid var(--chmsu-primary);
+    border-radius: 10px;
+    background: #fbfdfb;
+    color: #4b5563
+}
+
+.verification-copy {
+    min-width: 0;
+    flex: 1
+}
+
+.verification-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px
+}
+
+.verification-title {
+    color: var(--chmsu-primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase
+}
+
+.verification-subtitle {
+    display: block;
+    margin-top: 2px;
+    color: #6b7280;
+    font-size: 10px
+}
+
+.verification-status {
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #e8f3ee;
+    color: var(--chmsu-primary);
+    font-size: 10px;
+    font-weight: 800
+}
+
+.verification-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px 14px;
+    margin-bottom: 7px;
+    font-size: 10px
+}
+
+.verification-grid span {
+    min-width: 0
+}
+
+.verification-panel strong {
+    display: inline-block;
+    margin-right: 4px;
+    color: #374151;
+    font-weight: 800
+}
+
+.verification-line {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 6px;
+    margin: 4px 0;
+    font-size: 10px;
+    word-break: break-word
+}
+
+.verification-panel code {
+    font-family: Consolas, monospace;
+    font-size: 9px
+}
+
+.verification-qr {
+    width: 78px;
+    height: 78px;
+    flex: 0 0 auto;
+    padding: 4px;
+    border: 1px solid #dbe4de;
+    border-radius: 8px;
+    background: #fff
+}
+
+.print-signatories {
+    display: none
+}
+
+.print-table-signatories {
+    display: none !important
+}
 
 @media print {
 
-  app-sidebar,
-  app-header,
-  .sidebar,
-  .topbar,
-  .dashboard-layout,
-  .admin-layout,
-  nav,
-  aside,
-  header,
-  .no-print {
-    display: none !important;
-  }
+    app-sidebar,
+    app-header,
+    .sidebar,
+    .topbar,
+    .dashboard-layout,
+    .admin-layout,
+    nav,
+    aside,
+    header,
+    .no-print {
+        display: none !important
+    }
 
-  body,
-  html {
-    margin: 0 !important;
-    padding: 0 !important;
-    background: white !important;
-  }
+    html,
+    body,
+    app-faculty-evaluation-print-component,
+    .print-container {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important
+    }
 
-  app-faculty-evaluation-print-component {
-    display: block !important;
-    width: 100% !important;
-  }
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        box-shadow: none !important
+    }
 
-  .print-container {
-    width: 100%;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
+    .print-container {
+        display: table;
+        width: 100%;
+        margin: 0 !important;
+        border: 0 !important;
+        padding-bottom: 0 !important;
+        overflow: visible !important;
+        border-collapse: collapse
+    }
 
-  @page {
-    size: A4;
-    margin: 14mm;
-  }
+    .print-body {
+        display: table-row-group
+    }
+
+    .print-content-row {
+        display: table-row;
+        break-inside: auto;
+        page-break-inside: auto
+    }
+
+    .print-content-cell {
+        display: table-cell;
+        padding: 0 !important;
+        border: 0 !important;
+        background: #fff !important;
+        break-inside: auto;
+        page-break-inside: auto
+    }
+
+    .report-header {
+        gap: 14px;
+        padding-bottom: 12px;
+        margin-bottom: 16px;
+        border-bottom-width: 3px
+    }
+
+    .report-logo {
+        width: 64px;
+        height: 64px
+    }
+
+    .report-header-content h1 {
+        font-size: 21px
+    }
+
+    .report-header-content h2 {
+        font-size: 14px
+    }
+
+    .report-header-content p,
+    .faculty-label,
+    .summary-label {
+        font-size: 10px
+    }
+
+    .faculty-info {
+        padding: 10px 12px;
+        margin-bottom: 14px;
+        border-radius: 8px
+    }
+
+    .faculty-grid {
+        gap: 8px 14px
+    }
+
+    .faculty-value,
+    th,
+    td {
+        font-size: 10px
+    }
+
+    .section-title {
+        margin: 18px 0 8px;
+        padding-left: 8px;
+        border-left-width: 4px;
+        font-size: 13px
+    }
+
+    table {
+        margin-top: 6px;
+        table-layout: fixed;
+        page-break-inside: auto
+    }
+
+    .print-container {
+        margin-top: 0 !important;
+        table-layout: auto !important
+    }
+
+    thead {
+        display: table-header-group
+    }
+
+    .print-table-signatories {
+        display: none !important
+    }
+
+    tr {
+        break-inside: avoid-page;
+        page-break-inside: avoid
+    }
+
+    th,
+    td {
+        padding: 4px 6px;
+        line-height: 1.22;
+        overflow-wrap: anywhere;
+        word-break: normal
+    }
+
+    .evaluation-table th:first-child,
+    .evaluation-table td:first-child,
+    .comments-table th:first-child,
+    .comments-table td:first-child {
+        width: 11mm
+    }
+
+    .comments-table td {
+        line-height: 1.18
+    }
+
+    .summary-wrapper {
+        gap: 10px
+    }
+
+    .summary-card {
+        padding: 12px;
+        border-radius: 8px
+    }
+
+    .summary-value {
+        margin-top: 6px;
+        font-size: 22px
+    }
+
+    .approval-section {
+        display: none !important
+    }
+
+    .verification-panel {
+        gap: 8px;
+        margin-top: 18px;
+        padding: 8px 10px;
+        border-left-width: 3px;
+        border-radius: 7px
+    }
+
+    .verification-header {
+        margin-bottom: 5px
+    }
+
+    .verification-title,
+    .verification-subtitle,
+    .verification-status,
+    .verification-grid,
+    .verification-line {
+        font-size: 7.5px
+    }
+
+    .verification-status {
+        padding: 1px 5px
+    }
+
+    .verification-grid {
+        gap: 2px 8px;
+        margin-bottom: 4px
+    }
+
+    .verification-line {
+        grid-template-columns: 30px minmax(0, 1fr);
+        gap: 4px;
+        margin: 2px 0
+    }
+
+    .verification-panel code {
+        font-size: 6.5px
+    }
+
+    .verification-qr {
+        width: 46px;
+        height: 46px;
+        padding: 2px
+    }
+
+    .print-signatories {
+        display: table-footer-group !important;
+        color: #1f2937
+    }
+
+    .print-signatory-row {
+        display: table-row
+    }
+
+    .print-signatory-cell {
+        display: table-cell;
+        padding: 8mm 0 0;
+        background: #fff !important
+    }
+
+    .print-signatory-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30mm;
+        min-height: 28mm;
+        padding: 4mm 6mm 0;
+        border-top: 1.5px solid var(--chmsu-primary);
+        background: #fff !important;
+        break-inside: avoid;
+        page-break-inside: avoid
+    }
+
+    .print-signatory {
+        display: grid;
+        grid-template-rows: auto 11mm auto 5mm;
+        gap: 1.2mm;
+        font-size: 8.2px;
+        text-align: center
+    }
+
+    .print-signatory strong {
+        color: var(--chmsu-primary);
+        text-transform: uppercase
+    }
+
+    .print-signature-line {
+        display: block;
+        width: 100%;
+        border-bottom: 1px solid #374151
+    }
+
+    .print-signature-caption {
+        font-weight: 700
+    }
+
+    .print-signatory em {
+        justify-self: center;
+        min-width: 30mm;
+        padding-top: 1mm;
+        border-top: 1px solid #374151;
+        font-style: normal
+    }
+
+    @page {
+        size: A4;
+        margin: 10mm 12mm 14mm
+    }
 }

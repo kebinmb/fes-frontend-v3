@@ -8,10 +8,11 @@ import {
   Validators,
 } from '@angular/forms';
 import { AdminDataFacade } from '@core/store/admin-data/admin-data.facade';
-import { FetchFacultyResponse } from '@core/services/admin/admin-service';
+import {
+  AdminService,
+  FetchFacultyResponse,
+} from '@core/services/admin/admin-service';
 import { debounceTime, Subject, take } from 'rxjs';
-import * as AdminDataActions from '@core/store/admin-data/admin-data.actions';
-import { Actions, ofType } from '@ngrx/effects';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 export interface FacultyEvaluationPrintRecord {
@@ -58,9 +59,9 @@ type SeparatedEvaluationComments = {
 })
 export class FacultyDataTableComponent implements OnInit {
   private adminDataFacade = inject(AdminDataFacade);
+  private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
   private searchSubject = new Subject<string>();
-  private actions$ = inject(Actions);
   faculties$ = this.adminDataFacade.faculties$;
   updateFacultyMessage$ = this.adminDataFacade.updateFacultyMessage$;
   selectedFaculty: FetchFacultyResponse | null = null;
@@ -168,12 +169,10 @@ export class FacultyDataTableComponent implements OnInit {
     return this.facultyForm.controls;
   }
   printSingle(record: FacultyEvaluationPrintRecord): void {
-    this.adminDataFacade.loadFacultyEvaluationScoresByFacultyId(record.facultyId);
-
-    this.actions$
-      .pipe(ofType(AdminDataActions.loadFacultyEvaluationScoresByFacultyIdSuccess), take(1))
-      .subscribe(({ response }) => {
-        const normalizedData = response.map((item) => {
+    this.adminService.generateFacultyEvaluationReport(record.facultyId)
+      .pipe(take(1))
+      .subscribe((report) => {
+        const normalizedData = report.items.map((item) => {
           const separatedComments = this.separateEvaluationComments(item);
 
           return {
@@ -218,7 +217,22 @@ export class FacultyDataTableComponent implements OnInit {
         });
 
 
-        localStorage.setItem('faculty-print-data', JSON.stringify(normalizedData));
+        localStorage.setItem(
+          'faculty-print-data',
+          JSON.stringify({
+            report: {
+              reportId: report.reportId,
+              reportHash: report.reportHash,
+              verificationUrl: report.verificationUrl,
+              qrCodeDataUri: report.qrCodeDataUri,
+              versionNumber: report.versionNumber,
+              status: report.status,
+              generatedAt: report.generatedAt,
+              generatedByUsername: report.generatedByUsername,
+            },
+            items: normalizedData,
+          }),
+        );
 
         window.open('/print/faculty-evaluation', '_blank');
       });

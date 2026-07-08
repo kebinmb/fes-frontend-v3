@@ -39,6 +39,22 @@ interface PrintCommentRow {
   comment: string;
 }
 
+interface FacultyEvaluationPrintReportMeta {
+  reportId: string;
+  reportHash: string;
+  verificationUrl: string;
+  qrCodeDataUri: string;
+  versionNumber: number;
+  status: string;
+  generatedAt: string;
+  generatedByUsername?: string | null;
+}
+
+interface FacultyEvaluationPrintPayload {
+  report?: FacultyEvaluationPrintReportMeta;
+  items?: FacultyEvaluationPrintRecord[];
+}
+
 @Component({
   selector: 'app-faculty-evaluation-print-component',
   imports: [UnicodeTextPipe],
@@ -48,6 +64,8 @@ interface PrintCommentRow {
 export class FacultyEvaluationPrintComponent {
   @Input()
   data: FacultyEvaluationPrintRecord[] = [];
+
+  report: FacultyEvaluationPrintReportMeta | null = null;
 
   faculty: FacultyEvaluationPrintRecord | null = null;
 
@@ -66,7 +84,16 @@ export class FacultyEvaluationPrintComponent {
   ngOnInit(): void {
     const storedData = localStorage.getItem('faculty-print-data');
     if (storedData && !this.data.length) {
-      this.data = repairSpecialCharacters(JSON.parse(storedData));
+      const parsed = repairSpecialCharacters(
+        JSON.parse(storedData),
+      ) as FacultyEvaluationPrintPayload | FacultyEvaluationPrintRecord[];
+
+      if (Array.isArray(parsed)) {
+        this.data = parsed;
+      } else {
+        this.report = parsed.report ?? null;
+        this.data = parsed.items ?? [];
+      }
     }
     if (!this.data.length) {
       return;

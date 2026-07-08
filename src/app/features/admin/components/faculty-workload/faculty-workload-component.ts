@@ -13,6 +13,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import {
   AdminService,
   FacultyLoadStatus,
@@ -54,6 +55,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   private readonly toastFacade = inject(ToastFacade);
   private readonly fb = inject(FormBuilder);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly route = inject(ActivatedRoute);
   private readonly destroy$ = new Subject<void>();
   private readonly facultySearch$ = new Subject<string>();
   private readonly workloadSearch$ = new Subject<string>();
@@ -128,6 +130,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     this.initializeSearch();
     this.initializeFacultyIdLookup();
     this.initializeWorkloadCalculation();
+    this.initializeRouteFacultyFocus();
     this.searchFaculties('');
     this.loadWorkloads();
   }
@@ -521,6 +524,24 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     this.workloadForm.controls.semester.valueChanges
       .pipe(debounceTime(250), takeUntil(this.destroy$))
       .subscribe(() => this.refreshTermWorkloads());
+  }
+
+  private initializeRouteFacultyFocus(): void {
+    this.route.queryParamMap
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        const facultyId = params.get('facultyId')?.trim();
+
+        if (!facultyId) {
+          return;
+        }
+
+        this.facultySearchTerm = facultyId;
+        this.workloadSearchTerm = facultyId;
+        this.workloadForm.patchValue({ facultyId });
+        this.page = 0;
+        this.loadWorkloads();
+      });
   }
 
   private searchFaculties(search: string): void {

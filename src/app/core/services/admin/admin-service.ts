@@ -54,6 +54,48 @@ export interface FetchFacultyEvaluationScoreResponse {
   overallInterpretation: string;
 }
 
+export interface FacultyEvaluationPrintResponse {
+  facultyEvaluationScoreId: number;
+  facultyId: string;
+  facultyName?: string;
+  evaluatorId?: string;
+  evaluatorType?: string;
+  classCode: string;
+  numberOfStudents?: number;
+  college: string;
+  sectionCode?: string;
+  programCode?: string;
+  position: string;
+  semester?: string;
+  schoolYear?: number;
+  subjectCode?: string;
+  yearLevel?: string;
+  overallAverageScore: number;
+  overallInterpretation?: string;
+  setRating?: number;
+  sefRating?: number;
+  studentComments?: string;
+  supervisorComments?: string;
+  comments?: string;
+}
+
+export interface FacultyEvaluationGeneratedReportResponse {
+  reportId: string;
+  facultyId: string;
+  facultyName?: string;
+  schoolYear: number;
+  semester: string;
+  versionNumber: number;
+  status: 'VALID' | 'SUPERSEDED' | 'REVOKED' | string;
+  reportHash: string;
+  verificationUrl: string;
+  qrCodeDataUri: string;
+  generatedByUserId?: number | null;
+  generatedByUsername?: string | null;
+  generatedAt: string;
+  items: FacultyEvaluationPrintResponse[];
+}
+
 export interface UpdateFacultyRequest {
   facultyId: string;
   firstname: string;
@@ -293,6 +335,30 @@ export interface AdminDashboardResponse {
   facultyLoads: AdminDashboardFacultyLoadResponse[];
 }
 
+export interface FacultyWorkloadCoverageFacultyResponse {
+  facultyId: string;
+  facultyName: string;
+  position?: string | null;
+  college?: string | null;
+  status?: string | null;
+  loadLimit?: number | null;
+  hasWorkload: boolean;
+  workloadCount: number;
+  totalHoursPerWeek: FacultyWorkloadNumber;
+  numberOfPreparations?: number | null;
+}
+
+export interface FacultyWorkloadCoverageResponse {
+  schoolYear: number;
+  semester: string;
+  totalActiveFaculty: number;
+  withWorkloadCount: number;
+  withoutWorkloadCount: number;
+  coverageRate: number;
+  withWorkload: FacultyWorkloadCoverageFacultyResponse[];
+  withoutWorkload: FacultyWorkloadCoverageFacultyResponse[];
+}
+
 export interface AuditLogResponse {
   id: number;
   userId: number | null;
@@ -342,6 +408,8 @@ export class AdminService {
   private dashboardCacheCreatedAt = 0;
   private currentTermCache$?: Observable<CurrentSchoolYearAndSemesterResponse>;
   private currentTermCacheCreatedAt = 0;
+  private workloadCoverageCache$?: Observable<FacultyWorkloadCoverageResponse>;
+  private workloadCoverageCacheCreatedAt = 0;
 
   getDashboard(forceRefresh = false): Observable<AdminDashboardResponse> {
     const isExpired =
@@ -383,6 +451,29 @@ export class AdminService {
         withCredentials: true,
       },
     );
+  }
+
+  getFacultyWorkloadCoverage(
+    forceRefresh = false,
+  ): Observable<FacultyWorkloadCoverageResponse> {
+    const isExpired =
+      Date.now() - this.workloadCoverageCacheCreatedAt >
+      this.DASHBOARD_CACHE_TTL_MS;
+
+    if (forceRefresh || !this.workloadCoverageCache$ || isExpired) {
+      this.workloadCoverageCacheCreatedAt = Date.now();
+      this.workloadCoverageCache$ = this.http.get<FacultyWorkloadCoverageResponse>(
+        `${this.ADMIN_API_URL}/dashboard/faculty-workload-coverage`,
+        {
+          withCredentials: true,
+        },
+      ).pipe(
+        map((response) => repairSpecialCharacters(response)),
+        shareReplay({ bufferSize: 1, refCount: false }),
+      );
+    }
+
+    return this.workloadCoverageCache$;
   }
 
   getAuditLogs(
@@ -480,6 +571,12 @@ export class AdminService {
   clearDashboardCache(): void {
     this.dashboardCache$ = undefined;
     this.dashboardCacheCreatedAt = 0;
+    this.clearWorkloadCoverageCache();
+  }
+
+  clearWorkloadCoverageCache(): void {
+    this.workloadCoverageCache$ = undefined;
+    this.workloadCoverageCacheCreatedAt = 0;
   }
 
   getFaculties(
@@ -577,6 +674,7 @@ export class AdminService {
     ).pipe(
       tap(() => {
         this.clearDashboardCache();
+        this.clearWorkloadCoverageCache();
       }),
     );
   }
@@ -677,6 +775,18 @@ export class AdminService {
         withCredentials: true,
       },
     );
+  }
+
+  generateFacultyEvaluationReport(
+    facultyId: string,
+  ): Observable<FacultyEvaluationGeneratedReportResponse> {
+    return this.http.post<FacultyEvaluationGeneratedReportResponse>(
+      `${this.ADMIN_API_URL}/faculty-evaluation-reports/${encodeURIComponent(facultyId)}`,
+      {},
+      {
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
   }
 
   migrateAll(): Observable<MigrationResponse<void>> {
