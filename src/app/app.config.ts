@@ -1,6 +1,8 @@
 import {
   ApplicationConfig,
+  inject,
   provideBrowserGlobalErrorListeners,
+  provideAppInitializer,
   isDevMode,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
@@ -22,10 +24,12 @@ import { authInterceptor } from './utilities/interceptor/auth-interceptor';
 import { MigrationEffects } from './core/store/migration/migration.effects';
 import { SchoolYearAndSemesterEffects } from './core/store/school-year-and-semester/school-year-and-semester.effects';
 import { StudentEvaluationEffects } from './core/store/student-evaluation-data/student-evaluation-data.effects';
+import { SessionActivityService } from './core/services/auth/session-activity-service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideAppInitializer(() => inject(SessionActivityService).start()),
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideStore(reducers, {

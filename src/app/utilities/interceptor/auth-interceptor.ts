@@ -1,10 +1,10 @@
 import { HttpInterceptorFn, HttpParams, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { catchError, map, throwError } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 
+import { SessionActivityService } from '../../core/services/auth/session-activity-service';
 import * as AuthActions from './../../core/store/auth/auth.action';
 import { normalizeUnicode, repairSpecialCharacters } from '../normalize-text';
 
@@ -14,10 +14,8 @@ export const authInterceptor: HttpInterceptorFn = (
   req,
   next,
 ) => {
-
-  const router = inject(Router);
-
   const store = inject(Store);
+  const sessionActivity = inject(SessionActivityService);
 
   const cloned = req.clone({
     body: normalizeRequestBody(req.body),
@@ -29,13 +27,20 @@ export const authInterceptor: HttpInterceptorFn = (
     req.url.includes('/auth/student/login') ||
     req.url.includes('/auth/supervisor/login') ||
     req.url.includes('/auth/administrator/login') ||
-    req.url.includes('/auth/access-code/generate');
+    req.url.includes('/auth/access-code/generate') ||
+    req.url.includes('/auth/logout');
+
+  if (!isAuthRequest) {
+    sessionActivity.recordApiActivity();
+  }
 
   return next(cloned).pipe(
     map((event) => {
       if (event instanceof HttpResponse) {
-        if (isAuthRequest) {
-          isHandlingAuthError = false;
+        isHandlingAuthError = false;
+
+        if (!isAuthRequest) {
+          sessionActivity.recordApiActivity();
         }
 
         return event.clone({
@@ -55,10 +60,7 @@ export const authInterceptor: HttpInterceptorFn = (
       }
 
       // Session expired
-      if (
-        error?.status === 401 ||
-        error?.status === 403
-      ) {
+      if (error?.status === 401) {
         if (isHandlingAuthError) {
           return throwError(() => error);
         }
