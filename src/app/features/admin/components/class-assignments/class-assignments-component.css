@@ -3,8 +3,9 @@
 }
 
 .assignments-page {
+  display: grid;
+  gap: 14px;
   color: #182230;
-  padding: 32px;
 }
 
 .page-header,
@@ -18,9 +19,13 @@
 }
 
 .page-header {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-top: 4px solid #14532d;
+  border-radius: 12px;
   justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 20px;
+  gap: 18px;
+  padding: 16px 18px;
 }
 
 .eyebrow,
@@ -34,13 +39,15 @@
 }
 
 h1 {
-  font-size: 26px;
+  font-size: 22px;
+  line-height: 1.2;
   margin: 0;
 }
 
 .page-header p:last-child {
   color: #667085;
-  margin: 7px 0 0;
+  font-size: 13px;
+  margin: 4px 0 0;
 }
 
 button,
@@ -71,21 +78,22 @@ button:disabled {
 }
 
 .refresh-button {
-  background: #fff;
-  border: 1px solid #d0d5dd;
-  color: #344054;
-  min-height: 42px;
-  padding: 0 15px;
+  background: #14532d;
+  border: 1px solid #14532d;
+  color: #fff;
+  min-height: 38px;
+  padding: 0 13px;
 }
 
 .term-strip {
   background: #edf7f2;
   border: 1px solid #cce7da;
-  border-radius: 7px 7px 0 0;
+  border-radius: 10px;
   color: #275c48;
   gap: 10px;
-  min-height: 46px;
-  padding: 0 18px;
+  font-size: 12px;
+  min-height: 40px;
+  padding: 0 14px;
 }
 
 .term-strip .record-count {
@@ -95,20 +103,15 @@ button:disabled {
 .assignment-panel {
   background: #fff;
   border: 1px solid #dfe3e8;
-  border-radius: 7px;
+  border-radius: 12px;
   box-shadow: 0 5px 18px rgb(16 24 40 / 5%);
   overflow: hidden;
 }
 
-.term-strip + .assignment-panel {
-  border-radius: 0 0 7px 7px;
-  border-top: 0;
-}
-
 .filter-bar {
   border-bottom: 1px solid #eaecf0;
-  gap: 14px;
-  padding: 18px;
+  gap: 10px;
+  padding: 14px 16px;
 }
 
 .filter-bar label,
@@ -120,8 +123,9 @@ button:disabled {
 .filter-bar label > span,
 .faculty-select > span {
   color: #475467;
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .search-control {
@@ -140,30 +144,30 @@ button:disabled {
   border: 1px solid #cfd6df;
   border-radius: 7px;
   color: #182230;
-  height: 42px;
+  height: 38px;
   outline: none;
   width: 100%;
 }
 
 .search-control input {
-  padding: 0 42px 0 40px;
+  padding: 0 38px 0 36px;
 }
 
 .search-control i {
   color: #667085;
-  left: 14px;
+  left: 12px;
   position: absolute;
-  top: 13px;
+  top: 11px;
 }
 
 .search-control button {
   background: transparent;
   border: 0;
-  height: 38px;
+  height: 34px;
   position: absolute;
   right: 2px;
   top: 2px;
-  width: 38px;
+  width: 34px;
 }
 
 .search-control button i {
@@ -172,7 +176,7 @@ button:disabled {
 }
 
 .select-control {
-  min-width: 190px;
+  min-width: 180px;
 }
 
 .select-control select,
@@ -185,19 +189,19 @@ button:disabled {
   background: #f8fafc;
   border: 1px solid #d0d5dd;
   color: #344054;
-  height: 42px;
-  padding: 0 14px;
+  height: 38px;
+  padding: 0 12px;
 }
 
 .table-wrap {
-  min-height: 240px;
+  min-height: 200px;
   overflow-x: auto;
   position: relative;
 }
 
 table {
   border-collapse: collapse;
-  min-width: 1080px;
+  min-width: 1020px;
   width: 100%;
 }
 
@@ -205,14 +209,14 @@ th {
   background: #f8fafb;
   color: #475467;
   font-size: 11px;
-  padding: 13px 16px;
+  padding: 10px 14px;
   text-align: left;
   text-transform: uppercase;
 }
 
 td {
   border-top: 1px solid #eaecf0;
-  padding: 14px 16px;
+  padding: 10px 14px;
   vertical-align: middle;
 }
 
@@ -229,13 +233,13 @@ td strong {
 td small {
   color: #667085;
   font-size: 11px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .faculty-cell {
   align-items: center;
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 
 .faculty-cell > span {
@@ -245,9 +249,9 @@ td small {
   color: #126747;
   display: flex;
   font-weight: 700;
-  height: 36px;
+  height: 30px;
   justify-content: center;
-  width: 36px;
+  width: 30px;
 }
 
 .faculty-cell.unassigned > span {
@@ -262,7 +266,7 @@ td small {
   display: inline-block;
   font-size: 11px;
   font-weight: 600;
-  padding: 5px 9px;
+  padding: 4px 8px;
 }
 
 .action-column {
@@ -274,13 +278,13 @@ td small {
   background: #fff;
   border: 1px solid #b7d6c7;
   color: #126747;
-  height: 36px;
-  padding: 0 12px;
+  height: 32px;
+  padding: 0 10px;
 }
 
 .edit-button:hover,
 .refresh-button:hover {
-  background: #f3f8f5;
+  filter: brightness(0.96);
 }
 
 .empty-state,
@@ -336,8 +340,8 @@ td small {
   color: #667085;
   font-size: 12px;
   justify-content: space-between;
-  min-height: 64px;
-  padding: 0 18px;
+  min-height: 54px;
+  padding: 0 14px;
 }
 
 .pagination label,
@@ -350,7 +354,7 @@ td small {
 .pagination select {
   border: 1px solid #d0d5dd;
   border-radius: 6px;
-  height: 34px;
+  height: 32px;
   padding: 0 8px;
 }
 
@@ -358,8 +362,8 @@ td small {
   background: #fff;
   border: 1px solid #d0d5dd;
   border-radius: 6px;
-  height: 34px;
-  width: 34px;
+  height: 32px;
+  width: 32px;
 }
 
 .modal-backdrop {
@@ -378,7 +382,7 @@ td small {
   border-radius: 8px;
   box-shadow: 0 24px 50px rgb(16 24 40 / 22%);
   max-height: calc(100vh - 40px);
-  max-width: 620px;
+  max-width: 540px;
   overflow-y: auto;
   width: 100%;
 }
@@ -386,7 +390,7 @@ td small {
 .reassignment-dialog header {
   border-bottom: 1px solid #eaecf0;
   justify-content: space-between;
-  padding: 18px 22px;
+  padding: 14px 16px;
 }
 
 .reassignment-dialog header > div {
@@ -402,13 +406,13 @@ td small {
   color: #126747;
   display: flex;
   font-size: 18px;
-  height: 42px;
+  height: 36px;
   justify-content: center;
-  width: 42px;
+  width: 36px;
 }
 
 .reassignment-dialog h2 {
-  font-size: 18px;
+  font-size: 16px;
   margin: 0;
 }
 
@@ -421,7 +425,7 @@ td small {
 }
 
 .dialog-body {
-  padding: 22px;
+  padding: 16px;
 }
 
 .class-summary {
@@ -430,11 +434,11 @@ td small {
   border-radius: 7px;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  margin: 0 0 20px;
+  margin: 0 0 14px;
 }
 
 .class-summary div {
-  padding: 13px 15px;
+  padding: 10px 12px;
 }
 
 .class-summary dt {
@@ -451,7 +455,7 @@ td small {
 }
 
 .faculty-select select {
-  height: 46px;
+  height: 40px;
 }
 
 .selected-faculty {
@@ -461,8 +465,8 @@ td small {
   border-radius: 7px;
   display: flex;
   gap: 11px;
-  margin-top: 12px;
-  padding: 12px;
+  margin-top: 10px;
+  padding: 10px;
 }
 
 .selected-faculty i {
@@ -488,7 +492,7 @@ td small {
   font-size: 12px;
   gap: 8px;
   line-height: 1.5;
-  margin: 18px 0 0;
+  margin: 12px 0 0;
 }
 
 .reassignment-dialog footer {
@@ -496,14 +500,14 @@ td small {
   border-top: 1px solid #eaecf0;
   gap: 10px;
   justify-content: flex-end;
-  padding: 15px 22px;
+  padding: 12px 16px;
 }
 
 .cancel-button,
 .confirm-button {
   border: 1px solid #d0d5dd;
-  min-height: 40px;
-  padding: 0 16px;
+  min-height: 38px;
+  padding: 0 14px;
 }
 
 .cancel-button {
@@ -518,10 +522,6 @@ td small {
 }
 
 @media (max-width: 760px) {
-  .assignments-page {
-    padding: 18px 14px;
-  }
-
   .page-header,
   .filter-bar,
   .pagination {

@@ -196,13 +196,14 @@ export class ClassAssignmentsComponent implements OnInit, OnDestroy {
               : row,
           ),
         );
+        this.isSaving.set(false);
+        this.closeReassignment();
         this.toastFacade.showToast(
           response.changed
             ? 'Class faculty assignment updated successfully.'
             : 'The class assignment is already up to date.',
           'success',
         );
-        this.closeReassignment();
       },
       error: (error) => {
         this.toastFacade.showToast(extractErrorMessage(error), 'error');
