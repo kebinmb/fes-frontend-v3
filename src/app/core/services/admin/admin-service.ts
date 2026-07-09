@@ -403,6 +403,8 @@ export interface AuditLogResponse {
   requestMethod: string | null;
   requestPath: string | null;
   executionTimeMs: number | null;
+  oldValue: string | null;
+  newValue: string | null;
   status: 'SUCCESS' | 'FAILED' | 'RECORDED' | 'UNKNOWN' | string;
   createdAt: string;
 }

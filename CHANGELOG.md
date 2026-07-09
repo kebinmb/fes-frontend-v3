@@ -8,6 +8,27 @@ This project follows a simple semantic versioning style:
 - `MINOR` for new backward-compatible screens or features.
 - `PATCH` for bug fixes, optimizations, and documentation.
 
+## [0.2.0] - 2026-07-09
+
+### Added
+
+- Added a dedicated **Class Assignments** administrator sidebar option and workspace.
+- Added current-term class browsing with debounced search, campus filtering, server-side pagination, responsive table states, and clear loading and empty feedback.
+- Added a faculty reassignment confirmation dialog limited to active faculty from the class's source database.
+- Added five-minute inactivity-based session expiration using keyboard, pointer, touch, API, focus, reload, and cross-tab activity.
+
+### Changed
+
+- Successful faculty reassignment replaces the affected table row immediately without requiring a page refresh.
+- Faculty option responses are cached by source database while the assignment workspace is open.
+- Session expiration now reacts to authentication failures (`401`) without treating normal authorization failures (`403`) as expired sessions.
+- Audit-log response handling now preserves structured previous and new values supplied by the backend.
+
+### Security And Data Integrity
+
+- The reassignment dialog clearly states that student loads, evaluation records, and migrated source data are not rewritten.
+- Stale assignment submissions are rejected by the backend and surfaced through the existing error notification flow.
+
 ## [0.1.0] - 2026-07-08
 
 ### Added

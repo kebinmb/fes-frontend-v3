@@ -337,6 +337,8 @@ export class AuditLogsComponent implements OnInit, OnDestroy {
       requestMethod: this.toNullableText(log['requestMethod'] ?? log['request_method']),
       requestPath: this.toNullableText(log['requestPath'] ?? log['request_path']),
       executionTimeMs: this.nullableNumber(log['executionTimeMs'] ?? log['execution_time_ms']),
+      oldValue: this.toNullableText(log['oldValue'] ?? log['old_value']),
+      newValue: this.toNullableText(log['newValue'] ?? log['new_value']),
       status,
       createdAt: this.toText(log['createdAt'] ?? log['created_at'] ?? new Date().toISOString()),
     };
