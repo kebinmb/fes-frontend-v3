@@ -27,6 +27,38 @@ export interface FetchFacultyResponse {
   college: string;
   legacyDatabase?: string;
 }
+
+export interface ClassFacultyAssignmentResponse {
+  primaryClassId: number;
+  classCode: string;
+  subjectCode: string;
+  subjectTitle: string | null;
+  sectionId: number | null;
+  programCode: string | null;
+  yearLevel: string | null;
+  sectionCode: string | null;
+  facultyId: string | null;
+  facultyName: string | null;
+  schoolYear: number;
+  semester: string;
+  legacyDatabase: string | null;
+  sourceCampus: string | null;
+}
+
+export interface FacultyAssignmentOptionResponse {
+  facultyId: string;
+  facultyName: string;
+  position: string | null;
+  college: string | null;
+  legacyDatabase: string | null;
+}
+
+export interface ClassFacultyReassignmentResponse {
+  assignment: ClassFacultyAssignmentResponse;
+  previousFacultyId: string | null;
+  newFacultyId: string;
+  changed: boolean;
+}
 export interface FetchUserAccountsResponse {
   userId: string;
   username: string;
@@ -599,6 +631,60 @@ export class AdminService {
       params,
       withCredentials: true,
     }).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  getClassAssignments(
+    page: number = 0,
+    size: number = 20,
+    search: string = '',
+    legacyDatabase: string = '',
+  ): Observable<PageResponse<ClassFacultyAssignmentResponse>> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+
+    if (search.trim()) {
+      params = params.set('search', search.trim());
+    }
+
+    if (legacyDatabase.trim()) {
+      params = params.set('legacyDatabase', legacyDatabase.trim());
+    }
+
+    return this.http.get<PageResponse<ClassFacultyAssignmentResponse>>(
+      `${this.ADMIN_API_URL}/class-assignments`,
+      { params, withCredentials: true },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  getClassAssignmentFacultyOptions(
+    legacyDatabase: string = '',
+  ): Observable<FacultyAssignmentOptionResponse[]> {
+    let params = new HttpParams();
+
+    if (legacyDatabase.trim()) {
+      params = params.set('legacyDatabase', legacyDatabase.trim());
+    }
+
+    return this.http.get<FacultyAssignmentOptionResponse[]>(
+      `${this.ADMIN_API_URL}/class-assignments/faculties`,
+      { params, withCredentials: true },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  reassignClassFaculty(
+    primaryClassId: number,
+    facultyId: string,
+    expectedCurrentFacultyId: string | null,
+  ): Observable<ClassFacultyReassignmentResponse> {
+    return this.http.patch<ClassFacultyReassignmentResponse>(
+      `${this.ADMIN_API_URL}/class-assignments/${primaryClassId}/faculty`,
+      { facultyId, expectedCurrentFacultyId },
+      { withCredentials: true },
+    ).pipe(
+      map((response) => repairSpecialCharacters(response)),
+      tap(() => this.clearDashboardCache()),
+    );
   }
 
   getFacultyWorkloads(

@@ -1,0 +1,290 @@
+<section class="assignments-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Academic Records</p>
+      <h1>Class Faculty Assignments</h1>
+      <p>Correct late faculty changes for migrated classes in the current academic term.</p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      [disabled]="isLoading()"
+      (click)="loadAssignments(true)"
+    >
+      <i class="bi bi-arrow-clockwise" [class.spin]="isRefreshing()"></i>
+      Refresh
+    </button>
+  </header>
+
+  <div class="term-strip" *ngIf="currentTerm() as term">
+    <span><i class="bi bi-calendar3"></i> Current term</span>
+    <strong>{{ semesterLabel(term.semester) }} / {{ term.schoolYear }}</strong>
+    <span class="record-count">{{ totalElements() | number }} classes</span>
+  </div>
+
+  <section class="assignment-panel">
+    <div class="filter-bar">
+      <label class="search-control">
+        <span>Search classes</span>
+        <div>
+          <i class="bi bi-search"></i>
+          <input
+            type="search"
+            [ngModel]="searchTerm()"
+            (ngModelChange)="updateSearch($event)"
+            placeholder="Class code, subject, faculty, program"
+          />
+          <button
+            *ngIf="searchTerm()"
+            type="button"
+            aria-label="Clear search"
+            (click)="updateSearch('')"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </label>
+
+      <label class="select-control">
+        <span>Source campus</span>
+        <select
+          [ngModel]="legacyDatabase()"
+          (ngModelChange)="updateDatabase($event)"
+        >
+          <option *ngFor="let option of databaseOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </label>
+
+      <button
+        type="button"
+        class="clear-button"
+        [disabled]="!searchTerm() && !legacyDatabase()"
+        (click)="clearFilters()"
+      >
+        <i class="bi bi-sliders"></i>
+        Reset
+      </button>
+    </div>
+
+    <div class="table-wrap" [class.loading]="isLoading()">
+      <table>
+        <thead>
+          <tr>
+            <th>Class</th>
+            <th>Subject</th>
+            <th>Program / Year / Section</th>
+            <th>Current Faculty</th>
+            <th>Source</th>
+            <th class="action-column">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let assignment of assignments(); trackBy: trackByClassId"
+          >
+            <td>
+              <strong>{{ assignment.classCode | unicodeText }}</strong>
+              <small>Record #{{ assignment.primaryClassId }}</small>
+            </td>
+            <td>
+              <strong>{{ assignment.subjectCode | unicodeText }}</strong>
+              <small>{{ (assignment.subjectTitle | unicodeText) || 'No subject title' }}</small>
+            </td>
+            <td>
+              <strong>
+                {{ (assignment.programCode | unicodeText) || '-' }}
+                / {{ (assignment.yearLevel | unicodeText) || '-' }}
+                / {{ (assignment.sectionCode | unicodeText) || '-' }}
+              </strong>
+              <small>Section ID {{ assignment.sectionId || '-' }}</small>
+            </td>
+            <td>
+              <div class="faculty-cell" [class.unassigned]="!assignment.facultyId">
+                <span>{{ assignment.facultyName?.charAt(0) || '?' }}</span>
+                <div>
+                  <strong>{{ (assignment.facultyName | unicodeText) || 'Unassigned' }}</strong>
+                  <small>{{ assignment.facultyId || 'No faculty ID' }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="source-badge">{{ databaseLabel(assignment.legacyDatabase) }}</span>
+            </td>
+            <td class="action-column">
+              <button
+                type="button"
+                class="edit-button"
+                (click)="openReassignment(assignment)"
+              >
+                <i class="bi bi-pencil-square"></i>
+                Change
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="!isLoading() && assignments().length === 0">
+            <td colspan="6">
+              <div class="empty-state">
+                <i class="bi bi-journal-x"></i>
+                <strong>No class assignments found</strong>
+                <span>Try changing the search or campus filter.</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="loading-state" *ngIf="isLoading()">
+        <span class="spinner"></span>
+        Loading class assignments
+      </div>
+    </div>
+
+    <footer class="pagination">
+      <label>
+        <span>Rows per page</span>
+        <select [ngModel]="pageSize()" (ngModelChange)="updatePageSize($event)">
+          <option *ngFor="let size of pageSizes" [ngValue]="size">{{ size }}</option>
+        </select>
+      </label>
+
+      <span class="page-summary">
+        Showing {{ pageStart() }}-{{ pageEnd() }} of {{ totalElements() | number }}
+      </span>
+
+      <div class="page-actions">
+        <button
+          type="button"
+          aria-label="Previous page"
+          [disabled]="pageIndex() === 0 || isLoading()"
+          (click)="goToPage(pageIndex() - 1)"
+        >
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <span>Page {{ totalPages() ? pageIndex() + 1 : 0 }} of {{ totalPages() }}</span>
+        <button
+          type="button"
+          aria-label="Next page"
+          [disabled]="pageIndex() + 1 >= totalPages() || isLoading()"
+          (click)="goToPage(pageIndex() + 1)"
+        >
+          <i class="bi bi-chevron-right"></i>
+        </button>
+      </div>
+    </footer>
+  </section>
+</section>
+
+<div
+  class="modal-backdrop"
+  *ngIf="selectedAssignment() as assignment"
+  (click)="closeReassignment()"
+>
+  <section
+    class="reassignment-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="reassignment-title"
+    (click)="$event.stopPropagation()"
+  >
+    <header>
+      <div>
+        <span class="dialog-icon"><i class="bi bi-person-gear"></i></span>
+        <div>
+          <p>Faculty reassignment</p>
+          <h2 id="reassignment-title">{{ assignment.classCode | unicodeText }}</h2>
+        </div>
+      </div>
+      <button
+        type="button"
+        aria-label="Close dialog"
+        [disabled]="isSaving()"
+        (click)="closeReassignment()"
+      >
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </header>
+
+    <div class="dialog-body">
+      <dl class="class-summary">
+        <div>
+          <dt>Subject</dt>
+          <dd>{{ assignment.subjectCode | unicodeText }}</dd>
+        </div>
+        <div>
+          <dt>Program / Year / Section</dt>
+          <dd>
+            {{ assignment.programCode || '-' }} /
+            {{ assignment.yearLevel || '-' }} /
+            {{ assignment.sectionCode || '-' }}
+          </dd>
+        </div>
+        <div>
+          <dt>Current faculty</dt>
+          <dd>{{ (assignment.facultyName | unicodeText) || 'Unassigned' }}</dd>
+        </div>
+        <div>
+          <dt>Source</dt>
+          <dd>{{ databaseLabel(assignment.legacyDatabase) }}</dd>
+        </div>
+      </dl>
+
+      <label class="faculty-select">
+        <span>New faculty member</span>
+        <select
+          [ngModel]="selectedFacultyId()"
+          (ngModelChange)="selectedFacultyId.set($event)"
+          [disabled]="isLoadingOptions() || isSaving()"
+        >
+          <option value="" disabled>
+            {{ isLoadingOptions() ? 'Loading faculty...' : 'Select faculty' }}
+          </option>
+          <option *ngFor="let faculty of facultyOptions()" [value]="faculty.facultyId">
+            {{ faculty.facultyName | unicodeText }} ({{ faculty.facultyId }})
+          </option>
+        </select>
+      </label>
+
+      <div class="selected-faculty" *ngIf="selectedFaculty() as faculty">
+        <i class="bi bi-person-check"></i>
+        <div>
+          <strong>{{ faculty.facultyName | unicodeText }}</strong>
+          <span>
+            {{ faculty.position || 'Position not specified' }}
+            <ng-container *ngIf="faculty.college"> · {{ faculty.college }}</ng-container>
+          </span>
+        </div>
+      </div>
+
+      <p class="change-notice">
+        <i class="bi bi-info-circle"></i>
+        This changes only the faculty assigned to this class record. Student loads,
+        evaluation records, and migration source data are not rewritten.
+      </p>
+    </div>
+
+    <footer>
+      <button
+        type="button"
+        class="cancel-button"
+        [disabled]="isSaving()"
+        (click)="closeReassignment()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="confirm-button"
+        [disabled]="!canSave()"
+        (click)="saveReassignment()"
+      >
+        <span class="spinner small" *ngIf="isSaving()"></span>
+        <i class="bi bi-check2" *ngIf="!isSaving()"></i>
+        {{ isSaving() ? 'Saving...' : 'Confirm change' }}
+      </button>
+    </footer>
+  </section>
+</div>

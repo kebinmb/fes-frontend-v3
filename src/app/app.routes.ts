@@ -96,6 +96,13 @@ export const routes: Routes = [
           ).then((m) => m.FacultyWorkloadCoverageComponent),
       },
       {
+        path: 'class-assignments',
+        loadComponent: () =>
+          import(
+            '@features/admin/components/class-assignments/class-assignments-component'
+          ).then((m) => m.ClassAssignmentsComponent),
+      },
+      {
         path: 'evaluation-score-list',
         loadComponent: () =>
           import(
