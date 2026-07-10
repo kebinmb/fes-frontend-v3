@@ -24,8 +24,8 @@
         </div>
       </div>
 
-      <div class="status-card" [class.status-overload]="selectedLoadStatus === 'OVERLOAD'">
-        <span>Status</span>
+      <div class="status-card" [class.status-overload]="selectedLoadStatus === 'Overload'">
+        <span>Type of Load</span>
         <strong>{{ statusLabel(selectedLoadStatus) }}</strong>
       </div>
     </div>
@@ -217,6 +217,15 @@
         </div>
 
         <div class="form-group">
+          <label for="loadStatus">Type of Load</label>
+          <select id="loadStatus" formControlName="loadStatus">
+            @for (status of loadStatusOptions; track status) {
+              <option [value]="status">{{ status }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="workloadSource">Source</label>
           <select id="workloadSource" formControlName="source">
             @for (source of sourceOptions; track source) {
@@ -331,13 +340,14 @@
             <th>Program/Year/Section</th>
             <th>Term</th>
             <th>Subject Hours/Week</th>
+            <th>Type of Load</th>
             <th class="text-center">Action</th>
           </tr>
         </thead>
         <tbody>
           @if (isLoadingWorkloads && !workloads.length) {
             <tr>
-              <td colspan="6" class="empty-state" data-empty-title="Loading workloads">
+              <td colspan="7" class="empty-state" data-empty-title="Loading workloads">
                 Please wait while records are refreshed.
               </td>
             </tr>
@@ -361,6 +371,11 @@
                   {{ semesterLabel(workload.semester) }} · {{ workload.schoolYear }}
                 </td>
                 <td data-label="Subject Hours/Week">{{ workload.totalHoursPerWeek || 0 }}</td>
+                <td data-label="Type of Load">
+                  <span class="workload-status" [class.overload]="statusLabel(workload.loadStatus) === 'Overload'">
+                    {{ statusLabel(workload.loadStatus) }}
+                  </span>
+                </td>
                 <td data-label="Action">
                   <button type="button" class="single-print-btn" (click)="editWorkload(workload)">
                     <i class="bi bi-pencil-square"></i>
@@ -371,7 +386,7 @@
             }
           } @else {
             <tr>
-              <td colspan="6" class="empty-state" data-empty-title="No workload records">
+              <td colspan="7" class="empty-state" data-empty-title="No workload records">
                 Select a faculty above and encode the workload for this term.
               </td>
             </tr>

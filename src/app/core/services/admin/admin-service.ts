@@ -140,7 +140,7 @@ export interface UpdateFacultyRequest {
 }
 
 export type FacultyWorkloadSource = 'MANUAL' | 'IMPORTED' | 'SYSTEM';
-export type FacultyLoadStatus = 'REGULAR_LOAD' | 'OVERLOAD';
+export type FacultyLoadStatus = 'Regular' | 'Overload';
 export type FacultyWorkloadNumber = number | string | null;
 
 export interface FacultyWorkloadRequest {
@@ -159,6 +159,7 @@ export interface FacultyWorkloadRequest {
   designationEtu?: FacultyWorkloadNumber;
   totalWorkload?: FacultyWorkloadNumber;
   overloadHours?: FacultyWorkloadNumber;
+  loadStatus?: FacultyLoadStatus;
   source?: FacultyWorkloadSource;
   remarks?: string | null;
 }

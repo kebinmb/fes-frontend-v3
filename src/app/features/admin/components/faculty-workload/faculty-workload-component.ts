@@ -80,6 +80,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     { label: 'Summer Semester', value: 'SUMMER_SEMESTER' },
   ];
   readonly sourceOptions = ['MANUAL', 'IMPORTED', 'SYSTEM'] as const;
+  readonly loadStatusOptions: FacultyLoadStatus[] = ['Regular', 'Overload'];
 
   facultyResults: FetchFacultyResponse[] = [];
   workloads: FacultyWorkloadResponse[] = [];
@@ -96,7 +97,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   isLoadingWorkloads = false;
   isLoadingClasses = false;
   isSaving = false;
-  selectedLoadStatus: FacultyLoadStatus = 'REGULAR_LOAD';
+  selectedLoadStatus: FacultyLoadStatus = 'Regular';
   selectedFacultyWorkloadCount = 0;
   projectedTeachingLoadValue = 0;
   projectedTotalWorkloadValue = 0;
@@ -121,6 +122,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     designationEtu: [0, [Validators.required, Validators.min(0)]],
     totalWorkload: [0, [Validators.required, Validators.min(0)]],
     overloadHours: [0, [Validators.required, Validators.min(0)]],
+    loadStatus: ['Regular' as FacultyLoadStatus, Validators.required],
     source: ['MANUAL' as FacultyWorkloadSource, Validators.required],
     remarks: [''],
   });
@@ -210,7 +212,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     const semester = this.workloadForm.controls.semester.value ?? 'FIRST_SEMESTER';
 
     this.selectedFaculty = null;
-    this.selectedLoadStatus = 'REGULAR_LOAD';
+    this.selectedLoadStatus = 'Regular';
     this.workloadSearchTerm = '';
     this.workloadForm.reset({
       facultyId: '',
@@ -228,6 +230,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       designationEtu: 0,
       totalWorkload: 0,
       overloadHours: 0,
+      loadStatus: 'Regular',
       source: 'MANUAL',
       remarks: '',
     });
@@ -292,8 +295,8 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     this.loadWorkloads();
   }
 
-  statusLabel(status: FacultyLoadStatus | null | undefined): string {
-    return status === 'OVERLOAD' ? 'Overload' : 'Regular Load';
+  statusLabel(status: FacultyLoadStatus | string | null | undefined): string {
+    return this.normalizeLoadStatus(status);
   }
 
   semesterLabel(semester: string | null | undefined): string {
@@ -542,6 +545,13 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     this.workloadForm.controls.numberOfPreparations.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.scheduleRecalculateWorkload());
+
+    this.workloadForm.controls.loadStatus.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((status) => {
+        this.selectedLoadStatus = this.normalizeLoadStatus(status);
+        this.updateDashboardState();
+      });
 
     this.workloadForm.controls.schoolYear.valueChanges
       .pipe(debounceTime(250), takeUntil(this.destroy$))
@@ -806,6 +816,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         designationEtu: 0,
         totalWorkload: 0,
         overloadHours: 0,
+        loadStatus: 'Regular',
         source: 'MANUAL',
         remarks: '',
       },
@@ -819,7 +830,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   }
 
   private patchWorkload(workload: FacultyWorkloadResponse): void {
-    this.selectedLoadStatus = workload.loadStatus ?? 'REGULAR_LOAD';
+    this.selectedLoadStatus = this.normalizeLoadStatus(workload.loadStatus);
     this.workloadForm.patchValue(
       {
         facultyWorkloadId: workload.facultyWorkloadId,
@@ -837,6 +848,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         designationEtu: this.toNumber(workload.designationEtu),
         totalWorkload: this.toNumber(workload.totalWorkload),
         overloadHours: this.toNumber(workload.overloadHours),
+        loadStatus: this.normalizeLoadStatus(workload.loadStatus),
         source: workload.source ?? 'MANUAL',
         remarks: workload.remarks ?? '',
       },
@@ -907,6 +919,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         totalTeachingLoad: this.projectedTeachingLoadValue,
         totalWorkload: this.projectedTotalWorkloadValue,
         overloadHours: this.projectedOverloadHoursValue,
+        loadStatus: this.selectedLoadStatus,
       },
       { emitEvent: false },
     );
@@ -932,7 +945,6 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         designationEtu: savedWorkload.designationEtu,
         totalWorkload: savedWorkload.totalWorkload,
         overloadHours: savedWorkload.overloadHours,
-        loadStatus: savedWorkload.loadStatus,
         loadLimit: savedWorkload.loadLimit,
       };
     });
@@ -1004,7 +1016,6 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     const totalWorkload = teachingLoad + designationEtu;
     const overloadHours = Math.max(totalWorkload - loadLimit, 0);
 
-    this.selectedLoadStatus = overloadHours > 0 ? 'OVERLOAD' : 'REGULAR_LOAD';
     this.workloadForm.patchValue(
       {
         totalTeachingLoad: teachingLoad,
@@ -1150,9 +1161,18 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       designationEtu: this.toNumber(value.designationEtu),
       totalWorkload: this.toNumber(value.totalWorkload),
       overloadHours: this.toNumber(value.overloadHours),
+      loadStatus: this.normalizeLoadStatus(value.loadStatus),
       source: value.source ?? 'MANUAL',
       remarks: value.remarks?.trim() || null,
     };
+  }
+
+  private normalizeLoadStatus(
+    status: FacultyLoadStatus | string | null | undefined,
+  ): FacultyLoadStatus {
+    return String(status ?? '').toLowerCase().includes('overload')
+      ? 'Overload'
+      : 'Regular';
   }
 
   private toNumber(value: string | number | null | undefined): number {
