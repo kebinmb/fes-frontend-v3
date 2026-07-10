@@ -23,6 +23,33 @@ export interface ReleaseNoteSection {
  */
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.2.1',
+    date: '2026-07-10',
+    title: 'Session Timeout Refinement',
+    summary:
+      'Sessions now expire after ten minutes of inactivity, with clearer coordination between the browser and backend so active users stay signed in while AFK sessions are closed.',
+    sections: [
+      {
+        title: 'Session Timeout',
+        description: 'The inactivity window now matches the updated system policy.',
+        items: [
+          'Authenticated sessions now expire after ten minutes without user activity.',
+          'Keyboard, pointer, touch, scroll, focus, and tab visibility are treated as user activity.',
+          'The app checks the inactivity deadline before sending protected requests.',
+        ],
+      },
+      {
+        title: 'Backend Coordination',
+        description: 'Session renewal now depends on real user activity.',
+        items: [
+          'Protected requests include an activity signal only when recent user interaction is detected.',
+          'Background requests no longer keep an idle session alive by themselves.',
+          'Active users can continue working normally without being signed out mid-task.',
+        ],
+      },
+    ],
+  },
+  {
     version: '0.2.0',
     date: '2026-07-09',
     title: 'Class Assignment and Session Update',

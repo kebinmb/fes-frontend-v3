@@ -8,6 +8,20 @@ This project follows a simple semantic versioning style:
 - `MINOR` for new backward-compatible screens or features.
 - `PATCH` for bug fixes, optimizations, and documentation.
 
+## [0.2.1] - 2026-07-10
+
+### Changed
+
+- Updated authenticated session expiration from five minutes to ten minutes of user inactivity.
+- Session activity is now based on real user interaction such as keyboard, pointer, touch, scroll, focus, and tab visibility checks.
+- Protected API requests no longer count as user activity by themselves, preventing background requests from keeping an idle session alive.
+- Protected requests now send a short-lived activity signal to the backend only when recent user interaction is detected.
+
+### Security And Session Handling
+
+- The frontend now expires the session locally before sending protected requests after the ten-minute inactivity limit.
+- The frontend and backend now coordinate session renewal so active users remain signed in, while AFK users are signed out consistently.
+
 ## [0.2.0] - 2026-07-09
 
 ### Added
