@@ -34,7 +34,10 @@ export const authInterceptor: HttpInterceptorFn = (
     return throwError(() => new Error('Session expired'));
   }
 
-  if (!isAuthRequest && sessionActivity.hasRecentUserActivity()) {
+  const shouldSendUserActivitySignal =
+    !isAuthRequest && sessionActivity.shouldSendUserActivitySignal();
+
+  if (shouldSendUserActivitySignal) {
     cloned = cloned.clone({
       setHeaders: {
         'X-FES-User-Activity': 'true',
@@ -53,6 +56,10 @@ export const authInterceptor: HttpInterceptorFn = (
 
         if (!isAuthRequest) {
           sessionActivity.recordApiActivity();
+        }
+
+        if (shouldSendUserActivitySignal) {
+          sessionActivity.markServerActivitySynced();
         }
 
         return event.clone({

@@ -12,9 +12,11 @@ import {
   AdminService,
   FetchFacultyResponse,
 } from '@core/services/admin/admin-service';
-import { debounceTime, Subject, take } from 'rxjs';
+import { Subject, catchError, debounceTime, finalize, of, take } from 'rxjs';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
+import { extractErrorMessage } from '@utilities/extract-error.util';
+import { ToastFacade } from '@core/store/toast/toast.facade';
 export interface FacultyEvaluationPrintRecord {
   facultyEvaluationScoreId: number;
   facultyId: string;
@@ -60,35 +62,41 @@ type SeparatedEvaluationComments = {
 export class FacultyDataTableComponent implements OnInit {
   private adminDataFacade = inject(AdminDataFacade);
   private adminService = inject(AdminService);
+  private toastFacade = inject(ToastFacade);
   private fb = inject(FormBuilder);
   private searchSubject = new Subject<string>();
   faculties$ = this.adminDataFacade.faculties$;
+  loading$ = this.adminDataFacade.loading$;
+  error$ = this.adminDataFacade.error$;
   updateFacultyMessage$ = this.adminDataFacade.updateFacultyMessage$;
   selectedFaculty: FetchFacultyResponse | null = null;
   searchTerm = '';
   selectedLegacyDatabase = '';
+  isPrintingFacultyId: string | null = null;
   readonly legacyDatabaseOptions = [
     { label: 'Talisay', value: 'LEGACY_TALISAY' },
     { label: 'Alijis', value: 'LEGACY_ALIJIS' },
     { label: 'Fortune-Towne', value: 'LEGACY_FT' },
     { label: 'Binalbagan', value: 'LEGACY_BINALBAGAN' },
   ];
+  readonly collegeOptions = ['CAS', 'CIT', 'COED', 'COENG', 'CCS'];
+  readonly statusOptions = ['ACTIVE', 'INACTIVE'];
   currentPage = 0;
   pageSize = 10;
   facultyForm: FormGroup = this.fb.group({
-    facultyId: ['', Validators.required],
-    firstname: ['', [Validators.required, Validators.minLength(2)]],
-    middlename: [''],
-    lastname: ['', [Validators.required, Validators.minLength(2)]],
-    position: ['', Validators.required],
-    loadLimit: [0, [Validators.required, Validators.min(1)]],
+    facultyId: ['', [Validators.required, Validators.maxLength(30)]],
+    firstname: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(80)]],
+    middlename: ['', Validators.maxLength(80)],
+    lastname: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(80)]],
+    position: ['', [Validators.required, Validators.maxLength(120)]],
+    loadLimit: [0, [Validators.required, Validators.min(1), Validators.max(60)]],
     college: ['', Validators.required],
     status: ['', Validators.required],
   });
   ngOnInit(): void {
     this.loadFaculties();
     this.searchSubject.pipe(debounceTime(400)).subscribe((value) => {
-      this.searchTerm = value;
+      this.searchTerm = this.normalizeSearchTerm(value);
       this.currentPage = 0;
       this.loadFaculties();
     });
@@ -102,9 +110,23 @@ export class FacultyDataTableComponent implements OnInit {
     );
   }
   onSearchChange(value: string): void {
+    if (value.length > 80) {
+      this.searchTerm = value.slice(0, 80);
+      this.toastFacade.showToast('Search is limited to 80 characters.', 'error');
+      this.searchSubject.next(this.searchTerm);
+      return;
+    }
+
     this.searchSubject.next(value);
   }
   onSearch(): void {
+    this.searchTerm = this.normalizeSearchTerm(this.searchTerm);
+    this.currentPage = 0;
+    this.loadFaculties();
+  }
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedLegacyDatabase = '';
     this.currentPage = 0;
     this.loadFaculties();
   }
@@ -140,6 +162,7 @@ export class FacultyDataTableComponent implements OnInit {
   updateFaculty(): void {
     if (this.facultyForm.invalid) {
       this.facultyForm.markAllAsTouched();
+      this.toastFacade.showToast('Please review the highlighted faculty fields.', 'error');
       return;
     }
     this.adminDataFacade.updateFaculty(this.facultyForm.value);
@@ -165,13 +188,98 @@ export class FacultyDataTableComponent implements OnInit {
     );
   }
 
+  hasActiveFilters(): boolean {
+    return !!this.searchTerm.trim() || !!this.selectedLegacyDatabase;
+  }
+
+  emptyStateTitle(): string {
+    return this.hasActiveFilters()
+      ? 'No faculty records match the current filters'
+      : 'No faculty records are available';
+  }
+
+  emptyStateDescription(): string {
+    return this.hasActiveFilters()
+      ? 'Try a different search term, choose another campus, or clear the filters.'
+      : 'Faculty records will appear here once they are available from the backend.';
+  }
+
+  formError(controlName: string): string {
+    const control = this.facultyForm.get(controlName);
+
+    if (!control || !(control.touched || control.dirty) || !control.errors) {
+      return '';
+    }
+
+    if (control.errors['required']) {
+      return 'This field is required.';
+    }
+
+    if (control.errors['minlength']) {
+      return `Enter at least ${control.errors['minlength'].requiredLength} characters.`;
+    }
+
+    if (control.errors['maxlength']) {
+      return `Use ${control.errors['maxlength'].requiredLength} characters or fewer.`;
+    }
+
+    if (control.errors['min']) {
+      return `Value must be at least ${control.errors['min'].min}.`;
+    }
+
+    if (control.errors['max']) {
+      return `Value must not exceed ${control.errors['max'].max}.`;
+    }
+
+    return 'Please enter a valid value.';
+  }
+
+  errorMessage(error: unknown): string {
+    return extractErrorMessage(error);
+  }
+
+  retryLoad(): void {
+    this.loadFaculties();
+  }
+
   get f() {
     return this.facultyForm.controls;
   }
   printSingle(record: FacultyEvaluationPrintRecord): void {
+    if (this.isPrintingFacultyId) {
+      return;
+    }
+
+    this.isPrintingFacultyId = record.facultyId;
+
     this.adminService.generateFacultyEvaluationReport(record.facultyId)
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        catchError((error) => {
+          this.toastFacade.showToast(
+            `Unable to prepare faculty report. ${extractErrorMessage(error)}`,
+            'error',
+          );
+
+          return of(null);
+        }),
+        finalize(() => {
+          this.isPrintingFacultyId = null;
+        }),
+      )
       .subscribe((report) => {
+        if (!report) {
+          return;
+        }
+
+        if (!report.items?.length) {
+          this.toastFacade.showToast(
+            'No evaluation records are available for this faculty.',
+            'error',
+          );
+          return;
+        }
+
         const normalizedData = report.items.map((item) => {
           const separatedComments = this.separateEvaluationComments(item);
 
@@ -236,6 +344,10 @@ export class FacultyDataTableComponent implements OnInit {
 
         window.open('/print/faculty-evaluation', '_blank');
       });
+  }
+
+  private normalizeSearchTerm(value: string): string {
+    return value.replace(/\s+/g, ' ').trim();
   }
 
   private separateEvaluationComments(

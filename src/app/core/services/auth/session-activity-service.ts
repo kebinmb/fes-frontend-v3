@@ -6,8 +6,8 @@ import { selectAuthenticationState } from '../../store/auth/auth.selector';
 
 const IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 const ACTIVITY_THROTTLE_MS = 1000;
-const SERVER_ACTIVITY_SIGNAL_WINDOW_MS = 30 * 1000;
 const LAST_ACTIVITY_KEY = 'fes:last-session-activity-at';
+const LAST_SERVER_ACTIVITY_SYNC_KEY = 'fes:last-server-session-activity-sync-at';
 
 @Injectable({ providedIn: 'root' })
 export class SessionActivityService {
@@ -77,14 +77,29 @@ export class SessionActivityService {
     return true;
   }
 
-  hasRecentUserActivity(): boolean {
+  shouldSendUserActivitySignal(): boolean {
     if (!this.authenticated || this.expired) {
       return false;
     }
 
     const lastActivity = Math.max(this.lastRecordedAt, this.readLastActivity());
+    const lastServerSync = this.readLastServerActivitySync();
 
-    return !!lastActivity && Date.now() - lastActivity <= SERVER_ACTIVITY_SIGNAL_WINDOW_MS;
+    return !!lastActivity
+      && Date.now() - lastActivity < IDLE_TIMEOUT_MS
+      && lastActivity > lastServerSync;
+  }
+
+  markServerActivitySynced(): void {
+    if (!this.authenticated || this.expired) {
+      return;
+    }
+
+    const lastActivity = Math.max(this.lastRecordedAt, this.readLastActivity());
+
+    if (lastActivity) {
+      localStorage.setItem(LAST_SERVER_ACTIVITY_SYNC_KEY, String(lastActivity));
+    }
   }
 
   private readonly handleUserActivity = (): void => {
@@ -180,6 +195,10 @@ export class SessionActivityService {
 
   private readLastActivity(): number {
     return Number(localStorage.getItem(LAST_ACTIVITY_KEY)) || 0;
+  }
+
+  private readLastServerActivitySync(): number {
+    return Number(localStorage.getItem(LAST_SERVER_ACTIVITY_SYNC_KEY)) || 0;
   }
 
   private isIdleExpired(): boolean {

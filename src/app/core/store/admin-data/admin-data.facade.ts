@@ -16,6 +16,7 @@ export class AdminDataFacade {
   userAccounts$ = this.store.select(AdminDataSelectors.selectUserAccounts);
   facultyEvaluationScores$ = this.store.select(AdminDataSelectors.selectFacultyEvaluationScores);
   loading$ = this.store.select(AdminDataSelectors.selectLoading);
+  error$ = this.store.select(AdminDataSelectors.selectError);
   updateFacultyMessage$ = this.store.select(AdminDataSelectors.selectUpdateFacultyMessage);
   studentSections$ = this.store.select(AdminDataSelectors.selectStudentSections);
   facultyEvaluationScoresByFacultyId$ = this.store.select(

@@ -1,4 +1,6 @@
 @let facultiesData = faculties$ | async;
+@let isLoading = loading$ | async;
+@let loadError = error$ | async;
 <section class="modern-card">
   <div class="card-topbar"></div>
   <!-- HEADER -->
@@ -46,6 +48,11 @@
           </option>
           }
         </select>
+        @if (hasActiveFilters()) {
+        <button type="button" class="clear-btn" (click)="clearFilters()">
+          Clear
+        </button>
+        }
       </form>
     </div>
     <div class="table-count" aria-label="Total faculty records">
@@ -53,6 +60,17 @@
       <span>records</span>
     </div>
   </div>
+  @if (loadError) {
+  <div class="feedback-banner error-banner" role="alert">
+    <div>
+      <strong>Unable to load faculty records.</strong>
+      <span>{{ errorMessage(loadError) }}</span>
+    </div>
+    <button type="button" class="retry-btn" (click)="retryLoad()">
+      Retry
+    </button>
+  </div>
+  }
   <!-- TABLE -->
   <div class="table-responsive">
     <table class="table modern-table align-middle mb-0">
@@ -67,7 +85,15 @@
         </tr>
       </thead>
       <tbody>
-        @if (facultiesData?.content?.length) {
+        @if (isLoading && !facultiesData?.content?.length) {
+        @for (row of [1, 2, 3, 4]; track row) {
+        <tr class="loading-row">
+          <td colspan="6">
+            <div class="skeleton-line"></div>
+          </td>
+        </tr>
+        }
+        } @else if (facultiesData?.content?.length) {
         @for (faculty of facultiesData?.content; track faculty.facultyId) {
         <tr>
           <td data-label="ID">
@@ -111,6 +137,7 @@
               <button
                 type="button"
                 class="single-print-btn"
+                [disabled]="isPrintingFacultyId === faculty.facultyId"
                 [attr.aria-label]="'Print evaluation report for ' + facultyName(faculty)"
                 (click)="printSingle({
                       facultyEvaluationScoreId: 0,
@@ -121,9 +148,10 @@
                       classCode: '',
                       overallAverageScore: 0
                     })">
-                <i class="bi bi-printer"></i>
+                <i class="bi" [class.bi-printer]="isPrintingFacultyId !== faculty.facultyId"
+                  [class.bi-hourglass-split]="isPrintingFacultyId === faculty.facultyId"></i>
                 <span>
-                  Print
+                  {{ isPrintingFacultyId === faculty.facultyId ? 'Preparing' : 'Print' }}
                 </span>
               </button>
             </div>
@@ -132,8 +160,13 @@
         }
         } @else {
         <tr>
-          <td colspan="6" class="empty-state" data-empty-title="No faculties found">
-            Try adjusting the search term or clearing the filter.
+          <td colspan="6" class="empty-state" [attr.data-empty-title]="emptyStateTitle()">
+            {{ emptyStateDescription() }}
+            @if (hasActiveFilters()) {
+            <button type="button" class="empty-clear-btn" (click)="clearFilters()">
+              Clear filters
+            </button>
+            }
           </td>
         </tr>
         }
@@ -207,82 +240,164 @@
 
         <!-- FACULTY ID -->
         <div class="form-group">
-          <label>
+          <label for="facultyId">
             Faculty ID
           </label>
 
-          <input type="text" formControlName="facultyId" placeholder="Enter faculty ID" />
+          <input
+            id="facultyId"
+            type="text"
+            formControlName="facultyId"
+            placeholder="Enter faculty ID"
+            readonly
+            [class.is-invalid]="formError('facultyId')"
+            [attr.aria-invalid]="!!formError('facultyId')"
+          />
+          @if (formError('facultyId')) {
+          <small class="field-error">{{ formError('facultyId') }}</small>
+          }
         </div>
 
         <!-- FIRSTNAME -->
         <div class="form-group">
-          <label>
-            Firstname
+          <label for="firstname">
+            First Name
           </label>
 
-          <input type="text" formControlName="firstname" placeholder="Enter firstname" />
+          <input
+            id="firstname"
+            type="text"
+            formControlName="firstname"
+            placeholder="Enter first name"
+            [class.is-invalid]="formError('firstname')"
+            [attr.aria-invalid]="!!formError('firstname')"
+          />
+          @if (formError('firstname')) {
+          <small class="field-error">{{ formError('firstname') }}</small>
+          }
         </div>
 
         <!-- MIDDLENAME -->
         <div class="form-group">
-          <label>
-            Middlename
+          <label for="middlename">
+            Middle Name
           </label>
 
-          <input type="text" formControlName="middlename" placeholder="Enter middlename" />
+          <input
+            id="middlename"
+            type="text"
+            formControlName="middlename"
+            placeholder="Enter middle name"
+            [class.is-invalid]="formError('middlename')"
+            [attr.aria-invalid]="!!formError('middlename')"
+          />
+          @if (formError('middlename')) {
+          <small class="field-error">{{ formError('middlename') }}</small>
+          }
         </div>
 
         <!-- LASTNAME -->
         <div class="form-group">
-          <label>
-            Lastname
+          <label for="lastname">
+            Last Name
           </label>
 
-          <input type="text" formControlName="lastname" placeholder="Enter lastname" />
+          <input
+            id="lastname"
+            type="text"
+            formControlName="lastname"
+            placeholder="Enter last name"
+            [class.is-invalid]="formError('lastname')"
+            [attr.aria-invalid]="!!formError('lastname')"
+          />
+          @if (formError('lastname')) {
+          <small class="field-error">{{ formError('lastname') }}</small>
+          }
         </div>
 
         <!-- POSITION -->
         <div class="form-group">
-          <label>
+          <label for="position">
             Position
           </label>
 
-          <input type="text" formControlName="position" placeholder="Enter position" />
+          <input
+            id="position"
+            type="text"
+            formControlName="position"
+            placeholder="Enter position"
+            [class.is-invalid]="formError('position')"
+            [attr.aria-invalid]="!!formError('position')"
+          />
+          @if (formError('position')) {
+          <small class="field-error">{{ formError('position') }}</small>
+          }
         </div>
 
         <!-- LOAD LIMIT -->
         <div class="form-group">
-          <label>
+          <label for="loadLimit">
             Load Limit
           </label>
 
-          <input type="number" formControlName="loadLimit" placeholder="Enter load limit" />
+          <input
+            id="loadLimit"
+            type="number"
+            formControlName="loadLimit"
+            min="1"
+            max="60"
+            step="1"
+            placeholder="Enter load limit"
+            [class.is-invalid]="formError('loadLimit')"
+            [attr.aria-invalid]="!!formError('loadLimit')"
+          />
+          @if (formError('loadLimit')) {
+          <small class="field-error">{{ formError('loadLimit') }}</small>
+          }
         </div>
 
         <!-- COLLEGE -->
         <div class="form-group">
-          <label>
+          <label for="college">
             College
           </label>
 
-          <input type="text" formControlName="college" placeholder="Enter college" />
+          <select
+            id="college"
+            formControlName="college"
+            [class.is-invalid]="formError('college')"
+            [attr.aria-invalid]="!!formError('college')"
+          >
+            <option value="" disabled>Select college</option>
+            @for (college of collegeOptions; track college) {
+            <option [value]="college">{{ college }}</option>
+            }
+          </select>
+          @if (formError('college')) {
+          <small class="field-error">{{ formError('college') }}</small>
+          }
         </div>
 
         <!-- STATUS -->
         <div class="form-group">
-          <label>
+          <label for="status">
             Status
           </label>
 
-          <select formControlName="status">
-            <option value="ACTIVE">
-              ACTIVE
-            </option>
-
-            <option value="INACTIVE">
-              INACTIVE
-            </option>
+          <select
+            id="status"
+            formControlName="status"
+            [class.is-invalid]="formError('status')"
+            [attr.aria-invalid]="!!formError('status')"
+          >
+            <option value="" disabled>Select status</option>
+            @for (status of statusOptions; track status) {
+            <option [value]="status">{{ status }}</option>
+            }
           </select>
+          @if (formError('status')) {
+          <small class="field-error">{{ formError('status') }}</small>
+          }
         </div>
 
       </div>
