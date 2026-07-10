@@ -232,6 +232,13 @@
   cursor: not-allowed;
 }
 
+.edit-btn:disabled,
+.clear-btn:disabled {
+  opacity: 0.62;
+
+  cursor: not-allowed;
+}
+
 .single-print-btn,
 .cancel-btn {
   height: 42px;
@@ -324,6 +331,37 @@
 
 .table-responsive {
   overflow-x: auto;
+
+  transition: opacity 0.2s ease;
+}
+
+.table-responsive.is-refreshing {
+  opacity: 0.72;
+}
+
+.refresh-indicator {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 0.5rem;
+
+  margin: 1rem 1.5rem 0;
+  padding: 0.55rem 0.8rem;
+
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+
+  background: #f0fdf4;
+
+  color: #14532d;
+
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.refresh-indicator i,
+.edit-btn:disabled i {
+  animation: spin 0.9s linear infinite;
 }
 
 .modern-table {
@@ -717,6 +755,29 @@
 
   100% {
     background-position: 0 50%;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line,
+  .refresh-indicator i,
+  .edit-btn:disabled i {
+    animation: none;
+  }
+
+  .modern-table tbody tr,
+  .search-input,
+  .filter-select,
+  .form-group input,
+  .form-group select,
+  .table-responsive {
+    transition: none;
   }
 }
 

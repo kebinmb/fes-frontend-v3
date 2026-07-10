@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import {
@@ -35,6 +42,7 @@ interface DashboardViewModel {
   imports: [CommonModule, RouterLink, UnicodeTextPipe],
   templateUrl: './admin-dashboard-overview-component.html',
   styleUrl: './admin-dashboard-overview-component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AdminDashboardOverviewComponent implements OnInit {
   private readonly adminService = inject(AdminService);

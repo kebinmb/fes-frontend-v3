@@ -1,5 +1,12 @@
 import { AsyncPipe } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   FormBuilder,
   FormGroup,
@@ -12,7 +19,16 @@ import {
   AdminService,
   FetchFacultyResponse,
 } from '@core/services/admin/admin-service';
-import { Subject, catchError, debounceTime, finalize, of, take } from 'rxjs';
+import {
+  Subject,
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  map,
+  of,
+  take,
+} from 'rxjs';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 import { extractErrorMessage } from '@utilities/extract-error.util';
@@ -58,12 +74,14 @@ type SeparatedEvaluationComments = {
   templateUrl: './faculty-data-table-component.html',
   styleUrl: './faculty-data-table-component.css',
   imports: [AsyncPipe, ReactiveFormsModule, FormsModule, UnicodeTextPipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacultyDataTableComponent implements OnInit {
   private adminDataFacade = inject(AdminDataFacade);
   private adminService = inject(AdminService);
   private toastFacade = inject(ToastFacade);
   private fb = inject(FormBuilder);
+  private destroyRef = inject(DestroyRef);
   private searchSubject = new Subject<string>();
   faculties$ = this.adminDataFacade.faculties$;
   loading$ = this.adminDataFacade.loading$;
@@ -95,11 +113,18 @@ export class FacultyDataTableComponent implements OnInit {
   });
   ngOnInit(): void {
     this.loadFaculties();
-    this.searchSubject.pipe(debounceTime(400)).subscribe((value) => {
-      this.searchTerm = this.normalizeSearchTerm(value);
-      this.currentPage = 0;
-      this.loadFaculties();
-    });
+    this.searchSubject
+      .pipe(
+        debounceTime(350),
+        map((value) => this.normalizeSearchTerm(value)),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((value) => {
+        this.searchTerm = value;
+        this.currentPage = 0;
+        this.loadFaculties();
+      });
   }
   loadFaculties(): void {
     this.adminDataFacade.loadFaculties(

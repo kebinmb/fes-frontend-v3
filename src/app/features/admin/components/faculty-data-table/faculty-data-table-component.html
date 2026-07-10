@@ -28,8 +28,11 @@
             (ngModelChange)="onSearchChange($event)"
           />
         </div>
-        <button type="submit" class="edit-btn">
-          Search
+        <button type="submit" class="edit-btn" [disabled]="!!isLoading">
+          @if (isLoading) {
+          <i class="bi bi-arrow-repeat"></i>
+          }
+          <span>Search</span>
         </button>
         <label class="visually-hidden" for="legacyDatabaseFilter">
           Filter by campus
@@ -49,7 +52,7 @@
           }
         </select>
         @if (hasActiveFilters()) {
-        <button type="button" class="clear-btn" (click)="clearFilters()">
+        <button type="button" class="clear-btn" [disabled]="!!isLoading" (click)="clearFilters()">
           Clear
         </button>
         }
@@ -72,7 +75,13 @@
   </div>
   }
   <!-- TABLE -->
-  <div class="table-responsive">
+  @if (isLoading && facultiesData?.content?.length) {
+  <div class="refresh-indicator" role="status" aria-live="polite">
+    <i class="bi bi-arrow-repeat"></i>
+    Updating faculty records...
+  </div>
+  }
+  <div class="table-responsive" [class.is-refreshing]="isLoading && facultiesData?.content?.length" [attr.aria-busy]="!!isLoading">
     <table class="table modern-table align-middle mb-0">
       <thead>
         <tr>
@@ -183,7 +192,7 @@
       faculty records
     </small>
     <div class="pagination-group">
-      <button type="button" class="pagination-btn" [disabled]="(facultiesData?.page ?? 0) === 0"
+      <button type="button" class="pagination-btn" [disabled]="!!isLoading || (facultiesData?.page ?? 0) === 0"
         (click)="onFacultyPageChange((facultiesData?.page ?? 0) - 1)">
         Prev
       </button>
@@ -193,7 +202,7 @@
         of
         {{ facultiesData?.totalPages ?? 1 }}
       </span>
-      <button type="button" class="pagination-btn" [disabled]="(facultiesData?.page ?? 0) >= (facultiesData?.totalPages ?? 1) - 1"
+      <button type="button" class="pagination-btn" [disabled]="!!isLoading || (facultiesData?.page ?? 0) >= (facultiesData?.totalPages ?? 1) - 1"
         (click)="onFacultyPageChange((facultiesData?.page ?? 0) + 1)">
         Next
       </button>
