@@ -9,6 +9,7 @@ import * as AuthActions from './../../core/store/auth/auth.action';
 import { normalizeUnicode, repairSpecialCharacters } from '../normalize-text';
 
 let isHandlingAuthError = false;
+const SESSION_ACTIVITY_SYNCED_HEADER = 'X-FES-Session-Activity-Synced';
 
 export const authInterceptor: HttpInterceptorFn = (
   req,
@@ -58,7 +59,10 @@ export const authInterceptor: HttpInterceptorFn = (
           sessionActivity.recordApiActivity();
         }
 
-        if (shouldSendUserActivitySignal) {
+        if (
+          shouldSendUserActivitySignal &&
+          event.headers.get(SESSION_ACTIVITY_SYNCED_HEADER) === 'true'
+        ) {
           sessionActivity.markServerActivitySynced();
         }
 
