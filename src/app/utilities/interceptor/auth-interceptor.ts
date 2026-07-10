@@ -17,7 +17,7 @@ export const authInterceptor: HttpInterceptorFn = (
   const store = inject(Store);
   const sessionActivity = inject(SessionActivityService);
 
-  const cloned = req.clone({
+  let cloned = req.clone({
     body: normalizeRequestBody(req.body),
     params: normalizeRequestParams(req.params),
     withCredentials: true,
@@ -29,6 +29,18 @@ export const authInterceptor: HttpInterceptorFn = (
     req.url.includes('/auth/administrator/login') ||
     req.url.includes('/auth/access-code/generate') ||
     req.url.includes('/auth/logout');
+
+  if (!isAuthRequest && sessionActivity.expireIfIdle()) {
+    return throwError(() => new Error('Session expired'));
+  }
+
+  if (!isAuthRequest && sessionActivity.hasRecentUserActivity()) {
+    cloned = cloned.clone({
+      setHeaders: {
+        'X-FES-User-Activity': 'true',
+      },
+    });
+  }
 
   if (!isAuthRequest) {
     sessionActivity.recordApiActivity();

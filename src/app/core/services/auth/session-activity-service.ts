@@ -4,8 +4,9 @@ import { Store } from '@ngrx/store';
 import * as AuthActions from '../../store/auth/auth.action';
 import { selectAuthenticationState } from '../../store/auth/auth.selector';
 
-const IDLE_TIMEOUT_MS = 5 * 60 * 1000;
+const IDLE_TIMEOUT_MS = 10 * 60 * 1000;
 const ACTIVITY_THROTTLE_MS = 1000;
+const SERVER_ACTIVITY_SIGNAL_WINDOW_MS = 30 * 1000;
 const LAST_ACTIVITY_KEY = 'fes:last-session-activity-at';
 
 @Injectable({ providedIn: 'root' })
@@ -63,7 +64,27 @@ export class SessionActivityService {
   }
 
   recordApiActivity(): void {
-    this.recordActivity();
+    this.checkIdleDeadline();
+  }
+
+  expireIfIdle(): boolean {
+    if (!this.isIdleExpired()) {
+      return false;
+    }
+
+    this.expireSession();
+
+    return true;
+  }
+
+  hasRecentUserActivity(): boolean {
+    if (!this.authenticated || this.expired) {
+      return false;
+    }
+
+    const lastActivity = Math.max(this.lastRecordedAt, this.readLastActivity());
+
+    return !!lastActivity && Date.now() - lastActivity <= SERVER_ACTIVITY_SIGNAL_WINDOW_MS;
   }
 
   private readonly handleUserActivity = (): void => {
@@ -159,6 +180,16 @@ export class SessionActivityService {
 
   private readLastActivity(): number {
     return Number(localStorage.getItem(LAST_ACTIVITY_KEY)) || 0;
+  }
+
+  private isIdleExpired(): boolean {
+    if (!this.authenticated || this.expired) {
+      return false;
+    }
+
+    const lastActivity = Math.max(this.lastRecordedAt, this.readLastActivity());
+
+    return !lastActivity || Date.now() - lastActivity >= IDLE_TIMEOUT_MS;
   }
 
   private clearIdleTimer(): void {
