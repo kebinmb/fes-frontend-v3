@@ -1,324 +1,353 @@
+@for (section of sections; track trackPrintSection($index, section)) {
 <table class="print-container" role="presentation">
   <tbody class="print-body">
     <tr class="print-content-row">
       <td class="print-content-cell">
-    <!-- ================================================= -->
-    <!-- HEADER -->
-    <!-- ================================================= -->
-
-  <div class="report-header">
-    <img src="chmsu-logo.png" class="report-logo" alt="CHMSU Logo" />
-
-    <div class="report-header-content">
-      <h1>CHMSU Faculty Evaluation System</h1>
-
-      <h2>Individual Faculty Evaluation Report</h2>
-
-      <p>Carlos Hilado Memorial State University</p>
-    </div>
-  </div>
-
-  <!-- ================================================= -->
-  <!-- FACULTY INFO -->
-  <!-- ================================================= -->
-
-  <div class="faculty-info">
-    <div class="faculty-grid">
-      <div class="faculty-item">
-        <span class="faculty-label"> Faculty Name </span>
-
-        <span class="faculty-value">
-          {{ safeText(faculty?.facultyName) | unicodeText }}
-        </span>
-      </div>
-
-      <div class="faculty-item">
-        <span class="faculty-label"> Department / College </span>
-
-        <span class="faculty-value">
-          {{ safeText(faculty?.college) | unicodeText }}
-        </span>
-      </div>
-
-      <div class="faculty-item">
-        <span class="faculty-label"> Faculty Rank </span>
-
-        <span class="faculty-value">
-          {{ safeText(faculty?.position) | unicodeText }}
-        </span>
-      </div>
-
-      <div class="faculty-item">
-        <span class="faculty-label"> Academic Term </span>
-
-        <span class="faculty-value">
-          {{ academicTerm() }}
-        </span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ================================================= -->
-  <!-- SET -->
-  <!-- ================================================= -->
-
-  <div class="section-title">A. Student Evaluation of Teaching (SET)</div>
-
-  <table class="evaluation-table">
-    <thead>
-      <tr>
-        <th>Seq</th>
-        <th>Course Code</th>
-        <th>Year / Section</th>
-        <th>No. of Students</th>
-        <th>SET Rating</th>
-        <th>Weighted Score</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      @for (item of setData; track trackEvaluationRecord($index, item); let i = $index) {
-        <tr>
-          <td>{{ i + 1 }}</td>
-
-          <td>
-            {{ safeText(cleanSubjectCode(item.subjectCode)) }}
-          </td>
-
-          <td>{{ yearSection(item) }}</td>
-
-          <td>
-            {{ safeNumber(item.numberOfStudents) }}
-          </td>
-
-          <td>
-            {{ formattedNumber(item.setRating) }}
-          </td>
-
-          <td>
-            {{ weightedScore(item) }}
-          </td>
-        </tr>
-      }
-
-      <tr class="total-row">
-        <td colspan="3">TOTAL</td>
-
-        <td>
-          {{ totalStudents }}
-        </td>
-
-        <td>-</td>
-
-        <td>
-          {{ totalWeightedScore.toFixed(2) }}
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- ================================================= -->
-  <!-- SEF -->
-  <!-- ================================================= -->
-
-  <div class="section-title">B. Supervisor Evaluation of Faculty (SEF)</div>
-
-  <table class="evaluation-table">
-    <thead>
-      <tr>
-        <th>Seq</th>
-        <th>Course Code</th>
-        <th>Year / Section</th>
-        <th>SEF Rating</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      @for (item of sefData; track trackEvaluationRecord($index, item); let i = $index) {
-        <tr>
-          <td>{{ i + 1 }}</td>
-
-          <td>
-            {{ safeText(cleanSubjectCode(item.subjectCode)) }}
-          </td>
-
-          <td>{{ yearSection(item) }}</td>
-
-          <td>
-            {{ formattedNumber(item.sefRating) }}
-          </td>
-        </tr>
-      }
-    </tbody>
-  </table>
-
-  <!-- ================================================= -->
-  <!-- SUMMARY -->
-  <!-- ================================================= -->
-
-  <div class="section-title">C. Overall Evaluation Summary</div>
-
-  <div class="summary-wrapper">
-    <div class="summary-card">
-      <div class="summary-label">Overall SET Rating</div>
-
-      <div class="summary-value">
-        {{ overallSetRating.toFixed(2) }}
-      </div>
-    </div>
-
-    <div class="summary-card">
-      <div class="summary-label">Overall SEF Rating</div>
-
-      <div class="summary-value">
-        {{ overallSefRating.toFixed(2) }}
-      </div>
-    </div>
-  </div>
-
-  <!-- ================================================= -->
-  <!-- STUDENT COMMENTS -->
-  <!-- ================================================= -->
-
-  <div class="section-title">D. Student Feedback and Comments</div>
-
-  <table class="comments-table">
-    <thead>
-      <tr>
-        <th width="80">Seq</th>
-
-        <th>Student Feedback / Comments</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      @if (studentComments.length) {
-        @for (item of studentComments; track item.id; let i = $index) {
-          <tr>
-            <td>
-              {{ i + 1 }}
-            </td>
-
-            <td>
-            {{ item.comment | unicodeText }}
-            </td>
-          </tr>
-        }
-      } @else {
-        <tr>
-          <td colspan="2">No student feedback or comments recorded.</td>
-        </tr>
-      }
-    </tbody>
-
-  </table>
-
-  <!-- ================================================= -->
-  <!-- SUPERVISOR COMMENTS -->
-  <!-- ================================================= -->
-
-  <div class="section-title">E. Supervisor Feedback and Comments</div>
-
-  <table class="comments-table">
-    <thead>
-      <tr>
-        <th width="80">Seq</th>
-
-        <th>Supervisor Feedback / Comments</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      @if (supervisorComments.length) {
-        @for (item of supervisorComments; track item.id; let i = $index) {
-          <tr>
-            <td>
-              {{ i + 1 }}
-            </td>
-
-            <td>
-              {{ item.comment | unicodeText }}
-            </td>
-          </tr>
-        }
-      } @else {
-        <tr>
-          <td colspan="2">No supervisor feedback or comments recorded.</td>
-        </tr>
-      }
-    </tbody>
-
-  </table>
-
-  <!-- ================================================= -->
-  <!-- APPROVAL -->
-  <!-- ================================================= -->
-
-  <div class="approval-section">
-    <div class="approval-card">
-      <div class="approval-title">Prepared By</div>
-
-      <div class="signature-line"></div>
-
-      <div class="signature-caption">Signature Over Printed Name</div>
-
-      <div class="date-line"></div>
-
-      <div class="signature-caption">Date</div>
-    </div>
-
-    <div class="approval-card">
-      <div class="approval-title">Reviewed By</div>
-
-      <div class="signature-line"></div>
-
-      <div class="signature-caption">Authorized Official</div>
-
-      <div class="date-line"></div>
-
-      <div class="signature-caption">Date</div>
-    </div>
-  </div>
-
-  @if (hasReportVerification()) {
-    <footer class="verification-panel">
-      <div class="verification-copy">
-        <div class="verification-header">
-          <div>
-            <div class="verification-title">Digitally verifiable report</div>
-            <span class="verification-subtitle">Scan the QR code or use the verification URL to validate this copy.</span>
+        <!-- ================================================= -->
+        <!-- HEADER -->
+        <!-- ================================================= -->
+
+        <div class="report-header">
+          <img src="chmsu-logo.png" class="report-logo" alt="CHMSU Logo" />
+
+          <div class="report-header-content">
+            <h1>CHMSU Faculty Evaluation System</h1>
+
+            <h2>Individual Faculty Evaluation Report</h2>
+
+            <p>Carlos Hilado Memorial State University</p>
+          </div>
+        </div>
+
+        <!-- ================================================= -->
+        <!-- FACULTY INFO -->
+        <!-- ================================================= -->
+
+        <div class="faculty-info">
+          <div class="faculty-grid">
+            <div class="faculty-item">
+              <span class="faculty-label"> Faculty Name </span>
+
+              <span class="faculty-value">
+                {{ safeText(section.faculty?.facultyName) | unicodeText }}
+              </span>
+            </div>
+
+            <div class="faculty-item">
+              <span class="faculty-label"> Department / College </span>
+
+              <span class="faculty-value">
+                {{ safeText(section.faculty?.college) | unicodeText }}
+              </span>
+            </div>
+
+            <div class="faculty-item">
+              <span class="faculty-label"> Faculty Rank </span>
+
+              <span class="faculty-value">
+                {{ safeText(section.faculty?.position) | unicodeText }}
+              </span>
+            </div>
+
+            <div class="faculty-item">
+              <span class="faculty-label"> Academic Term </span>
+
+              <span class="faculty-value">
+                {{ academicTerm(section) }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================================================= -->
+        <!-- SET -->
+        <!-- ================================================= -->
+
+        <div class="section-title">A. Student Evaluation of Teaching (SET)</div>
+
+        <table class="evaluation-table">
+          <thead>
+            <tr>
+              <th>Seq</th>
+              <th>Course Code</th>
+              <th>Year / Section</th>
+              <th>No. of Students</th>
+              <th>SET Rating</th>
+              <th>Weighted Score</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (item of section.setData; track trackEvaluationRecord($index, item); let i = $index) {
+              <tr>
+                <td>{{ i + 1 }}</td>
+
+                <td>
+                  {{ safeText(cleanSubjectCode(item.subjectCode)) }}
+                </td>
+
+                <td>{{ yearSection(item) }}</td>
+
+                <td>
+                  {{ safeNumber(item.numberOfStudents) }}
+                </td>
+
+                <td>
+                  {{ formattedNumber(item.setRating) }}
+                </td>
+
+                <td>
+                  {{ weightedScore(item) }}
+                </td>
+              </tr>
+            }
+
+            <tr class="total-row">
+              <td colspan="3">TOTAL</td>
+
+              <td>
+                {{ section.totalStudents }}
+              </td>
+
+              <td>-</td>
+
+              <td>
+                {{ section.totalWeightedScore.toFixed(2) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- ================================================= -->
+        <!-- SEF -->
+        <!-- ================================================= -->
+
+        <div class="section-title">B. Supervisor Evaluation of Faculty (SEF)</div>
+
+        <table class="evaluation-table">
+          <thead>
+            <tr>
+              <th>Seq</th>
+              <th>Course Code</th>
+              <th>Year / Section</th>
+              <th>SEF Rating</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @for (item of section.sefData; track trackEvaluationRecord($index, item); let i = $index) {
+              <tr>
+                <td>{{ i + 1 }}</td>
+
+                <td>
+                  {{ safeText(cleanSubjectCode(item.subjectCode)) }}
+                </td>
+
+                <td>{{ yearSection(item) }}</td>
+
+                <td>
+                  {{ formattedNumber(item.sefRating) }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <!-- ================================================= -->
+        <!-- SUMMARY -->
+        <!-- ================================================= -->
+
+        <div class="section-title">C. Overall Evaluation Summary</div>
+
+        <div class="summary-wrapper">
+          <div class="summary-card">
+            <div class="summary-label">Overall SET Rating</div>
+
+            <div class="summary-value">
+              {{ section.overallSetRating.toFixed(2) }}
+            </div>
           </div>
 
-          <span class="verification-status">{{ safeText(report?.status, 'Verified') }}</span>
+          <div class="summary-card">
+            <div class="summary-label">Overall SEF Rating</div>
+
+            <div class="summary-value">
+              {{ section.overallSefRating.toFixed(2) }}
+            </div>
+          </div>
         </div>
 
-        <div class="verification-grid">
-          <span><strong>Report ID</strong> {{ safeText(report?.reportId) }}</span>
-          <span><strong>Version</strong> {{ safeNumber(report?.versionNumber) || '-' }}</span>
-          <span><strong>Generated</strong> {{ safeText(report?.generatedAt) }}</span>
-          <span><strong>Generated By</strong> {{ safeText(report?.generatedByUsername) }}</span>
+        <!-- ================================================= -->
+        <!-- STUDENT COMMENTS -->
+        <!-- ================================================= -->
+
+        <div class="section-title">D. Student Feedback and Comments</div>
+
+        <table class="comments-table">
+          <thead>
+            <tr>
+              <th width="80">Seq</th>
+
+              <th>Student Feedback / Comments</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @if (section.studentComments.length) {
+              @for (item of section.studentComments; track item.id; let i = $index) {
+                <tr>
+                  <td>
+                    {{ i + 1 }}
+                  </td>
+
+                  <td>
+                    {{ item.comment | unicodeText }}
+                  </td>
+                </tr>
+              }
+            } @else {
+              <tr>
+                <td colspan="2">No student feedback or comments recorded.</td>
+              </tr>
+            }
+          </tbody>
+
+        </table>
+
+        <!-- ================================================= -->
+        <!-- SUPERVISOR COMMENTS -->
+        <!-- ================================================= -->
+
+        <div class="section-title">E. Supervisor Feedback and Comments</div>
+
+        <table class="comments-table">
+          <thead>
+            <tr>
+              <th width="80">Seq</th>
+
+              <th>Supervisor Feedback / Comments</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            @if (section.supervisorComments.length) {
+              @for (item of section.supervisorComments; track item.id; let i = $index) {
+                <tr>
+                  <td>
+                    {{ i + 1 }}
+                  </td>
+
+                  <td>
+                    {{ item.comment | unicodeText }}
+                  </td>
+                </tr>
+              }
+            } @else {
+              <tr>
+                <td colspan="2">No supervisor feedback or comments recorded.</td>
+              </tr>
+            }
+          </tbody>
+
+        </table>
+
+        <!-- ================================================= -->
+        <!-- APPROVAL -->
+        <!-- ================================================= -->
+
+        <div class="approval-section">
+          <div class="approval-block">
+            <div class="approval-heading">Prepared by:</div>
+
+            <div class="approval-row">
+              <span class="approval-label">Signature of Staff</span>
+              <span class="approval-colon">:</span>
+              <span class="approval-line"></span>
+            </div>
+
+            <div class="approval-row">
+              <span class="approval-label">Name of Staff</span>
+              <span class="approval-colon">:</span>
+              <span class="approval-line">
+                <span class="approval-line-value">
+                  {{ safeText(section.report?.generatedByUsername, '') | unicodeText }}
+                </span>
+              </span>
+            </div>
+
+            <div class="approval-row">
+              <span class="approval-label">Date</span>
+              <span class="approval-colon">:</span>
+              <span class="approval-line"></span>
+            </div>
+          </div>
+
+          <div class="approval-block">
+            <div class="approval-heading">Reviewed by:</div>
+
+            <div class="approval-row">
+              <span class="approval-label">Signature of Authorized Official</span>
+              <span class="approval-colon">:</span>
+              <span class="approval-line"></span>
+            </div>
+
+            <div class="approval-row">
+              <span class="approval-label">Name of Authorized Official</span>
+              <span class="approval-colon">:</span>
+              <span class="approval-line">
+                <span class="approval-line-value">
+                  {{ safeText(section.supervisorName, '') | unicodeText }}
+                </span>
+              </span>
+            </div>
+
+            <div class="approval-row">
+              <span class="approval-label">Date</span>
+              <span class="approval-colon">:</span>
+              <span class="approval-line"></span>
+            </div>
+          </div>
         </div>
 
-        <p class="verification-line">
-          <strong>Hash</strong>
-          <code>{{ safeText(report?.reportHash) }}</code>
-        </p>
+        @if (hasReportVerification(section.report)) {
+          <footer class="verification-panel">
+            <div class="verification-copy">
+              <div class="verification-header">
+                <div>
+                  <div class="verification-title">Digitally verifiable report</div>
+                  <span class="verification-subtitle">Scan the QR code or use the verification URL to validate this copy.</span>
+                </div>
 
-        <p class="verification-line">
-          <strong>Verify</strong>
-          <span>{{ safeText(report?.verificationUrl) }}</span>
-        </p>
-      </div>
+                <span class="verification-status">{{ safeText(section.report?.status, 'Verified') }}</span>
+              </div>
 
-      @if (report?.qrCodeDataUri) {
-        <img
-          [src]="report?.qrCodeDataUri"
-          class="verification-qr"
-          alt="Report verification QR code"
-        />
-      }
-    </footer>
-  }
+              <div class="verification-grid">
+                <span><strong>Report ID</strong> {{ safeText(section.report?.reportId) }}</span>
+                <span><strong>Version</strong> {{ safeNumber(section.report?.versionNumber) || '-' }}</span>
+                <span><strong>Generated</strong> {{ safeText(section.report?.generatedAt) }}</span>
+                <span><strong>Generated By</strong> {{ safeText(section.report?.generatedByUsername) }}</span>
+              </div>
+
+              <p class="verification-line">
+                <strong>Hash</strong>
+                <code>{{ safeText(section.report?.reportHash) }}</code>
+              </p>
+
+              <p class="verification-line">
+                <strong>Verify</strong>
+                <span>{{ safeText(section.report?.verificationUrl) }}</span>
+              </p>
+            </div>
+
+            @if (section.report?.qrCodeDataUri) {
+              <img
+                [src]="section.report?.qrCodeDataUri"
+                class="verification-qr"
+                alt="Report verification QR code"
+              />
+            }
+          </footer>
+        }
 
       </td>
     </tr>
@@ -328,21 +357,60 @@
     <tr class="print-signatory-row">
       <td class="print-signatory-cell">
         <div class="print-signatory-grid">
-          <div class="print-signatory">
-            <strong>Prepared By</strong>
-            <span class="print-signature-line"></span>
-            <span class="print-signature-caption">Signature Over Printed Name</span>
-            <em>Date</em>
+          <div class="print-signatory-block">
+            <span class="print-signatory-heading">Prepared by:</span>
+
+            <div class="print-signatory-row-item">
+              <strong>Signature of Staff</strong>
+              <span>:</span>
+              <span class="print-signatory-line"></span>
+            </div>
+
+            <div class="print-signatory-row-item">
+              <strong>Name of Staff</strong>
+              <span>:</span>
+              <span class="print-signatory-line">
+                <span class="print-signatory-value">
+                  {{ safeText(section.report?.generatedByUsername, '') | unicodeText }}
+                </span>
+              </span>
+            </div>
+
+            <div class="print-signatory-row-item">
+              <strong>Date</strong>
+              <span>:</span>
+              <span class="print-signatory-line"></span>
+            </div>
           </div>
 
-          <div class="print-signatory">
-            <strong>Reviewed By</strong>
-            <span class="print-signature-line"></span>
-            <span class="print-signature-caption">Authorized Official</span>
-            <em>Date</em>
+          <div class="print-signatory-block">
+            <span class="print-signatory-heading">Reviewed by:</span>
+
+            <div class="print-signatory-row-item">
+              <strong>Signature of Authorized Official</strong>
+              <span>:</span>
+              <span class="print-signatory-line"></span>
+            </div>
+
+            <div class="print-signatory-row-item">
+              <strong>Name of Authorized Official</strong>
+              <span>:</span>
+              <span class="print-signatory-line">
+                <span class="print-signatory-value">
+                  {{ safeText(section.supervisorName, '') | unicodeText }}
+                </span>
+              </span>
+            </div>
+
+            <div class="print-signatory-row-item">
+              <strong>Date</strong>
+              <span>:</span>
+              <span class="print-signatory-line"></span>
+            </div>
           </div>
         </div>
       </td>
     </tr>
   </tfoot>
 </table>
+}

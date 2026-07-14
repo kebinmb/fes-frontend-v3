@@ -23,6 +23,39 @@ export interface ReleaseNoteSection {
  */
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.2.2',
+    date: '2026-07-14',
+    title: 'Optimization and Session Alignment',
+    summary:
+      'This patch aligns the browser and backend session timeout policy, improves Faculty Dashboard bulk-print feedback, and adds backend guards for safer paginated admin requests.',
+    sections: [
+      {
+        title: 'Session Reliability',
+        description: 'The frontend now follows the same inactivity window as the backend.',
+        items: [
+          'The browser-side session timer now uses the ten-minute inactivity policy.',
+          'Active users get the intended working window before an AFK session is closed.',
+        ],
+      },
+      {
+        title: 'Faculty Dashboard',
+        description: 'Bulk-printing now communicates its required filter state more clearly.',
+        items: [
+          'The Bulk Print button stays disabled until a campus or college filter is selected.',
+          'Clearing filters now also clears the college filter used for bulk printing.',
+        ],
+      },
+      {
+        title: 'Backend Efficiency',
+        description: 'Administrative list requests now have safer defaults.',
+        items: [
+          'Faculty workload coverage is cached for the active term to reduce repeated aggregation work.',
+          'Backend pagination and sorting are clamped for selected admin listings.',
+        ],
+      },
+    ],
+  },
+  {
     version: '0.2.1',
     date: '2026-07-10',
     title: 'Session Timeout Refinement',

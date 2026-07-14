@@ -3,6 +3,7 @@
   [class.show]="sidebarService.sidebarOpen()"
   (click)="closeSidebar()"
 ></div>
+@let role = role$ | async;
 
 <aside
   class="admin-sidebar"
@@ -26,7 +27,7 @@
         </h2>
 
         <span>
-          Administrator Panel
+          {{ role === 'ROLE_HR' ? 'HR Panel' : 'Administrator Panel' }}
         </span>
 
       </div>
@@ -40,6 +41,7 @@
 
     <nav class="sidebar-nav" aria-label="Primary navigation">
 
+      @if (role === 'ROLE_ADMIN') {
       <div class="nav-section">
         <span class="nav-section-label">Overview</span>
 
@@ -57,6 +59,7 @@
           </span>
         </a>
       </div>
+      }
 
       <div class="nav-section">
         <span class="nav-section-label">Management</span>
@@ -70,10 +73,24 @@
           <i class="bi bi-person-workspace"></i>
 
           <span>
-            Faculty
+            Faculty Dashboard
           </span>
         </a>
 
+        <a
+          class="nav-item"
+          routerLink="/admin-dashboard/supervisor-evaluations"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-person-check"></i>
+
+          <span>
+            Supervisor Evaluations
+          </span>
+        </a>
+
+        @if (role === 'ROLE_ADMIN') {
         <a
           class="nav-item"
           routerLink="/admin-dashboard/user-accounts"
@@ -125,8 +142,10 @@
             Class Assignments
           </span>
         </a>
+        }
       </div>
 
+      @if (role === 'ROLE_ADMIN') {
       <div class="nav-section">
         <span class="nav-section-label">Evaluations</span>
 
@@ -199,6 +218,7 @@
           </span>
         </a>
       </div>
+      }
 
     </nav>
 

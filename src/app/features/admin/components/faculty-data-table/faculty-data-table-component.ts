@@ -18,8 +18,11 @@ import {
 import { AdminDataFacade } from '@core/store/admin-data/admin-data.facade';
 import {
   AdminService,
+  FacultyEvaluationGeneratedReportResponse,
+  FacultyEvaluationPrintResponse,
   FetchFacultyResponse,
 } from '@core/services/admin/admin-service';
+import { AuthFacade } from '@core/store/auth/auth.facade';
 import {
   Subject,
   catchError,
@@ -43,6 +46,8 @@ export interface FacultyEvaluationPrintRecord {
   evaluatorId?: string;
   evaluatorType?: string;
   classCode: string;
+  sectionCode?: string;
+  programCode?: string;
   semester?: string;
   schoolYear?: number;
   subjectCode?: string;
@@ -55,6 +60,8 @@ export interface FacultyEvaluationPrintRecord {
   sefRating?: number;
   studentComments?: string;
   supervisorComments?: string;
+  supervisorName?: string;
+  supervisorDesignation?: string;
 }
 
 type EvaluationCommentSource = {
@@ -80,26 +87,31 @@ type SeparatedEvaluationComments = {
 export class FacultyDataTableComponent implements OnInit {
   private adminDataFacade = inject(AdminDataFacade);
   private adminService = inject(AdminService);
+  private authFacade = inject(AuthFacade);
   private toastFacade = inject(ToastFacade);
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
   private searchSubject = new Subject<string>();
   faculties$ = this.adminDataFacade.faculties$;
+  role$ = this.authFacade.role$;
+  isAdmin$ = this.role$.pipe(map((role) => role === 'ROLE_ADMIN'));
   loading$ = this.adminDataFacade.loading$;
   error$ = this.adminDataFacade.error$;
   updateFacultyMessage$ = this.adminDataFacade.updateFacultyMessage$;
   selectedFaculty: FetchFacultyResponse | null = null;
   searchTerm = '';
   selectedLegacyDatabase = '';
+  selectedBulkPrintCollege = '';
   isPrintingFacultyId: string | null = null;
+  isBulkPrinting = false;
   readonly legacyDatabaseOptions = [
     { label: 'Talisay', value: 'LEGACY_TALISAY' },
     { label: 'Alijis', value: 'LEGACY_ALIJIS' },
     { label: 'Fortune-Towne', value: 'LEGACY_FT' },
     { label: 'Binalbagan', value: 'LEGACY_BINALBAGAN' },
   ];
-  readonly collegeOptions = ['CAS', 'CIT', 'COED', 'COENG', 'CCS'];
+  readonly collegeOptions = ['CAS', 'CIT', 'COED', 'COENG', 'CCS', 'CCJ', 'COF', 'CBMA'];
   readonly statusOptions = ['ACTIVE', 'INACTIVE'];
   currentPage = 0;
   pageSize = 10;
@@ -158,6 +170,7 @@ export class FacultyDataTableComponent implements OnInit {
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedLegacyDatabase = '';
+    this.selectedBulkPrintCollege = '';
     this.currentPage = 0;
     this.clearTransientFacultyState();
     this.loadFaculties();
@@ -222,17 +235,23 @@ export class FacultyDataTableComponent implements OnInit {
   }
 
   hasActiveFilters(): boolean {
+    return !!this.searchTerm.trim()
+      || !!this.selectedLegacyDatabase
+      || !!this.selectedBulkPrintCollege;
+  }
+
+  hasListFilters(): boolean {
     return !!this.searchTerm.trim() || !!this.selectedLegacyDatabase;
   }
 
   emptyStateTitle(): string {
-    return this.hasActiveFilters()
+    return this.hasListFilters()
       ? 'No faculty records match the current filters'
       : 'No faculty records are available';
   }
 
   emptyStateDescription(): string {
-    return this.hasActiveFilters()
+    return this.hasListFilters()
       ? 'Try a different search term, choose another campus, or clear the filters.'
       : 'Faculty records will appear here once they are available from the backend.';
   }
@@ -331,86 +350,94 @@ export class FacultyDataTableComponent implements OnInit {
           return;
         }
 
-        const safeText = (value: unknown, fallback = ''): string => {
-          if (value === null || value === undefined) {
-            return fallback;
-          }
-
-          const text = String(value).trim();
-
-          return text && text.toLowerCase() !== 'null' && text.toLowerCase() !== 'undefined'
-            ? text
-            : fallback;
-        };
-
-        const safeNumber = (value: unknown, fallback = 0): number => {
-          const number = Number(value);
-
-          return Number.isFinite(number) ? number : fallback;
-        };
-
-        const normalizedData = report.items
-          .filter((item) => !!item)
-          .map((item) => {
-          const separatedComments = this.separateEvaluationComments(item);
-
-          return {
-            facultyEvaluationScoreId: safeNumber(item.facultyEvaluationScoreId),
-
-            facultyId: safeText(item.facultyId, record.facultyId),
-
-            facultyName: safeText(item.facultyName, record.facultyName ?? ''),
-
-            evaluatorId: safeText(item.evaluatorId),
-
-            evaluatorType: safeText(item.evaluatorType),
-
-            classCode: safeText(item.classCode),
-            programCode: safeText(item.programCode),
-            sectionCode: safeText(item.sectionCode),
-
-            college: safeText(item.college, record.college),
-
-            position: safeText(item.position, record.position),
-
-            semester: safeText(item.semester),
-
-            schoolYear: safeNumber(item.schoolYear),
-
-            subjectCode: safeText(item.subjectCode),
-
-            yearLevel: safeText(item.yearLevel),
-
-            ...separatedComments,
-
-            overallAverageScore: safeNumber(item.overallAverageScore),
-
-            overallInterpretation: safeText(item.overallInterpretation),
-
-            numberOfStudents: safeNumber(item.numberOfStudents),
-
-            setRating: safeNumber(item.setRating),
-
-            sefRating: safeNumber(item.sefRating),
-          };
-        });
-
+        const printPayload = this.toPrintPayload(report, record);
 
         localStorage.setItem(
           'faculty-print-data',
-          JSON.stringify({
-            report: {
-              reportId: report.reportId,
-              reportHash: report.reportHash,
-              verificationUrl: report.verificationUrl,
-              qrCodeDataUri: report.qrCodeDataUri,
-              versionNumber: report.versionNumber,
-              status: report.status,
-              generatedAt: report.generatedAt,
-              generatedByUsername: report.generatedByUsername,
-            },
-            items: normalizedData,
-          }),
+          JSON.stringify(printPayload),
+        );
+
+        printWindow.location.href = '/print/faculty-evaluation';
+        printWindow.focus();
+      });
+  }
+
+  printBulk(): void {
+    if (this.isBulkPrinting) {
+      return;
+    }
+
+    if (!this.selectedLegacyDatabase && !this.selectedBulkPrintCollege) {
+      this.toastFacade.showToast(
+        'Choose a campus, a college, or both before bulk printing.',
+        'error',
+      );
+      return;
+    }
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      this.toastFacade.showToast(
+        'The print window was blocked. Please allow pop-ups for this site and try again.',
+        'error',
+      );
+      return;
+    }
+
+    printWindow.document.write(
+      '<!doctype html><title>Preparing reports...</title><body style="font-family: Arial, sans-serif; padding: 24px;">Preparing faculty evaluation reports...</body>',
+    );
+    printWindow.document.close();
+
+    this.setBulkPrinting(true);
+
+    this.adminService.generateBulkFacultyEvaluationReports(
+      this.selectedLegacyDatabase,
+      this.selectedBulkPrintCollege,
+    )
+      .pipe(
+        take(1),
+        catchError((error) => {
+          this.toastFacade.showToast(
+            `Unable to prepare faculty reports. ${extractErrorMessage(error)}`,
+            'error',
+          );
+
+          printWindow.close();
+
+          return of(null);
+        }),
+        finalize(() => {
+          this.setBulkPrinting(false);
+        }),
+      )
+      .subscribe((response) => {
+        const reports = response?.reports
+          ?.map((report) => this.toPrintPayload(report))
+          .filter((payload) => payload.items.length) ?? [];
+
+        if (!reports.length) {
+          this.toastFacade.showToast(
+            'No printable faculty evaluation reports were found for the selected filters.',
+            'error',
+          );
+          printWindow.close();
+          return;
+        }
+
+        localStorage.setItem(
+          'faculty-print-data',
+          JSON.stringify({ reports }),
+        );
+
+        const skippedCount = response?.skippedFacultyIds?.length ?? 0;
+        const skippedMessage = skippedCount
+          ? ` ${skippedCount} faculty record(s) were skipped because no evaluated report was available.`
+          : '';
+
+        this.toastFacade.showToast(
+          `Prepared ${reports.length} faculty report(s).${skippedMessage}`,
+          'success',
         );
 
         printWindow.location.href = '/print/faculty-evaluation';
@@ -432,6 +459,90 @@ export class FacultyDataTableComponent implements OnInit {
   private setPrintingFaculty(facultyId: string | null): void {
     this.isPrintingFacultyId = facultyId;
     this.cdr.markForCheck();
+  }
+
+  private setBulkPrinting(isPrinting: boolean): void {
+    this.isBulkPrinting = isPrinting;
+    this.cdr.markForCheck();
+  }
+
+  private toPrintPayload(
+    report: FacultyEvaluationGeneratedReportResponse,
+    fallback: Partial<FacultyEvaluationPrintRecord> = {},
+  ): {
+    report: Partial<FacultyEvaluationGeneratedReportResponse>;
+    items: FacultyEvaluationPrintRecord[];
+  } {
+    return {
+      report: {
+        reportId: report.reportId,
+        reportHash: report.reportHash,
+        verificationUrl: report.verificationUrl,
+        qrCodeDataUri: report.qrCodeDataUri,
+        versionNumber: report.versionNumber,
+        status: report.status,
+        generatedAt: report.generatedAt,
+        generatedByUsername: report.generatedByUsername,
+      },
+      items: this.normalizePrintItems(report.items, fallback),
+    };
+  }
+
+  private normalizePrintItems(
+    items: FacultyEvaluationPrintResponse[] = [],
+    fallback: Partial<FacultyEvaluationPrintRecord> = {},
+  ): FacultyEvaluationPrintRecord[] {
+    return items
+      .filter((item) => !!item)
+      .map((item) => {
+        const separatedComments = this.separateEvaluationComments(item);
+
+        return {
+          facultyEvaluationScoreId: this.safePrintNumber(item.facultyEvaluationScoreId),
+          facultyId: this.safePrintText(item.facultyId, fallback.facultyId),
+          facultyName: this.safePrintText(item.facultyName, fallback.facultyName),
+          evaluatorId: this.safePrintText(item.evaluatorId),
+          evaluatorType: this.safePrintText(item.evaluatorType),
+          classCode: this.safePrintText(item.classCode, fallback.classCode),
+          programCode: this.safePrintText(item.programCode),
+          sectionCode: this.safePrintText(item.sectionCode),
+          college: this.safePrintText(item.college, fallback.college),
+          position: this.safePrintText(item.position, fallback.position),
+          semester: this.safePrintText(item.semester),
+          schoolYear: this.safePrintNumber(item.schoolYear),
+          subjectCode: this.safePrintText(item.subjectCode),
+          yearLevel: this.safePrintText(item.yearLevel),
+          ...separatedComments,
+          overallAverageScore: this.safePrintNumber(item.overallAverageScore),
+          overallInterpretation: this.safePrintText(item.overallInterpretation),
+          numberOfStudents: this.safePrintNumber(item.numberOfStudents),
+          setRating: this.safePrintNumber(item.setRating),
+          sefRating: this.safePrintNumber(item.sefRating),
+          supervisorName: this.safePrintText(item.supervisorName),
+          supervisorDesignation: this.safePrintText(item.supervisorDesignation),
+        };
+      });
+  }
+
+  private safePrintText(value: unknown, fallback: unknown = ''): string {
+    const fallbackText =
+      fallback === null || fallback === undefined ? '' : String(fallback).trim();
+
+    if (value === null || value === undefined) {
+      return fallbackText;
+    }
+
+    const text = String(value).trim();
+
+    return text && text.toLowerCase() !== 'null' && text.toLowerCase() !== 'undefined'
+      ? text
+      : fallbackText;
+  }
+
+  private safePrintNumber(value: unknown, fallback = 0): number {
+    const number = Number(value);
+
+    return Number.isFinite(number) ? number : fallback;
   }
 
   private separateEvaluationComments(

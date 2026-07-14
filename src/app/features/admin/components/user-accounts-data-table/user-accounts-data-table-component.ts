@@ -45,6 +45,7 @@ export class UserAccountsDataTableComponent implements OnInit {
     'DEAN',
     'STUDENT',
     'ADMIN',
+    'HR',
   ];
 
   statuses = [

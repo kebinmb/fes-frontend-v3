@@ -8,6 +8,20 @@ This project follows a simple semantic versioning style:
 - `MINOR` for new backward-compatible screens or features.
 - `PATCH` for bug fixes, optimizations, and documentation.
 
+## [0.2.2] - 2026-07-14
+
+### Changed
+
+- Aligned the frontend idle-session timer to the ten-minute backend policy.
+- Improved the Faculty Dashboard bulk-print action so it is disabled until a campus or college print filter is selected.
+- Included the bulk-print college filter in the clear-filter workflow.
+- Removed an unused CSRF helper allocation from the auth interceptor.
+
+### User Impact
+
+- Active users should no longer see a five-minute local timeout when the intended policy is ten minutes.
+- Bulk printing now communicates the required filter state before the administrator starts the action.
+
 ## [0.2.1] - 2026-07-10
 
 ### Changed

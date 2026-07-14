@@ -26,7 +26,15 @@ export const roleGuard: CanActivateFn = (route) => {
       const allowedRoles = Array.isArray(expectedRoles) ? expectedRoles : [expectedRoles];
       const hasRole = allowedRoles.some((role) => userRoles.includes(role));
 
-      return hasRole ? true : router.createUrlTree(['/login']);
+      if (hasRole) {
+        return true;
+      }
+
+      if (state.role === 'ROLE_HR') {
+        return router.createUrlTree(['/admin-dashboard/supervisor-evaluations']);
+      }
+
+      return router.createUrlTree(['/login']);
     }),
   );
 };

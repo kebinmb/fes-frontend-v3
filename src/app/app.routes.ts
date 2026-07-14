@@ -56,12 +56,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('@features/admin/pages/admin-dashboard/admin-dashboard-component').then(
         (m) => m.AdminDashboardComponent,
-      ),
+    ),
     canActivate: [authGuard, roleGuard],
-    data: { role: 'ROLE_ADMIN' },
+    data: { role: ['ROLE_ADMIN', 'ROLE_HR'] },
     children: [
       {
         path: '',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import(
             '@features/admin/components/admin-dashboard-overview/admin-dashboard-overview-component'
@@ -69,6 +71,8 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import(
             '@features/admin/components/admin-dashboard-overview/admin-dashboard-overview-component'
@@ -76,13 +80,26 @@ export const routes: Routes = [
       },
       {
         path: 'faculty-list',
+        canActivate: [roleGuard],
+        data: { role: ['ROLE_ADMIN', 'ROLE_HR'] },
         loadComponent: () =>
           import(
             '@features/admin/components/faculty-data-table/faculty-data-table-component'
           ).then((m) => m.FacultyDataTableComponent),
       },
       {
+        path: 'supervisor-evaluations',
+        canActivate: [roleGuard],
+        data: { role: ['ROLE_ADMIN', 'ROLE_HR'] },
+        loadComponent: () =>
+          import(
+            '@features/admin/components/supervisor-evaluation-dashboard-component'
+          ).then((m) => m.SupervisorEvaluationDashboardComponent),
+      },
+      {
         path: 'faculty-workloads',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import(
             '@features/admin/components/faculty-workload/faculty-workload-component'
@@ -90,6 +107,8 @@ export const routes: Routes = [
       },
       {
         path: 'faculty-workload-coverage',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import(
             '@features/admin/components/faculty-workload-coverage/faculty-workload-coverage-component'
@@ -97,6 +116,8 @@ export const routes: Routes = [
       },
       {
         path: 'class-assignments',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import(
             '@features/admin/components/class-assignments/class-assignments-component'
@@ -104,6 +125,8 @@ export const routes: Routes = [
       },
       {
         path: 'evaluation-score-list',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import(
             '@features/admin/components/faculty-evaluation-scores-data-table/faculty-evaluation-scores-data-table-component'
@@ -111,6 +134,8 @@ export const routes: Routes = [
       },
       {
         path: 'user-accounts',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import(
             '@features/admin/components/user-accounts-data-table/user-accounts-data-table-component'
@@ -118,6 +143,8 @@ export const routes: Routes = [
       },
       {
         path: 'student-evaluations',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import(
             '@features/admin/components/student-evaluations-data-table/student-evaluations-data-table-component'
@@ -125,6 +152,8 @@ export const routes: Routes = [
       },
       {
         path: 'student-evaluation-list',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import(
             '@features/admin/components/student-evaluation-list/student-evaluation-list-component'
@@ -132,6 +161,8 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import('@features/admin/components/settings/settings-component').then(
             (m) => m.SettingsComponent,
@@ -139,6 +170,8 @@ export const routes: Routes = [
       },
       {
         path: 'audit-logs',
+        canActivate: [roleGuard],
+        data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
           import('@features/admin/components/audit-logs/audit-logs-component').then(
             (m) => m.AuditLogsComponent,
@@ -151,9 +184,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('@shared/components/faculty-evaluation-print-component/faculty-evaluation-print-component').then(
         (m) => m.FacultyEvaluationPrintComponent,
-      ),
+    ),
     canActivate: [authGuard, roleGuard],
-    data: { role: 'ROLE_ADMIN' },
+    data: { role: ['ROLE_ADMIN', 'ROLE_HR'] },
   },
   {
     path: 'print/student-evaluation',

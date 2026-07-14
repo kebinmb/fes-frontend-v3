@@ -55,7 +55,7 @@ export const administratorLogin = createAction(
 );
 export const administratorLoginSuccess = createAction(
   '[Administrator Authentication] Administrator Login Success',
-  props<{ administratorId: string; role: 'ROLE_ADMIN' }>(),
+  props<{ administratorId: string; role: 'ROLE_ADMIN' | 'ROLE_HR' }>(),
 );
 export const administratorLoginFailure = createAction(
   '[Supervisor Authentication] Administrator Login Failed',
@@ -69,7 +69,7 @@ export const checkLoggedInUserAuthenticationSuccess = createAction(
   '[Authentication Check] Authentication Check Success',
   props<{
     evaluatorId: string;
-    role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_PROGRAM_CHAIR' | 'ROLE_ADMIN';
+    role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_PROGRAM_CHAIR' | 'ROLE_ADMIN' | 'ROLE_HR';
     college: string;
     program:string;
     requiresPasswordChange:boolean;

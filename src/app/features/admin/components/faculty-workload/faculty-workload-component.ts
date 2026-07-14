@@ -80,7 +80,6 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     { label: 'Summer Semester', value: 'SUMMER_SEMESTER' },
   ];
   readonly sourceOptions = ['MANUAL', 'IMPORTED', 'SYSTEM'] as const;
-  readonly loadStatusOptions: FacultyLoadStatus[] = ['Regular', 'Overload'];
 
   facultyResults: FetchFacultyResponse[] = [];
   workloads: FacultyWorkloadResponse[] = [];
@@ -297,6 +296,13 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
   statusLabel(status: FacultyLoadStatus | string | null | undefined): string {
     return this.normalizeLoadStatus(status);
+  }
+
+  setLoadStatus(isOverload: boolean): void {
+    const loadStatus: FacultyLoadStatus = isOverload ? 'Overload' : 'Regular';
+
+    this.selectedLoadStatus = loadStatus;
+    this.workloadForm.controls.loadStatus.setValue(loadStatus);
   }
 
   semesterLabel(semester: string | null | undefined): string {
@@ -794,6 +800,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     updateSearchTerm = true,
   ): void {
     this.selectedFaculty = faculty;
+    this.selectedLoadStatus = 'Regular';
 
     if (updateSearchTerm) {
       this.facultySearchTerm = this.facultySearchLabel(faculty);

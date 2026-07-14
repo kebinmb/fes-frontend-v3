@@ -25,6 +25,11 @@
     background: #fff
 }
 
+.print-container + .print-container {
+    margin-top: 32px;
+    border-top: 1px dashed var(--chmsu-border)
+}
+
 .print-body,
 .print-content-row,
 .print-content-cell {
@@ -172,38 +177,57 @@ tbody tr:nth-child(even) {
 }
 
 .approval-section {
-    gap: 64px;
-    margin-top: 76px;
-    padding: 0 20px
+    grid-template-columns: 1fr;
+    gap: 28px;
+    margin-top: 64px;
+    padding: 0 12px
 }
 
-.approval-title {
-    margin-bottom: 34px;
-    color: var(--chmsu-primary);
-    font-size: 16px;
-    font-weight: 800;
-    text-align: center;
-    text-transform: uppercase
+.approval-block {
+    display: grid;
+    gap: 10px
 }
 
-.signature-line {
-    height: 34px;
-    border-top: 1px solid #374151;
-    width: 100%
-}
-
-.date-line {
-    width: 46%;
-    margin: 20px auto 0;
-    border-top: 1px solid #374151
-}
-
-.signature-caption {
-    margin-top: 6px;
+.approval-heading {
     color: #374151;
-    text-align: center;
+    font-size: 14px;
+    font-weight: 600
+}
+
+.approval-row {
+    display: grid;
+    grid-template-columns: 260px 12px minmax(0, 1fr);
+    align-items: end;
+    gap: 8px;
+    min-height: 28px
+}
+
+.approval-label {
+    color: #374151;
+    font-size: 13px;
+    font-weight: 800
+}
+
+.approval-colon {
+    color: #111827;
+    font-size: 13px;
+    font-weight: 800
+}
+
+.approval-line {
+    min-height: 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    border-bottom: 1px solid #374151
+}
+
+.approval-line-value {
+    padding: 0 8px 2px;
+    color: #111827;
     font-size: 12px;
-    font-weight: 700
+    font-weight: 800;
+    text-transform: uppercase
 }
 
 .verification-panel {
@@ -345,6 +369,11 @@ tbody tr:nth-child(even) {
         padding-bottom: 0 !important;
         overflow: visible !important;
         border-collapse: collapse
+    }
+
+    .print-container:not(:last-child) {
+        break-after: page;
+        page-break-after: always
     }
 
     .print-body {
@@ -533,50 +562,60 @@ tbody tr:nth-child(even) {
     .print-signatory-cell {
         display: table-cell;
         padding: 8mm 0 0;
+        border: 0 !important;
         background: #fff !important
     }
 
     .print-signatory-grid {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30mm;
-        min-height: 28mm;
+        grid-template-columns: 1fr;
+        gap: 5mm;
+        min-height: 34mm;
         padding: 4mm 6mm 0;
-        border-top: 1.5px solid var(--chmsu-primary);
+        border: 0 !important;
         background: #fff !important;
         break-inside: avoid;
         page-break-inside: avoid
     }
 
-    .print-signatory {
+    .print-signatory-block {
         display: grid;
-        grid-template-rows: auto 11mm auto 5mm;
-        gap: 1.2mm;
+        gap: 1.8mm;
         font-size: 8.2px;
-        text-align: center
+        text-align: left
     }
 
-    .print-signatory strong {
+    .print-signatory-heading {
+        color: #374151;
+        font-weight: 500
+    }
+
+    .print-signatory-row-item {
+        display: grid;
+        grid-template-columns: 40mm 3mm minmax(0, 1fr);
+        align-items: end;
+        gap: 1.6mm
+    }
+
+    .print-signatory-row-item strong {
         color: var(--chmsu-primary);
-        text-transform: uppercase
+        font-weight: 800
     }
 
-    .print-signature-line {
-        display: block;
-        width: 100%;
+    .print-signatory-line {
+        min-height: 4mm;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
         border-bottom: 1px solid #374151
     }
 
-    .print-signature-caption {
-        font-weight: 700
-    }
-
-    .print-signatory em {
-        justify-self: center;
-        min-width: 30mm;
-        padding-top: 1mm;
-        border-top: 1px solid #374151;
-        font-style: normal
+    .print-signatory-value {
+        padding: 0 1.5mm .6mm;
+        color: #111827;
+        font-size: 8px;
+        font-weight: 800;
+        text-transform: uppercase
     }
 
     @page {

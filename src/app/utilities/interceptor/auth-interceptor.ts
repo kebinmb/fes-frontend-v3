@@ -166,8 +166,6 @@ function prepareCsrfRequest<T>(
     return of(addCsrfHeader(req, existingToken));
   }
 
-  const http = new HttpClient(httpBackend);
-
   return refreshCsrfToken(httpBackend)
     .pipe(
       map((token) => token ? addCsrfHeader(req, token) : req),

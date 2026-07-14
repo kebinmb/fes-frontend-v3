@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
+
 export interface FacultyEvaluationPrintRecord {
   facultyEvaluationScoreId?: number | null;
 
@@ -32,6 +33,8 @@ export interface FacultyEvaluationPrintRecord {
 
   studentComments?: string | null;
   supervisorComments?: string | null;
+  supervisorName?: string | null;
+  supervisorDesignation?: string | null;
 }
 
 interface PrintCommentRow {
@@ -50,9 +53,29 @@ interface FacultyEvaluationPrintReportMeta {
   generatedByUsername?: string | null;
 }
 
-interface FacultyEvaluationPrintPayload {
-  report?: FacultyEvaluationPrintReportMeta;
+interface FacultyEvaluationPrintReportPayload {
+  report?: Partial<FacultyEvaluationPrintReportMeta> | null;
   items?: FacultyEvaluationPrintRecord[];
+}
+
+interface FacultyEvaluationPrintPayload extends FacultyEvaluationPrintReportPayload {
+  reports?: FacultyEvaluationPrintReportPayload[];
+}
+
+interface FacultyEvaluationPrintSection {
+  report: Partial<FacultyEvaluationPrintReportMeta> | null;
+  data: FacultyEvaluationPrintRecord[];
+  faculty: FacultyEvaluationPrintRecord | null;
+  setData: FacultyEvaluationPrintRecord[];
+  sefData: FacultyEvaluationPrintRecord[];
+  totalStudents: number;
+  totalWeightedScore: number;
+  overallSetRating: number;
+  overallSefRating: number;
+  studentComments: PrintCommentRow[];
+  supervisorComments: PrintCommentRow[];
+  supervisorName: string;
+  supervisorDesignation: string;
 }
 
 @Component({
@@ -61,95 +84,116 @@ interface FacultyEvaluationPrintPayload {
   templateUrl: './faculty-evaluation-print-component.html',
   styleUrl: './faculty-evaluation-print-component.css',
 })
-export class FacultyEvaluationPrintComponent {
+export class FacultyEvaluationPrintComponent implements OnInit {
   @Input()
   data: FacultyEvaluationPrintRecord[] = [];
 
-  report: Partial<FacultyEvaluationPrintReportMeta> | null = null;
-
-  faculty: FacultyEvaluationPrintRecord | null = null;
-
-  setData: FacultyEvaluationPrintRecord[] = [];
-
-  sefData: FacultyEvaluationPrintRecord[] = [];
-
-  totalStudents = 0;
-
-  totalWeightedScore = 0;
-
-  overallSetRating = 0;
-
-  overallSefRating = 0;
+  sections: FacultyEvaluationPrintSection[] = [];
 
   ngOnInit(): void {
-    const storedData = localStorage.getItem('faculty-print-data');
-    localStorage.removeItem('faculty-print-data');
-    if (storedData && !this.data.length) {
-      try {
-        const parsed = repairSpecialCharacters(
-          JSON.parse(storedData),
-        ) as FacultyEvaluationPrintPayload | FacultyEvaluationPrintRecord[];
+    this.sections = this.readPrintPayload()
+      .map((payload) => this.buildSection(payload))
+      .filter((section) => section.data.length);
 
-        if (Array.isArray(parsed)) {
-          this.data = parsed;
-        } else {
-          this.report = this.normalizeReport(parsed?.report);
-          this.data = Array.isArray(parsed?.items) ? parsed.items : [];
-        }
-      } catch {
-        this.data = [];
-        this.report = null;
-      }
-    }
-
-    this.data = this.normalizeRecords(this.data);
-
-    if (!this.data.length) {
+    if (!this.sections.length) {
       return;
     }
-    this.faculty = this.data[0];
-    this.setData = this.data.filter((item) => (item.setRating ?? 0) > 0);
-    this.sefData = this.data.filter((item) => (item.sefRating ?? 0) > 0);
-    this.computeTotals();
+
     setTimeout(() => {
       window.print();
     }, 500);
   }
 
-  private computeTotals(): void {
-    this.totalStudents = this.setData.reduce(
+  private readPrintPayload(): FacultyEvaluationPrintReportPayload[] {
+    const storedData = localStorage.getItem('faculty-print-data');
+    localStorage.removeItem('faculty-print-data');
+
+    if (!storedData) {
+      return this.data.length ? [{ items: this.data }] : [];
+    }
+
+    try {
+      const parsed = repairSpecialCharacters(
+        JSON.parse(storedData),
+      ) as FacultyEvaluationPrintPayload | FacultyEvaluationPrintRecord[];
+
+      if (Array.isArray(parsed)) {
+        return [{ items: parsed }];
+      }
+
+      if (Array.isArray(parsed?.reports)) {
+        return parsed.reports;
+      }
+
+      return [
+        {
+          report: parsed?.report,
+          items: Array.isArray(parsed?.items) ? parsed.items : [],
+        },
+      ];
+    } catch {
+      return this.data.length ? [{ items: this.data }] : [];
+    }
+  }
+
+  private buildSection(
+    payload: FacultyEvaluationPrintReportPayload,
+  ): FacultyEvaluationPrintSection {
+    const data = this.normalizeRecords(payload.items ?? []);
+    const faculty = data[0] ?? null;
+    const setData = data.filter((item) => (item.setRating ?? 0) > 0);
+    const sefData = data.filter((item) => (item.sefRating ?? 0) > 0);
+    const totals = this.computeTotals(setData, sefData);
+
+    return {
+      report: this.normalizeReport(payload.report ?? undefined),
+      data,
+      faculty,
+      setData,
+      sefData,
+      ...totals,
+      studentComments: this.collectUniqueComments(data, 'studentComments'),
+      supervisorComments: this.collectUniqueComments(data, 'supervisorComments'),
+      supervisorName: this.firstRecordValue(data, 'supervisorName'),
+      supervisorDesignation: this.firstRecordValue(data, 'supervisorDesignation'),
+    };
+  }
+
+  private computeTotals(
+    setData: FacultyEvaluationPrintRecord[],
+    sefData: FacultyEvaluationPrintRecord[],
+  ): Pick<
+    FacultyEvaluationPrintSection,
+    'totalStudents' | 'totalWeightedScore' | 'overallSetRating' | 'overallSefRating'
+  > {
+    const totalStudents = setData.reduce(
       (total, item) => total + this.safeNumber(item.numberOfStudents),
       0,
     );
 
-    this.totalWeightedScore = this.setData.reduce((total, item) => {
+    const totalWeightedScore = setData.reduce((total, item) => {
       return total + this.safeNumber(item.numberOfStudents) * this.safeNumber(item.setRating);
     }, 0);
 
-    this.overallSetRating =
-      this.totalStudents > 0 ? this.totalWeightedScore / this.totalStudents : 0;
-
-    this.overallSefRating =
-      this.sefData.length > 0
-        ? this.sefData.reduce((total, item) => total + this.safeNumber(item.sefRating), 0) /
-          this.sefData.length
-        : 0;
-  }
-
-  get studentComments(): PrintCommentRow[] {
-    return this.collectUniqueComments('studentComments');
-  }
-
-  get supervisorComments(): PrintCommentRow[] {
-    return this.collectUniqueComments('supervisorComments');
+    return {
+      totalStudents,
+      totalWeightedScore,
+      overallSetRating: totalStudents > 0 ? totalWeightedScore / totalStudents : 0,
+      overallSefRating:
+        sefData.length > 0
+          ? sefData.reduce((total, item) => total + this.safeNumber(item.sefRating), 0) /
+            sefData.length
+          : 0,
+    };
   }
 
   private collectUniqueComments(
+    records: FacultyEvaluationPrintRecord[],
     commentKey: 'studentComments' | 'supervisorComments',
   ): PrintCommentRow[] {
     const uniqueComments = new Map<string, string>();
 
-    this.data
+    records
       .flatMap((item) => this.splitComments(item[commentKey]))
       .forEach((comment) => {
         const uniqueKey = comment.toLocaleLowerCase();
@@ -171,9 +215,18 @@ export class FacultyEvaluationPrintComponent {
     }
 
     return repairSpecialCharacters(comments)
-      .split(/\r?\n|(?:\s*\|\s*)|(?:\s*;\s*)|(?:\s*•\s*)/)
+      .split(/\r?\n|(?:\s*\|\s*)|(?:\s*;\s*)|(?:\s*â€¢\s*)/)
       .map((comment) => comment.replace(/[ \t]+/g, ' ').trim())
       .filter((comment) => comment && comment !== '-');
+  }
+
+  private firstRecordValue(
+    records: FacultyEvaluationPrintRecord[],
+    key: 'supervisorName' | 'supervisorDesignation',
+  ): string {
+    return records
+      .map((record) => this.safeText(record[key], ''))
+      .find((value) => !!value) ?? '';
   }
 
   cleanSubjectCode(subjectCode: string | null | undefined): string {
@@ -183,6 +236,10 @@ export class FacultyEvaluationPrintComponent {
         .replace(/\s+/g, ' ')
         .trim() || ''
     );
+  }
+
+  trackPrintSection(index: number, section: FacultyEvaluationPrintSection): string | number {
+    return section.report?.reportId ?? section.faculty?.facultyId ?? index;
   }
 
   trackEvaluationRecord(index: number, item: FacultyEvaluationPrintRecord): string {
@@ -233,9 +290,9 @@ export class FacultyEvaluationPrintComponent {
     return parts.length ? parts.join(' - ') : '-';
   }
 
-  academicTerm(): string {
-    const semester = this.safeText(this.faculty?.semester, '');
-    const schoolYear = this.safeText(this.faculty?.schoolYear, '');
+  academicTerm(section: FacultyEvaluationPrintSection): string {
+    const semester = this.safeText(section.faculty?.semester, '');
+    const schoolYear = this.safeText(section.faculty?.schoolYear, '');
 
     if (!semester && !schoolYear) {
       return '-';
@@ -244,12 +301,14 @@ export class FacultyEvaluationPrintComponent {
     return `${semester || '-'} Semester / ${schoolYear || '-'}`;
   }
 
-  hasReportVerification(): boolean {
+  hasReportVerification(
+    report: Partial<FacultyEvaluationPrintReportMeta> | null,
+  ): boolean {
     return !!(
-      this.report?.reportId ||
-      this.report?.reportHash ||
-      this.report?.verificationUrl ||
-      this.report?.qrCodeDataUri
+      report?.reportId ||
+      report?.reportHash ||
+      report?.verificationUrl ||
+      report?.qrCodeDataUri
     );
   }
 
@@ -282,11 +341,13 @@ export class FacultyEvaluationPrintComponent {
         sefRating: this.safeNumber(item.sefRating),
         studentComments: this.safeText(item.studentComments, ''),
         supervisorComments: this.safeText(item.supervisorComments, ''),
+        supervisorName: this.safeText(item.supervisorName, ''),
+        supervisorDesignation: this.safeText(item.supervisorDesignation, ''),
       }));
   }
 
   private normalizeReport(
-    report: FacultyEvaluationPrintReportMeta | undefined,
+    report: Partial<FacultyEvaluationPrintReportMeta> | undefined,
   ): Partial<FacultyEvaluationPrintReportMeta> | null {
     if (!report) {
       return null;

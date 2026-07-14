@@ -42,6 +42,11 @@ export const guestGuard: CanActivateFn = () => {
             '/admin-dashboard',
           ]);
 
+        case 'ROLE_HR':
+          return router.createUrlTree([
+            '/admin-dashboard/faculty-list',
+          ]);
+
         default:
           return true;
       }

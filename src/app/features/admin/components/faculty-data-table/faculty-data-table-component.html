@@ -1,6 +1,7 @@
 @let facultiesData = faculties$ | async;
 @let isLoading = loading$ | async;
 @let loadError = error$ | async;
+@let isAdmin = isAdmin$ | async;
 <section class="modern-card">
   <div class="card-topbar"></div>
   <!-- HEADER -->
@@ -51,6 +52,36 @@
           </option>
           }
         </select>
+        <label class="visually-hidden" for="bulkPrintCollegeFilter">
+          Filter bulk print by college
+        </label>
+        <select
+          id="bulkPrintCollegeFilter"
+          class="filter-select"
+          [(ngModel)]="selectedBulkPrintCollege"
+          name="bulkPrintCollegeFilter"
+        >
+          <option value="">All Colleges</option>
+          @for (college of collegeOptions; track college) {
+          <option [value]="college">
+            {{ college }}
+          </option>
+          }
+        </select>
+        <button
+          type="button"
+          class="bulk-print-btn"
+          [disabled]="!!isLoading || isBulkPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
+          [title]="!selectedLegacyDatabase && !selectedBulkPrintCollege ? 'Select a campus or college before bulk printing.' : 'Prepare faculty evaluation reports for printing.'"
+          (click)="printBulk()"
+        >
+          <i
+            class="bi"
+            [class.bi-printer-fill]="!isBulkPrinting"
+            [class.bi-hourglass-split]="isBulkPrinting"
+          ></i>
+          <span>{{ isBulkPrinting ? 'Preparing' : 'Bulk Print' }}</span>
+        </button>
         @if (hasActiveFilters()) {
         <button type="button" class="clear-btn" [disabled]="!!isLoading" (click)="clearFilters()">
           Clear
@@ -134,6 +165,7 @@
           </td>
           <td data-label="Actions">
             <div class="action-group">
+              @if (isAdmin) {
               <button
                 type="button"
                 class="edit-btn"
@@ -143,6 +175,7 @@
                 <i class="bi bi-pencil-square"></i>
                 Edit
               </button>
+              }
               <button
                 type="button"
                 class="single-print-btn"

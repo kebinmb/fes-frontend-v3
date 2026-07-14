@@ -26,6 +26,11 @@
   border-bottom: 1px solid #e5e7eb;
 }
 
+.header-content {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
 .header-content h2 {
   margin: 0;
 
@@ -42,7 +47,7 @@
 
   margin-top: 0.35rem;
 
-  color: #6b7280;
+  color: white;
 
   font-size: 0.88rem;
 }
@@ -85,24 +90,33 @@
 }
 
 .search-wrapper {
-  display: flex;
+  display: grid;
+  grid-template-columns:
+    minmax(260px, 1fr)
+    auto
+    minmax(160px, 190px)
+    minmax(160px, 190px)
+    auto
+    auto;
   align-items: center;
 
   gap: 0.7rem;
 
   margin-top: 1rem;
 
-  flex-wrap: wrap;
+  width: 100%;
 }
 
 .search-wrapper > * {
-  flex-shrink: 0;
+  min-width: 0;
 }
 
 .search-field {
   position: relative;
 
-  min-width: min(360px, 100%);
+  width: 100%;
+
+  min-width: 0;
 }
 
 .search-field i {
@@ -151,7 +165,9 @@
 .filter-select {
   height: 44px;
 
-  min-width: 180px;
+  width: 100%;
+
+  min-width: 0;
 
   padding: 0 0.9rem;
 
@@ -181,6 +197,7 @@
 .edit-btn,
 .pagination-btn,
 .single-print-btn,
+.bulk-print-btn,
 .cancel-btn,
 .save-btn,
 .clear-btn,
@@ -205,6 +222,7 @@
 }
 
 .edit-btn,
+.bulk-print-btn,
 .pagination-btn,
 .save-btn {
   height: 44px;
@@ -221,6 +239,7 @@
 }
 
 .edit-btn:hover,
+.bulk-print-btn:hover,
 .pagination-btn:hover,
 .save-btn:hover {
   background: #166534;
@@ -233,6 +252,7 @@
 }
 
 .edit-btn:disabled,
+.bulk-print-btn:disabled,
 .clear-btn:disabled {
   opacity: 0.62;
 
@@ -360,7 +380,8 @@
 }
 
 .refresh-indicator i,
-.edit-btn:disabled i {
+.edit-btn:disabled i,
+.bulk-print-btn:disabled i {
   animation: spin 0.9s linear infinite;
 }
 
@@ -767,7 +788,8 @@
 @media (prefers-reduced-motion: reduce) {
   .skeleton-line,
   .refresh-indicator i,
-  .edit-btn:disabled i {
+  .edit-btn:disabled i,
+  .bulk-print-btn:disabled i {
     animation: none;
   }
 
@@ -791,8 +813,13 @@
   .search-wrapper,
   .search-field,
   .filter-select,
+  .bulk-print-btn,
   .clear-btn {
     width: 100%;
+  }
+
+  .search-wrapper {
+    grid-template-columns: 1fr;
   }
 
   .search-input {
@@ -814,6 +841,7 @@
 
   .pagination-btn,
   .edit-btn,
+  .bulk-print-btn,
   .single-print-btn {
     width: 100%;
   }
@@ -900,6 +928,20 @@
   .modal-form {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1180px) {
+  .modern-card-header {
+    flex-direction: column;
+  }
+
+  .search-wrapper {
+    grid-template-columns: minmax(260px, 1fr) auto minmax(170px, 1fr);
+  }
+
+  .table-count {
+    align-self: flex-end;
   }
 }
 

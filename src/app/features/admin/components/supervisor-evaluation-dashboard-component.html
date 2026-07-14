@@ -1,0 +1,178 @@
+<section class="supervisor-evaluation-page" [attr.aria-busy]="isLoading()">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">Supervisor Evaluation Dashboard</span>
+      <h1>Supervisor Review Submissions</h1>
+      <p>Track which faculty already have submitted supervisor reviews for {{ currentTermLabel() }} and identify records missing evaluator names.</p>
+    </div>
+
+    <button type="button" class="refresh-btn" (click)="loadDashboard()" [disabled]="isLoading()">
+      <i class="bi bi-arrow-clockwise"></i>
+      Refresh
+    </button>
+  </header>
+
+  <div class="summary-grid">
+    <article class="summary-card">
+      <span>Total Faculty</span>
+      <strong>{{ totalFacultyCount() }}</strong>
+      <small>with assigned classes</small>
+    </article>
+
+    <article class="summary-card success">
+      <span>Submitted Reviews</span>
+      <strong>{{ evaluatedCount() }}</strong>
+      <small>{{ evaluationStatus() === 'EVALUATED' ? 'shown by this filter' : 'available in this result' }}</small>
+    </article>
+
+    <article class="summary-card warning">
+      <span>Not Submitted</span>
+      <strong>{{ pendingCount() }}</strong>
+      <small>{{ evaluationStatus() === 'PENDING' ? 'shown by this filter' : 'available in this result' }}</small>
+    </article>
+  </div>
+
+  <section class="toolbar" aria-label="Supervisor evaluation filters">
+    <label class="search-field">
+      <span>Search</span>
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input
+          type="search"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="updateSearchTerm($event)"
+          placeholder="Faculty, supervisor, or evaluator"
+          autocomplete="off"
+        />
+      </div>
+    </label>
+
+    <label>
+      <span>Status</span>
+      <select [ngModel]="evaluationStatus()" (ngModelChange)="updateEvaluationStatus($event)">
+        @for (option of statusOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      <span>Campus</span>
+      <select [ngModel]="sourceDatabase()" (ngModelChange)="updateSourceDatabase($event)">
+        @for (option of sourceOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
+    <button type="button" class="clear-btn" (click)="resetFilters()">Clear</button>
+  </section>
+
+  <section class="table-shell">
+    @if (isLoading() && rows().length === 0) {
+      <div class="state-panel">
+        <span class="loader"></span>
+        <strong>Loading supervisor evaluation status...</strong>
+      </div>
+    } @else if (rows().length === 0) {
+      <div class="state-panel">
+        <i class="bi bi-clipboard-x"></i>
+        <strong>No records found</strong>
+        <span>Adjust the filters or refresh the dashboard.</span>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Faculty</th>
+              <th>College / Campus</th>
+              <th class="text-center">Classes</th>
+              <th>Review Status</th>
+              <th>Submitted By</th>
+              <th>Last Evaluation</th>
+              <th class="text-end">Average</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track trackByFacultyId($index, row)) {
+              <tr>
+                <td>
+                  <strong>{{ row.facultyName | unicodeText }}</strong>
+                  <span>{{ row.facultyId }}</span>
+                  <small>{{ row.position || '-' }}</small>
+                </td>
+                <td>
+                  <strong>{{ row.college || '-' }}</strong>
+                  <span>{{ displaySource(row.campus) }}</span>
+                  <small>{{ displaySource(row.legacyDatabase) }}</small>
+                </td>
+                <td class="text-center">
+                  <span class="class-count">{{ row.assignedClassCount }}</span>
+                </td>
+                <td>
+                  <span
+                    class="status-pill"
+                    [class.pending]="!row.supervisorEvaluated"
+                    [class.needs-details]="row.supervisorEvaluated && !hasSupervisorDetails(row)"
+                  >
+                    {{ evaluationStatusLabel(row) }}
+                  </span>
+                  <small>{{ evaluationStatusHint(row) }}</small>
+                </td>
+                <td
+                  class="supervisor-cell"
+                  [class.missing-details]="row.supervisorEvaluated && !hasSupervisorDetails(row)"
+                  [class.pending-details]="!row.supervisorEvaluated"
+                >
+                  <strong>{{ supervisorDisplayName(row) | unicodeText }}</strong>
+                  <span>{{ supervisorDisplayId(row) }}</span>
+                  <small>{{ supervisorDisplayPosition(row) | unicodeText }}</small>
+                </td>
+                <td>
+                  <span>{{ displayDate(row.lastEvaluatedAt) }}</span>
+                </td>
+                <td class="text-end">
+                  <strong>
+                    {{ row.supervisorAverageScore === null || row.supervisorAverageScore === undefined
+                      ? '-'
+                      : (row.supervisorAverageScore | number: '1.2-2') }}
+                  </strong>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <footer class="pagination-bar">
+    <span>Showing {{ pageStart() }}-{{ pageEnd() }} of {{ totalElements() }}</span>
+
+    <div class="pagination-controls">
+      <label>
+        Rows
+        <select [ngModel]="pageSize()" (ngModelChange)="updatePageSize($event)">
+          @for (size of pageSizes; track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
+      </label>
+
+      <button type="button" (click)="goToPage(pageIndex() - 1)" [disabled]="pageIndex() === 0">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+
+      @for (page of paginationPages(); track page) {
+        <button type="button" [class.active]="page === pageIndex()" (click)="goToPage(page)">
+          {{ page + 1 }}
+        </button>
+      }
+
+      <button type="button" (click)="goToPage(pageIndex() + 1)" [disabled]="pageIndex() >= totalPages() - 1">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </footer>
+</section>

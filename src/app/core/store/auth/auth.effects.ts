@@ -188,7 +188,7 @@ export class AuthEffects {
             this.spinnerFacade.hideSpinner();
             return AuthActions.administratorLoginSuccess({
               administratorId: response.administratorId,
-              role: 'ROLE_ADMIN',
+              role: response.role === 'ROLE_HR' ? 'ROLE_HR' : 'ROLE_ADMIN',
             });
           }),
           catchError((error) => {
@@ -207,13 +207,18 @@ export class AuthEffects {
     () =>
       this.actions$.pipe(
         ofType(AuthActions.administratorLoginSuccess),
-        tap(() => {
+        tap(({ role }) => {
           if (this.shouldAnnounceLoginSuccess('/admin')) {
             this.toastFacade.showToast(`Login successful`, 'success');
           }
 
-          if (this.shouldNavigateAfterLogin('/admin-dashboard')) {
-            Promise.resolve().then(() => this.router.navigate(['/admin-dashboard']));
+          const targetRoute =
+            role === 'ROLE_HR'
+              ? '/admin-dashboard/faculty-list'
+              : '/admin-dashboard';
+
+          if (this.shouldNavigateAfterLogin(targetRoute)) {
+            Promise.resolve().then(() => this.router.navigate([targetRoute]));
           }
         }),
       ),
@@ -277,10 +282,10 @@ export class AuthEffects {
           return this.handleSupervisorLoginSuccess(response);
         }
 
-        if (response.role === 'ROLE_ADMIN') {
+        if (response.role === 'ROLE_ADMIN' || response.role === 'ROLE_HR') {
           return AuthActions.administratorLoginSuccess({
             administratorId: response.evaluatorId,
-            role: 'ROLE_ADMIN',
+            role: response.role,
           });
         }
 

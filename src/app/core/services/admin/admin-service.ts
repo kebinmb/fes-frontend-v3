@@ -108,6 +108,8 @@ export interface FacultyEvaluationPrintResponse {
   sefRating?: number;
   studentComments?: string;
   supervisorComments?: string;
+  supervisorName?: string;
+  supervisorDesignation?: string;
   comments?: string;
 }
 
@@ -126,6 +128,13 @@ export interface FacultyEvaluationGeneratedReportResponse {
   generatedByUsername?: string | null;
   generatedAt: string;
   items: FacultyEvaluationPrintResponse[];
+}
+
+export interface FacultyEvaluationBulkReportResponse {
+  requestedCount: number;
+  generatedCount: number;
+  skippedFacultyIds: string[];
+  reports: FacultyEvaluationGeneratedReportResponse[];
 }
 
 export interface UpdateFacultyRequest {
@@ -392,6 +401,43 @@ export interface FacultyWorkloadCoverageResponse {
   withoutWorkload: FacultyWorkloadCoverageFacultyResponse[];
 }
 
+export type SupervisorEvaluationStatusFilter = 'ALL' | 'EVALUATED' | 'PENDING';
+
+export interface SupervisorEvaluationDashboardResponse {
+  facultyId: string;
+  facultyName: string;
+  position?: string | null;
+  college?: string | null;
+  legacyDatabase?: string | null;
+  campus?: string | null;
+  assignedClassCount: number;
+  supervisorEvaluated: boolean;
+  supervisorEvaluationCount: number;
+  supervisorIds?: string | null;
+  supervisorNames?: string | null;
+  supervisorPositions?: string | null;
+  supervisorAverageScore?: number | null;
+  lastEvaluatedAt?: string | null;
+  schoolYear: number;
+  semester: string;
+}
+
+export interface SupervisorEvaluationDashboardPageResponse
+  extends PageResponse<SupervisorEvaluationDashboardResponse> {
+  totalFacultyCount: number;
+  evaluatedFacultyCount: number;
+  pendingFacultyCount: number;
+}
+
+export interface SupervisorEvaluationDashboardFilter {
+  search?: string;
+  evaluationStatus?: SupervisorEvaluationStatusFilter;
+  legacyDatabase?: string;
+  campus?: string;
+  schoolYear?: number | null;
+  semester?: string;
+}
+
 export interface AuditLogResponse {
   id: number;
   userId: number | null;
@@ -509,6 +555,48 @@ export class AdminService {
     }
 
     return this.workloadCoverageCache$;
+  }
+
+  getSupervisorEvaluationDashboard(
+    page: number = 0,
+    size: number = 10,
+    filters: SupervisorEvaluationDashboardFilter = {},
+  ): Observable<SupervisorEvaluationDashboardPageResponse> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+
+    if (filters.search?.trim()) {
+      params = params.set('search', filters.search.trim());
+    }
+
+    if (filters.evaluationStatus && filters.evaluationStatus !== 'ALL') {
+      params = params.set('evaluationStatus', filters.evaluationStatus);
+    }
+
+    if (filters.legacyDatabase?.trim()) {
+      params = params.set('legacyDatabase', filters.legacyDatabase.trim());
+    }
+
+    if (filters.campus?.trim()) {
+      params = params.set('campus', filters.campus.trim());
+    }
+
+    if (filters.schoolYear) {
+      params = params.set('schoolYear', filters.schoolYear);
+    }
+
+    if (filters.semester?.trim()) {
+      params = params.set('semester', filters.semester.trim());
+    }
+
+    return this.http.get<SupervisorEvaluationDashboardPageResponse>(
+      `${this.ADMIN_API_URL}/dashboard/supervisor-evaluations`,
+      {
+        params,
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
   }
 
   getAuditLogs(
@@ -884,6 +972,30 @@ export class AdminService {
       `${this.ADMIN_API_URL}/faculty-evaluation-reports/${encodeURIComponent(facultyId)}`,
       {},
       {
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  generateBulkFacultyEvaluationReports(
+    legacyDatabase: string = '',
+    college: string = '',
+  ): Observable<FacultyEvaluationBulkReportResponse> {
+    let params = new HttpParams();
+
+    if (legacyDatabase.trim()) {
+      params = params.set('legacyDatabase', legacyDatabase.trim());
+    }
+
+    if (college.trim()) {
+      params = params.set('college', college.trim());
+    }
+
+    return this.http.post<FacultyEvaluationBulkReportResponse>(
+      `${this.ADMIN_API_URL}/faculty-evaluation-reports/bulk`,
+      {},
+      {
+        params,
         withCredentials: true,
       },
     ).pipe(map((response) => repairSpecialCharacters(response)));
