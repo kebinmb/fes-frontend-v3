@@ -46,6 +46,8 @@ export const appConfig: ApplicationConfig = {
       SchoolYearAndSemesterEffects,
       StudentEvaluationEffects,
     ]),
-    provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
+    ...(isDevMode()
+      ? [provideStoreDevtools({ maxAge: 25 })]
+      : []),
   ],
 };

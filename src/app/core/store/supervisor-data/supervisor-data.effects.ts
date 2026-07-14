@@ -27,6 +27,7 @@ import {
   of,
   switchMap,
   tap,
+  takeUntil,
   withLatestFrom,
 } from 'rxjs';
 
@@ -142,6 +143,14 @@ export class SupervisorDataEffects {
 
           facultyId,
         }) => {
+          const cancelSelection$ = this.actions$.pipe(
+            ofType(
+              ActionsSet.loadFaculties,
+              ActionsSet.clearFacultySelectionContext,
+              ActionsSet.resetSupervisorState,
+            ),
+          );
+
           return this.api.loadFacultyClasses(facultyId).pipe(
             map((classes) =>
               ActionsSet.loadFacultyClassesSuccess({
@@ -154,8 +163,13 @@ export class SupervisorDataEffects {
             ),
 
             catchError((error) => {
+              const message =
+                error?.status === 403
+                  ? 'Selected faculty is no longer available in your current scope. Please search and select again.'
+                  : 'Failed to load faculty classes';
+
               this.toast.showToast(
-                'Failed to load faculty classes',
+                message,
                 'error',
               );
 
@@ -169,6 +183,7 @@ export class SupervisorDataEffects {
                 }),
               );
             }),
+            takeUntil(cancelSelection$),
           );
         },
       ),
@@ -228,6 +243,24 @@ export class SupervisorDataEffects {
       ofType(ActionsSet.loadEvaluationStatusBatch),
 
       switchMap((action) => {
+        if (!action.payload.length) {
+          return of(
+            ActionsSet.loadEvaluationStatusBatchSuccess({
+              key: action.key,
+
+              results: [],
+            }),
+          );
+        }
+
+        const cancelSelection$ = this.actions$.pipe(
+          ofType(
+            ActionsSet.loadFaculties,
+            ActionsSet.clearFacultySelectionContext,
+            ActionsSet.resetSupervisorState,
+          ),
+        );
+
         const requests = action.payload.map((item) =>
           this.evaluationDataService
             .checkEvaluationStatus(
@@ -287,8 +320,9 @@ export class SupervisorDataEffects {
 
                 error,
               }),
-            );
-          }),
+              );
+            }),
+            takeUntil(cancelSelection$),
         );
       }),
     ),

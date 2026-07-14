@@ -184,6 +184,13 @@ export const selectFacultyClassForEvaluation = createAction(
   }>(),
 );
 
+export const clearFacultySelectionContext = createAction(
+  '[Supervisor] Clear Faculty Selection Context',
+  props<{
+    key: string;
+  }>(),
+);
+
 export interface BatchEvaluationPayload {
   facultyId: string;
 

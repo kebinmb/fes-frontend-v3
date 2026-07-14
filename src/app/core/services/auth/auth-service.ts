@@ -21,16 +21,12 @@ export class AuthService {
   ) {
     return this.http.post<{
       studentId: string;
-      accessCode: string;
       expiresAt: string;
+      message: string;
     }>(
       `${this.AUTH_URL}/access-code/generate`,
-      {},
+      { studentId, password },
       {
-        params: {
-          studentId,
-          password
-        },
         withCredentials: true
       }
     );
@@ -39,11 +35,17 @@ export class AuthService {
   studentLogin(studentId: string, accessCode: string) {
     return this.http.post<{ message: string, studentId: string }>(
       `${this.AUTH_URL}/student/login`,
-      {},
+      { studentId, accessCode },
       {
-        params: { studentId, accessCode },
         withCredentials: true
       },
+    );
+  }
+
+  getCsrfToken() {
+    return this.http.get<{ token: string; headerName: string }>(
+      `${this.AUTH_URL}/csrf`,
+      { withCredentials: true },
     );
   }
 

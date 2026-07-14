@@ -1,6 +1,7 @@
 import { AsyncPipe } from '@angular/common';
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   inject,
@@ -82,6 +83,7 @@ export class FacultyDataTableComponent implements OnInit {
   private toastFacade = inject(ToastFacade);
   private fb = inject(FormBuilder);
   private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
   private searchSubject = new Subject<string>();
   faculties$ = this.adminDataFacade.faculties$;
   loading$ = this.adminDataFacade.loading$;
@@ -123,6 +125,7 @@ export class FacultyDataTableComponent implements OnInit {
       .subscribe((value) => {
         this.searchTerm = value;
         this.currentPage = 0;
+        this.clearTransientFacultyState();
         this.loadFaculties();
       });
   }
@@ -135,6 +138,8 @@ export class FacultyDataTableComponent implements OnInit {
     );
   }
   onSearchChange(value: string): void {
+    this.clearTransientFacultyState();
+
     if (value.length > 80) {
       this.searchTerm = value.slice(0, 80);
       this.toastFacade.showToast('Search is limited to 80 characters.', 'error');
@@ -147,17 +152,20 @@ export class FacultyDataTableComponent implements OnInit {
   onSearch(): void {
     this.searchTerm = this.normalizeSearchTerm(this.searchTerm);
     this.currentPage = 0;
+    this.clearTransientFacultyState();
     this.loadFaculties();
   }
   clearFilters(): void {
     this.searchTerm = '';
     this.selectedLegacyDatabase = '';
     this.currentPage = 0;
+    this.clearTransientFacultyState();
     this.loadFaculties();
   }
   onLegacyDatabaseChange(value: string): void {
     this.selectedLegacyDatabase = value;
     this.currentPage = 0;
+    this.clearTransientFacultyState();
     this.loadFaculties();
   }
   onFacultyPageChange(page: number): void {
@@ -165,6 +173,7 @@ export class FacultyDataTableComponent implements OnInit {
       return;
     }
     this.currentPage = page;
+    this.clearTransientFacultyState();
     this.loadFaculties();
   }
   openEditModal(faculty: FetchFacultyResponse): void {
@@ -181,8 +190,7 @@ export class FacultyDataTableComponent implements OnInit {
     });
   }
   closeEditModal(): void {
-    this.selectedFaculty = null;
-    this.facultyForm.reset();
+    this.clearTransientFacultyState();
   }
   updateFaculty(): void {
     if (this.facultyForm.invalid) {
@@ -264,6 +272,7 @@ export class FacultyDataTableComponent implements OnInit {
   }
 
   retryLoad(): void {
+    this.clearTransientFacultyState();
     this.loadFaculties();
   }
 
@@ -275,7 +284,21 @@ export class FacultyDataTableComponent implements OnInit {
       return;
     }
 
-    this.isPrintingFacultyId = record.facultyId;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      this.toastFacade.showToast(
+        'The print window was blocked. Please allow pop-ups for this site and try again.',
+        'error',
+      );
+      return;
+    }
+
+    printWindow.document.write(
+      '<!doctype html><title>Preparing report...</title><body style="font-family: Arial, sans-serif; padding: 24px;">Preparing faculty evaluation report...</body>',
+    );
+    printWindow.document.close();
+
+    this.setPrintingFaculty(record.facultyId);
 
     this.adminService.generateFacultyEvaluationReport(record.facultyId)
       .pipe(
@@ -286,10 +309,12 @@ export class FacultyDataTableComponent implements OnInit {
             'error',
           );
 
+          printWindow.close();
+
           return of(null);
         }),
         finalize(() => {
-          this.isPrintingFacultyId = null;
+          this.setPrintingFaculty(null);
         }),
       )
       .subscribe((report) => {
@@ -302,50 +327,71 @@ export class FacultyDataTableComponent implements OnInit {
             'No evaluation records are available for this faculty.',
             'error',
           );
+          printWindow.close();
           return;
         }
 
-        const normalizedData = report.items.map((item) => {
+        const safeText = (value: unknown, fallback = ''): string => {
+          if (value === null || value === undefined) {
+            return fallback;
+          }
+
+          const text = String(value).trim();
+
+          return text && text.toLowerCase() !== 'null' && text.toLowerCase() !== 'undefined'
+            ? text
+            : fallback;
+        };
+
+        const safeNumber = (value: unknown, fallback = 0): number => {
+          const number = Number(value);
+
+          return Number.isFinite(number) ? number : fallback;
+        };
+
+        const normalizedData = report.items
+          .filter((item) => !!item)
+          .map((item) => {
           const separatedComments = this.separateEvaluationComments(item);
 
           return {
-            facultyEvaluationScoreId: item.facultyEvaluationScoreId,
+            facultyEvaluationScoreId: safeNumber(item.facultyEvaluationScoreId),
 
-            facultyId: item.facultyId,
+            facultyId: safeText(item.facultyId, record.facultyId),
 
-            facultyName: item.facultyName ?? record.facultyName,
+            facultyName: safeText(item.facultyName, record.facultyName ?? ''),
 
-            evaluatorId: item.evaluatorId,
+            evaluatorId: safeText(item.evaluatorId),
 
-            evaluatorType: item.evaluatorType,
+            evaluatorType: safeText(item.evaluatorType),
 
-            classCode: item.classCode,
-            programCode: item.programCode,
-            sectionCode: item.sectionCode,
+            classCode: safeText(item.classCode),
+            programCode: safeText(item.programCode),
+            sectionCode: safeText(item.sectionCode),
 
-            college: item.college,
+            college: safeText(item.college, record.college),
 
-            position: item.position,
+            position: safeText(item.position, record.position),
 
-            semester: item.semester,
+            semester: safeText(item.semester),
 
-            schoolYear: item.schoolYear,
+            schoolYear: safeNumber(item.schoolYear),
 
-            subjectCode: item.subjectCode,
+            subjectCode: safeText(item.subjectCode),
 
-            yearLevel: item.yearLevel ?? '-',
+            yearLevel: safeText(item.yearLevel),
 
             ...separatedComments,
 
-            overallAverageScore: item.overallAverageScore,
+            overallAverageScore: safeNumber(item.overallAverageScore),
 
-            overallInterpretation: item.overallInterpretation,
+            overallInterpretation: safeText(item.overallInterpretation),
 
-            numberOfStudents: item.numberOfStudents ?? 0,
+            numberOfStudents: safeNumber(item.numberOfStudents),
 
-            setRating: item.setRating ?? 0,
+            setRating: safeNumber(item.setRating),
 
-            sefRating: item.sefRating ?? 0,
+            sefRating: safeNumber(item.sefRating),
           };
         });
 
@@ -367,12 +413,25 @@ export class FacultyDataTableComponent implements OnInit {
           }),
         );
 
-        window.open('/print/faculty-evaluation', '_blank');
+        printWindow.location.href = '/print/faculty-evaluation';
+        printWindow.focus();
       });
   }
 
   private normalizeSearchTerm(value: string): string {
     return value.replace(/\s+/g, ' ').trim();
+  }
+
+  private clearTransientFacultyState(): void {
+    this.selectedFaculty = null;
+    this.facultyForm.reset();
+    this.setPrintingFaculty(null);
+    this.cdr.markForCheck();
+  }
+
+  private setPrintingFaculty(facultyId: string | null): void {
+    this.isPrintingFacultyId = facultyId;
+    this.cdr.markForCheck();
   }
 
   private separateEvaluationComments(

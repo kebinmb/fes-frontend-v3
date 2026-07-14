@@ -7,7 +7,7 @@ export const generateAccessCodeForStudent = createAction(
 
 export const generateAccessCodeForStudentSuccess = createAction(
   '[Student Authentication] Access code generated successfully',
-  props<{ accessCode: string }>(),
+  props<{ expiresAt: string }>(),
 );
 
 export const generateAccessCodeForStudentFailure = createAction(
@@ -37,7 +37,12 @@ export const supervisorLogin = createAction(
 
 export const supervisorLoginSuccess = createAction(
   '[Supervisor Authentication] Supervisor Login Successful',
-  props<{ evaluatorId: string; role: 'ROLE_DEAN'; college: string; program: string }>(),
+  props<{
+    evaluatorId: string;
+    role: 'ROLE_DEAN' | 'ROLE_PROGRAM_CHAIR';
+    college: string;
+    program: string;
+  }>(),
 );
 
 export const supervisorLoginFailure = createAction(
@@ -64,7 +69,7 @@ export const checkLoggedInUserAuthenticationSuccess = createAction(
   '[Authentication Check] Authentication Check Success',
   props<{
     evaluatorId: string;
-    role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN';
+    role: 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_PROGRAM_CHAIR' | 'ROLE_ADMIN';
     college: string;
     program:string;
     requiresPasswordChange:boolean;

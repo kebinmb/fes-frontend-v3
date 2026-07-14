@@ -152,6 +152,8 @@ export const routes: Routes = [
       import('@shared/components/faculty-evaluation-print-component/faculty-evaluation-print-component').then(
         (m) => m.FacultyEvaluationPrintComponent,
       ),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' },
   },
   {
     path: 'print/student-evaluation',
@@ -160,6 +162,8 @@ export const routes: Routes = [
       import(
         '@shared/components/student-evaluation-list-print-component/student-evaluation-list-print-component'
       ).then((m) => m.StudentEvaluationListPrintComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { role: 'ROLE_ADMIN' },
   },
   {
     path: '',

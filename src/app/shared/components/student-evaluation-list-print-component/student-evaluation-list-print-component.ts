@@ -14,6 +14,7 @@ export class StudentEvaluationListPrintComponent {
   today = new Date();
   ngOnInit(): void {
     const rawData = localStorage.getItem('student-evaluation-print-data');
+    localStorage.removeItem('student-evaluation-print-data');
 
     if (rawData) {
       this.records = JSON.parse(rawData);

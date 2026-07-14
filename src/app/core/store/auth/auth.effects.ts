@@ -31,7 +31,7 @@ export class AuthEffects {
           map((response: any) => {
             this.spinnerFacade.hideSpinner();
             return AuthActions.generateAccessCodeForStudentSuccess({
-              accessCode: response.accessCode,
+              expiresAt: response.expiresAt,
             });
           }),
           catchError((error) => {
@@ -80,7 +80,7 @@ export class AuthEffects {
             this.spinnerFacade.hideSpinner();
             return AuthActions.studentLoginSuccess({
               evaluatorId: response.studentId,
-              accessCode: response.accessCode,
+              accessCode,
               role: 'ROLE_STUDENT',
             });
           }),
@@ -390,6 +390,9 @@ export class AuthEffects {
   private shouldNavigateAfterLogin(targetRoute: string): boolean {
     const currentRoute = this.router.url.split('?')[0];
 
-    return currentRoute !== targetRoute;
+    return (
+      currentRoute !== targetRoute &&
+      ['/login', '/admin', '/oauth-success'].includes(currentRoute)
+    );
   }
 }

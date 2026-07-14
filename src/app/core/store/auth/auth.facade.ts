@@ -3,6 +3,7 @@ import * as AuthActions from './auth.action';
 import { Store } from '@ngrx/store';
 import {
   selectAccessCode,
+  selectAccessCodeSent,
   selectAuthenticationError,
   selectAuthenticationState,
   selectCollege,
@@ -20,6 +21,7 @@ export class AuthFacade {
   role$ = this.store.select(selectRole);
   isLoading$ = this.store.select(selectLoading);
   accessCode$ = this.store.select(selectAccessCode);
+  accessCodeSent$ = this.store.select(selectAccessCodeSent);
   error$ = this.store.select(selectAuthenticationError);
   college$ = this.store.select(selectCollege);
   loginSupervisor(username: string, password: string) {

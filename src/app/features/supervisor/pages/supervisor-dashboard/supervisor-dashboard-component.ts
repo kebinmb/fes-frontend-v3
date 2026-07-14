@@ -130,6 +130,7 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
       .subscribe((search) => {
         this.search = search.toLowerCase();
         this.currentPage = 0;
+        this.clearSelectedFacultyContext();
         this.reload();
       });
   }
@@ -162,6 +163,7 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
       return;
     }
     this.currentPage++;
+    this.clearSelectedFacultyContext();
     this.reload();
   }
   previousPage(): void {
@@ -169,6 +171,7 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
       return;
     }
     this.currentPage--;
+    this.clearSelectedFacultyContext();
     this.reload();
   }
   goToPage(page: number): void {
@@ -176,6 +179,7 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
       return;
     }
     this.currentPage = page;
+    this.clearSelectedFacultyContext();
     this.reload();
   }
   getPageNumbers(totalPages: number): number[] {
@@ -193,10 +197,11 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
     this.supervisorDataFacade.loadFacultyClasses(this.key, faculty.facultyId, this.program);
   }
   closeFacultyModal(): void {
-    this.selectedFaculty = null;
+    this.clearSelectedFacultyContext();
   }
   onCampusChange(): void {
     this.currentPage = 0;
+    this.clearSelectedFacultyContext();
     this.reload();
   }
   openFacultyConfirmation(faculty: FacultyLoadDTO): void {
@@ -213,6 +218,13 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   closeFacultyConfirmation(): void {
     this.isConfirmationVisible = false;
     this.pendingFaculty = null;
+  }
+  private clearSelectedFacultyContext(): void {
+    this.selectedFaculty = null;
+    this.selectedClass = null;
+    this.pendingFaculty = null;
+    this.isConfirmationVisible = false;
+    this.supervisorDataFacade.clearFacultySelectionContext(this.key);
   }
   confirmEvaluation(): void {
     this.isConfirmationVisible = false;

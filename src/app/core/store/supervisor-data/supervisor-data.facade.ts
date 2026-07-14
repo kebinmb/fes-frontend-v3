@@ -263,6 +263,14 @@ export class SupervisorDataFacade {
     );
   }
 
+  clearFacultySelectionContext(key: string): void {
+    this.store.dispatch(
+      SupervisorActions.clearFacultySelectionContext({
+        key,
+      }),
+    );
+  }
+
   resetState(): void {
     this.store.dispatch(SupervisorActions.resetSupervisorState());
   }

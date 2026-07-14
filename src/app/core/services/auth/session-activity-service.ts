@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import * as AuthActions from '../../store/auth/auth.action';
 import { selectAuthenticationState } from '../../store/auth/auth.selector';
 
-const IDLE_TIMEOUT_MS = 10 * 60 * 1000;
+const IDLE_TIMEOUT_MS = 5 * 60 * 1000;
 const ACTIVITY_THROTTLE_MS = 1000;
 const LAST_ACTIVITY_KEY = 'fes:last-session-activity-at';
 const LAST_SERVER_ACTIVITY_SYNC_KEY = 'fes:last-server-session-activity-sync-at';

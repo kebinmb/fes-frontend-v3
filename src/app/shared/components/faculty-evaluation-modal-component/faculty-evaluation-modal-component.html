@@ -93,7 +93,7 @@
                   cls.schoolYear
                 );
 
-              @let evaluationState = evaluationStatus?.['BSIS-ACTIVE']?.classes?.[evaluationKey];
+              @let evaluationState = evaluationStatus?.[contextKey]?.classes?.[evaluationKey];
 
               @let isEvaluated = evaluationState?.evaluated ?? false;
 

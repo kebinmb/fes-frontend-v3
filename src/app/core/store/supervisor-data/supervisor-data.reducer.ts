@@ -363,6 +363,27 @@ export const supervisorDataReducer = createReducer(
     }),
   ),
   on(
+    SupervisorDataActions.clearFacultySelectionContext,
+
+    (state, { key }) => {
+      const remainingFacultyClasses = { ...state.facultyClasses };
+      const remainingEvaluationStatus = { ...state.evaluationStatus };
+
+      delete remainingFacultyClasses[key];
+      delete remainingEvaluationStatus[key];
+
+      return {
+        ...state,
+
+        selectedClass: null,
+
+        facultyClasses: remainingFacultyClasses,
+
+        evaluationStatus: remainingEvaluationStatus,
+      };
+    },
+  ),
+  on(
     SupervisorDataActions.loadEvaluationStatusBatch,
 
     (state, { key, payload, evaluatorId }) => {

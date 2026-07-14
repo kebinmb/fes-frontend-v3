@@ -14,5 +14,9 @@ export const selectAccessCode = createSelector(
   selectAuthenticationState,
   (state) => state.accessCode,
 );
+export const selectAccessCodeSent = createSelector(
+  selectAuthenticationState,
+  (state) => state.accessCodeSent,
+);
 
 export const selectAuthenticationError = createSelector(selectAuthenticationState, (state) => state.error);

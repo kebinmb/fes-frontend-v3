@@ -26,6 +26,9 @@ export class FacultyEvaluationModalComponent {
   evaluationStatus: any;
 
   @Input()
+  contextKey = '';
+
+  @Input()
   buildEvaluationKey!: (
     classCode: string,
     subjectCode: string,

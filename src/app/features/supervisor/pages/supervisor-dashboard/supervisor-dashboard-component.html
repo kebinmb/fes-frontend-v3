@@ -186,6 +186,7 @@
 
   <app-faculty-evaluation-modal-component *ngIf="selectedFaculty" [faculty]="selectedFaculty"
     [facultyClasses]="facultyClasses$ | async" [evaluationStatus]="evaluationStatus$ | async"
+    [contextKey]="key"
     [buildEvaluationKey]="buildEvaluationKey" [getFacultyInitials]="getFacultyInitials" [getCampusName]="getCampusName"
     [trackClass]="trackClass" (close)="closeFacultyModal()" (evaluate)="startEvaluation($event.cls, $event.faculty)">
   </app-faculty-evaluation-modal-component>

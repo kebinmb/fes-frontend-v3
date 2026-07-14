@@ -9,9 +9,10 @@ export const authReducer = createReducer(
     evaluatorId,
     isLoading: true,
   })),
-  on(AuthActions.generateAccessCodeForStudentSuccess, (state, { accessCode }) => ({
+  on(AuthActions.generateAccessCodeForStudentSuccess, (state) => ({
     ...state,
-    accessCode,
+    accessCode: null,
+    accessCodeSent: true,
     isLoading: false,
   })),
   on(AuthActions.generateAccessCodeForStudentFailure, (state, { error }) => ({
@@ -23,6 +24,7 @@ export const authReducer = createReducer(
     ...state,
     evaluatorId,
     accessCode,
+    accessCodeSent: true,
     isLoading: true,
   })),
   on(AuthActions.studentLoginSuccess, (state, { evaluatorId, role, accessCode }) => ({
@@ -30,6 +32,7 @@ export const authReducer = createReducer(
     evaluatorId,
     role,
     accessCode,
+    accessCodeSent: false,
     isLoading: false,
     isAuthenticated: true,
     isAuthChecked: true,
@@ -107,6 +110,7 @@ export const authReducer = createReducer(
     role: null,
     userId: null,
     accessCode: null,
+    accessCodeSent: false,
     college: null,
     isAuthenticated: false,
     isAuthChecked: true,
@@ -119,6 +123,7 @@ export const authReducer = createReducer(
     role: null,
     userId: null,
     accessCode: null,
+    accessCodeSent: false,
     college: null,
     isAuthenticated: false,
     isAuthChecked: true,
@@ -128,6 +133,7 @@ export const authReducer = createReducer(
   on(AuthActions.resetStudentLoginFlow, (state) => ({
   ...state,
   accessCode: null,
+  accessCodeSent: false,
   error: null,
 })),
 );

@@ -54,7 +54,7 @@ export class LoginComponent
 
   isCapsLockOn = false;
 
-  accessCode$ = this.authFacade.accessCode$;
+  accessCodeSent$ = this.authFacade.accessCodeSent$;
 
   isLoading$ = this.authFacade.isLoading$;
 
@@ -126,9 +126,9 @@ export class LoginComponent
 
   ngOnInit(): void {
 
-    this.authFacade.accessCode$
+    this.authFacade.accessCodeSent$
       .pipe(
-        filter((accessCode) => !!accessCode),
+        filter((accessCodeSent) => accessCodeSent),
         takeUntil(this.destroy$),
       )
       .subscribe(() => {
