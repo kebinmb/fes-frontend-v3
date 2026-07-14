@@ -91,25 +91,6 @@ export const authInterceptor: HttpInterceptorFn = (
 
     catchError((error) => {
 
-      // Allow login page to handle its own errors
-      if (isAuthRequest) {
-
-        return throwError(() => error);
-      }
-
-      // Session expired
-      if (error?.status === 401) {
-        if (isHandlingAuthError) {
-          return throwError(() => error);
-        }
-
-        isHandlingAuthError = true;
-
-        store.dispatch(
-          AuthActions.sessionExpired()
-        );
-      }
-
       if (error?.status === 403 && requiresCsrf(cloned)) {
         csrfToken = null;
 
@@ -127,6 +108,25 @@ export const authInterceptor: HttpInterceptorFn = (
 
             return throwError(() => retryError);
           }),
+        );
+      }
+
+      // Allow login page to handle its own non-CSRF errors.
+      if (isAuthRequest) {
+
+        return throwError(() => error);
+      }
+
+      // Session expired
+      if (error?.status === 401) {
+        if (isHandlingAuthError) {
+          return throwError(() => error);
+        }
+
+        isHandlingAuthError = true;
+
+        store.dispatch(
+          AuthActions.sessionExpired()
         );
       }
 
