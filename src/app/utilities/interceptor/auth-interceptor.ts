@@ -21,6 +21,7 @@ let isHandlingAuthError = false;
 let csrfToken: string | null = null;
 const SESSION_ACTIVITY_SYNCED_HEADER = 'X-FES-Session-Activity-Synced';
 const CSRF_HEADER = 'X-XSRF-TOKEN';
+let csrfHeaderName = CSRF_HEADER;
 
 export const authInterceptor: HttpInterceptorFn = (
   req,
@@ -156,7 +157,7 @@ function prepareCsrfRequest<T>(
   req: HttpRequest<T>,
   httpBackend: HttpBackend,
 ): Observable<HttpRequest<T>> {
-  if (!requiresCsrf(req) || req.headers.has(CSRF_HEADER)) {
+  if (!requiresCsrf(req) || hasCsrfHeader(req)) {
     return of(addCsrfHeader(req));
   }
 
@@ -177,12 +178,13 @@ function refreshCsrfToken(httpBackend: HttpBackend): Observable<string | null> {
   const http = new HttpClient(httpBackend);
 
   return http
-    .get<{ token: string }>(`${environment.API_URL}/auth/csrf`, {
+    .get<{ token: string; headerName?: string }>(`${environment.API_URL}/auth/csrf`, {
       withCredentials: true,
     })
     .pipe(
       map((response) => {
         csrfToken = response.token;
+        csrfHeaderName = response.headerName || CSRF_HEADER;
         return response.token;
       }),
       catchError(() => of(null)),
@@ -201,15 +203,19 @@ function addCsrfHeader<T>(
   req: HttpRequest<T>,
   token: string | null = csrfToken,
 ): HttpRequest<T> {
-  if (!token || req.headers.has(CSRF_HEADER)) {
+  if (!token || hasCsrfHeader(req)) {
     return req;
   }
 
   return req.clone({
     setHeaders: {
-      [CSRF_HEADER]: token,
+      [csrfHeaderName]: token,
     },
   });
+}
+
+function hasCsrfHeader<T>(req: HttpRequest<T>): boolean {
+  return req.headers.has(CSRF_HEADER) || req.headers.has(csrfHeaderName);
 }
 
 function readCookie(name: string): string | null {

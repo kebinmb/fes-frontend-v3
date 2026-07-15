@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
 import { Observable } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { FacultyEvaluationScore, Page } from '../evaluation/evaluation-service';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
 export interface PageResponse<T> {
@@ -476,12 +476,19 @@ export interface AuditLogSliceResponse {
   hasNext: boolean;
   hasPrevious: boolean;
 }
+
+interface CsrfTokenResponse {
+  token: string;
+  headerName?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
   private http = inject(HttpClient);
   private readonly ADMIN_API_URL = `${environment.API_URL}/admin`;
+  private readonly AUTH_API_URL = `${environment.API_URL}/auth`;
   private readonly MIGRATION_API_URL = `${environment.API_URL}/migration/all`;
   private readonly DASHBOARD_CACHE_TTL_MS = 5 * 60_000;
   private readonly CURRENT_TERM_CACHE_TTL_MS = 5 * 60_000;
@@ -853,13 +860,22 @@ export class AdminService {
   upsertFacultyWorkload(
     payload: FacultyWorkloadRequest,
   ): Observable<FacultyWorkloadResponse> {
-    return this.http.put<FacultyWorkloadResponse>(
-      `${this.ADMIN_API_URL}/faculty-workloads`,
-      payload,
-      {
-        withCredentials: true,
-      },
+    return this.http.get<CsrfTokenResponse>(
+      `${this.AUTH_API_URL}/csrf`,
+      { withCredentials: true },
     ).pipe(
+      switchMap((csrf) =>
+        this.http.put<FacultyWorkloadResponse>(
+          `${this.ADMIN_API_URL}/faculty-workloads`,
+          payload,
+          {
+            headers: {
+              [csrf.headerName || 'X-XSRF-TOKEN']: csrf.token,
+            },
+            withCredentials: true,
+          },
+        ),
+      ),
       tap(() => {
         this.clearDashboardCache();
         this.clearWorkloadCoverageCache();
