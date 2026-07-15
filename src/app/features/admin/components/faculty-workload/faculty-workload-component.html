@@ -398,10 +398,31 @@
                   </span>
                 </td>
                 <td data-label="Action">
-                  <button type="button" class="single-print-btn" (click)="editWorkload(workload)">
-                    <i class="bi bi-pencil-square"></i>
-                    Edit
-                  </button>
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="single-print-btn"
+                      [disabled]="deletingWorkloadId === workload.facultyWorkloadId"
+                      (click)="editWorkload(workload)"
+                    >
+                      <i class="bi bi-pencil-square"></i>
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      class="delete-btn"
+                      [disabled]="deletingWorkloadId === workload.facultyWorkloadId"
+                      (click)="confirmDeleteWorkload(workload)"
+                    >
+                      @if (deletingWorkloadId === workload.facultyWorkloadId) {
+                        <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+                        Deleting
+                      } @else {
+                        <i class="bi bi-trash3"></i>
+                        Delete
+                      }
+                    </button>
+                  </div>
                 </td>
               </tr>
             }
@@ -432,4 +453,58 @@
       </div>
     </div>
   </div>
+
+  @if (workloadPendingDelete) {
+    <div class="delete-modal-backdrop" role="presentation" (click)="cancelDeleteWorkload()">
+      <section
+        class="delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="deleteWorkloadTitle"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="delete-modal-icon">
+          <i class="bi bi-trash3"></i>
+        </div>
+        <div class="delete-modal-content">
+          <h3 id="deleteWorkloadTitle">Delete encoded workload?</h3>
+          <p>
+            This will remove
+            <strong>{{ workloadPendingDelete.courseCode || 'this subject' }}</strong>
+            for
+            <strong>{{ workloadPendingDelete.facultyName | unicodeText }}</strong>
+            and recalculate the remaining workload totals.
+          </p>
+          <small>
+            {{ workloadPendingDelete.programCode || '-' }} /
+            {{ workloadPendingDelete.yearLevel || '-' }} /
+            {{ workloadPendingDelete.sectionCode || '-' }}
+          </small>
+        </div>
+        <div class="delete-modal-actions">
+          <button
+            type="button"
+            class="cancel-btn"
+            [disabled]="deletingWorkloadId !== null"
+            (click)="cancelDeleteWorkload()"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="delete-btn delete-btn-solid"
+            [disabled]="deletingWorkloadId !== null"
+            (click)="deleteWorkload()"
+          >
+            @if (deletingWorkloadId !== null) {
+              <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+              Deleting
+            } @else {
+              Delete workload
+            }
+          </button>
+        </div>
+      </section>
+    </div>
+  }
 </section>

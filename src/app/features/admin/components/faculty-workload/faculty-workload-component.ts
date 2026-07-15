@@ -97,6 +97,8 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   isLoadingWorkloads = false;
   isLoadingClasses = false;
   isSaving = false;
+  deletingWorkloadId: number | null = null;
+  workloadPendingDelete: FacultyWorkloadResponse | null = null;
   selectedLoadStatus: FacultyLoadStatus = 'Regular';
   selectedFacultyWorkloadCount = 0;
   projectedTeachingLoadValue = 0;
@@ -188,6 +190,54 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           this.applyWorkloadForEditing(response);
+        },
+        error: (error) => {
+          this.toastFacade.showToast(extractErrorMessage(error), 'error');
+        },
+      });
+  }
+
+  confirmDeleteWorkload(workload: FacultyWorkloadResponse): void {
+    this.workloadPendingDelete = workload;
+    this.requestViewRefresh();
+  }
+
+  cancelDeleteWorkload(): void {
+    if (this.deletingWorkloadId !== null) {
+      return;
+    }
+
+    this.workloadPendingDelete = null;
+    this.requestViewRefresh();
+  }
+
+  deleteWorkload(): void {
+    const workload = this.workloadPendingDelete;
+
+    if (!workload?.facultyWorkloadId || this.deletingWorkloadId !== null) {
+      return;
+    }
+
+    this.deletingWorkloadId = workload.facultyWorkloadId;
+    this.updateDashboardState();
+    this.adminService
+      .deleteFacultyWorkload(workload.facultyWorkloadId)
+      .pipe(
+        finalize(() => {
+          this.deletingWorkloadId = null;
+          this.updateDashboardState();
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe({
+        next: () => {
+          this.removeDeletedWorkloadFromLocalState(workload);
+          this.clearDeletedWorkloadFromForm(workload);
+          this.invalidateCurrentClassOptionsCache();
+          this.workloadPendingDelete = null;
+          this.toastFacade.showToast('Faculty workload deleted successfully.', 'success');
+          this.loadClassOptions();
+          this.loadWorkloads();
         },
         error: (error) => {
           this.toastFacade.showToast(extractErrorMessage(error), 'error');
@@ -961,6 +1011,84 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         loadLimit: savedWorkload.loadLimit,
       };
     });
+  }
+
+  private removeDeletedWorkloadFromLocalState(
+    deletedWorkload: FacultyWorkloadResponse,
+  ): void {
+    const deletedId = deletedWorkload.facultyWorkloadId;
+    const beforeCount = this.workloads.length;
+    const remainingWorkloads = this.workloads.filter(
+      (workload) => workload.facultyWorkloadId !== deletedId,
+    );
+    const termWorkloads = remainingWorkloads.filter(
+      (workload) =>
+        workload.facultyId === deletedWorkload.facultyId &&
+        workload.schoolYear === deletedWorkload.schoolYear &&
+        workload.semester === deletedWorkload.semester,
+    );
+    const teachingLoad = termWorkloads.reduce(
+      (total, workload) => total + this.toNumber(workload.totalHoursPerWeek),
+      0,
+    );
+    const designationEtu = this.toNumber(deletedWorkload.designationEtu);
+    const numberOfPreparations = deletedWorkload.numberOfPreparations ?? 0;
+    const loadLimit = this.effectiveLoadLimit(numberOfPreparations);
+    const totalWorkload = teachingLoad + designationEtu;
+    const overloadHours = Math.max(totalWorkload - loadLimit, 0);
+
+    this.workloads = remainingWorkloads.map((workload) => {
+      if (
+        workload.facultyId !== deletedWorkload.facultyId ||
+        workload.schoolYear !== deletedWorkload.schoolYear ||
+        workload.semester !== deletedWorkload.semester
+      ) {
+        return workload;
+      }
+
+      return {
+        ...workload,
+        totalTeachingLoad: teachingLoad,
+        totalWorkload,
+        overloadHours,
+        designationEtu,
+        numberOfPreparations,
+        loadLimit,
+      };
+    });
+
+    if (beforeCount !== this.workloads.length) {
+      this.totalElements = Math.max(this.totalElements - 1, 0);
+      this.totalPages = Math.max(Math.ceil(this.totalElements / this.pageSize), 1);
+    }
+
+    this.recalculateWorkload();
+    this.updateDashboardState();
+  }
+
+  private clearDeletedWorkloadFromForm(
+    deletedWorkload: FacultyWorkloadResponse,
+  ): void {
+    const currentWorkloadId = this.workloadForm.controls.facultyWorkloadId.value;
+
+    if (currentWorkloadId !== deletedWorkload.facultyWorkloadId) {
+      return;
+    }
+
+    this.workloadForm.patchValue(
+      {
+        facultyWorkloadId: null,
+        classCode: '',
+        courseCode: '',
+        programCode: '',
+        yearLevel: '',
+        sectionCode: '',
+        totalHoursPerWeek: 0,
+      },
+      { emitEvent: false },
+    );
+    this.selectedClassKey = '';
+    this.recalculateWorkload();
   }
 
   private isClassOptionAlreadyEncoded(

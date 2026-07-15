@@ -895,6 +895,29 @@ export class AdminService {
     );
   }
 
+  deleteFacultyWorkload(facultyWorkloadId: number): Observable<void> {
+    return this.http.get<CsrfTokenResponse>(
+      `${this.AUTH_API_URL}/csrf`,
+      { withCredentials: true },
+    ).pipe(
+      switchMap((csrf) =>
+        this.http.delete<void>(
+          `${this.ADMIN_API_URL}/faculty-workloads/${facultyWorkloadId}`,
+          {
+            headers: {
+              [csrf.headerName || 'X-XSRF-TOKEN']: csrf.token,
+            },
+            withCredentials: true,
+          },
+        ),
+      ),
+      tap(() => {
+        this.clearDashboardCache();
+        this.clearWorkloadCoverageCache();
+      }),
+    );
+  }
+
   getFacultyWorkloadSectionOptions(
     schoolYear: number,
     semester: string,

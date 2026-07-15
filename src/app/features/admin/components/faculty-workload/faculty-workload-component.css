@@ -568,7 +568,8 @@
 .cancel-btn,
 .pagination-btn,
 .refresh-btn,
-.single-print-btn {
+.single-print-btn,
+.delete-btn {
   min-height: 40px;
   display: inline-flex;
   align-items: center;
@@ -586,9 +587,29 @@
 .cancel-btn:hover,
 .pagination-btn:hover:not(:disabled),
 .refresh-btn:hover:not(:disabled),
-.single-print-btn:hover {
+.single-print-btn:hover:not(:disabled),
+.delete-btn:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.delete-btn {
+  border: 1px solid #fecaca;
+  background: #ffffff;
+  color: #b91c1c;
+}
+
+.delete-btn-solid {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: #ffffff;
 }
 
 .refresh-btn {
@@ -601,6 +622,79 @@
 .refresh-btn:disabled {
   cursor: not-allowed;
   opacity: 0.65;
+}
+
+.single-print-btn:disabled,
+.delete-btn:disabled,
+.cancel-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.delete-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1060;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.42);
+}
+
+.delete-modal {
+  width: min(440px, 100%);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid #fee2e2;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.2);
+}
+
+.delete-modal-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.delete-modal-content {
+  min-width: 0;
+}
+
+.delete-modal-content h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.delete-modal-content p {
+  margin: 0.35rem 0 0;
+  color: #475569;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.delete-modal-content small {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--ui-text-muted);
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+.delete-modal-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  padding-top: 0.2rem;
 }
 
 .table-responsive {
@@ -730,7 +824,8 @@
   .cancel-btn,
   .pagination-btn,
   .refresh-btn,
-  .single-print-btn {
+  .single-print-btn,
+  .delete-btn {
     width: 100%;
   }
 
@@ -841,8 +936,14 @@
     display: none;
   }
 
-  .modern-table tbody td[data-label='Action'] .single-print-btn {
+  .modern-table tbody td[data-label='Action'] .single-print-btn,
+  .modern-table tbody td[data-label='Action'] .delete-btn {
     width: 100%;
+  }
+
+  .row-actions {
+    width: 100%;
+    flex-direction: column;
   }
 }
 
@@ -917,5 +1018,13 @@
     grid-template-columns: 1fr;
     gap: 0.25rem;
     text-align: left;
+  }
+
+  .delete-modal {
+    grid-template-columns: 1fr;
+  }
+
+  .delete-modal-actions {
+    flex-direction: column-reverse;
   }
 }
