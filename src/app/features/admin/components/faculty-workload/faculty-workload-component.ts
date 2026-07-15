@@ -72,6 +72,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   private readonly highPreparationLoadLimit = 18;
   private readonly highPreparationThreshold = 3;
   private viewRefreshPending = false;
+  private viewRefreshTimer: ReturnType<typeof setTimeout> | null = null;
   private isDestroyed = false;
 
   readonly semesterOptions: Array<{ label: string; value: Semester }> = [
@@ -141,6 +142,10 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
     if (this.recalculationTimer) {
       clearTimeout(this.recalculationTimer);
+    }
+
+    if (this.viewRefreshTimer) {
+      clearTimeout(this.viewRefreshTimer);
     }
 
     this.destroy$.next();
@@ -624,6 +629,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
           this.totalPages = Math.max(response.totalPages ?? 1, 1);
           this.syncCommonTermFieldsFromWorkloads();
           this.recalculateWorkload();
+          this.requestViewRefresh();
         },
         error: (error) => {
           if (requestId !== this.workloadRequestId) {
@@ -1140,13 +1146,15 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     }
 
     this.viewRefreshPending = true;
-    queueMicrotask(() => {
+    this.viewRefreshTimer = setTimeout(() => {
       this.viewRefreshPending = false;
+      this.viewRefreshTimer = null;
 
       if (!this.isDestroyed) {
+        this.cdr.markForCheck();
         this.cdr.detectChanges();
       }
-    });
+    }, 0);
   }
 
   private buildPayload(): FacultyWorkloadRequest {

@@ -44,12 +44,18 @@ export class SessionActivityService {
 
     this.zone.runOutsideAngular(() => {
       const activityEvents: (keyof WindowEventMap)[] = [
+        'change',
         'click',
+        'input',
         'keydown',
         'mousedown',
         'mousemove',
+        'pointerdown',
+        'pointermove',
         'scroll',
         'touchstart',
+        'touchmove',
+        'touchend',
         'wheel',
       ];
 
@@ -65,6 +71,10 @@ export class SessionActivityService {
 
   recordApiActivity(): void {
     this.checkIdleDeadline();
+  }
+
+  recordUserActivity(): void {
+    this.recordActivity(true);
   }
 
   expireIfIdle(): boolean {

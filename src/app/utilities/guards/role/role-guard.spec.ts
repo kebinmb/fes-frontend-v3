@@ -22,6 +22,7 @@ describe('roleGuard', () => {
     isAuthChecked: true,
     error: null,
     accessCode: null,
+    accessCodeSent: false,
     college: null,
   });
 
@@ -46,6 +47,7 @@ describe('roleGuard', () => {
       isAuthChecked: true,
       error: null,
       accessCode: null,
+      accessCodeSent: false,
       college: null,
     });
 

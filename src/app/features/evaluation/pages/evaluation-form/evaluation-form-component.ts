@@ -13,6 +13,7 @@ import {
   EvaluationCriteria,
   SubjectEvaluationDTO,
 } from '@core/services/evaluation/evaluation-service';
+import { SessionActivityService } from '@core/services/auth/session-activity-service';
 import { ConfirmationModalComponent } from '@shared/components/confirmation-modal-component/confirmation-modal-component';
 
 export type UserRole = 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN' | 'ROLE_PROGRAM_CHAIR';
@@ -30,6 +31,7 @@ export class EvaluationFormComponent {
   private authFacade = inject(AuthFacade);
   private router = inject(Router);
   private fb = inject(FormBuilder);
+  private sessionActivity = inject(SessionActivityService);
 
   role$ = this.authFacade.role$;
   evaluatorId$ = this.authFacade.evaluatorId$;
@@ -148,6 +150,7 @@ export class EvaluationFormComponent {
   confirmSubmit(): void {
 
     this.showSubmitConfirmation = false;
+    this.sessionActivity.recordUserActivity();
 
     const dto =
       this.mapFormToDTO(
