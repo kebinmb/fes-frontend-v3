@@ -31,7 +31,7 @@ export const roleGuard: CanActivateFn = (route) => {
       }
 
       if (state.role === 'ROLE_HR') {
-        return router.createUrlTree(['/admin-dashboard/supervisor-evaluations']);
+        return router.createUrlTree(['/admin-dashboard/faculty-list']);
       }
 
       return router.createUrlTree(['/login']);

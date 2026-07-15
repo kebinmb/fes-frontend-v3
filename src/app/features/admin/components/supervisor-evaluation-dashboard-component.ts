@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import {
   AdminService,
@@ -11,7 +12,7 @@ import {
 import { ToastFacade } from '@core/store/toast/toast.facade';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 import { extractErrorMessage } from '@utilities/extract-error.util';
-import { finalize } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 
 interface Option<T extends string = string> {
   label: string;
@@ -28,9 +29,13 @@ interface Option<T extends string = string> {
 export class SupervisorEvaluationDashboardComponent implements OnInit {
   private readonly adminService = inject(AdminService);
   private readonly toastFacade = inject(ToastFacade);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly searchChanges$ = new Subject<string>();
+  private requestId = 0;
 
   readonly rows = signal<SupervisorEvaluationDashboardResponse[]>([]);
   readonly isLoading = signal(false);
+  readonly hasLoaded = signal(false);
   readonly searchTerm = signal('');
   readonly evaluationStatus = signal<SupervisorEvaluationStatusFilter>('ALL');
   readonly sourceDatabase = signal('');
@@ -84,26 +89,78 @@ export class SupervisorEvaluationDashboardComponent implements OnInit {
     const end = Math.min(total, start + 5);
     return Array.from({ length: end - start }, (_, index) => start + index);
   });
+  readonly completionRate = computed(() => {
+    const total = this.totalFacultyCount();
+    return total ? Math.round((this.evaluatedFacultyCount() / total) * 100) : 0;
+  });
+  readonly hasActiveFilters = computed(() =>
+    Boolean(
+      this.searchTerm().trim()
+      || this.evaluationStatus() !== 'ALL'
+      || this.sourceDatabase().trim(),
+    ),
+  );
+  readonly activeFilterSummary = computed(() => {
+    const filters = [
+      this.searchTerm().trim() ? `Search: ${this.searchTerm().trim()}` : '',
+      this.evaluationStatus() !== 'ALL'
+        ? `Status: ${this.statusLabel(this.evaluationStatus())}`
+        : '',
+      this.sourceDatabase().trim()
+        ? `Campus: ${this.displaySource(this.sourceDatabase())}`
+        : '',
+    ].filter(Boolean);
+
+    return filters.length ? filters.join(' | ') : 'Showing all supervisor evaluation records';
+  });
 
   ngOnInit(): void {
+    this.searchChanges$
+      .pipe(
+        debounceTime(350),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => this.resetAndLoad());
+
     this.loadDashboard();
   }
 
   loadDashboard(): void {
+    const currentRequestId = ++this.requestId;
     this.isLoading.set(true);
 
     this.adminService
       .getSupervisorEvaluationDashboard(this.pageIndex(), this.pageSize(), this.buildFilters())
-      .pipe(finalize(() => this.isLoading.set(false)))
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => {
+          if (currentRequestId === this.requestId) {
+            this.isLoading.set(false);
+          }
+        }),
+      )
       .subscribe({
-        next: (response) => this.applyResponse(response),
+        next: (response) => {
+          if (currentRequestId !== this.requestId) {
+            return;
+          }
+
+          this.applyResponse(response);
+          this.hasLoaded.set(true);
+        },
         error: (error) => {
+          if (currentRequestId !== this.requestId) {
+            return;
+          }
+
           this.rows.set([]);
           this.totalElements.set(0);
           this.totalPages.set(1);
           this.totalFacultyCount.set(0);
           this.evaluatedFacultyCount.set(0);
           this.pendingFacultyCount.set(0);
+          this.hasLoaded.set(true);
           this.toastFacade.showToast(extractErrorMessage(error), 'error');
         },
       });
@@ -111,7 +168,7 @@ export class SupervisorEvaluationDashboardComponent implements OnInit {
 
   updateSearchTerm(value: string): void {
     this.searchTerm.set(value);
-    this.resetAndLoad();
+    this.searchChanges$.next(value.trim());
   }
 
   updateEvaluationStatus(value: SupervisorEvaluationStatusFilter): void {
@@ -207,6 +264,10 @@ export class SupervisorEvaluationDashboardComponent implements OnInit {
 
   displaySource(value: string | null | undefined): string {
     return this.sourceOptions.find((option) => option.value === value)?.label ?? value ?? '-';
+  }
+
+  statusLabel(value: SupervisorEvaluationStatusFilter): string {
+    return this.statusOptions.find((option) => option.value === value)?.label ?? value;
   }
 
   displayDate(value: string | null | undefined): string {

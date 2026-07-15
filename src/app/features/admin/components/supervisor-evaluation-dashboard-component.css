@@ -4,7 +4,7 @@
 
 .supervisor-evaluation-page {
   display: grid;
-  gap: 1rem;
+  gap: 0.9rem;
   color: #102033;
 }
 
@@ -22,7 +22,7 @@
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.25rem;
+  padding: 1.1rem 1.25rem;
 }
 
 .eyebrow {
@@ -76,14 +76,15 @@ p {
 
 .summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
 }
 
 .summary-card {
   display: grid;
-  gap: 0.2rem;
-  padding: 1rem;
+  gap: 0.3rem;
+  min-width: 0;
+  padding: 0.9rem 1rem;
   background: #ffffff;
   border: 1px solid #d9e5df;
   border-left: 5px solid #006b3f;
@@ -106,16 +107,36 @@ p {
 
 .summary-card strong {
   color: #083b28;
-  font-size: 1.9rem;
+  font-size: 1.75rem;
   line-height: 1;
+}
+
+.progress-card {
+  border-left-color: #0d5f9f;
+}
+
+.progress-track {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e7eef4;
+}
+
+.progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #0d6f3f;
+  transition: width 180ms ease;
 }
 
 .toolbar {
   display: grid;
   grid-template-columns: minmax(240px, 1.3fr) minmax(150px, 0.7fr) minmax(170px, 0.7fr) auto;
-  gap: 0.85rem;
+  gap: 0.75rem;
   align-items: end;
-  padding: 1rem;
+  padding: 0.9rem 1rem;
 }
 
 label {
@@ -172,8 +193,52 @@ select {
   color: #006b3f;
 }
 
+.clear-btn:disabled {
+  color: #91a39b;
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.filter-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 38px;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #d9e5df;
+  border-radius: 8px;
+  background: #f7fbf9;
+  color: #51675d;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.filter-strip.active {
+  border-color: #bfd7ca;
+  background: #eef7f2;
+  color: #0b5135;
+}
+
+.filter-strip i {
+  color: #006b3f;
+}
+
 .table-shell {
+  position: relative;
   overflow: hidden;
+}
+
+.loading-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: rgba(255, 255, 255, 0.78);
+  color: #0b5135;
+  font-weight: 800;
 }
 
 .table-responsive {
@@ -182,13 +247,13 @@ select {
 
 table {
   width: 100%;
-  min-width: 980px;
+  min-width: 1040px;
   border-collapse: collapse;
 }
 
 th,
 td {
-  padding: 0.9rem 1rem;
+  padding: 0.8rem 0.95rem;
   border-bottom: 1px solid #e4eee9;
   vertical-align: middle;
 }
@@ -302,6 +367,16 @@ td small {
   animation: spin 800ms linear infinite;
 }
 
+.loader.small {
+  width: 22px;
+  height: 22px;
+  border-width: 3px;
+}
+
+.mobile-card-list {
+  display: none;
+}
+
 .pagination-bar {
   display: flex;
   justify-content: space-between;
@@ -365,5 +440,71 @@ td small {
 
   .pagination-controls {
     flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 760px) {
+  .table-responsive {
+    display: none;
+  }
+
+  .mobile-card-list {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .mobile-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0.85rem;
+    border: 1px solid #d9e5df;
+    border-radius: 8px;
+    background: #ffffff;
+  }
+
+  .mobile-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+
+  .mobile-card-header strong,
+  .mobile-card-header span {
+    display: block;
+  }
+
+  .mobile-card-header span {
+    color: #61766c;
+    font-size: 0.83rem;
+  }
+
+  .mobile-card dl {
+    display: grid;
+    gap: 0.65rem;
+    margin: 0;
+  }
+
+  .mobile-card dl div {
+    display: grid;
+    gap: 0.15rem;
+  }
+
+  .mobile-card dt {
+    color: #63776d;
+    font-size: 0.73rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .mobile-card dd {
+    margin: 0;
+    color: #102033;
+    font-weight: 700;
+  }
+
+  .status-pill {
+    white-space: nowrap;
   }
 }

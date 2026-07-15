@@ -22,6 +22,7 @@ describe('roleGuard', () => {
     isAuthChecked: true,
     error: null,
     accessCode: null,
+    accessCodeSent: false,
     college: null,
   });
 
@@ -46,6 +47,7 @@ describe('roleGuard', () => {
       isAuthChecked: true,
       error: null,
       accessCode: null,
+      accessCodeSent: false,
       college: null,
     });
 
@@ -100,5 +102,15 @@ describe('roleGuard', () => {
 
     await expect(firstValueFrom(executeGuard({ role: 'ROLE_ADMIN' }))).resolves.toBe(loginTree);
     expect(router.createUrlTree).toHaveBeenCalledWith(['/login']);
+  });
+
+  it('redirects HR users away from admin-only children to the faculty list', async () => {
+    authState$.next({
+      ...authState$.value,
+      role: 'ROLE_HR',
+    });
+
+    await expect(firstValueFrom(executeGuard({ role: 'ROLE_ADMIN' }))).resolves.toBe(loginTree);
+    expect(router.createUrlTree).toHaveBeenCalledWith(['/admin-dashboard/faculty-list']);
   });
 });

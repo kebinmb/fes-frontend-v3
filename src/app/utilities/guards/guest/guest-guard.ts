@@ -33,6 +33,7 @@ export const guestGuard: CanActivateFn = () => {
           ]);
 
         case 'ROLE_DEAN':
+        case 'ROLE_PROGRAM_CHAIR':
           return router.createUrlTree([
             '/supervisor-dashboard',
           ]);

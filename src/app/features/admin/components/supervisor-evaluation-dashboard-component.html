@@ -30,6 +30,15 @@
       <strong>{{ pendingCount() }}</strong>
       <small>{{ evaluationStatus() === 'PENDING' ? 'shown by this filter' : 'available in this result' }}</small>
     </article>
+
+    <article class="summary-card progress-card">
+      <span>Completion Rate</span>
+      <strong>{{ completionRate() }}%</strong>
+      <div class="progress-track" aria-hidden="true">
+        <span [style.width.%]="completionRate()"></span>
+      </div>
+      <small>{{ evaluatedFacultyCount() }} of {{ totalFacultyCount() }} faculty reviewed</small>
+    </article>
   </div>
 
   <section class="toolbar" aria-label="Supervisor evaluation filters">
@@ -65,11 +74,18 @@
       </select>
     </label>
 
-    <button type="button" class="clear-btn" (click)="resetFilters()">Clear</button>
+    <button type="button" class="clear-btn" (click)="resetFilters()" [disabled]="!hasActiveFilters()">
+      Clear
+    </button>
   </section>
 
+  <div class="filter-strip" [class.active]="hasActiveFilters()">
+    <i class="bi" [class.bi-funnel-fill]="hasActiveFilters()" [class.bi-list-check]="!hasActiveFilters()"></i>
+    <span>{{ activeFilterSummary() }}</span>
+  </div>
+
   <section class="table-shell">
-    @if (isLoading() && rows().length === 0) {
+    @if (isLoading() && !hasLoaded()) {
       <div class="state-panel">
         <span class="loader"></span>
         <strong>Loading supervisor evaluation status...</strong>
@@ -81,6 +97,13 @@
         <span>Adjust the filters or refresh the dashboard.</span>
       </div>
     } @else {
+      @if (isLoading()) {
+        <div class="loading-shade">
+          <span class="loader small"></span>
+          <strong>Updating results...</strong>
+        </div>
+      }
+
       <div class="table-responsive">
         <table>
           <thead>
@@ -143,6 +166,53 @@
             }
           </tbody>
         </table>
+      </div>
+
+      <div class="mobile-card-list">
+        @for (row of rows(); track trackByFacultyId($index, row)) {
+          <article class="mobile-card">
+            <div class="mobile-card-header">
+              <div>
+                <strong>{{ row.facultyName | unicodeText }}</strong>
+                <span>{{ row.facultyId }} | {{ row.position || '-' }}</span>
+              </div>
+              <span
+                class="status-pill"
+                [class.pending]="!row.supervisorEvaluated"
+                [class.needs-details]="row.supervisorEvaluated && !hasSupervisorDetails(row)"
+              >
+                {{ evaluationStatusLabel(row) }}
+              </span>
+            </div>
+
+            <dl>
+              <div>
+                <dt>College / Campus</dt>
+                <dd>{{ row.college || '-' }} / {{ displaySource(row.campus) }}</dd>
+              </div>
+              <div>
+                <dt>Assigned Classes</dt>
+                <dd>{{ row.assignedClassCount }}</dd>
+              </div>
+              <div>
+                <dt>Submitted By</dt>
+                <dd>{{ supervisorDisplayName(row) | unicodeText }}</dd>
+              </div>
+              <div>
+                <dt>Last Evaluation</dt>
+                <dd>{{ displayDate(row.lastEvaluatedAt) }}</dd>
+              </div>
+              <div>
+                <dt>Average</dt>
+                <dd>
+                  {{ row.supervisorAverageScore === null || row.supervisorAverageScore === undefined
+                    ? '-'
+                    : (row.supervisorAverageScore | number: '1.2-2') }}
+                </dd>
+              </div>
+            </dl>
+          </article>
+        }
       </div>
     }
   </section>
