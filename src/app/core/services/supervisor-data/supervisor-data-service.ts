@@ -75,6 +75,20 @@ export interface EvaluatedStudentsDTO {
   lastname: string;
 }
 
+export interface ClassStudentEvaluationStats {
+  classCode: string;
+  facultyId: string;
+  facultyName: string;
+  subjectCode: string;
+  programCode: string;
+  yearLevel: string;
+  sectionCode: string;
+  totalStudents: number;
+  evaluatedStudents: number;
+  pendingStudents: number;
+  evaluationPercentage: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -154,6 +168,33 @@ export class SupervisorDataService {
 
     return this.http.get<PageResponse<EvaluatedStudentsDTO>>(
       `${this.FACULTY_API_URL}/evaluated-students`,
+      {
+        params,
+        withCredentials: true,
+      },
+    );
+  }
+
+  getStudentEvaluationStats(
+    page: number = 0,
+    size: number = 10,
+    search: string = '',
+    campus: string = '',
+  ): Observable<PageResponse<ClassStudentEvaluationStats>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    if (search?.trim()) {
+      params = params.set('search', search.trim());
+    }
+
+    if (campus?.trim()) {
+      params = params.set('campus', campus.trim());
+    }
+
+    return this.http.get<PageResponse<ClassStudentEvaluationStats>>(
+      `${this.FACULTY_API_URL}/student-evaluation-stats`,
       {
         params,
         withCredentials: true,

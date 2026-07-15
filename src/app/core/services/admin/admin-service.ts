@@ -1,8 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../../environments/environment';
-import { Observable } from 'rxjs';
-import { map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { FacultyEvaluationScore, Page } from '../evaluation/evaluation-service';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
 export interface PageResponse<T> {
@@ -510,7 +510,14 @@ export class AdminService {
         {
           withCredentials: true,
         },
-      ).pipe(shareReplay({ bufferSize: 1, refCount: false }));
+      ).pipe(
+        catchError((error) => {
+          this.dashboardCache$ = undefined;
+          this.dashboardCacheCreatedAt = 0;
+          return throwError(() => error);
+        }),
+        shareReplay({ bufferSize: 1, refCount: false }),
+      );
     }
 
     return this.dashboardCache$;
@@ -557,6 +564,11 @@ export class AdminService {
         },
       ).pipe(
         map((response) => repairSpecialCharacters(response)),
+        catchError((error) => {
+          this.workloadCoverageCache$ = undefined;
+          this.workloadCoverageCacheCreatedAt = 0;
+          return throwError(() => error);
+        }),
         shareReplay({ bufferSize: 1, refCount: false }),
       );
     }
@@ -1073,7 +1085,14 @@ export class AdminService {
         {
           withCredentials: true,
         },
-      ).pipe(shareReplay({ bufferSize: 1, refCount: false }));
+      ).pipe(
+        catchError((error) => {
+          this.currentTermCache$ = undefined;
+          this.currentTermCacheCreatedAt = 0;
+          return throwError(() => error);
+        }),
+        shareReplay({ bufferSize: 1, refCount: false }),
+      );
     }
 
     return this.currentTermCache$;

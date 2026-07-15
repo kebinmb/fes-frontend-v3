@@ -3,6 +3,7 @@ import { createReducer, on } from '@ngrx/store';
 import * as SupervisorDataActions from './supervisor-data.actions';
 
 import { supervisorDataInitialState } from './supervisor-data.state';
+import { FacultyClass } from '../../services/supervisor-data/supervisor-data-service';
 
 const buildEvaluationKey = (
   classCode: string,
@@ -11,6 +12,61 @@ const buildEvaluationKey = (
   semester: string,
   schoolYear: number,
 ): string => `${classCode}-${subjectCode}-${yearLevel}-${semester}-${schoolYear}`;
+
+const normalizeClassValue = (value: string | number | null | undefined): string =>
+  `${value ?? ''}`.trim().toUpperCase();
+
+const splitSectionCodes = (sectionCode: string | null | undefined): string[] =>
+  `${sectionCode ?? ''}`
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+const mergeSectionCodes = (
+  first: string | null | undefined,
+  second: string | null | undefined,
+): string => Array.from(new Set([...splitSectionCodes(first), ...splitSectionCodes(second)]))
+  .sort((left, right) => left.localeCompare(right, undefined, { numeric: true, sensitivity: 'base' }))
+  .join(', ');
+
+const mergeClassValues = (
+  first: string | null | undefined,
+  second: string | null | undefined,
+): string => mergeSectionCodes(first, second);
+
+const buildFacultyClassGroupKey = (cls: FacultyClass): string =>
+  [
+    cls.facultyId,
+    cls.subjectCode,
+    cls.semester,
+    cls.schoolYear,
+  ]
+    .map(normalizeClassValue)
+    .join('|');
+
+const deduplicateFacultyClasses = (classes: FacultyClass[]): FacultyClass[] => {
+  const grouped = new Map<string, FacultyClass>();
+
+  classes.forEach((cls) => {
+    const groupKey = buildFacultyClassGroupKey(cls);
+    const existing = grouped.get(groupKey);
+
+    if (!existing) {
+      grouped.set(groupKey, cls);
+      return;
+    }
+
+    grouped.set(groupKey, {
+      ...existing,
+      classCode: existing.classCode || cls.classCode,
+      programCode: mergeClassValues(existing.programCode, cls.programCode),
+      yearLevel: mergeClassValues(existing.yearLevel, cls.yearLevel),
+      sectionCode: mergeSectionCodes(existing.sectionCode, cls.sectionCode),
+    });
+  });
+
+  return Array.from(grouped.values());
+};
 
 export const supervisorDataReducer = createReducer(
   supervisorDataInitialState,
@@ -136,7 +192,7 @@ export const supervisorDataReducer = createReducer(
           ...state.facultyClasses[key],
 
           [facultyId]: {
-            classes,
+            classes: deduplicateFacultyClasses(classes),
 
             loading: false,
 

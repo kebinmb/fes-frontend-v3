@@ -1,0 +1,189 @@
+<section class="stats-panel">
+  <div class="stats-header">
+    <div>
+      <span class="eyebrow">Student Evaluation Coverage</span>
+      <h2>Class Evaluation Statistics</h2>
+      <p>
+        Track how many students have evaluated each faculty member per class for the active term.
+      </p>
+    </div>
+    <div class="header-actions">
+      @if (rows.length) {
+        <span class="range-pill">
+          Showing {{ rangeStart | number }}-{{ rangeEnd | number }} of {{ totalElements | number }}
+        </span>
+      }
+      <button type="button" class="refresh-button" (click)="reload()" [disabled]="loading">
+        <i class="bi" [class.bi-arrow-clockwise]="!loading" [class.bi-hourglass-split]="loading"></i>
+        {{ loading ? 'Refreshing' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <i class="bi bi-grid-3x3-gap"></i>
+      <span>Total Classes</span>
+      <strong>{{ totalElements | number }}</strong>
+    </div>
+    <div class="summary-card">
+      <i class="bi bi-people"></i>
+      <span>Visible Students</span>
+      <strong>{{ studentTotal | number }}</strong>
+    </div>
+    <div class="summary-card">
+      <i class="bi bi-check2-circle"></i>
+      <span>Visible Evaluated</span>
+      <strong>{{ evaluatedTotal | number }}</strong>
+    </div>
+    <div class="summary-card accent">
+      <i class="bi bi-graph-up-arrow"></i>
+      <span>Visible Completion</span>
+      <strong>{{ averageCompletion }}%</strong>
+    </div>
+  </div>
+
+  <div class="stats-toolbar">
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input
+        type="text"
+        placeholder="Search class, faculty, subject, program..."
+        [value]="search"
+        (input)="onSearch($event)"
+      />
+      @if (search) {
+        <button type="button" class="clear-search" (click)="clearSearch()" aria-label="Clear search">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      }
+    </div>
+    <label class="page-size-control">
+      <span>Rows</span>
+      <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+        @for (size of pageSizeOptions; track size) {
+          <option [ngValue]="size">{{ size }}</option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (loading && !rows.length) {
+    <div class="panel-state">
+      <i class="bi bi-hourglass-split"></i>
+      <p>Loading class statistics...</p>
+    </div>
+  } @else if (error) {
+    <div class="panel-state error">
+      <i class="bi bi-exclamation-triangle"></i>
+      <p>{{ error }}</p>
+    </div>
+  } @else if (!rows.length) {
+    <div class="panel-state">
+      <i class="bi bi-inbox"></i>
+      <p>No class statistics found for the selected filters.</p>
+      @if (search) {
+        <button type="button" class="state-action" (click)="clearSearch()">Clear Search</button>
+      }
+    </div>
+  } @else {
+    <div class="table-shell">
+      @if (loading) {
+        <div class="table-loading-bar"></div>
+      }
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th>Faculty</th>
+            <th>Program / Year / Section</th>
+            <th>Students</th>
+            <th>Completion</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows; track trackRow($index, row)) {
+            <tr>
+              <td>
+                <div class="class-cell">
+                  <span class="subject-icon"><i class="bi bi-journal-bookmark"></i></span>
+                  <div>
+                    <div class="primary-text">{{ displayCode(row.subjectCode) }}</div>
+                    <small>Class #{{ displayCode(row.classCode) }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="primary-text">{{ row.facultyName | unicodeText: 'upper' }}</div>
+                <small>#{{ row.facultyId }}</small>
+              </td>
+              <td>
+                <div class="section-chips">
+                  <span>{{ row.programCode }}</span>
+                  <span>Year {{ row.yearLevel }}</span>
+                  <span>Section {{ row.sectionCode }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="student-counts">
+                  <strong>{{ row.evaluatedStudents | number }}</strong>
+                  <span>of {{ row.totalStudents | number }}</span>
+                </div>
+                <small>{{ row.pendingStudents | number }} pending</small>
+              </td>
+              <td>
+                <div class="completion-cell">
+                  <div class="completion-topline">
+                    <strong>{{ row.evaluationPercentage | number: '1.0-2' }}%</strong>
+                    <span [class]="completionClass(row)">
+                      {{ completionLabel(row) }}
+                    </span>
+                  </div>
+                  <div class="progress-track">
+                    <div
+                      class="progress-fill"
+                      [class]="completionClass(row)"
+                      [style.width.%]="row.evaluationPercentage || 0"
+                    ></div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>
+        Showing {{ rangeStart | number }}-{{ rangeEnd | number }} of {{ totalElements | number }} classes
+      </span>
+      @if (totalPages > 1) {
+      <div class="stats-pagination" aria-label="Student evaluation stats pagination">
+        <button type="button" [disabled]="currentPage === 0" (click)="goToPage(0)">
+          <i class="bi bi-chevron-double-left"></i>
+        </button>
+        <button type="button" [disabled]="currentPage === 0" (click)="previousPage()">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        @for (page of getPageNumbers(); track page) {
+          <button
+            type="button"
+            [class.active]="currentPage === page"
+            (click)="goToPage(page)"
+          >
+            {{ page + 1 }}
+          </button>
+        }
+        <button type="button" [disabled]="currentPage + 1 >= totalPages" (click)="nextPage()">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+        <span>
+          Page {{ currentPage + 1 }} of {{ totalPages }}
+          | {{ totalElements | number }} classes
+        </span>
+      </div>
+      }
+    </div>
+  }
+</section>
