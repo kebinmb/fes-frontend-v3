@@ -111,6 +111,10 @@
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
   background: #f8fafc;
 }
+.btn-evaluated-students.active-view {
+  background: #ecfdf5;
+  color: var(--chmsu-primary);
+}
 .btn-evaluated-students:active {
   transform: translateY(0);
 }

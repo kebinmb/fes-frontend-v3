@@ -26,6 +26,17 @@
           : 'View Completed Evaluations'
           }}
         </button>
+        <button
+          class="btn-evaluated-students"
+          type="button"
+          [class.active-view]="showStudentEvaluationStats"
+          (click)="toggleStudentEvaluationStats()"
+        >
+          <i class="bi" [class.bi-graph-up-arrow]="!showStudentEvaluationStats"
+            [class.bi-arrow-left]="showStudentEvaluationStats">
+          </i>
+          {{ showStudentEvaluationStats ? 'Back to Faculty List' : 'Student Evaluation Stats' }}
+        </button>
         <button type="button" class="btn-logout-navbar" (click)="logout()">
           <i class="bi bi-box-arrow-right me-2"></i>
           Logout
@@ -55,7 +66,9 @@
         </div>
       </div>
     </section>
-    @if (showEvaluatedStudents$ | async) {
+    @if (showStudentEvaluationStats) {
+    <app-student-evaluation-stats-component></app-student-evaluation-stats-component>
+    } @else if (showEvaluatedStudents$ | async) {
     <app-evaluated-students-component> </app-evaluated-students-component>
     } @else {
     <section class="dashboard-toolbar sticky-toolbar">

@@ -20,6 +20,7 @@ import { AuthService, ChangePasswordRequest } from '@core/services/auth/auth-ser
 import { ToastFacade } from '@core/store/toast/toast.facade';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
+import { StudentEvaluationStatsComponent } from '../../components/student-evaluation-stats/student-evaluation-stats-component';
 @Component({
   selector: 'app-supervisor-dashboard-component',
   standalone: true,
@@ -30,6 +31,7 @@ import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
     FormsModule,
     FacultyEvaluationModalComponent,
     EvaluatedStudentsComponent,
+    StudentEvaluationStatsComponent,
     UnicodeTextPipe,
     ChangePasswordModalComponent
   ],
@@ -47,7 +49,9 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   private readonly authFacade = inject(AuthFacade);
   private readonly destroyRef = inject(DestroyRef);
   showEvaluatedStudents$ = this.supervisorDataFacade.showEvaluatedStudents$;
+  showStudentEvaluationStats = false;
   backToDashboard(): void {
+    this.showStudentEvaluationStats = false;
     this.supervisorDataFacade.showDashboardView();
   }
   @ViewChild('confirmationModal')
@@ -277,11 +281,31 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
     this.supervisorDataFacade.showEvaluatedStudentsView();
   }
   toggleEvaluatedStudents(): void {
+    if (this.showStudentEvaluationStats) {
+      this.showStudentEvaluationStats = false;
+      this.supervisorDataFacade.showEvaluatedStudentsView();
+      return;
+    }
+
     this.showEvaluatedStudents$.pipe(take(1)).subscribe((show) => {
       if (show) {
         this.supervisorDataFacade.showDashboardView();
       } else {
         this.supervisorDataFacade.showEvaluatedStudentsView();
+      }
+    });
+  }
+
+  toggleStudentEvaluationStats(): void {
+    this.showEvaluatedStudents$.pipe(take(1)).subscribe((showCompletedEvaluations) => {
+      if (!this.showStudentEvaluationStats) {
+        this.supervisorDataFacade.showDashboardView();
+      }
+
+      this.showStudentEvaluationStats = !this.showStudentEvaluationStats;
+
+      if (!this.showStudentEvaluationStats && showCompletedEvaluations) {
+        this.supervisorDataFacade.showDashboardView();
       }
     });
   }
