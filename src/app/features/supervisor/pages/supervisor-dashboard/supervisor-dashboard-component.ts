@@ -64,25 +64,6 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   search = '';
   selectedFaculty: FacultyLoadDTO | null = null;
   selectedClass: FacultyClass | null = null;
-  selectedCampus: string = '';
-  campusOptions = [
-    {
-      label: 'TALISAY',
-      value: 'LEGACY_TALISAY',
-    },
-    {
-      label: 'ALIJIS',
-      value: 'LEGACY_ALIJIS',
-    },
-    {
-      label: 'BINALBAGAN',
-      value: 'LEGACY_BINALBAGAN',
-    },
-    {
-      label: 'FT',
-      value: 'LEGACY_FT',
-    },
-  ];
   buildEvaluationKey(
     classCode: string,
     subjectCode: string,
@@ -151,7 +132,6 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
       this.pageSize,
       'lastname,asc',
       this.search,
-      this.selectedCampus,
     );
   }
   reload(): void {
@@ -202,11 +182,6 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   }
   closeFacultyModal(): void {
     this.clearSelectedFacultyContext();
-  }
-  onCampusChange(): void {
-    this.currentPage = 0;
-    this.clearSelectedFacultyContext();
-    this.reload();
   }
   openFacultyConfirmation(faculty: FacultyLoadDTO): void {
     this.pendingFaculty = faculty;

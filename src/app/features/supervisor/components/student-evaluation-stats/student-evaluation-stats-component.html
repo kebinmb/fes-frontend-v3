@@ -58,16 +58,6 @@
         </button>
       }
     </div>
-    <label class="filter-control">
-      <span>Campus</span>
-      <select [(ngModel)]="campus" (ngModelChange)="onCampusChange()">
-        @for (campusOption of campusOptions; track campusOption.value) {
-          <option [value]="campusOption.value">
-            {{ campusOption.label }}
-          </option>
-        }
-      </select>
-    </label>
     <label class="page-size-control">
       <span>Rows</span>
       <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">

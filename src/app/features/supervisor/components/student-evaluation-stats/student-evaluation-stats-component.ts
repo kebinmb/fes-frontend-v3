@@ -33,19 +33,11 @@ export class StudentEvaluationStatsComponent implements OnInit {
   private readonly reloadSubject = new Subject<void>();
 
   readonly pageSizeOptions = [10, 20, 50];
-  readonly campusOptions = [
-    { label: 'All Campuses', value: '' },
-    { label: 'Talisay', value: 'LEGACY_TALISAY' },
-    { label: 'Alijis', value: 'LEGACY_ALIJIS' },
-    { label: 'Binalbagan', value: 'LEGACY_BINALBAGAN' },
-    { label: 'Fortune Towne', value: 'LEGACY_FT' },
-  ];
 
   rows: ClassStudentEvaluationStats[] = [];
   loading = false;
   error: string | null = null;
   search = '';
-  campus = '';
   currentPage = 0;
   pageSize = 10;
   totalElements = 0;
@@ -64,7 +56,6 @@ export class StudentEvaluationStatsComponent implements OnInit {
               this.currentPage,
               this.pageSize,
               this.search,
-              this.campus,
             )
             .pipe(
               map((response) => ({ response, error: null })),
@@ -111,11 +102,6 @@ export class StudentEvaluationStatsComponent implements OnInit {
 
   onSearch(event: Event): void {
     this.searchSubject.next((event.target as HTMLInputElement)?.value ?? '');
-  }
-
-  onCampusChange(): void {
-    this.currentPage = 0;
-    this.loadStats();
   }
 
   onPageSizeChange(size: number): void {
