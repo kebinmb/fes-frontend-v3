@@ -104,6 +104,8 @@
     </div>
     }
     @else {
+    @let facultyClassState = facultyClasses$ | async;
+    @let evaluationStatusState = evaluationStatus$ | async;
     <div class="faculty-table-wrapper">
       <table class="faculty-table">
         <thead>
@@ -111,12 +113,14 @@
             <th>Faculty</th>
             <th>Position</th>
             <th>Campus</th>
+            <th>Evaluation Progress</th>
             <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
           @for (faculty of (faculties$ | async) ?? []; track trackFaculty($index, faculty)) {
+          @let progress = getFacultyEvaluationProgress(faculty, facultyClassState, evaluationStatusState);
           <tr class="faculty-row">
             <td>
               <div class="faculty-cell-profile">
@@ -148,6 +152,35 @@
               </div>
             </td>
             <td>
+              <div
+                class="faculty-progress-cell"
+                [class.progress-complete]="progress.tone === 'complete'"
+                [class.progress-partial]="progress.tone === 'partial'"
+                [class.progress-pending]="progress.tone === 'pending'"
+                [class.progress-loading]="progress.tone === 'loading'"
+                [class.progress-empty]="progress.tone === 'empty'"
+                [class.progress-error]="progress.tone === 'error'"
+              >
+                <div class="faculty-progress-topline">
+                  <span class="faculty-progress-badge">
+                    <i class="bi" [ngClass]="progress.icon"></i>
+                    {{ progress.label }}
+                  </span>
+                  @if (progress.total > 0) {
+                  <span class="faculty-progress-count">
+                    {{ progress.evaluated }}/{{ progress.total }}
+                  </span>
+                  }
+                </div>
+                @if (progress.total > 0) {
+                <div class="faculty-progress-track" aria-hidden="true">
+                  <span [style.width.%]="progress.percent"></span>
+                </div>
+                }
+                <small>{{ progress.helper }}</small>
+              </div>
+            </td>
+            <td>
               <span class="faculty-active-badge"> ACTIVE </span>
             </td>
             <td>
@@ -157,7 +190,7 @@
                 (click)="openFacultyConfirmation(faculty)"
               >
                 <i class="bi bi-clipboard-check me-2"></i>
-                Evaluate
+                {{ progress.complete ? 'View' : 'Evaluate' }}
               </button>
             </td>
           </tr>

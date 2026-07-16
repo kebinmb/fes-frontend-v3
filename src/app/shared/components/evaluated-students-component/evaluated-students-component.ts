@@ -1,4 +1,5 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AsyncPipe, DatePipe } from '@angular/common';
 
@@ -24,6 +25,7 @@ export class EvaluatedStudentsComponent implements OnInit {
   private facade = inject(SupervisorDataFacade);
   private authfacade = inject(AuthFacade);
   private store = inject(Store);
+  private destroyRef = inject(DestroyRef);
   readonly key = 'evaluated-students';
   evaluatorId$ = this.store.select(selectEvaluatorId);
   private searchSubject = new Subject<string>();
@@ -45,35 +47,43 @@ export class EvaluatedStudentsComponent implements OnInit {
   ngOnInit(): void {
     this.load();
 
-    this.searchSubject.pipe(debounceTime(500), distinctUntilChanged()).subscribe((value) => {
-      this.search = value;
+    this.searchSubject
+      .pipe(
+        debounceTime(500),
+        distinctUntilChanged(),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((value) => {
+        this.search = value;
 
-      this.page = 0;
+        this.page = 0;
 
-      this.load();
-    });
+        this.load();
+      });
   }
 
   load(): void {
-    this.authfacade.evaluatorId$.pipe(take(1)).subscribe((userId) => {
-      if (!userId) {
-        return;
-      }
+    this.authfacade.evaluatorId$
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe((userId) => {
+        if (!userId) {
+          return;
+        }
 
-      this.facade.loadEvaluatedStudents(
-        this.key,
+        this.facade.loadEvaluatedStudents(
+          this.key,
 
-        userId,
+          userId,
 
-        this.page,
+          this.page,
 
-        this.size,
+          this.size,
 
-        this.sort,
+          this.sort,
 
-        this.search,
-      );
-    });
+          this.search,
+        );
+      });
   }
 
   onSearch(value: string): void {

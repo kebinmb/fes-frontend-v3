@@ -13,10 +13,11 @@
 
       <div class="search-wrapper">
         <input
+          #searchInput
           type="text"
           class="search-input"
           placeholder="Search evaluator ID..."
-          (input)="onSearch($any($event.target).value)"
+          (input)="onSearch(searchInput.value)"
         />
       </div>
     </div>

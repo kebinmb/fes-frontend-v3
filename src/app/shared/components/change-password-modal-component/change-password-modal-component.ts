@@ -4,12 +4,14 @@ import {
 
 import {
   Component,
+  DestroyRef,
   EventEmitter,
   HostListener,
   Input,
   Output,
   inject
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
   FormBuilder,
@@ -66,6 +68,9 @@ export class ChangePasswordModalComponent {
   private readonly fb =
     inject(FormBuilder);
 
+  private readonly destroyRef =
+    inject(DestroyRef);
+
   readonly form = this.fb.group({
     currentPassword: [
       '',
@@ -92,11 +97,13 @@ export class ChangePasswordModalComponent {
 
   constructor() {
 
-    this.form.valueChanges.subscribe(() => {
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
 
-      this.validatePasswords();
+        this.validatePasswords();
 
-    });
+      });
 
   }
 

@@ -21,6 +21,45 @@ import { ToastFacade } from '@core/store/toast/toast.facade';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 import { StudentEvaluationStatsComponent } from '../../components/student-evaluation-stats/student-evaluation-stats-component';
+
+interface FacultyClassStateEntry {
+  classes: FacultyClass[];
+  loading: boolean;
+  error: string | null;
+}
+
+type FacultyClassState = Record<string, FacultyClassStateEntry>;
+
+const SUPERVISOR_RETURN_FACULTY_KEY = 'supervisorReturnFaculty';
+const SUPERVISOR_REOPEN_FACULTY_MODAL_KEY = 'supervisorReopenFacultyModal';
+
+interface EvaluationStatusMap {
+  [key: string]: {
+    classes?: Record<
+      string,
+      {
+        evaluated: boolean | null;
+        loading: boolean;
+        error: string | null;
+      }
+    >;
+  };
+}
+
+interface FacultyEvaluationProgress {
+  total: number;
+  evaluated: number;
+  pending: number;
+  percent: number;
+  loading: boolean;
+  error: boolean;
+  complete: boolean;
+  label: string;
+  helper: string;
+  icon: string;
+  tone: 'loading' | 'empty' | 'pending' | 'partial' | 'complete' | 'error';
+}
+
 @Component({
   selector: 'app-supervisor-dashboard-component',
   standalone: true,
@@ -90,6 +129,8 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
     this.showChangePasswordModal = requiresPasswordChange;
     this.initializeSearch();
     this.initializeFacultyLoad();
+    this.initializeFacultyEvaluationOverview();
+    this.restoreFacultyModalAfterEvaluation();
   }
   ngAfterViewInit(): void {
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
@@ -118,6 +159,54 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
         this.clearSelectedFacultyContext();
         this.reload();
       });
+  }
+  private initializeFacultyEvaluationOverview(): void {
+    this.faculties$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((faculties) => {
+        faculties.forEach((faculty) => {
+          this.supervisorDataFacade.loadFacultyClasses(
+            this.key,
+            faculty.facultyId,
+            this.program,
+          );
+        });
+      });
+  }
+  private restoreFacultyModalAfterEvaluation(): void {
+    const shouldRestore =
+      sessionStorage.getItem(SUPERVISOR_REOPEN_FACULTY_MODAL_KEY) === 'true';
+    const facultyJson = sessionStorage.getItem(SUPERVISOR_RETURN_FACULTY_KEY);
+
+    if (!shouldRestore || !facultyJson) {
+      return;
+    }
+
+    sessionStorage.removeItem(SUPERVISOR_REOPEN_FACULTY_MODAL_KEY);
+    sessionStorage.removeItem(SUPERVISOR_RETURN_FACULTY_KEY);
+
+    try {
+      const faculty = JSON.parse(facultyJson) as FacultyLoadDTO;
+
+      if (!faculty?.facultyId) {
+        return;
+      }
+
+      this.supervisorDataFacade.showDashboardView();
+      this.showStudentEvaluationStats = false;
+      this.selectedFaculty = faculty;
+      this.selectedClass = null;
+      this.pendingFaculty = null;
+      this.isConfirmationVisible = false;
+      this.supervisorDataFacade.loadFacultyClasses(
+        this.key,
+        faculty.facultyId,
+        this.program,
+      );
+    } catch {
+      sessionStorage.removeItem(SUPERVISOR_REOPEN_FACULTY_MODAL_KEY);
+      sessionStorage.removeItem(SUPERVISOR_RETURN_FACULTY_KEY);
+    }
   }
   onSearch(event: Event): void {
     const value = (event.target as HTMLInputElement)?.value ?? '';
@@ -181,7 +270,10 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
     this.supervisorDataFacade.loadFacultyClasses(this.key, faculty.facultyId, this.program);
   }
   closeFacultyModal(): void {
-    this.clearSelectedFacultyContext();
+    this.selectedFaculty = null;
+    this.selectedClass = null;
+    this.pendingFaculty = null;
+    this.isConfirmationVisible = false;
   }
   openFacultyConfirmation(faculty: FacultyLoadDTO): void {
     this.pendingFaculty = faculty;
@@ -216,6 +308,12 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
     const facultyName = repairSpecialCharacters(
       `${faculty.firstname ?? ''} ${faculty.lastname ?? ''}`.trim(),
     );
+
+    sessionStorage.setItem(
+      SUPERVISOR_RETURN_FACULTY_KEY,
+      JSON.stringify(faculty),
+    );
+
     this.supervisorDataFacade.selectClass({
       ...cls,
       college: faculty.college,
@@ -248,6 +346,138 @@ export class SupervisorDashboardComponent implements OnInit, AfterViewInit {
   }
   trackClass(_: number, cls: FacultyClass): string {
     return cls.classCode;
+  }
+  getFacultyEvaluationProgress(
+    faculty: FacultyLoadDTO,
+    facultyClassesState: FacultyClassState | null | undefined,
+    evaluationStatus: EvaluationStatusMap | null | undefined,
+  ): FacultyEvaluationProgress {
+    const entry = facultyClassesState?.[faculty.facultyId];
+
+    if (!entry) {
+      return this.createFacultyEvaluationProgress({
+        loading: true,
+        label: 'Loading subjects',
+        helper: 'Checking assigned subjects',
+        icon: 'bi-arrow-repeat',
+        tone: 'loading',
+      });
+    }
+
+    if (entry.loading) {
+      return this.createFacultyEvaluationProgress({
+        loading: true,
+        label: 'Loading subjects',
+        helper: 'Checking assigned subjects',
+        icon: 'bi-arrow-repeat',
+        tone: 'loading',
+      });
+    }
+
+    if (entry.error) {
+      return this.createFacultyEvaluationProgress({
+        error: true,
+        label: 'Unable to load',
+        helper: 'Refresh or open the faculty again',
+        icon: 'bi-exclamation-triangle-fill',
+        tone: 'error',
+      });
+    }
+
+    const classes = entry.classes ?? [];
+
+    if (!classes.length) {
+      return this.createFacultyEvaluationProgress({
+        label: 'No subjects',
+        helper: 'No assigned subjects found',
+        icon: 'bi-journal-x',
+        tone: 'empty',
+      });
+    }
+
+    const statusGroup = evaluationStatus?.[this.key]?.classes ?? {};
+    const evaluated = classes.filter((cls) => {
+      const evaluationKey = this.buildEvaluationKey(
+        cls.classCode,
+        cls.subjectCode,
+        cls.yearLevel,
+        cls.semester,
+        cls.schoolYear,
+      );
+
+      return statusGroup[evaluationKey]?.evaluated === true;
+    }).length;
+    const hasPendingStatus = classes.some((cls) => {
+      const evaluationKey = this.buildEvaluationKey(
+        cls.classCode,
+        cls.subjectCode,
+        cls.yearLevel,
+        cls.semester,
+        cls.schoolYear,
+      );
+      const status = statusGroup[evaluationKey];
+
+      return !status || status.loading || status.evaluated === null;
+    });
+    const pending = Math.max(classes.length - evaluated, 0);
+    const complete = evaluated === classes.length && !hasPendingStatus;
+    const percent = Math.round((evaluated / classes.length) * 100);
+
+    if (hasPendingStatus) {
+      return this.createFacultyEvaluationProgress({
+        total: classes.length,
+        evaluated,
+        pending,
+        percent,
+        loading: true,
+        label: `${evaluated} of ${classes.length} checked`,
+        helper: 'Updating status',
+        icon: 'bi-arrow-repeat',
+        tone: evaluated > 0 ? 'partial' : 'loading',
+      });
+    }
+
+    if (complete) {
+      return this.createFacultyEvaluationProgress({
+        total: classes.length,
+        evaluated,
+        pending,
+        percent: 100,
+        complete: true,
+        label: 'Completed',
+        helper: `${classes.length} subject${classes.length === 1 ? '' : 's'} evaluated`,
+        icon: 'bi-check-circle-fill',
+        tone: 'complete',
+      });
+    }
+
+    return this.createFacultyEvaluationProgress({
+      total: classes.length,
+      evaluated,
+      pending,
+      percent,
+      label: `${evaluated} of ${classes.length} evaluated`,
+      helper: `${pending} subject${pending === 1 ? '' : 's'} remaining`,
+      icon: evaluated > 0 ? 'bi-hourglass-split' : 'bi-clock-history',
+      tone: evaluated > 0 ? 'partial' : 'pending',
+    });
+  }
+  private createFacultyEvaluationProgress(
+    progress: Partial<FacultyEvaluationProgress>,
+  ): FacultyEvaluationProgress {
+    return {
+      total: progress.total ?? 0,
+      evaluated: progress.evaluated ?? 0,
+      pending: progress.pending ?? 0,
+      percent: progress.percent ?? 0,
+      loading: progress.loading ?? false,
+      error: progress.error ?? false,
+      complete: progress.complete ?? false,
+      label: progress.label ?? 'Pending',
+      helper: progress.helper ?? '',
+      icon: progress.icon ?? 'bi-clock-history',
+      tone: progress.tone ?? 'pending',
+    };
   }
   logout(): void {
     this.authFacade.logout();

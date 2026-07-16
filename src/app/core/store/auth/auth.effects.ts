@@ -1,6 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { AuthService } from '../../services/auth/auth-service';
+import {
+  AuthService,
+  CurrentUserResponse,
+} from '../../services/auth/auth-service';
 import { Router } from '@angular/router';
 import { SpinnerFacade } from '../spinner/spinner.facade';
 import { ToastFacade } from '../toast/toast.facade';
@@ -11,6 +14,11 @@ import { Store } from '@ngrx/store';
 import { resetEvaluationState } from '../evaluation-data/evaluation.action';
 import { resetStudentState } from '../student-data/student-data.action';
 import { resetSupervisorState } from '../supervisor-data/supervisor-data.actions';
+
+type SupervisorCurrentUserResponse = CurrentUserResponse & {
+  evaluatorId: string;
+  role: 'ROLE_DEAN' | 'ROLE_PROGRAM_CHAIR';
+};
 
 @Injectable({
   providedIn: 'root',
@@ -28,7 +36,7 @@ export class AuthEffects {
       exhaustMap(({ evaluatorId, password }) => {
         this.spinnerFacade.showSpinner();
         return this.authService.generateStudentAccessCode(evaluatorId, password).pipe(
-          map((response: any) => {
+          map((response) => {
             this.spinnerFacade.hideSpinner();
             return AuthActions.generateAccessCodeForStudentSuccess({
               expiresAt: response.expiresAt,
@@ -76,7 +84,7 @@ export class AuthEffects {
         this.spinnerFacade.showSpinner();
 
         return this.authService.studentLogin(evaluatorId, accessCode).pipe(
-          map((response: any) => {
+          map((response) => {
             this.spinnerFacade.hideSpinner();
             return AuthActions.studentLoginSuccess({
               evaluatorId: response.studentId,
@@ -181,10 +189,10 @@ export class AuthEffects {
         this.spinnerFacade.showSpinner();
 
         return this.authService.administratorLogin(username, password).pipe(
-          tap((response: any) => {
-            sessionStorage.setItem('college', response.college);
+          tap((response) => {
+            sessionStorage.setItem('college', response.college ?? '');
           }),
-          map((response: any) => {
+          map((response) => {
             this.spinnerFacade.hideSpinner();
             return AuthActions.administratorLoginSuccess({
               administratorId: response.administratorId,
@@ -242,21 +250,21 @@ export class AuthEffects {
 
       exhaustMap(() =>
         this.authService.getCurrentUser().pipe(
-          map((response: any) => {
+          map((response) => {
             const resolvedUserId =
               response.studentId ??
               response.userId ??
               response.administratorId ??
               response.evaluatorId ??
-              null;
+              '';
 
             return AuthActions.checkLoggedInUserAuthenticationSuccess({
               evaluatorId: resolvedUserId,
 
               role: response.role,
 
-              college: response.college ?? null,
-              program: response.program,
+              college: response.college ?? '',
+              program: response.program ?? '',
               requiresPasswordChange:
                 response.requiresPasswordChange ?? false,
             });
@@ -277,9 +285,13 @@ export class AuthEffects {
     this.actions$.pipe(
       ofType(AuthActions.checkLoggedInUserAuthenticationSuccess),
 
-      map((response: any) => {
+      map((response) => {
         if (response.role === 'ROLE_DEAN' || response.role === 'ROLE_PROGRAM_CHAIR') {
-          return this.handleSupervisorLoginSuccess(response);
+          return this.handleSupervisorLoginSuccess({
+            ...response,
+            evaluatorId: response.evaluatorId,
+            role: response.role,
+          });
         }
 
         if (response.role === 'ROLE_ADMIN' || response.role === 'ROLE_HR') {
@@ -358,17 +370,17 @@ export class AuthEffects {
     { dispatch: false },
   );
   private handleSupervisorLoginSuccess(
-    response: any
+    response: SupervisorCurrentUserResponse
   ) {
 
     sessionStorage.setItem(
       'college',
-      response.college
+      response.college ?? ''
     );
 
     sessionStorage.setItem(
       'program',
-      response.program
+      response.program ?? ''
     );
 
     sessionStorage.setItem(
@@ -381,8 +393,8 @@ export class AuthEffects {
     return AuthActions.supervisorLoginSuccess({
       evaluatorId: response.evaluatorId,
       role: response.role,
-      college: response.college,
-      program: response.program,
+      college: response.college ?? '',
+      program: response.program ?? '',
     });
   }
 

@@ -14,6 +14,7 @@ import * as StudentDataSelectors from './../../store/student-data/student-data.s
 import * as SupervisorDataSelectors from './../../store/supervisor-data/supervisor-data.selectors';
 import { selectEvaluationDataContext } from './evaluation.selector';
 import { updateStudentEvaluatedClass } from '../student-data/student-data.action';
+import { updateEvaluatedClass } from '../supervisor-data/supervisor-data.actions';
 @Injectable()
 export class EvaluationEffects {
   private actions$ = inject(Actions);
@@ -116,13 +117,20 @@ export class EvaluationEffects {
 
       withLatestFrom(this.store.select(selectRole), this.store.select(selectEvaluationDataContext)),
 
-      tap(([_, role]) => {
+      tap(([_, role, context]) => {
         this.spinnerFacade.hideSpinner();
         this.toastFacade.showToast('Evaluation submitted successfully', 'success');
 
         if (role === 'ROLE_STUDENT') {
           this.router.navigate(['/student-dashboard']);
         } else {
+          if (
+            (role === 'ROLE_DEAN' || role === 'ROLE_PROGRAM_CHAIR') &&
+            context
+          ) {
+            sessionStorage.setItem('supervisorReopenFacultyModal', 'true');
+          }
+
           this.router.navigate(['/supervisor-dashboard']);
         }
       }),
@@ -138,7 +146,25 @@ export class EvaluationEffects {
           });
         }
 
-        // If not student, emit a no-op (or handle supervisor similarly if needed)
+        if (
+          (role === 'ROLE_DEAN' || role === 'ROLE_PROGRAM_CHAIR') &&
+          context
+        ) {
+          const supervisorDashboardKey = `${sessionStorage.getItem('program') ?? ''}-ACTIVE`;
+          const evaluationKey = [
+            context.classCode,
+            context.subjectCode,
+            context.yearLevel,
+            context.semester,
+            context.schoolYear,
+          ].join('-');
+
+          return updateEvaluatedClass({
+            key: supervisorDashboardKey,
+            evaluationKey,
+          });
+        }
+
         return { type: '[Evaluation] Noop' };
       }),
     ),

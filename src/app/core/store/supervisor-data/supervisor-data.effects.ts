@@ -24,6 +24,7 @@ import {
   finalize,
   forkJoin,
   map,
+  mergeMap,
   of,
   switchMap,
   tap,
@@ -137,7 +138,7 @@ export class SupervisorDataEffects {
     this.actions$.pipe(
       ofType(ActionsSet.loadFacultyClasses),
 
-      switchMap(
+      mergeMap(
         ({
           key,
 
@@ -242,7 +243,7 @@ export class SupervisorDataEffects {
     this.actions$.pipe(
       ofType(ActionsSet.loadEvaluationStatusBatch),
 
-      switchMap((action) => {
+      mergeMap((action) => {
         if (!action.payload.length) {
           return of(
             ActionsSet.loadEvaluationStatusBatchSuccess({
@@ -422,9 +423,11 @@ export class SupervisorDataEffects {
               selectedClass!.schoolYear,
             );
 
+          const supervisorDashboardKey = `${sessionStorage.getItem('program') ?? ''}-ACTIVE`;
+
           this.store.dispatch(
             ActionsSet.loadEvaluationStatus({
-              key: `${auth.college}-ACTIVE`,
+              key: supervisorDashboardKey,
 
               role: auth.role,
 

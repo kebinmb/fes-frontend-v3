@@ -15,7 +15,10 @@ import {
 } from 'rxjs';
 import { extractErrorMessage } from '../../../utilities/extract-error.util';
 import { EvaluationService } from '../../services/evaluation/evaluation-service';
-import { StudentDataService } from '../../services/student-data/student-data-service';
+import {
+  StudentClassLoadDTO,
+  StudentDataService,
+} from '../../services/student-data/student-data-service';
 import { selectRole } from '../auth/auth.selector';
 import { SpinnerFacade } from '../spinner/spinner.facade';
 import { ToastFacade } from '../toast/toast.facade';
@@ -89,7 +92,7 @@ export class StudentDataEffects {
 
         this.spinnerFacade.showSpinner();
 
-        const buildKey = (cls: any) =>
+        const buildKey = (cls: StudentClassLoadDTO) =>
           `${cls.facultyId}-${cls.classCode}-${cls.semester}-${cls.schoolYear}`;
 
         const requests = classes.map((cls) => {

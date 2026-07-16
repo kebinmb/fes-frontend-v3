@@ -386,27 +386,42 @@ export const supervisorDataReducer = createReducer(
   on(
     SupervisorDataActions.updateEvaluatedClass,
 
-    (state, { key, evaluationKey }) => ({
-      ...state,
+    (state, { key, evaluationKey }) => {
+      const existingGroup = state.evaluationStatus[key];
+      const existingClasses = existingGroup?.classes || {};
 
-      evaluationStatus: {
-        ...state.evaluationStatus,
+      return {
+        ...state,
 
-        [key]: {
-          ...state.evaluationStatus[key],
+        evaluationStatus: {
+          ...state.evaluationStatus,
 
-          classes: {
-            ...state.evaluationStatus[key].classes,
+          [key]: {
+            facultyId: existingGroup?.facultyId || '',
 
-            [evaluationKey]: {
-              ...state.evaluationStatus[key].classes[evaluationKey],
+            evaluatorId: existingGroup?.evaluatorId || '',
 
-              evaluated: true,
+            semester: existingGroup?.semester || '',
+
+            schoolYear: existingGroup?.schoolYear || 0,
+
+            classes: {
+              ...existingClasses,
+
+              [evaluationKey]: {
+                ...existingClasses[evaluationKey],
+
+                evaluated: true,
+
+                loading: false,
+
+                error: null,
+              },
             },
           },
         },
-      },
-    }),
+      };
+    },
   ),
 
   on(

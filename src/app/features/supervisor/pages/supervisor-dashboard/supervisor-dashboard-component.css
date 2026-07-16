@@ -355,7 +355,7 @@
 }
 .faculty-table {
   width: 100%;
-  min-width: 760px;
+  min-width: 940px;
   border-collapse: collapse;
 }
 .faculty-table thead {
@@ -438,6 +438,98 @@
   color: #15803d;
   font-size: 0.72rem;
   font-weight: 800;
+}
+.faculty-progress-cell {
+  min-width: 210px;
+}
+.faculty-progress-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+.faculty-progress-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.34rem 0.62rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.faculty-progress-badge i {
+  font-size: 0.88rem;
+}
+.faculty-progress-count {
+  color: #64748b;
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.faculty-progress-track {
+  overflow: hidden;
+  height: 7px;
+  margin-top: 0.48rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+.faculty-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #94a3b8;
+  transition: width 0.2s ease;
+}
+.faculty-progress-cell small {
+  display: block;
+  margin-top: 0.32rem;
+  color: #64748b;
+  font-size: 0.73rem;
+  font-weight: 700;
+}
+.faculty-progress-cell.progress-complete .faculty-progress-badge {
+  background: #dcfce7;
+  color: #15803d;
+}
+.faculty-progress-cell.progress-complete .faculty-progress-track span {
+  background: #22c55e;
+}
+.faculty-progress-cell.progress-partial .faculty-progress-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.faculty-progress-cell.progress-partial .faculty-progress-track span {
+  background: #0ea5e9;
+}
+.faculty-progress-cell.progress-pending .faculty-progress-badge {
+  background: #fff7ed;
+  color: #c2410c;
+}
+.faculty-progress-cell.progress-pending .faculty-progress-track span {
+  background: #fb923c;
+}
+.faculty-progress-cell.progress-loading .faculty-progress-badge {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+.faculty-progress-cell.progress-loading .faculty-progress-badge i {
+  animation: progress-spin 0.9s linear infinite;
+}
+.faculty-progress-cell.progress-empty .faculty-progress-badge {
+  background: #f8fafc;
+  color: #64748b;
+}
+.faculty-progress-cell.progress-error .faculty-progress-badge {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+@keyframes progress-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 .btn-evaluate-table {
   width: 128px;

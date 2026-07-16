@@ -15,6 +15,10 @@ export interface StudentClassLoadDTO {
   subjectDescription?: string;
   college: string;
 }
+
+export interface StudentClassLoadWithEvaluation extends StudentClassLoadDTO {
+  isEvaluated: boolean;
+}
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;

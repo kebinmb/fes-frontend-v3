@@ -3,7 +3,9 @@ import { StudentDataFacade } from '@core/store/student-data/student-data.facade'
 import { AsyncPipe, CommonModule, JsonPipe } from '@angular/common';
 import { AuthFacade } from '@core/store/auth/auth.facade';
 import { filter, map, take } from 'rxjs';
-import { StudentClassLoadDTO } from '@core/services/student-data/student-data-service';
+import {
+  StudentClassLoadWithEvaluation,
+} from '@core/services/student-data/student-data-service';
 import { EvaluationClass } from '@core/services/evaluation/evaluation-service';
 @Component({
   selector: 'app-student-dashboard-component',
@@ -41,7 +43,7 @@ export class StudentDashboardComponent {
     };
     this.studentDataFacade.selectClassForEvaluation(selectedClass);
   }
-  onEvaluateClick(cls: any, event: Event) {
+  onEvaluateClick(cls: StudentClassLoadWithEvaluation, event: Event) {
     event.stopPropagation();
     this.startEvaluation(cls, event);
   }

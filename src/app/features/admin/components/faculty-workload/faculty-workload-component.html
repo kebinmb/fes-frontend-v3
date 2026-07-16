@@ -1,5 +1,5 @@
 <section class="workload-page">
-  <div class="workload-editor modern-card">
+  <div class="workload-dashboard modern-card">
     <div class="card-topbar"></div>
 
     <div class="modern-card-header">
@@ -24,9 +24,9 @@
         </div>
       </div>
 
-      <div class="status-card" [class.status-overload]="selectedLoadStatus === 'Overload'">
-        <span>Type of Load</span>
-        <strong>{{ statusLabel(selectedLoadStatus) }}</strong>
+      <div class="status-card">
+        <span>Encoded Assignments</span>
+        <strong>{{ encodedAssignmentDraftCount }} / {{ assignmentDrafts.length || 0 }}</strong>
       </div>
     </div>
 
@@ -55,7 +55,9 @@
       </div>
     }
 
-    <form class="workload-form" [formGroup]="workloadForm" (ngSubmit)="saveWorkload()">
+    <div class="dashboard-body">
+      <aside class="common-panel">
+    <form class="workload-form" [formGroup]="workloadForm">
       <div class="selected-faculty" [class.selected-faculty-empty]="!selectedFaculty">
         <div class="faculty-avatar">{{ selectedFacultyInitials }}</div>
         <div class="selected-faculty-main">
@@ -125,69 +127,6 @@
         </div>
 
         <div class="form-section-title">
-          <span>Teaching Assignment</span>
-        </div>
-
-        <div class="form-group form-group-wide">
-          <label for="workloadClassOption">Course / Program / Year / Section</label>
-          <select
-            id="workloadClassOption"
-            [value]="selectedClassKey"
-            [disabled]="!selectedFaculty || isLoadingClasses"
-            (change)="onClassOptionChange($any($event.target).value)"
-          >
-            <option value="">
-              {{ classOptionPlaceholder }}
-            </option>
-            @for (option of availableClassOptions; track classOptionKey(option)) {
-              <option [value]="classOptionKey(option)">
-                {{ classOptionLabel(option) }}
-              </option>
-            }
-          </select>
-          @if (isLoadingClasses) {
-            <small class="field-status">
-              <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
-              Loading available classes for the selected faculty.
-            </small>
-          }
-        </div>
-
-        <div class="form-group">
-          <label for="workloadClassCode">Class Code</label>
-          <input id="workloadClassCode" type="text" formControlName="classCode" readonly />
-        </div>
-
-        <div class="form-group">
-          <label for="workloadCourseCode">Course Code</label>
-          <input id="workloadCourseCode" type="text" formControlName="courseCode" readonly />
-        </div>
-
-        <div class="form-group">
-          <label for="workloadProgramCode">Program</label>
-          <input id="workloadProgramCode" type="text" formControlName="programCode" readonly />
-        </div>
-
-        <div class="form-group">
-          <label for="workloadYearLevel">Year Level</label>
-          <input id="workloadYearLevel" type="text" formControlName="yearLevel" readonly />
-        </div>
-
-        <div class="form-group">
-          <label for="workloadSectionCode">Section</label>
-          <input id="workloadSectionCode" type="text" formControlName="sectionCode" readonly />
-        </div>
-
-        <div class="form-section-title">
-          <span>Subject-Specific Hours</span>
-        </div>
-
-        <div class="form-group">
-          <label for="totalHoursPerWeek">Subject Total Hours/Week</label>
-          <input id="totalHoursPerWeek" type="number" min="0" step="0.01" formControlName="totalHoursPerWeek" />
-        </div>
-
-        <div class="form-section-title">
           <span>Common Faculty-Term Values</span>
         </div>
 
@@ -216,36 +155,6 @@
           <input id="overloadHours" type="number" min="0" step="0.01" formControlName="overloadHours" readonly />
         </div>
 
-        <div class="form-group form-group-wide">
-          <label id="loadStatusLabel">Type of Load</label>
-          <div
-            class="load-status-toggle"
-            [class.load-status-toggle-overload]="selectedLoadStatus === 'Overload'"
-            aria-labelledby="loadStatusLabel"
-          >
-            <label class="checkbox-control">
-              <input
-                type="checkbox"
-                [checked]="selectedLoadStatus === 'Overload'"
-                (change)="setLoadStatus($any($event.target).checked)"
-              />
-              <span class="checkbox-box" aria-hidden="true">
-                @if (selectedLoadStatus === 'Overload') {
-                  <i class="bi bi-check-lg"></i>
-                }
-              </span>
-              <span class="checkbox-copy">
-                <strong>Mark as overload</strong>
-                <small>Unchecked saves Regular. Checked saves Overload.</small>
-              </span>
-            </label>
-
-            <span class="load-status-pill" [class.overload]="selectedLoadStatus === 'Overload'">
-              {{ selectedLoadStatus }}
-            </span>
-          </div>
-        </div>
-
         <div class="form-group">
           <label for="workloadSource">Source</label>
           <select id="workloadSource" formControlName="source">
@@ -266,33 +175,27 @@
       </div>
 
       <div class="form-actions">
-        <small>{{ selectedFaculty ? 'Ready to save the selected assignment.' : 'Select a faculty before saving.' }}</small>
+        <small>
+          {{ selectedFaculty ? 'Common values apply when saving each teaching-assignment row below.' : 'Select a faculty before encoding assignments.' }}
+        </small>
         <button type="button" class="cancel-btn" (click)="clearForm()">Clear</button>
-        <button type="submit" class="save-btn" [disabled]="!canSaveWorkloadValue">
-          @if (isSaving) {
-            <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
-            Saving
-          } @else {
-            <i class="bi bi-check-circle-fill"></i>
-            Save Workload
-          }
-        </button>
       </div>
     </form>
-  </div>
 
-  <div class="workload-list modern-card">
+      </aside>
+
+      <section class="encoder-panel">
     <div class="modern-card-header compact-header">
       <div class="header-content">
-        <h2>Encoded Workloads</h2>
+        <h2>Teaching Assignments</h2>
         <span>
-          {{ totalElements }} records &middot;
-          {{ visibleHoursPerWeekTotalValue | number: '1.0-2' }} visible hours/week
+          {{ assignmentDrafts.length }} assignments &middot;
+          {{ encodedAssignmentDraftCount }} encoded for the selected term
         </span>
-        @if (isLoadingWorkloads) {
+        @if (isLoadingClasses) {
           <small class="loading-badge">
             <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
-            Refreshing workloads
+            Loading teaching assignments
           </small>
         }
       </div>
@@ -303,17 +206,181 @@
           <input
             type="search"
             class="search-input"
-            placeholder="Search faculty, course, program, section"
-            [(ngModel)]="workloadSearchTerm"
-            (ngModelChange)="onWorkloadSearchChange($event)"
+            placeholder="Filter assignments"
+            [(ngModel)]="assignmentDraftSearchTerm"
           />
         </div>
-        <button type="button" class="refresh-btn" [disabled]="isLoadingWorkloads" (click)="refreshWorkloads()">
+        <button
+          type="button"
+          class="refresh-btn"
+          [disabled]="isLoadingClasses || isLoadingWorkloads || !selectedFaculty"
+          (click)="refreshTeachingAssignments()"
+        >
           <i class="bi bi-arrow-clockwise"></i>
           Refresh
         </button>
       </div>
     </div>
+
+    <div class="table-responsive assignment-table-wrap">
+      <table class="table modern-table assignment-table align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Assignment</th>
+            <th>Program / Year / Section</th>
+            <th>Hours / Week</th>
+            <th>Type of Load</th>
+            <th class="text-center">Save</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (!selectedFaculty) {
+            <tr>
+              <td colspan="5" class="empty-state" data-empty-title="No faculty selected">
+                Search and select a faculty above to load teaching assignments.
+              </td>
+            </tr>
+          } @else if (isLoadingClasses && !assignmentDrafts.length) {
+            <tr>
+              <td colspan="5" class="empty-state" data-empty-title="Loading assignments">
+                Please wait while teaching assignments are loaded.
+              </td>
+            </tr>
+          } @else if (filteredAssignmentDrafts.length) {
+            @for (draft of filteredAssignmentDrafts; track draft.key) {
+              <tr
+                [class.assignment-row-encoded]="draft.isEncoded"
+                [class.assignment-row-dirty]="isAssignmentDraftDirty(draft)"
+              >
+                <td data-label="Assignment">
+                  <strong>{{ draft.option.courseCode || '-' }}</strong>
+                  <small>#{{ draft.option.classCode || '-' }}</small>
+                  <span class="assignment-status" [class.assignment-status-encoded]="draft.isEncoded">
+                    {{ draft.isEncoded ? 'Encoded' : 'Pending' }}
+                  </span>
+                </td>
+                <td data-label="Program / Year / Section">
+                  {{ draft.option.programCode || '-' }} /
+                  {{ draft.option.yearLevel || '-' }} /
+                  {{ draft.option.sectionCode || '-' }}
+                </td>
+                <td data-label="Hours / Week">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    class="table-input"
+                    [name]="'assignmentHours' + draft.key"
+                    [(ngModel)]="draft.totalHoursPerWeek"
+                    [ngModelOptions]="{ standalone: true }"
+                  />
+                  <small
+                    class="assignment-data-hint"
+                    [class.assignment-data-hint-dirty]="isAssignmentDraftDirty(draft)"
+                  >
+                    {{ assignmentDraftDataHint(draft) }}
+                  </small>
+                </td>
+                <td data-label="Type of Load">
+                  <label
+                    class="table-checkbox"
+                    [class.table-checkbox-active]="assignmentDraftStatus(draft) === 'Overload'"
+                  >
+                    <input
+                      type="checkbox"
+                      [name]="'assignmentLoadStatus' + draft.key"
+                      [checked]="assignmentDraftStatus(draft) === 'Overload'"
+                      (change)="draft.loadStatus = $any($event.target).checked ? 'Overload' : 'Regular'"
+                    />
+                    <span class="table-checkbox-box" aria-hidden="true">
+                      @if (assignmentDraftStatus(draft) === 'Overload') {
+                        <i class="bi bi-check-lg"></i>
+                      }
+                    </span>
+                    <span>
+                      <strong>{{ assignmentDraftStatus(draft) }}</strong>
+                      <small>Tick if overload</small>
+                    </span>
+                  </label>
+                </td>
+                <td data-label="Save">
+                  <button
+                    type="button"
+                    class="save-btn assignment-save-btn"
+                    [disabled]="draft.isSaving || !isAssignmentDraftValid(draft)"
+                    (click)="saveAssignmentDraft(draft)"
+                  >
+                    @if (draft.isSaving) {
+                      <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+                      Saving
+                    } @else {
+                      <i class="bi bi-check-circle-fill"></i>
+                      {{ draft.isEncoded ? 'Update' : 'Save' }}
+                    }
+                  </button>
+                </td>
+              </tr>
+            }
+          } @else {
+            <tr>
+              <td colspan="5" class="empty-state" data-empty-title="No assignments found">
+                Try a different filter or refresh the selected faculty's assignments.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+      </section>
+    </div>
+  </div>
+
+  <section
+    class="workload-list workload-history modern-card"
+    [class.workload-history-open]="isEncodedHistoryOpen"
+  >
+    <div class="modern-card-header compact-header">
+      <div class="header-content">
+        <h2>Encoded History</h2>
+        <span>
+          {{ totalElements }} records &middot;
+          {{ visibleHoursPerWeekTotalValue | number: '1.0-2' }} visible hours/week &middot;
+          {{ isEncodedHistoryOpen ? 'Expanded' : 'Collapsed' }}
+        </span>
+        @if (isLoadingWorkloads) {
+          <small class="loading-badge">
+            <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+            Refreshing workloads
+          </small>
+        }
+      </div>
+
+      <div class="list-tools">
+        <button type="button" class="history-toggle-btn" (click)="toggleEncodedHistory()">
+          <i class="bi" [class.bi-chevron-down]="!isEncodedHistoryOpen" [class.bi-chevron-up]="isEncodedHistoryOpen"></i>
+          {{ isEncodedHistoryOpen ? 'Hide History' : 'Show History' }}
+        </button>
+      </div>
+    </div>
+
+    @if (isEncodedHistoryOpen) {
+      <div class="history-body">
+        <div class="history-tools">
+          <div class="search-field list-search">
+            <i class="bi bi-search"></i>
+            <input
+              type="search"
+              class="search-input"
+              placeholder="Search faculty, course, program, section"
+              [(ngModel)]="workloadSearchTerm"
+              (ngModelChange)="onWorkloadSearchChange($event)"
+            />
+          </div>
+          <button type="button" class="refresh-btn" [disabled]="isLoadingWorkloads" (click)="refreshWorkloads()">
+            <i class="bi bi-arrow-clockwise"></i>
+            Refresh
+          </button>
+        </div>
 
     <div class="workload-summary-grid" aria-label="Common encoded workload values">
       <div class="summary-card">
@@ -405,8 +472,8 @@
                       [disabled]="deletingWorkloadId === workload.facultyWorkloadId"
                       (click)="editWorkload(workload)"
                     >
-                      <i class="bi bi-pencil-square"></i>
-                      Edit
+                      <i class="bi bi-box-arrow-in-up-right"></i>
+                      Load
                     </button>
                     <button
                       type="button"
@@ -452,7 +519,9 @@
         </button>
       </div>
     </div>
-  </div>
+      </div>
+    }
+  </section>
 
   @if (workloadPendingDelete) {
     <div class="delete-modal-backdrop" role="presentation" (click)="cancelDeleteWorkload()">
