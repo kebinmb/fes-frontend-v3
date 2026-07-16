@@ -356,12 +356,38 @@ export class FacultyEvaluationPrintComponent implements OnInit {
     return {
       reportId: this.safeText(report.reportId, ''),
       reportHash: this.safeText(report.reportHash, ''),
-      verificationUrl: this.safeText(report.verificationUrl, ''),
+      verificationUrl: this.frontendVerificationUrl(report.reportId, report.verificationUrl),
       qrCodeDataUri: this.safeText(report.qrCodeDataUri, ''),
       versionNumber: this.safeNumber(report.versionNumber, 0),
       status: this.safeText(report.status, ''),
       generatedAt: this.safeText(report.generatedAt, ''),
       generatedByUsername: this.safeText(report.generatedByUsername, ''),
     };
+  }
+
+  private frontendVerificationUrl(
+    reportId: string | null | undefined,
+    fallbackUrl: string | null | undefined,
+  ): string {
+    const resolvedReportId = this.safeText(reportId, '') ||
+      this.reportIdFromVerificationUrl(fallbackUrl);
+
+    if (!resolvedReportId) {
+      return this.safeText(fallbackUrl, '');
+    }
+
+    return `${window.location.origin}/verify-report/${encodeURIComponent(resolvedReportId)}`;
+  }
+
+  private reportIdFromVerificationUrl(url: string | null | undefined): string {
+    const text = this.safeText(url, '');
+
+    if (!text) {
+      return '';
+    }
+
+    const match = text.match(/\/verify-report\/([^/?#]+)/);
+
+    return match?.[1] ? decodeURIComponent(match[1]) : '';
   }
 }

@@ -477,7 +477,7 @@ export class FacultyDataTableComponent implements OnInit {
       report: {
         reportId: report.reportId,
         reportHash: report.reportHash,
-        verificationUrl: report.verificationUrl,
+        verificationUrl: this.frontendVerificationUrl(report.reportId, report.verificationUrl),
         qrCodeDataUri: report.qrCodeDataUri,
         versionNumber: report.versionNumber,
         status: report.status,
@@ -486,6 +486,32 @@ export class FacultyDataTableComponent implements OnInit {
       },
       items: this.normalizePrintItems(report.items, fallback),
     };
+  }
+
+  private frontendVerificationUrl(
+    reportId: string | null | undefined,
+    fallbackUrl: string | null | undefined,
+  ): string {
+    const resolvedReportId = this.safePrintText(reportId) ||
+      this.reportIdFromVerificationUrl(fallbackUrl);
+
+    if (!resolvedReportId) {
+      return this.safePrintText(fallbackUrl);
+    }
+
+    return `${window.location.origin}/verify-report/${encodeURIComponent(resolvedReportId)}`;
+  }
+
+  private reportIdFromVerificationUrl(url: string | null | undefined): string {
+    const text = this.safePrintText(url);
+
+    if (!text) {
+      return '';
+    }
+
+    const match = text.match(/\/verify-report\/([^/?#]+)/);
+
+    return match?.[1] ? decodeURIComponent(match[1]) : '';
   }
 
   private normalizePrintItems(

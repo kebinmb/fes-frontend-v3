@@ -12,6 +12,13 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'verify-report/:reportId',
+    loadComponent: () =>
+      import('@shared/components/report-verification-component/report-verification-component').then(
+        (m) => m.ReportVerificationComponent,
+      ),
+  },
+  {
     path: 'login',
     loadComponent: () =>
       import('@features/auth/login/login-component').then((m) => m.LoginComponent),

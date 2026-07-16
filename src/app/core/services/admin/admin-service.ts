@@ -130,6 +130,22 @@ export interface FacultyEvaluationGeneratedReportResponse {
   items: FacultyEvaluationPrintResponse[];
 }
 
+export interface FacultyEvaluationReportVerificationResponse {
+  reportId?: string;
+  reportHash?: string;
+  verificationUrl?: string;
+  versionNumber?: number;
+  status?: 'VALID' | 'SUPERSEDED' | 'REVOKED' | string;
+  generatedAt?: string;
+  generatedByUsername?: string | null;
+  facultyId?: string;
+  facultyName?: string;
+  schoolYear?: number;
+  semester?: string;
+  valid?: boolean;
+  message?: string;
+}
+
 export interface FacultyEvaluationBulkReportResponse {
   requestedCount: number;
   generatedCount: number;
@@ -1047,6 +1063,17 @@ export class AdminService {
       {},
       {
         params,
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  verifyFacultyEvaluationReport(
+    reportId: string,
+  ): Observable<FacultyEvaluationReportVerificationResponse> {
+    return this.http.get<FacultyEvaluationReportVerificationResponse>(
+      `${this.ADMIN_API_URL}/faculty-evaluation-reports/verify/${encodeURIComponent(reportId)}`,
+      {
         withCredentials: true,
       },
     ).pipe(map((response) => repairSpecialCharacters(response)));
