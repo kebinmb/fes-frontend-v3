@@ -58,6 +58,7 @@ interface FacultyEvaluationPrintRecord {
   overallAverageScore: number;
   overallInterpretation?: string;
   numberOfStudents?: number;
+  numberOfSupervisors?: number;
   setRating?: number;
   sefRating?: number;
   studentComments?: string;
@@ -481,6 +482,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
       || evaluatorType.includes('DEAN')
       || evaluatorType.includes('PROGRAM_CHAIR')
       || evaluatorType === 'SEF'
+      || this.safeNumber(record.numberOfSupervisors) > 0
       || this.safeNumber(record.sefRating) > 0;
   }
 
@@ -700,6 +702,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
           overallAverageScore: this.safeNumber(item.overallAverageScore),
           overallInterpretation: this.safeText(item.overallInterpretation),
           numberOfStudents: this.safeNumber(item.numberOfStudents),
+          numberOfSupervisors: this.safeNumber(item.numberOfSupervisors),
           setRating: this.safeNumber(item.setRating),
           sefRating: this.safeNumber(item.sefRating),
           supervisorName: this.safeText(item.supervisorName),

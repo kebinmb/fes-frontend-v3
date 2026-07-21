@@ -139,6 +139,7 @@ export interface FacultyEvaluationPrintResponse {
   evaluatorType?: string;
   classCode: string;
   numberOfStudents?: number;
+  numberOfSupervisors?: number;
   college: string;
   sectionCode?: string;
   programCode?: string;
@@ -559,6 +560,21 @@ export class AdminService {
   private currentTermCacheCreatedAt = 0;
   private workloadCoverageCache$?: Observable<FacultyWorkloadCoverageResponse>;
   private workloadCoverageCacheCreatedAt = 0;
+
+  private withCsrfToken<T>(
+    requestFactory: (csrf: CsrfTokenResponse) => Observable<T>,
+  ): Observable<T> {
+    return this.http.get<CsrfTokenResponse>(
+      `${this.AUTH_API_URL}/csrf`,
+      { withCredentials: true },
+    ).pipe(switchMap(requestFactory));
+  }
+
+  private csrfHeaders(csrf: CsrfTokenResponse): Record<string, string> {
+    return {
+      [csrf.headerName || 'X-XSRF-TOKEN']: csrf.token,
+    };
+  }
 
   getDashboard(forceRefresh = false): Observable<AdminDashboardResponse> {
     const isExpired =
@@ -1144,12 +1160,15 @@ export class AdminService {
   generateFacultyEvaluationReport(
     facultyId: string,
   ): Observable<FacultyEvaluationGeneratedReportResponse> {
-    return this.http.post<FacultyEvaluationGeneratedReportResponse>(
-      `${this.ADMIN_API_URL}/faculty-evaluation-reports/${encodeURIComponent(facultyId)}`,
-      {},
-      {
-        withCredentials: true,
-      },
+    return this.withCsrfToken((csrf) =>
+      this.http.post<FacultyEvaluationGeneratedReportResponse>(
+        `${this.ADMIN_API_URL}/faculty-evaluation-reports/${encodeURIComponent(facultyId)}`,
+        {},
+        {
+          headers: this.csrfHeaders(csrf),
+          withCredentials: true,
+        },
+      ),
     ).pipe(map((response) => repairSpecialCharacters(response)));
   }
 
@@ -1167,13 +1186,16 @@ export class AdminService {
       params = params.set('college', college.trim());
     }
 
-    return this.http.post<FacultyEvaluationBulkReportResponse>(
-      `${this.ADMIN_API_URL}/faculty-evaluation-reports/bulk`,
-      {},
-      {
-        params,
-        withCredentials: true,
-      },
+    return this.withCsrfToken((csrf) =>
+      this.http.post<FacultyEvaluationBulkReportResponse>(
+        `${this.ADMIN_API_URL}/faculty-evaluation-reports/bulk`,
+        {},
+        {
+          headers: this.csrfHeaders(csrf),
+          params,
+          withCredentials: true,
+        },
+      ),
     ).pipe(map((response) => repairSpecialCharacters(response)));
   }
 
@@ -1198,13 +1220,16 @@ export class AdminService {
       params = params.set('legacyDatabase', filters.legacyDatabase.trim());
     }
 
-    return this.http.post<FacultyEvaluationBulkReportResponse>(
-      `${this.ADMIN_API_URL}/faculty-evaluation-reports/readiness/bulk`,
-      {},
-      {
-        params,
-        withCredentials: true,
-      },
+    return this.withCsrfToken((csrf) =>
+      this.http.post<FacultyEvaluationBulkReportResponse>(
+        `${this.ADMIN_API_URL}/faculty-evaluation-reports/readiness/bulk`,
+        {},
+        {
+          headers: this.csrfHeaders(csrf),
+          params,
+          withCredentials: true,
+        },
+      ),
     ).pipe(map((response) => repairSpecialCharacters(response)));
   }
 

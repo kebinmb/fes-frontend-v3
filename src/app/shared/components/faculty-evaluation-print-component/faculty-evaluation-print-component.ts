@@ -27,6 +27,7 @@ export interface FacultyEvaluationPrintRecord {
   overallInterpretation?: string | null;
 
   numberOfStudents?: number | null;
+  numberOfSupervisors?: number | null;
 
   setRating?: number | null;
   sefRating?: number | null;
@@ -337,6 +338,7 @@ export class FacultyEvaluationPrintComponent implements OnInit {
         yearLevel: this.safeText(item.yearLevel, ''),
         overallAverageScore: this.safeNumber(item.overallAverageScore),
         numberOfStudents: this.safeNumber(item.numberOfStudents),
+        numberOfSupervisors: this.safeNumber(item.numberOfSupervisors),
         setRating: this.safeNumber(item.setRating),
         sefRating: this.safeNumber(item.sefRating),
         studentComments: this.safeText(item.studentComments, ''),
