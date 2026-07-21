@@ -23,6 +23,44 @@ export interface ReleaseNoteSection {
  */
 export const RELEASE_NOTES: ReleaseNote[] = [
   {
+    version: '0.3.0',
+    date: '2026-07-21',
+    title: 'Ready-to-Print Faculty Reports',
+    summary:
+      'This release adds the Faculty Reports dashboard for Admin and HR users, improves Ready-to-Print performance, and makes faculty evaluation printing more reliable in production.',
+    sections: [
+      {
+        title: 'Faculty Reports',
+        description: 'Admin and HR users now have a focused dashboard for print-ready evaluations.',
+        items: [
+          'Added a Faculty Reports dashboard showing faculty with both Student Evaluation and Supervisor Evaluation score records.',
+          'HR users now see only Faculty Dashboard, Supervisor Evaluations, and Faculty Reports in the sidebar.',
+          'Faculty Reports access is available to both Admin and HR roles.',
+        ],
+      },
+      {
+        title: 'Print Workflow',
+        description: 'Single and bulk faculty evaluation printing is more stable for large production data.',
+        items: [
+          'Bulk printing now prepares filtered reports in smaller batches instead of one oversized response.',
+          'Print-ready faculty IDs are fetched through a lightweight endpoint before report generation.',
+          'The printed Name of Staff now uses the logged-in user account firstname and lastname.',
+          'Removed the digital signature and QR verification block from the print template.',
+        ],
+      },
+      {
+        title: 'Performance',
+        description: 'Ready-to-Print data now avoids repeated heavy aggregation work.',
+        items: [
+          'Ready-to-Print faculty queries now read from a summary table optimized for the active term.',
+          'Readiness dashboard and faculty-ID results are cached and evicted when new evaluations are submitted.',
+          'Added a collation alignment migration to prevent MySQL comparison errors in production.',
+          'Client-aborted print responses are handled quietly instead of being logged as application failures.',
+        ],
+      },
+    ],
+  },
+  {
     version: '0.2.2',
     date: '2026-07-14',
     title: 'Optimization and Session Alignment',

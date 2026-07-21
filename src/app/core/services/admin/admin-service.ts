@@ -1073,6 +1073,36 @@ export class AdminService {
     ).pipe(map((response) => repairSpecialCharacters(response)));
   }
 
+  getFacultyEvaluationReadinessFacultyIds(
+    filters: FacultyEvaluationReadinessFilter = {},
+  ): Observable<string[]> {
+    let params = new HttpParams();
+
+    if (filters.search?.trim()) {
+      params = params.set('search', filters.search.trim());
+    }
+
+    if (filters.college?.trim()) {
+      params = params.set('college', filters.college.trim());
+    }
+
+    if (filters.campus?.trim()) {
+      params = params.set('campus', filters.campus.trim());
+    }
+
+    if (filters.legacyDatabase?.trim()) {
+      params = params.set('legacyDatabase', filters.legacyDatabase.trim());
+    }
+
+    return this.http.get<string[]>(
+      `${this.ADMIN_API_URL}/dashboard/faculty-evaluation-readiness/faculty-ids`,
+      {
+        params,
+        withCredentials: true,
+      },
+    );
+  }
+
   updateFaculty(payload: UpdateFacultyRequest): Observable<string> {
     const params = new HttpParams()
       .set('facultyId', payload.facultyId)

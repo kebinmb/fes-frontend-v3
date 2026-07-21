@@ -8,6 +8,28 @@ This project follows a simple semantic versioning style:
 - `MINOR` for new backward-compatible screens or features.
 - `PATCH` for bug fixes, optimizations, and documentation.
 
+## [0.3.0] - 2026-07-21
+
+### Added
+
+- Added the Faculty Reports dashboard for Admin and HR users.
+- Added Ready-to-Print faculty visibility for faculty with both Student Evaluation and Supervisor Evaluation score records.
+- Added a lightweight Ready-to-Print faculty ID endpoint used by filtered bulk printing.
+
+### Changed
+
+- HR sidebar access is now limited to Faculty Dashboard, Supervisor Evaluations, and Faculty Reports.
+- Filtered bulk printing now prepares reports in smaller batches instead of one oversized backend response.
+- Printed Faculty Evaluation reports now show the logged-in user account's first name and last name for Name of Staff.
+- Removed the digital signature and QR verification block from the Faculty Evaluation print template.
+
+### Performance And Reliability
+
+- Ready-to-Print faculty data now uses an optimized summary table instead of repeatedly aggregating the full score table.
+- Ready-to-Print dashboard and faculty ID results are cached and evicted when new evaluations are submitted.
+- Added a database collation alignment migration for the Ready-to-Print summary table.
+- Client-aborted print responses are handled quietly so cancelled browser requests do not appear as application failures.
+
 ## [0.2.2] - 2026-07-14
 
 ### Changed

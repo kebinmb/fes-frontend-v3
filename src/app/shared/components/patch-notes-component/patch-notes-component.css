@@ -4,7 +4,7 @@
   z-index: 1090;
   display: grid;
   place-items: center;
-  padding: 0.75rem;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
   background: rgba(15, 23, 42, 0.42);
   backdrop-filter: blur(4px);
   animation: patch-backdrop-enter 180ms ease-out;
@@ -14,8 +14,8 @@
   position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  width: min(500px, 100%);
-  max-height: min(640px, calc(100dvh - 1.5rem));
+  width: min(720px, calc(100vw - clamp(1.5rem, 4vw, 3rem)));
+  max-height: min(780px, calc(100dvh - clamp(1.5rem, 4vw, 3rem)));
   color: var(--ui-text);
   background: var(--ui-surface);
   border: 1px solid rgba(255, 255, 255, 0.72);
@@ -42,7 +42,7 @@
 }
 
 .patch-header {
-  padding: 0.7rem 0.8rem 0.6rem;
+  padding: clamp(0.7rem, 1.6vw, 1rem) clamp(0.8rem, 2vw, 1.2rem) clamp(0.6rem, 1.5vw, 0.9rem);
   border-bottom: 1px solid var(--ui-border-soft);
 }
 
@@ -113,7 +113,7 @@
 .patch-body {
   min-height: 0;
   overflow-y: auto;
-  padding: 0.65rem 0.8rem;
+  padding: clamp(0.65rem, 1.8vw, 1rem) clamp(0.8rem, 2vw, 1.2rem);
   overscroll-behavior: contain;
 }
 
@@ -240,7 +240,7 @@
 }
 
 .patch-actions {
-  padding: 0.6rem 0.8rem 0.7rem;
+  padding: clamp(0.6rem, 1.5vw, 0.9rem) clamp(0.8rem, 2vw, 1.2rem) clamp(0.7rem, 1.7vw, 1rem);
   justify-content: flex-end;
   background: #ffffff;
   border-top: 1px solid var(--ui-border-soft);
@@ -292,7 +292,7 @@
 
   .patch-notes {
     width: 100%;
-    max-height: calc(100dvh - 1rem);
+    max-height: min(92dvh, calc(100dvh - 1rem));
     border-radius: 12px 12px 10px 10px;
   }
 
@@ -329,6 +329,18 @@
   .patch-primary-btn,
   .patch-secondary-btn {
     width: 100%;
+  }
+}
+
+@media (min-width: 992px) {
+  .patch-notes {
+    width: min(760px, calc(100vw - 3rem));
+  }
+}
+
+@media (max-height: 640px) {
+  .patch-notes {
+    max-height: calc(100dvh - 1rem);
   }
 }
 

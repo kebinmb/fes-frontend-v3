@@ -23,6 +23,7 @@ import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 import { extractErrorMessage } from '@utilities/extract-error.util';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
 import {
+  Observable,
   Subject,
   catchError,
   debounceTime,
@@ -72,18 +73,26 @@ type EvaluationCommentSource = {
   supervisorComments?: string | null;
 };
 
-type PreparedReportResult =
-  | {
-      row: FacultyEvaluationReadinessRow;
-      payload: {
-        report: Partial<FacultyEvaluationGeneratedReportResponse>;
-        items: FacultyEvaluationPrintRecord[];
-      };
-    }
-  | {
-      row: FacultyEvaluationReadinessRow;
-      error: unknown;
-    };
+type PrintableFacultyTarget = Partial<FacultyEvaluationReadinessRow> & {
+  facultyId: string;
+};
+
+type PreparedPrintPayload = {
+  report: Partial<FacultyEvaluationGeneratedReportResponse>;
+  items: FacultyEvaluationPrintRecord[];
+};
+
+type PreparedReportSuccess = {
+  row: PrintableFacultyTarget;
+  payload: PreparedPrintPayload;
+};
+
+type PreparedReportFailure = {
+  row: PrintableFacultyTarget;
+  error: unknown;
+};
+
+type PreparedReportResult = PreparedReportSuccess | PreparedReportFailure;
 
 @Component({
   selector: 'app-faculty-evaluation-scores-data-table-component',
@@ -388,9 +397,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
       )
       .subscribe((results) => {
         const reports = results
-          .filter((result): result is Extract<PreparedReportResult, { payload: unknown }> =>
-            'payload' in result,
-          )
+          .filter((result): result is PreparedReportSuccess => this.isPreparedReportSuccess(result))
           .map((result) => result.payload)
           .filter((payload) => payload.items.length);
 
@@ -510,7 +517,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
     return printWindow;
   }
 
-  private preparePrintableReport(row: FacultyEvaluationReadinessRow) {
+  private preparePrintableReport(row: PrintableFacultyTarget): Observable<PreparedReportResult> {
     return this.adminService.generateFacultyEvaluationReport(row.facultyId).pipe(
       map((report): PreparedReportResult => {
         if (!this.reportHasBothEvaluationTypes(report.items ?? [])) {
@@ -522,15 +529,27 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
           payload: this.toPrintPayload(report, row),
         };
       }),
-      catchError((error) => of({ row, error } satisfies PreparedReportResult)),
+      catchError((error) => of({ row, error } as PreparedReportFailure)),
     );
   }
 
   private prepareFilteredBulkReports(printWindow: Window): void {
     this.adminService
-      .generateBulkFacultyEvaluationReadinessReports(this.buildFilters())
+      .getFacultyEvaluationReadinessFacultyIds(this.buildFilters())
       .pipe(
         take(1),
+        mergeMap((facultyIds) => {
+          const targets = facultyIds.map((facultyId) => ({ facultyId }));
+
+          if (!targets.length) {
+            return of([]);
+          }
+
+          return from(targets).pipe(
+            mergeMap((target) => this.preparePrintableReport(target), 4),
+            toArray(),
+          );
+        }),
         catchError((error) => {
           this.toastFacade.showToast(
             `Unable to prepare faculty reports. ${extractErrorMessage(error)}`,
@@ -538,14 +557,15 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
           );
           printWindow.close();
 
-          return of(null);
+          return of([] as PreparedReportResult[]);
         }),
         finalize(() => this.isBulkPrinting.set(false)),
       )
-      .subscribe((response) => {
-        const reports = response?.reports
-          ?.map((report) => this.toPrintPayload(report))
-          .filter((payload) => payload.items.length) ?? [];
+      .subscribe((results) => {
+        const reports = results
+          .filter((result): result is PreparedReportSuccess => this.isPreparedReportSuccess(result))
+          .map((result) => result.payload)
+          .filter((payload) => payload.items.length);
 
         if (!reports.length) {
           this.toastFacade.showToast(
@@ -558,7 +578,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
 
         localStorage.setItem('faculty-print-data', JSON.stringify({ reports }));
 
-        const skippedCount = response?.skippedFacultyIds?.length ?? 0;
+        const skippedCount = results.length - reports.length;
         const skippedMessage = skippedCount
           ? ` ${skippedCount} faculty record(s) were skipped.`
           : '';
@@ -576,6 +596,10 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
   private reportHasBothEvaluationTypes(items: FacultyEvaluationPrintResponse[]): boolean {
     return items.some((item) => this.isStudentEvaluation(item))
       && items.some((item) => this.isSupervisorEvaluation(item));
+  }
+
+  private isPreparedReportSuccess(result: PreparedReportResult): result is PreparedReportSuccess {
+    return 'payload' in result;
   }
 
   private applyResponse(response: FacultyEvaluationReadinessPageResponse): void {
