@@ -74,16 +74,61 @@ export interface FetchFacultyEvaluationScoreResponse {
   facultyId: string;
   facultyName: string;
   evaluatorId: string;
+  evaluatorType?: string | null;
   classCode: string;
   college: string;
   position: string;
+  legacyDatabase?: string | null;
+  campus?: string | null;
   semester: string;
   schoolYear: number;
   subjectCode: string;
   yearLevel: string;
+  programCode?: string | null;
+  sectionCode?: string | null;
+  numberOfStudents?: number | null;
+  setRating?: number | null;
+  sefRating?: number | null;
   commentsOrFeedbacks: string;
   overallAverageScore: number;
   overallInterpretation: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
+export interface FacultyEvaluationReadinessResponse {
+  facultyId: string;
+  facultyName: string;
+  college: string;
+  position: string;
+  legacyDatabase?: string | null;
+  campus?: string | null;
+  schoolYear?: number | null;
+  semester?: string | null;
+  subjects?: string[] | null;
+  studentEvaluationCount: number;
+  supervisorEvaluationCount: number;
+  totalScoreRecords: number;
+  setAverage?: number | null;
+  sefAverage?: number | null;
+  overallAverage?: number | null;
+  lastEvaluatedAt?: string | null;
+}
+
+export interface FacultyEvaluationReadinessPageResponse
+  extends PageResponse<FacultyEvaluationReadinessResponse> {
+  totalReadyFacultyCount?: number;
+  totalStudentEvaluationCount?: number;
+  totalSupervisorEvaluationCount?: number;
+  totalScoreRecordCount?: number;
+  averageOverallScore?: number | null;
+}
+
+export interface FacultyEvaluationReadinessFilter {
+  search?: string;
+  college?: string;
+  campus?: string;
+  legacyDatabase?: string;
 }
 
 export interface FacultyEvaluationPrintResponse {
@@ -994,6 +1039,40 @@ export class AdminService {
     );
   }
 
+  getFacultyEvaluationReadiness(
+    page: number = 0,
+    size: number = 10,
+    filters: FacultyEvaluationReadinessFilter = {},
+  ): Observable<FacultyEvaluationReadinessPageResponse> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+
+    if (filters.search?.trim()) {
+      params = params.set('search', filters.search.trim());
+    }
+
+    if (filters.college?.trim()) {
+      params = params.set('college', filters.college.trim());
+    }
+
+    if (filters.campus?.trim()) {
+      params = params.set('campus', filters.campus.trim());
+    }
+
+    if (filters.legacyDatabase?.trim()) {
+      params = params.set('legacyDatabase', filters.legacyDatabase.trim());
+    }
+
+    return this.http.get<FacultyEvaluationReadinessPageResponse>(
+      `${this.ADMIN_API_URL}/dashboard/faculty-evaluation-readiness`,
+      {
+        params,
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
   updateFaculty(payload: UpdateFacultyRequest): Observable<string> {
     const params = new HttpParams()
       .set('facultyId', payload.facultyId)
@@ -1060,6 +1139,37 @@ export class AdminService {
 
     return this.http.post<FacultyEvaluationBulkReportResponse>(
       `${this.ADMIN_API_URL}/faculty-evaluation-reports/bulk`,
+      {},
+      {
+        params,
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  generateBulkFacultyEvaluationReadinessReports(
+    filters: FacultyEvaluationReadinessFilter = {},
+  ): Observable<FacultyEvaluationBulkReportResponse> {
+    let params = new HttpParams();
+
+    if (filters.search?.trim()) {
+      params = params.set('search', filters.search.trim());
+    }
+
+    if (filters.college?.trim()) {
+      params = params.set('college', filters.college.trim());
+    }
+
+    if (filters.campus?.trim()) {
+      params = params.set('campus', filters.campus.trim());
+    }
+
+    if (filters.legacyDatabase?.trim()) {
+      params = params.set('legacyDatabase', filters.legacyDatabase.trim());
+    }
+
+    return this.http.post<FacultyEvaluationBulkReportResponse>(
+      `${this.ADMIN_API_URL}/faculty-evaluation-reports/readiness/bulk`,
       {},
       {
         params,

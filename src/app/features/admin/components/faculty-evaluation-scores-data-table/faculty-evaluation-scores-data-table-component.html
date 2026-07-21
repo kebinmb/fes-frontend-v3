@@ -1,167 +1,336 @@
-@let scoresData = facultyEvaluationScore$ | async;
-<section class="modern-card">
-  <div class="card-topbar"></div>
-  <!-- HEADER -->
-  <div class="modern-card-header">
-    <div class="header-content">
-      <h2>
-        Faculty Evaluation Scores
-      </h2>
-      <span>
-        Performance evaluation analytics
-      </span>
+<section class="report-dashboard" [attr.aria-busy]="isLoading()">
+  <header class="page-header">
+    <div>
+      <span class="eyebrow">Faculty Reports</span>
+      <h1>Print-Ready Faculty Evaluations</h1>
+      <p>
+        Faculty shown here have both Student Evaluation and Supervisor Evaluation score records.
+      </p>
     </div>
+
     <div class="header-actions">
-      <div class="table-count">
-        <i class="bi bi-bar-chart-fill"></i>
-        <span>
-          {{ scoresData?.totalElements || 0 }}
-        </span>
-      </div>
-    </div>
-  </div>
-  <!-- TABLE -->
-  <div class="table-responsive">
-    <table class="table modern-table align-middle mb-0">
-      <thead>
-        <tr>
-          <th>Faculty</th>
-          <th>Subject</th>
-          <th>Semester</th>
-          <th>SET Rating</th>
-          <th>Interpretation</th>
-        </tr>
-      </thead>
-      <tbody>
-        @if (scoresData?.content?.length) {
-          @for (
-            score of scoresData!.content;
-            track score.facultyEvaluationScoreId
-          ) {
-            <tr>
-              <!-- FACULTY -->
-              <td data-label="Faculty">
-                <div class="table-user">
-                  <div class="table-avatar warning-avatar">
-                    {{ initial(score.facultyName) }}
-                  </div>
-                  <div class="table-user-content">
-                    <div class="fw-semibold">
-                      {{ score.facultyName | unicodeText }}
-                    </div>
-                    <small>
-                      {{ score.facultyId }}
-                    </small>
-                  </div>
-                </div>
-              </td>
-              <!-- SUBJECT -->
-              <td data-label="Subject">
-                <span class="subject-code">
-                  {{ score.subjectCode }}
-                </span>
-              </td>
-              <!-- SEMESTER -->
-              <td data-label="Semester">
-                <span class="semester-badge">
-                  {{ score.semester }}
-                </span>
-              </td>
-              <!-- SCORE -->
-              <td data-label="SET Rating">
-                <span class="score-badge">
-                  {{
-                    score.overallAverageScore
-                      | number: '1.2-2'
-                  }}%
-                </span>
-              </td>
-              <!-- INTERPRETATION -->
-              <td data-label="Interpretation">
-                <span
-                  class="interpretation-badge"
-                  [class.excellent]="score.overallAverageScore >= 90"
-                  [class.average]="
-                    score.overallAverageScore >= 70 &&
-                    score.overallAverageScore < 90
-                  "
-                  [class.poor]="score.overallAverageScore < 70"
-                >
-                  {{ score.overallInterpretation }}
-                </span>
-              </td>
-            </tr>
-          }
-        } @else {
-          <tr>
-            <td colspan="5" class="empty-state">
-              <div class="empty-wrapper">
-                <i class="bi bi-bar-chart-line"></i>
-                <h4>
-                  No Evaluation Data
-                </h4>
-                <span>
-                  No faculty evaluation records found.
-                </span>
-              </div>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-  <!-- FOOTER -->
-  <div class="modern-card-footer">
-    <small>
-      Showing
-      <strong>
-        {{ scoresData?.content?.length || 0 }}
-      </strong>
-      of
-      <strong>
-        {{ scoresData?.totalElements || 0 }}
-      </strong>
-      evaluation records
-    </small>
-    <div class="pagination-group">
-      <!-- PREVIOUS -->
       <button
         type="button"
-        class="pagination-btn warning-btn"
-        [disabled]="(scoresData?.page ?? 0) === 0"
-        (click)="onUserPageChange((scoresData?.page ?? 0) - 1)"
+        class="secondary-btn"
+        (click)="loadDashboard()"
+        [disabled]="isLoading() || isBulkPrinting()"
       >
-        <i class="bi bi-chevron-left"></i>
+        @if (isLoading()) {
+          <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+          <span>Refreshing</span>
+        } @else {
+          <i class="bi bi-arrow-clockwise"></i>
+          <span>Refresh</span>
+        }
+      </button>
+
+      <button
+        type="button"
+        class="primary-btn"
+        (click)="printBulk()"
+        [disabled]="isLoading() || isBulkPrinting() || !totalElements()"
+      >
+        <i
+          class="bi"
+          [class.bi-printer-fill]="!isBulkPrinting()"
+          [class.bi-hourglass-split]="isBulkPrinting()"
+        ></i>
         <span>
-          Prev
+          @if (isBulkPrinting()) {
+            Preparing
+          } @else if (selectedCount()) {
+            Print Selected
+          } @else {
+            Bulk Print
+          }
         </span>
       </button>
-      <!-- PAGE INFO -->
-      <span class="pagination-info">
-        Page
-        <strong>
-          {{ (scoresData?.page ?? 0) + 1 }}
-        </strong>
-        of
-        <strong>
-          {{ scoresData?.totalPages ?? 1 }}
-        </strong>
-      </span>
-      <!-- NEXT -->
+    </div>
+  </header>
+
+  <div class="summary-grid">
+    <article class="summary-card">
+      <span>Ready Faculty</span>
+      <strong>{{ evaluatedFacultyCount() }}</strong>
+      <small>with both evaluation types</small>
+    </article>
+
+    <article class="summary-card success">
+      <span>Student Evaluations</span>
+      <strong>{{ studentEvaluationCount() }}</strong>
+      <small>matching ready faculty</small>
+    </article>
+
+    <article class="summary-card blue">
+      <span>Supervisor Evaluations</span>
+      <strong>{{ supervisorEvaluationCount() }}</strong>
+      <small>matching ready faculty</small>
+    </article>
+
+    <article class="summary-card gold">
+      <span>Average Score</span>
+      <strong>{{ formatScore(averageOverallScore()) }}</strong>
+      <small>{{ totalScoreRecords() }} score records summarized</small>
+    </article>
+  </div>
+
+  <section class="toolbar" aria-label="Faculty report filters">
+    <label class="search-field">
+      <span>Search</span>
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input
+          type="search"
+          [ngModel]="searchTerm()"
+          (ngModelChange)="updateSearchTerm($event)"
+          placeholder="Faculty, ID, subject, term"
+          autocomplete="off"
+        />
+      </div>
+    </label>
+
+    <label>
+      <span>College</span>
+      <select [ngModel]="selectedCollege()" (ngModelChange)="updateCollege($event)">
+        <option value="">All Colleges</option>
+        @for (college of collegeOptions; track college) {
+          <option [value]="college">{{ college }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      <span>Campus</span>
+      <select [ngModel]="selectedCampus()" (ngModelChange)="updateCampus($event)">
+        @for (option of campusOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
+    <button
+      type="button"
+      class="clear-btn"
+      (click)="clearFilters()"
+      [disabled]="!hasActiveFilters() || isLoading()"
+    >
+      Clear
+    </button>
+  </section>
+
+  @if (selectedCount()) {
+    <div class="selection-strip">
+      <i class="bi bi-check2-square"></i>
+      <span>{{ selectedCount() }} faculty selected for bulk printing</span>
+      <button type="button" (click)="clearSelection()">
+        Clear selection
+      </button>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="feedback-banner" role="alert">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <section class="table-shell">
+    @if (isLoading() && !hasLoaded()) {
+      <div class="state-panel">
+        <span class="loader"></span>
+        <strong>Loading print-ready faculty...</strong>
+      </div>
+    } @else if (!visibleRows().length) {
+      <div class="state-panel">
+        <i class="bi bi-clipboard-x"></i>
+        <strong>No print-ready faculty found</strong>
+        <span>
+          @if (hasActiveFilters()) {
+            Adjust the filters or clear them to see all qualified faculty.
+          } @else {
+            Faculty will appear here once both evaluation types exist in the score table.
+          }
+        </span>
+      </div>
+    } @else {
+      @if (isLoading()) {
+        <div class="loading-shade">
+          <span class="loader small"></span>
+          <strong>Refreshing report dashboard...</strong>
+        </div>
+      }
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th class="select-column">
+                <input
+                  type="checkbox"
+                  [checked]="areVisibleRowsSelected()"
+                  (change)="toggleVisibleSelection($any($event.target).checked)"
+                  aria-label="Select visible faculty"
+                />
+              </th>
+              <th>Primary Faculty</th>
+              <th>College / Campus</th>
+              <th>Academic Term</th>
+              <th>Subjects</th>
+              <th class="text-center">SET</th>
+              <th class="text-center">SEF</th>
+              <th class="text-end">Average</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of visibleRows(); track trackByFacultyId($index, row)) {
+              <tr>
+                <td class="select-column">
+                  <input
+                    type="checkbox"
+                    [checked]="isSelected(row.facultyId)"
+                    (change)="toggleSelection(row.facultyId, $any($event.target).checked)"
+                    [attr.aria-label]="'Select ' + row.facultyName"
+                  />
+                </td>
+                <td>
+                  <strong>{{ row.facultyName | unicodeText }}</strong>
+                  <span>{{ row.facultyId }}</span>
+                  <small>{{ row.position || '-' }}</small>
+                </td>
+                <td>
+                  <strong>{{ row.college || '-' }}</strong>
+                  <span>{{ displayCampus(row) }}</span>
+                </td>
+                <td>
+                  <strong>{{ formatSemester(row.semester) }}</strong>
+                  <span>{{ row.schoolYear || '-' }}</span>
+                  <small>{{ displayDate(row.lastEvaluatedAt) }}</small>
+                </td>
+                <td>
+                  <div class="subject-list">
+                    @for (subject of (row.subjects ?? []).slice(0, 3); track subject) {
+                      <span>{{ subject }}</span>
+                    }
+                    @if ((row.subjects ?? []).length > 3) {
+                      <span>+{{ (row.subjects ?? []).length - 3 }}</span>
+                    }
+                  </div>
+                </td>
+                <td class="text-center">
+                  <span class="count-pill success">{{ row.studentEvaluationCount }}</span>
+                  <small>{{ formatScore(row.setAverage) }}</small>
+                </td>
+                <td class="text-center">
+                  <span class="count-pill blue">{{ row.supervisorEvaluationCount }}</span>
+                  <small>{{ formatScore(row.sefAverage) }}</small>
+                </td>
+                <td class="text-end">
+                  <strong>{{ formatScore(row.overallAverage) }}</strong>
+                </td>
+                <td class="text-end">
+                  <button
+                    type="button"
+                    class="row-print-btn"
+                    (click)="printSingle(row)"
+                    [disabled]="!!printingFacultyId() || isBulkPrinting()"
+                  >
+                    <i
+                      class="bi"
+                      [class.bi-printer]="printingFacultyId() !== row.facultyId"
+                      [class.bi-hourglass-split]="printingFacultyId() === row.facultyId"
+                    ></i>
+                    <span>
+                      {{ printingFacultyId() === row.facultyId ? 'Preparing' : 'Print' }}
+                    </span>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mobile-card-list">
+        @for (row of visibleRows(); track trackByFacultyId($index, row)) {
+          <article class="mobile-card">
+            <div class="mobile-card-header">
+              <label>
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(row.facultyId)"
+                  (change)="toggleSelection(row.facultyId, $any($event.target).checked)"
+                />
+                <span>{{ row.facultyName | unicodeText }}</span>
+              </label>
+              <button
+                type="button"
+                class="row-print-btn"
+                (click)="printSingle(row)"
+                [disabled]="!!printingFacultyId() || isBulkPrinting()"
+              >
+                <i class="bi bi-printer"></i>
+                <span>Print</span>
+              </button>
+            </div>
+
+            <dl>
+              <div>
+                <dt>Faculty ID</dt>
+                <dd>{{ row.facultyId }}</dd>
+              </div>
+              <div>
+                <dt>College / Campus</dt>
+                <dd>{{ row.college || '-' }} / {{ displayCampus(row) }}</dd>
+              </div>
+              <div>
+                <dt>Term</dt>
+                <dd>{{ formatSemester(row.semester) }} / {{ row.schoolYear || '-' }}</dd>
+              </div>
+              <div>
+                <dt>Evaluations</dt>
+                <dd>
+                  SET {{ row.studentEvaluationCount }} / SEF {{ row.supervisorEvaluationCount }}
+                </dd>
+              </div>
+              <div>
+                <dt>Average</dt>
+                <dd>{{ formatScore(row.overallAverage) }}</dd>
+              </div>
+            </dl>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  <footer class="pagination-bar">
+    <span>Showing {{ pageStart() }}-{{ pageEnd() }} of {{ totalElements() }}</span>
+
+    <div class="pagination-controls">
+      <label>
+        Rows
+        <select [ngModel]="pageSize()" (ngModelChange)="updatePageSize($event)">
+          @for (size of pageSizes; track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
+      </label>
+
+      <button type="button" (click)="goToPage(pageIndex() - 1)" [disabled]="pageIndex() === 0">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+
+      <strong>{{ pageIndex() + 1 }} / {{ totalPages() }}</strong>
+
       <button
         type="button"
-        class="pagination-btn warning-btn"
-        [disabled]="
-          (scoresData?.page ?? 0) + 1 >=
-          (scoresData?.totalPages ?? 0)
-        "
-        (click)="onUserPageChange((scoresData?.page ?? 0) + 1)"
+        (click)="goToPage(pageIndex() + 1)"
+        [disabled]="pageIndex() >= totalPages() - 1"
       >
-        <span>
-          Next
-        </span>
         <i class="bi bi-chevron-right"></i>
       </button>
     </div>
-  </div>
+  </footer>
 </section>

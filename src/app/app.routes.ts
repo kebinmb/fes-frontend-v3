@@ -133,7 +133,7 @@ export const routes: Routes = [
       {
         path: 'evaluation-score-list',
         canActivate: [roleGuard],
-        data: { role: 'ROLE_ADMIN' },
+        data: { role: ['ROLE_ADMIN', 'ROLE_HR'] },
         loadComponent: () =>
           import(
             '@features/admin/components/faculty-evaluation-scores-data-table/faculty-evaluation-scores-data-table-component'

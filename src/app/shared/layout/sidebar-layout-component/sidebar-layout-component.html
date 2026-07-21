@@ -61,6 +61,7 @@
       </div>
       }
 
+      @if (role === 'ROLE_ADMIN' || role === 'ROLE_HR') {
       <div class="nav-section">
         <span class="nav-section-label">Management</span>
 
@@ -87,6 +88,19 @@
 
           <span>
             Supervisor Evaluations
+          </span>
+        </a>
+
+        <a
+          class="nav-item"
+          routerLink="/admin-dashboard/evaluation-score-list"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-printer-fill"></i>
+
+          <span>
+            Faculty Reports
           </span>
         </a>
 
@@ -144,23 +158,11 @@
         </a>
         }
       </div>
+      }
 
       @if (role === 'ROLE_ADMIN') {
       <div class="nav-section">
         <span class="nav-section-label">Evaluations</span>
-
-        <a
-          class="nav-item"
-          routerLink="/admin-dashboard/evaluation-score-list"
-          routerLinkActive="active"
-          (click)="closeSidebar()"
-        >
-          <i class="bi bi-clipboard-data"></i>
-
-          <span>
-            Faculty Scores
-          </span>
-        </a>
 
         <a
           class="nav-item"
