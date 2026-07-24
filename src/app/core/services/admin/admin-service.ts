@@ -68,6 +68,8 @@ export interface FetchUserAccountsResponse {
   college: string;
   programs: string;
   majors: string;
+  dataSource?: string | null;
+  data_source?: string | null;
 }
 export interface FetchFacultyEvaluationScoreResponse {
   facultyEvaluationScoreId: number;
@@ -279,6 +281,7 @@ export interface CreateUserAccountRequest {
   college?: string;
   programs?: string;
   majors?: string;
+  dataSource?: string;
   status: string;
 }
 
@@ -290,6 +293,7 @@ export interface UpdateUserAccountRequest {
   college?: string;
   programs?: string;
   majors?: string;
+  dataSource?: string;
   status: string;
   isEnabled: boolean;
   isLocked: boolean;
@@ -1034,13 +1038,39 @@ export class AdminService {
   getUserAccounts(
     page: number = 0,
     size: number = 10,
+    search: string = '',
   ): Observable<PageResponse<FetchUserAccountsResponse>> {
-    const params = new HttpParams().set('page', page).set('size', size);
+    let params = new HttpParams().set('page', page).set('size', size);
+
+    if (search.trim()) {
+      params = params.set('search', search.trim());
+    }
 
     return this.http.get<PageResponse<FetchUserAccountsResponse>>(
       `${this.ADMIN_API_URL}/user-accounts`,
       { params, withCredentials: true },
+    ).pipe(
+      map((response) => this.normalizeUserAccountsResponse(response)),
+      map((response) => repairSpecialCharacters(response)),
     );
+  }
+
+  private normalizeUserAccountsResponse(
+    response: PageResponse<FetchUserAccountsResponse>,
+  ): PageResponse<FetchUserAccountsResponse> {
+    return {
+      ...response,
+      content: (response.content ?? []).map((user) => ({
+        ...user,
+        dataSource: this.normalizeDataSource(user.dataSource ?? user.data_source),
+      })),
+    };
+  }
+
+  private normalizeDataSource(dataSource?: string | null): string | null {
+    const normalized = dataSource?.trim().toUpperCase();
+
+    return normalized || null;
   }
 
   getFacultyEvaluationScores(

@@ -6,7 +6,7 @@
 
   <div class="modern-card-header">
 
-    <div>
+    <div class="header-copy">
 
       <h2>
         User Accounts
@@ -38,6 +38,51 @@
 
   </div>
 
+  <form class="toolbar" role="search" (ngSubmit)="onSearch()">
+
+    <label class="visually-hidden" for="userSearch">
+      Search user accounts
+    </label>
+
+    <div class="search-field">
+      <i class="bi bi-search"></i>
+      <input
+        id="userSearch"
+        type="search"
+        name="userSearch"
+        [(ngModel)]="searchTerm"
+        placeholder="Search username, email, name, or data source"
+      />
+    </div>
+
+    <button type="submit" class="toolbar-btn primary">
+      Search
+    </button>
+
+    @if (searchTerm) {
+    <button type="button" class="toolbar-btn" (click)="clearSearch()">
+      Clear
+    </button>
+    }
+
+    <label class="page-size-label" for="userPageSize">
+      Rows
+    </label>
+
+    <select
+      id="userPageSize"
+      name="userPageSize"
+      class="page-size-select"
+      [ngModel]="pageSize"
+      (ngModelChange)="onPageSizeChange($event)"
+    >
+      <option [ngValue]="10">10</option>
+      <option [ngValue]="20">20</option>
+      <option [ngValue]="50">50</option>
+    </select>
+
+  </form>
+
   <div class="table-responsive">
 
     <table class="table modern-table align-middle mb-0">
@@ -60,6 +105,10 @@
 
           <th>
             Status
+          </th>
+
+          <th>
+            Data Source
           </th>
 
           <th class="text-end">
@@ -143,7 +192,17 @@
 
           </td>
 
-          <td class="text-end">
+          <td data-label="Data Source">
+
+            <span class="source-badge">
+
+              {{ dataSourceLabel(user.dataSource) }}
+
+            </span>
+
+          </td>
+
+          <td class="text-end" data-label="Actions">
 
             <button type="button" class="edit-btn" (click)="openEditModal(user)">
 
@@ -163,9 +222,9 @@
 
         <tr>
 
-          <td colspan="5" class="empty-state">
+          <td colspan="6" class="empty-state">
 
-            No users found
+            {{ searchTerm ? 'No user accounts match your search.' : 'No users found' }}
 
           </td>
 
@@ -187,6 +246,10 @@
 
       {{ usersData?.content?.length || 0 }}
 
+      of
+
+      {{ usersData?.totalElements || 0 }}
+
       user accounts
 
     </small>
@@ -204,6 +267,10 @@
         Prev
 
       </button>
+
+      <span class="pagination-info">
+        Page {{ (usersData?.page ?? 0) + 1 }} of {{ usersData?.totalPages || 1 }}
+      </span>
 
       <button type="button" class="pagination-btn" [disabled]="
           ((usersData?.page ?? 0) + 1)
@@ -416,6 +483,30 @@
             <option [value]="major">
 
               {{ major }}
+
+            </option>
+
+            }
+
+          </select>
+
+        </div>
+        <div class="form-group">
+
+          <label>
+            Data Source
+          </label>
+
+          <select formControlName="dataSource">
+
+            @for (
+            source of dataSources;
+            track source.value
+            ) {
+
+            <option [value]="source.value">
+
+              {{ source.label }}
 
             </option>
 

@@ -366,7 +366,7 @@ tbody tr:nth-child(even) {
         width: 100%;
         margin: 0 !important;
         border: 0 !important;
-        padding-bottom: 0 !important;
+        padding-bottom: 8mm !important;
         overflow: visible !important;
         border-collapse: collapse
     }
@@ -502,7 +502,52 @@ tbody tr:nth-child(even) {
     }
 
     .approval-section {
-        display: none !important
+        display: grid !important;
+        grid-template-columns: 1fr;
+        gap: 5mm;
+        margin-top: 10mm;
+        padding: 4mm 6mm 0;
+        color: #1f2937;
+        background: #fff !important;
+        break-inside: avoid;
+        page-break-inside: avoid
+    }
+
+    .approval-block {
+        gap: 1.8mm;
+        font-size: 8.2px
+    }
+
+    .approval-heading {
+        color: #374151;
+        font-size: 8.2px;
+        font-weight: 600
+    }
+
+    .approval-row {
+        grid-template-columns: 40mm 3mm minmax(0, 1fr);
+        gap: 1.6mm;
+        min-height: 4mm
+    }
+
+    .approval-label,
+    .approval-colon {
+        color: var(--chmsu-primary);
+        font-size: 8.2px;
+        font-weight: 800
+    }
+
+    .approval-line {
+        min-height: 4mm;
+        border-bottom: 1px solid #374151
+    }
+
+    .approval-line-value {
+        padding: 0 1.5mm .6mm;
+        color: #111827;
+        font-size: 8px;
+        font-weight: 800;
+        text-transform: uppercase
     }
 
     .verification-panel {
@@ -550,76 +595,15 @@ tbody tr:nth-child(even) {
         padding: 2px
     }
 
-    .print-signatories {
-        display: table-footer-group !important;
-        color: #1f2937
-    }
-
-    .print-signatory-row {
-        display: table-row
-    }
-
-    .print-signatory-cell {
-        display: table-cell;
-        padding: 8mm 0 0;
-        border: 0 !important;
-        background: #fff !important
-    }
-
-    .print-signatory-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 5mm;
-        min-height: 34mm;
-        padding: 4mm 6mm 0;
-        border: 0 !important;
-        background: #fff !important;
-        break-inside: avoid;
-        page-break-inside: avoid
-    }
-
-    .print-signatory-block {
-        display: grid;
-        gap: 1.8mm;
-        font-size: 8.2px;
-        text-align: left
-    }
-
-    .print-signatory-heading {
-        color: #374151;
-        font-weight: 500
-    }
-
-    .print-signatory-row-item {
-        display: grid;
-        grid-template-columns: 40mm 3mm minmax(0, 1fr);
-        align-items: end;
-        gap: 1.6mm
-    }
-
-    .print-signatory-row-item strong {
-        color: var(--chmsu-primary);
-        font-weight: 800
-    }
-
-    .print-signatory-line {
-        min-height: 4mm;
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        border-bottom: 1px solid #374151
-    }
-
-    .print-signatory-value {
-        padding: 0 1.5mm .6mm;
-        color: #111827;
-        font-size: 8px;
-        font-weight: 800;
-        text-transform: uppercase
-    }
-
     @page {
         size: A4;
-        margin: 10mm 12mm 14mm
+        margin: 10mm 12mm 18mm;
+
+        @bottom-center {
+            content: "Page " counter(page) " of " counter(pages);
+            color: #4b5563;
+            font-size: 9px;
+            font-weight: 600
+        }
     }
 }

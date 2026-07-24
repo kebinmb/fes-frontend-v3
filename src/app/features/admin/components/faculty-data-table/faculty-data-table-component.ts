@@ -216,8 +216,17 @@ export class FacultyDataTableComponent implements OnInit {
   }
 
   facultyName(faculty: FetchFacultyResponse): string {
+    const lastname = faculty.lastname?.trim();
+    const firstname = faculty.firstname?.trim();
+    const middlename = faculty.middlename?.trim();
+    const givenName = [firstname, middlename]
+      .filter(Boolean)
+      .join(', ');
+
     return repairSpecialCharacters(
-      `${faculty.firstname ?? ''} ${faculty.lastname ?? ''}`.trim(),
+      lastname && givenName
+        ? `${lastname}, ${givenName}`
+        : lastname || givenName,
     );
   }
 

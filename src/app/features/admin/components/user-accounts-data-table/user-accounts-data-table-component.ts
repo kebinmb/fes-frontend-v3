@@ -143,6 +143,15 @@ export class UserAccountsDataTableComponent implements OnInit {
     'BSED4ASP',
     'NONE',
   ];
+
+  dataSources = [
+    { label: 'Unassigned', value: '' },
+    { label: 'Talisay', value: 'LEGACY_TALISAY' },
+    { label: 'Alijis', value: 'LEGACY_ALIJIS' },
+    { label: 'Fortune-Towne', value: 'LEGACY_FT' },
+    { label: 'Binalbagan', value: 'LEGACY_BINALBAGAN' },
+  ];
+
   private adminDataFacade = inject(AdminDataFacade);
 
   private fb = inject(FormBuilder);
@@ -158,6 +167,10 @@ export class UserAccountsDataTableComponent implements OnInit {
 
   selectedUser =
     signal<FetchUserAccountsResponse | null>(null);
+
+  currentPage = 0;
+  pageSize = 10;
+  searchTerm = '';
 
   form = this.fb.group({
 
@@ -217,6 +230,11 @@ export class UserAccountsDataTableComponent implements OnInit {
     majors: [
       'NONE',
       Validators.required,
+    ],
+
+    dataSource: [
+      '',
+      Validators.maxLength(100),
     ],
 
     isEnabled: [true],
@@ -283,9 +301,30 @@ export class UserAccountsDataTableComponent implements OnInit {
     return 'Invalid field.';
   }
   ngOnInit(): void {
+    this.loadUsers();
+  }
 
+  loadUsers(): void {
     this.adminDataFacade
-      .loadUserAccounts(0, 10);
+      .loadUserAccounts(this.currentPage, this.pageSize, this.searchTerm);
+  }
+
+  onSearch(): void {
+    this.searchTerm = this.searchTerm.replace(/\s+/g, ' ').trim();
+    this.currentPage = 0;
+    this.loadUsers();
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.currentPage = 0;
+    this.loadUsers();
+  }
+
+  onPageSizeChange(size: number | string): void {
+    this.pageSize = Number(size) || 10;
+    this.currentPage = 0;
+    this.loadUsers();
   }
 
   onUserPageChange(
@@ -296,8 +335,8 @@ export class UserAccountsDataTableComponent implements OnInit {
       return;
     }
 
-    this.adminDataFacade
-      .loadUserAccounts(page, 10);
+    this.currentPage = page;
+    this.loadUsers();
   }
 
   openCreateModal(): void {
@@ -312,6 +351,7 @@ export class UserAccountsDataTableComponent implements OnInit {
       college: 'CAS',
       programs: 'BSIT',
       majors: 'NONE',
+      dataSource: '',
       isEnabled: true,
       isLocked: false,
     });
@@ -343,6 +383,7 @@ export class UserAccountsDataTableComponent implements OnInit {
       programs: user.programs,
 
       majors: user.majors,
+      dataSource: this.normalizedDataSource(user.dataSource ?? user.data_source),
       password: '',
     });
 
@@ -391,6 +432,9 @@ export class UserAccountsDataTableComponent implements OnInit {
 
         majors:
           this.form.value.majors ?? '',
+
+        dataSource:
+          this.form.value.dataSource ?? '',
 
         isEnabled:
           this.form.value.isEnabled ?? true,
@@ -451,6 +495,9 @@ export class UserAccountsDataTableComponent implements OnInit {
 
         majors:
           this.form.value.majors ?? '',
+
+        dataSource:
+          this.form.value.dataSource ?? '',
       };
 
       this.adminDataFacade
@@ -458,5 +505,17 @@ export class UserAccountsDataTableComponent implements OnInit {
     }
 
     this.closeModal();
+  }
+
+  dataSourceLabel(dataSource?: string | null): string {
+    const normalized = this.normalizedDataSource(dataSource);
+
+    return this.dataSources.find((option) => option.value === normalized)?.label
+      ?? normalized
+      ?? 'Unassigned';
+  }
+
+  private normalizedDataSource(dataSource?: string | null): string {
+    return dataSource?.trim().toUpperCase() ?? '';
   }
 }
