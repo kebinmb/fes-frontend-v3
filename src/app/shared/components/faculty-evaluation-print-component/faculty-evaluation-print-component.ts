@@ -293,13 +293,29 @@ export class FacultyEvaluationPrintComponent implements OnInit {
 
   academicTerm(section: FacultyEvaluationPrintSection): string {
     const semester = this.safeText(section.faculty?.semester, '');
-    const schoolYear = this.safeText(section.faculty?.schoolYear, '');
+    const schoolYear = this.academicYearRange(section.faculty?.schoolYear);
 
     if (!semester && !schoolYear) {
       return '-';
     }
 
     return `${semester || '-'} Semester / ${schoolYear || '-'}`;
+  }
+
+  private academicYearRange(schoolYear: number | string | null | undefined): string {
+    const rawSchoolYear = this.safeText(schoolYear, '');
+
+    if (!rawSchoolYear) {
+      return '';
+    }
+
+    const startYear = Number(rawSchoolYear.match(/\d{4}/)?.[0]);
+
+    if (!Number.isFinite(startYear)) {
+      return rawSchoolYear;
+    }
+
+    return `${startYear} - ${startYear + 1}`;
   }
 
   hasReportVerification(
