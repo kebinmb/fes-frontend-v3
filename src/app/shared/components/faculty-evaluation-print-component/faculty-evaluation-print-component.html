@@ -1,6 +1,10 @@
-@for (section of sections; track trackPrintSection($index, section)) {
+@for (section of sections; track trackPrintSection($index, section); let isLast = $last) {
 @if (showReport()) {
-<table class="print-container" role="presentation">
+<table
+  class="print-container"
+  [class.final-print-container]="isLast && !showAnnex()"
+  role="presentation"
+>
   <tbody class="print-body">
     <tr class="print-content-row">
       <td class="print-content-cell">
@@ -321,6 +325,7 @@
 <table
   class="print-container acknowledgement-container"
   [class.annex-no-page-number]="suppressAnnexPageNumber()"
+  [class.final-print-container]="isLast"
   role="presentation"
 >
   <tbody class="print-body">

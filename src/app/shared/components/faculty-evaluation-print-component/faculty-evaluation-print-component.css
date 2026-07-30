@@ -517,6 +517,12 @@ tbody tr:nth-child(even) {
         page-break-after: always
     }
 
+    .print-container.final-print-container {
+        break-after: auto !important;
+        page-break-after: auto !important;
+        padding-bottom: 0 !important
+    }
+
     .print-body {
         display: table-row-group
     }
