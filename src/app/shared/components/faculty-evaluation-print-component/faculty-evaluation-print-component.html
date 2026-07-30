@@ -1,4 +1,5 @@
 @for (section of sections; track trackPrintSection($index, section)) {
+@if (showReport()) {
 <table class="print-container" role="presentation">
   <tbody class="print-body">
     <tr class="print-content-row">
@@ -314,4 +315,144 @@
   </tbody>
 
 </table>
+}
+
+@if (showAnnex()) {
+<table
+  class="print-container acknowledgement-container"
+  [class.annex-no-page-number]="suppressAnnexPageNumber()"
+  role="presentation"
+>
+  <tbody class="print-body">
+    <tr class="print-content-row">
+      <td class="print-content-cell">
+        <section class="acknowledgement-form" aria-label="Faculty Evaluation and Development Acknowledgement Form">
+          <h1 class="acknowledgement-title">
+            FACULTY EVALUATION AND DEVELOPMENT ACKNOWLEDGEMENT FORM
+          </h1>
+
+          <div class="acknowledgement-section">
+            <h2>A. FACULTY MEMBER INFORMATION</h2>
+
+            <dl class="acknowledgement-details">
+              <div>
+                <dt>Name of Faculty</dt>
+                <dd>{{ safeText(section.faculty?.facultyName) | unicodeText }}</dd>
+              </div>
+
+              <div>
+                <dt>Department/College</dt>
+                <dd>{{ safeText(section.faculty?.college) | unicodeText }}</dd>
+              </div>
+
+              <div>
+                <dt>Current Faculty Rank</dt>
+                <dd>{{ safeText(section.faculty?.position) | unicodeText }}</dd>
+              </div>
+
+              <div>
+                <dt>Semester/Term & Academic Year</dt>
+                <dd>{{ academicTerm(section) }}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="acknowledgement-section">
+            <h2>B. FACULTY EVALUATION SUMMARY</h2>
+
+            <table class="acknowledgement-summary">
+              <thead>
+                <tr>
+                  <th colspan="2">Overall Rating</th>
+                </tr>
+
+                <tr>
+                  <th>Student Evaluation of Teachers (SET)</th>
+                  <th>Supervisor's Evaluation of Faculty (SEF)</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>{{ section.overallSetRating.toFixed(2) }}</td>
+                  <td>{{ section.overallSefRating.toFixed(2) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="acknowledgement-section">
+            <h2>C. Development Plan (to be jointly accomplished by the Supervisor and Faculty)</h2>
+
+            <table class="development-plan-table">
+              <tbody>
+                <tr>
+                  <td>Areas for Improvement</td>
+                </tr>
+
+                <tr>
+                  <td>Proposed Learning and Development Activities</td>
+                </tr>
+
+                <tr>
+                  <td>Action Plan</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p class="acknowledgement-statement">
+            I acknowledge that I have received and reviewed the faculty evaluation conducted for the
+            period mentioned above. I understand that my signature below does not necessarily indicate
+            agreement with the evaluation but confirms that I have been given the opportunity to discuss
+            it with my supervisor.
+          </p>
+
+          <table class="acknowledgement-signature-table">
+            <tbody>
+              <tr>
+                <th colspan="2">SUPERVISOR</th>
+              </tr>
+
+              <tr>
+                <td>Signature</td>
+                <td></td>
+              </tr>
+
+              <tr>
+                <td>Name</td>
+                <td>{{ safeText(section.supervisorName, '') | unicodeText }}</td>
+              </tr>
+
+              <tr>
+                <td>Date Signed</td>
+                <td></td>
+              </tr>
+
+              <tr>
+                <th colspan="2">FACULTY</th>
+              </tr>
+
+              <tr>
+                <td>Signature</td>
+                <td></td>
+              </tr>
+
+              <tr>
+                <td>Name</td>
+                <td>{{ safeText(section.faculty?.facultyName, '') | unicodeText }}</td>
+              </tr>
+
+              <tr>
+                <td>Date Signed</td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </td>
+    </tr>
+  </tbody>
+</table>
+}
 }

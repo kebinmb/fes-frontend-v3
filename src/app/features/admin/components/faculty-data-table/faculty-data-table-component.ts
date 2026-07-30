@@ -76,6 +76,9 @@ type SeparatedEvaluationComments = {
   studentComments: string;
   supervisorComments: string;
 };
+
+type FacultyPrintMode = 'report' | 'annex';
+
 @Component({
   selector: 'app-faculty-data-table-component',
   standalone: true,
@@ -104,7 +107,9 @@ export class FacultyDataTableComponent implements OnInit {
   selectedLegacyDatabase = '';
   selectedBulkPrintCollege = '';
   isPrintingFacultyId: string | null = null;
+  isPrintingAnnexFacultyId: string | null = null;
   isBulkPrinting = false;
+  isBulkAnnexPrinting = false;
   readonly legacyDatabaseOptions = [
     { label: 'Talisay', value: 'LEGACY_TALISAY' },
     { label: 'Alijis', value: 'LEGACY_ALIJIS' },
@@ -307,8 +312,8 @@ export class FacultyDataTableComponent implements OnInit {
   get f() {
     return this.facultyForm.controls;
   }
-  printSingle(record: FacultyEvaluationPrintRecord): void {
-    if (this.isPrintingFacultyId) {
+  printSingle(record: FacultyEvaluationPrintRecord, mode: FacultyPrintMode = 'report'): void {
+    if (this.isPrintingFacultyId || this.isPrintingAnnexFacultyId) {
       return;
     }
 
@@ -322,11 +327,11 @@ export class FacultyDataTableComponent implements OnInit {
     }
 
     printWindow.document.write(
-      '<!doctype html><title>Preparing report...</title><body style="font-family: Arial, sans-serif; padding: 24px;">Preparing faculty evaluation report...</body>',
+      `<!doctype html><title>Preparing report...</title><body style="font-family: Arial, sans-serif; padding: 24px;">${this.preparingMessage(mode, false)}</body>`,
     );
     printWindow.document.close();
 
-    this.setPrintingFaculty(record.facultyId);
+    this.setPrintingFaculty(mode, record.facultyId);
 
     this.adminService.generateFacultyEvaluationReport(record.facultyId)
       .pipe(
@@ -342,7 +347,7 @@ export class FacultyDataTableComponent implements OnInit {
           return of(null);
         }),
         finalize(() => {
-          this.setPrintingFaculty(null);
+          this.setPrintingFaculty(mode, null);
         }),
       )
       .subscribe((report) => {
@@ -363,7 +368,7 @@ export class FacultyDataTableComponent implements OnInit {
 
         localStorage.setItem(
           'faculty-print-data',
-          JSON.stringify(printPayload),
+          JSON.stringify({ mode, ...printPayload }),
         );
 
         printWindow.location.href = '/print/faculty-evaluation';
@@ -371,8 +376,8 @@ export class FacultyDataTableComponent implements OnInit {
       });
   }
 
-  printBulk(): void {
-    if (this.isBulkPrinting) {
+  printBulk(mode: FacultyPrintMode = 'report'): void {
+    if (this.isBulkPrinting || this.isBulkAnnexPrinting) {
       return;
     }
 
@@ -394,11 +399,11 @@ export class FacultyDataTableComponent implements OnInit {
     }
 
     printWindow.document.write(
-      '<!doctype html><title>Preparing reports...</title><body style="font-family: Arial, sans-serif; padding: 24px;">Preparing faculty evaluation reports...</body>',
+      `<!doctype html><title>Preparing reports...</title><body style="font-family: Arial, sans-serif; padding: 24px;">${this.preparingMessage(mode, true)}</body>`,
     );
     printWindow.document.close();
 
-    this.setBulkPrinting(true);
+    this.setBulkPrinting(mode, true);
 
     this.adminService.generateBulkFacultyEvaluationReports(
       this.selectedLegacyDatabase,
@@ -417,7 +422,7 @@ export class FacultyDataTableComponent implements OnInit {
           return of(null);
         }),
         finalize(() => {
-          this.setBulkPrinting(false);
+          this.setBulkPrinting(mode, false);
         }),
       )
       .subscribe((response) => {
@@ -436,7 +441,7 @@ export class FacultyDataTableComponent implements OnInit {
 
         localStorage.setItem(
           'faculty-print-data',
-          JSON.stringify({ reports }),
+          JSON.stringify({ mode, bulk: true, reports }),
         );
 
         const skippedCount = response?.skippedFacultyIds?.length ?? 0;
@@ -445,7 +450,7 @@ export class FacultyDataTableComponent implements OnInit {
           : '';
 
         this.toastFacade.showToast(
-          `Prepared ${reports.length} faculty report(s).${skippedMessage}`,
+          `Prepared ${reports.length} ${mode === 'annex' ? 'Annex D form(s)' : 'faculty report(s)'}.${skippedMessage}`,
           'success',
         );
 
@@ -461,18 +466,41 @@ export class FacultyDataTableComponent implements OnInit {
   private clearTransientFacultyState(): void {
     this.selectedFaculty = null;
     this.facultyForm.reset();
-    this.setPrintingFaculty(null);
+    this.setPrintingFaculty('report', null);
+    this.setPrintingFaculty('annex', null);
     this.cdr.markForCheck();
   }
 
-  private setPrintingFaculty(facultyId: string | null): void {
-    this.isPrintingFacultyId = facultyId;
+  private setPrintingFaculty(mode: FacultyPrintMode, facultyId: string | null): void {
+    if (mode === 'annex') {
+      this.isPrintingAnnexFacultyId = facultyId;
+    } else {
+      this.isPrintingFacultyId = facultyId;
+    }
+
     this.cdr.markForCheck();
   }
 
-  private setBulkPrinting(isPrinting: boolean): void {
-    this.isBulkPrinting = isPrinting;
+  private setBulkPrinting(mode: FacultyPrintMode, isPrinting: boolean): void {
+    if (mode === 'annex') {
+      this.isBulkAnnexPrinting = isPrinting;
+    } else {
+      this.isBulkPrinting = isPrinting;
+    }
+
     this.cdr.markForCheck();
+  }
+
+  private preparingMessage(mode: FacultyPrintMode, isBulk: boolean): string {
+    if (mode === 'annex') {
+      return isBulk
+        ? 'Preparing Annex D forms...'
+        : 'Preparing Annex D form...';
+    }
+
+    return isBulk
+      ? 'Preparing faculty evaluation reports...'
+      : 'Preparing faculty evaluation report...';
   }
 
   private toPrintPayload(

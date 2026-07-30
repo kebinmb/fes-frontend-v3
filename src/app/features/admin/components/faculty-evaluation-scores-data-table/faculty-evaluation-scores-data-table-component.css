@@ -91,6 +91,12 @@ p {
   color: #0b5135;
 }
 
+.annex-print-btn {
+  border-color: #a7d7bb;
+  background: #f6fbf8;
+  color: #14532d;
+}
+
 .primary-btn:not(:disabled):hover,
 .secondary-btn:not(:disabled):hover,
 .clear-btn:not(:disabled):hover,
@@ -345,6 +351,10 @@ td small {
   padding: 0 0.75rem;
 }
 
+.text-end .row-print-btn + .row-print-btn {
+  margin-left: 0.35rem;
+}
+
 .state-panel {
   display: grid;
   justify-items: center;
@@ -461,6 +471,7 @@ td small {
     justify-content: space-between;
     gap: 0.75rem;
     align-items: flex-start;
+    flex-wrap: wrap;
   }
 
   .mobile-card-header label {

@@ -97,6 +97,7 @@
     minmax(160px, 190px)
     minmax(160px, 190px)
     auto
+    auto
     auto;
   align-items: center;
 
@@ -281,6 +282,19 @@
   background: #f9fafb;
 }
 
+.annex-print-btn {
+  border: 1px solid #a7d7bb;
+
+  background: #f6fbf8;
+
+  color: #14532d;
+}
+
+.bulk-print-btn.annex-print-btn:hover,
+.single-print-btn.annex-print-btn:hover {
+  background: #e8f6ee;
+}
+
 .clear-btn,
 .retry-btn,
 .empty-clear-btn {
@@ -380,8 +394,7 @@
 }
 
 .refresh-indicator i,
-.edit-btn:disabled i,
-.bulk-print-btn:disabled i {
+.edit-btn:disabled i {
   animation: spin 0.9s linear infinite;
 }
 
@@ -932,8 +945,7 @@
 @media (prefers-reduced-motion: reduce) {
   .skeleton-line,
   .refresh-indicator i,
-  .edit-btn:disabled i,
-  .bulk-print-btn:disabled i {
+  .edit-btn:disabled i {
     animation: none;
   }
 
@@ -968,6 +980,7 @@
   .search-field,
   .filter-select,
   .bulk-print-btn,
+  .annex-print-btn,
   .clear-btn {
     width: 100%;
   }
@@ -1097,7 +1110,7 @@
   }
 
   .search-wrapper {
-    grid-template-columns: minmax(260px, 1fr) auto minmax(170px, 1fr);
+    grid-template-columns: minmax(260px, 1fr) auto minmax(170px, 1fr) minmax(170px, 1fr);
   }
 
   .table-count {

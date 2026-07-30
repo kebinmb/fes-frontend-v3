@@ -71,7 +71,7 @@
         <button
           type="button"
           class="bulk-print-btn"
-          [disabled]="!!isLoading || isBulkPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
+          [disabled]="!!isLoading || !!isPrintingFacultyId || !!isPrintingAnnexFacultyId || isBulkPrinting || isBulkAnnexPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
           [title]="!selectedLegacyDatabase && !selectedBulkPrintCollege ? 'Select a campus or college before bulk printing.' : 'Prepare faculty evaluation reports for printing.'"
           (click)="printBulk()"
         >
@@ -81,6 +81,20 @@
             [class.bi-hourglass-split]="isBulkPrinting"
           ></i>
           <span>{{ isBulkPrinting ? 'Preparing' : 'Bulk Print' }}</span>
+        </button>
+        <button
+          type="button"
+          class="bulk-print-btn annex-print-btn"
+          [disabled]="!!isLoading || !!isPrintingFacultyId || !!isPrintingAnnexFacultyId || isBulkPrinting || isBulkAnnexPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
+          [title]="!selectedLegacyDatabase && !selectedBulkPrintCollege ? 'Select a campus or college before printing Annex D.' : 'Prepare Annex D forms for printing.'"
+          (click)="printBulk('annex')"
+        >
+          <i
+            class="bi"
+            [class.bi-file-earmark-text]="!isBulkAnnexPrinting"
+            [class.bi-hourglass-split]="isBulkAnnexPrinting"
+          ></i>
+          <span>{{ isBulkAnnexPrinting ? 'Preparing' : 'Bulk Print Annex D' }}</span>
         </button>
         @if (hasActiveFilters()) {
         <button type="button" class="clear-btn" [disabled]="!!isLoading" (click)="clearFilters()">
@@ -178,7 +192,7 @@
               <button
                 type="button"
                 class="single-print-btn"
-                [disabled]="isPrintingFacultyId === faculty.facultyId"
+                [disabled]="!!isPrintingFacultyId || !!isPrintingAnnexFacultyId"
                 [attr.aria-label]="'Print evaluation report for ' + facultyName(faculty)"
                 (click)="printSingle({
                       facultyEvaluationScoreId: 0,
@@ -193,6 +207,26 @@
                   [class.bi-hourglass-split]="isPrintingFacultyId === faculty.facultyId"></i>
                 <span>
                   {{ isPrintingFacultyId === faculty.facultyId ? 'Preparing' : 'Print' }}
+                </span>
+              </button>
+              <button
+                type="button"
+                class="single-print-btn annex-print-btn"
+                [disabled]="!!isPrintingFacultyId || !!isPrintingAnnexFacultyId"
+                [attr.aria-label]="'Print Annex D for ' + facultyName(faculty)"
+                (click)="printSingle({
+                      facultyEvaluationScoreId: 0,
+                      facultyId: faculty.facultyId,
+                      facultyName: facultyName(faculty),
+                      college: faculty.college,
+                      position: faculty.position,
+                      classCode: '',
+                      overallAverageScore: 0
+                    }, 'annex')">
+                <i class="bi" [class.bi-file-earmark-text]="isPrintingAnnexFacultyId !== faculty.facultyId"
+                  [class.bi-hourglass-split]="isPrintingAnnexFacultyId === faculty.facultyId"></i>
+                <span>
+                  {{ isPrintingAnnexFacultyId === faculty.facultyId ? 'Preparing' : 'Print Annex D' }}
                 </span>
               </button>
             </div>

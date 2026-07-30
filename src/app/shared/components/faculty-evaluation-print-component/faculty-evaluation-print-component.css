@@ -331,6 +331,147 @@ tbody tr:nth-child(even) {
     display: none !important
 }
 
+.acknowledgement-container {
+    color: #343a46
+}
+
+.acknowledgement-form {
+    max-width: 760px;
+    min-height: 980px;
+    margin: 0 auto;
+    padding: 26px 10px 0;
+    font-family: Arial, Helvetica, sans-serif
+}
+
+.acknowledgement-title {
+    margin: 0 0 28px;
+    text-align: center;
+    color: #2f3745;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: .01em
+}
+
+.acknowledgement-section {
+    margin-top: 22px
+}
+
+.acknowledgement-section h2 {
+    margin: 0 0 8px;
+    color: #2f3745;
+    font-size: 16px;
+    font-weight: 800
+}
+
+.acknowledgement-details {
+    display: grid;
+    gap: 10px;
+    margin: 0 0 0 10px
+}
+
+.acknowledgement-details div {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    align-items: baseline
+}
+
+.acknowledgement-details dt,
+.acknowledgement-details dd {
+    margin: 0;
+    color: #424b59;
+    font-size: 15px;
+    line-height: 1.25
+}
+
+.acknowledgement-details dd {
+    grid-column: 2;
+    font-weight: 800
+}
+
+.acknowledgement-summary,
+.development-plan-table,
+.acknowledgement-signature-table {
+    width: 100%;
+    border: 1px solid #9aa3af;
+    border-collapse: collapse
+}
+
+.acknowledgement-summary {
+    margin-top: 6px;
+    text-align: center
+}
+
+.acknowledgement-summary th,
+.acknowledgement-summary td,
+.development-plan-table td,
+.acknowledgement-signature-table th,
+.acknowledgement-signature-table td {
+    border: 1px solid #9aa3af;
+    color: #343a46;
+    font-family: Arial, Helvetica, sans-serif
+}
+
+.acknowledgement-summary th {
+    padding: 6px 8px;
+    background: #d9d6df;
+    font-size: 15px;
+    font-weight: 800
+}
+
+.acknowledgement-summary thead tr:first-child th {
+    background: #fff
+}
+
+.acknowledgement-summary td {
+    padding: 8px;
+    font-size: 15px;
+    font-weight: 800
+}
+
+.development-plan-table {
+    margin-top: 6px
+}
+
+.development-plan-table td {
+    height: 96px;
+    padding: 7px 8px;
+    vertical-align: top;
+    font-size: 15px;
+    font-weight: 600
+}
+
+.acknowledgement-statement {
+    margin: 30px 0 24px;
+    color: #343a46;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.35;
+    text-align: justify
+}
+
+.acknowledgement-signature-table {
+    margin-top: 0
+}
+
+.acknowledgement-signature-table th {
+    padding: 5px 8px;
+    background: #a8a2ad;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-align: center
+}
+
+.acknowledgement-signature-table td {
+    height: 25px;
+    padding: 4px 8px;
+    font-size: 14px
+}
+
+.acknowledgement-signature-table td:first-child {
+    width: 175px
+}
+
 @media print {
 
     app-sidebar,
@@ -595,6 +736,111 @@ tbody tr:nth-child(even) {
         padding: 2px
     }
 
+    .acknowledgement-form {
+        max-width: none;
+        min-height: auto;
+        padding: 4mm 10mm 0;
+        color: #343a46
+    }
+
+    .acknowledgement-title {
+        margin-bottom: 8mm;
+        font-size: 14px
+    }
+
+    .acknowledgement-section {
+        margin-top: 6mm
+    }
+
+    .acknowledgement-section h2 {
+        margin-bottom: 2mm;
+        font-size: 12px
+    }
+
+    .acknowledgement-details {
+        gap: 2.2mm;
+        margin-left: 2mm
+    }
+
+    .acknowledgement-details div {
+        grid-template-columns: 60mm minmax(0, 1fr)
+    }
+
+    .acknowledgement-details dt,
+    .acknowledgement-details dd {
+        font-size: 11px
+    }
+
+    .acknowledgement-summary,
+    .development-plan-table,
+    .acknowledgement-signature-table {
+        table-layout: fixed
+    }
+
+    .acknowledgement-summary th,
+    .acknowledgement-summary td,
+    .development-plan-table td,
+    .acknowledgement-signature-table th,
+    .acknowledgement-signature-table td {
+        border-color: #8f98a3;
+        line-height: 1.15;
+        overflow-wrap: normal;
+        word-break: normal
+    }
+
+    .acknowledgement-summary th {
+        padding: 1.8mm 2mm;
+        background: #d9d6df !important;
+        color: #343a46 !important;
+        font-size: 10.5px
+    }
+
+    .acknowledgement-summary thead tr:first-child th {
+        background: #fff !important
+    }
+
+    .acknowledgement-summary td {
+        padding: 2mm;
+        font-size: 10.5px
+    }
+
+    .development-plan-table td {
+        height: 25mm;
+        padding: 1.8mm 2mm;
+        font-size: 10.5px
+    }
+
+    .acknowledgement-statement {
+        margin: 9mm 0 7mm;
+        font-size: 10.5px;
+        line-height: 1.28
+    }
+
+    .acknowledgement-signature-table th {
+        padding: 1.4mm 2mm;
+        background: #a8a2ad !important;
+        color: #343a46 !important;
+        font-size: 10.5px
+    }
+
+    .acknowledgement-signature-table td {
+        height: 6.2mm;
+        padding: 1mm 2mm;
+        font-size: 10.5px
+    }
+
+    .acknowledgement-signature-table td:first-child {
+        width: 38mm
+    }
+
+    .annex-no-page-number {
+        page: annex-no-page-number
+    }
+
+    .annex-no-page-number .acknowledgement-form {
+        padding: 10mm 22mm 10mm
+    }
+
     @page {
         size: A4;
         margin: 10mm 12mm 18mm;
@@ -605,5 +851,10 @@ tbody tr:nth-child(even) {
             font-size: 9px;
             font-weight: 600
         }
+    }
+
+    @page annex-no-page-number {
+        size: A4;
+        margin: 0
     }
 }

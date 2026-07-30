@@ -59,7 +59,11 @@ interface FacultyEvaluationPrintReportPayload {
   items?: FacultyEvaluationPrintRecord[];
 }
 
+type FacultyEvaluationPrintMode = 'report' | 'annex' | 'report-annex';
+
 interface FacultyEvaluationPrintPayload extends FacultyEvaluationPrintReportPayload {
+  mode?: FacultyEvaluationPrintMode;
+  bulk?: boolean;
   reports?: FacultyEvaluationPrintReportPayload[];
 }
 
@@ -90,6 +94,8 @@ export class FacultyEvaluationPrintComponent implements OnInit {
   data: FacultyEvaluationPrintRecord[] = [];
 
   sections: FacultyEvaluationPrintSection[] = [];
+  printMode: FacultyEvaluationPrintMode = 'report';
+  isBulkAnnexPrint = false;
 
   ngOnInit(): void {
     this.sections = this.readPrintPayload()
@@ -103,6 +109,18 @@ export class FacultyEvaluationPrintComponent implements OnInit {
     setTimeout(() => {
       window.print();
     }, 500);
+  }
+
+  showReport(): boolean {
+    return this.printMode === 'report' || this.printMode === 'report-annex';
+  }
+
+  showAnnex(): boolean {
+    return this.printMode === 'annex' || this.printMode === 'report-annex';
+  }
+
+  suppressAnnexPageNumber(): boolean {
+    return this.printMode === 'annex' && this.isBulkAnnexPrint;
   }
 
   private readPrintPayload(): FacultyEvaluationPrintReportPayload[] {
@@ -122,8 +140,13 @@ export class FacultyEvaluationPrintComponent implements OnInit {
         return [{ items: parsed }];
       }
 
-      if (Array.isArray(parsed?.reports)) {
-        return parsed.reports;
+      this.printMode = this.normalizePrintMode(parsed?.mode);
+      const reports = Array.isArray(parsed?.reports) ? parsed.reports : null;
+      this.isBulkAnnexPrint =
+        this.printMode === 'annex' && (parsed?.bulk === true || (reports?.length ?? 0) > 1);
+
+      if (reports) {
+        return reports;
       }
 
       return [
@@ -135,6 +158,10 @@ export class FacultyEvaluationPrintComponent implements OnInit {
     } catch {
       return this.data.length ? [{ items: this.data }] : [];
     }
+  }
+
+  private normalizePrintMode(mode: unknown): FacultyEvaluationPrintMode {
+    return mode === 'annex' || mode === 'report-annex' ? mode : 'report';
   }
 
   private buildSection(
