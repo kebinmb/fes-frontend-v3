@@ -362,6 +362,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
           return;
         }
 
+        this.trackPreparedPrints([result.payload], mode);
         localStorage.setItem('faculty-print-data', JSON.stringify({ mode, ...result.payload }));
         printWindow.location.href = '/print/faculty-evaluation';
         printWindow.focus();
@@ -422,6 +423,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
           ? ` ${skippedCount} faculty record(s) could not be prepared.`
           : '';
 
+        this.trackPreparedPrints(reports, mode);
         this.toastFacade.showToast(
           `Prepared ${reports.length} ${mode === 'annex' ? 'Annex D form(s)' : 'faculty report(s)'}.${skippedMessage}`,
           'success',
@@ -589,6 +591,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
           ? ` ${skippedCount} faculty record(s) were skipped.`
           : '';
 
+        this.trackPreparedPrints(reports, mode);
         this.toastFacade.showToast(
           `Prepared ${reports.length} ${mode === 'annex' ? 'Annex D form(s)' : 'faculty report(s)'}.${skippedMessage}`,
           'success',
@@ -634,6 +637,31 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
 
   private isPreparedReportSuccess(result: PreparedReportResult): result is PreparedReportSuccess {
     return 'payload' in result;
+  }
+
+  private trackPreparedPrints(payloads: PreparedPrintPayload[], mode: FacultyPrintMode): void {
+    const reportIds = payloads
+      .map((payload) => this.safeText(payload.report?.reportId))
+      .filter((reportId) => !!reportId);
+
+    if (!reportIds.length) {
+      return;
+    }
+
+    this.adminService
+      .markFacultyEvaluationReportsPrinted(
+        reportIds,
+        mode === 'annex' ? 'ANNEX_D' : 'REPORT',
+      )
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: (error) => {
+          this.toastFacade.showToast(
+            `The report was prepared, but print tracking was not updated. ${extractErrorMessage(error)}`,
+            'error',
+          );
+        },
+      });
   }
 
   private applyResponse(response: FacultyEvaluationReadinessPageResponse): void {

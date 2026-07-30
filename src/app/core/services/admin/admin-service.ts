@@ -133,6 +133,47 @@ export interface FacultyEvaluationReadinessFilter {
   legacyDatabase?: string;
 }
 
+export type FacultyEvaluationReportPrintStatusFilter =
+  | 'ALL'
+  | 'REPORT_PRINTED'
+  | 'REPORT_NOT_PRINTED'
+  | 'ANNEX_D_PRINTED'
+  | 'ANNEX_D_NOT_PRINTED';
+
+export interface FacultyEvaluationReportPrintTrackingFilter {
+  search?: string;
+  status?: 'ALL' | 'VALID' | 'SUPERSEDED' | 'REVOKED' | string;
+  printStatus?: FacultyEvaluationReportPrintStatusFilter;
+  schoolYear?: number | null;
+  semester?: string;
+}
+
+export interface FacultyEvaluationReportPrintTrackingResponse {
+  reportId: string;
+  facultyId: string;
+  facultyName?: string | null;
+  schoolYear: number;
+  semester: string;
+  versionNumber: number;
+  status: 'VALID' | 'SUPERSEDED' | 'REVOKED' | string;
+  generatedByUsername?: string | null;
+  generatedAt: string;
+  printTrackingAvailable?: boolean | null;
+  printedAt?: string | null;
+  printedByUsername?: string | null;
+  printCount?: number | null;
+  annexDPrintedAt?: string | null;
+  annexDPrintedByUsername?: string | null;
+  annexDPrintCount?: number | null;
+}
+
+export interface FacultyEvaluationPrintEventResponse {
+  type: 'REPORT' | 'ANNEX_D';
+  requestedCount: number;
+  updatedCount: number;
+  missingReportIds: string[];
+}
+
 export interface FacultyEvaluationPrintResponse {
   facultyEvaluationScoreId: number;
   facultyId: string;
@@ -175,6 +216,13 @@ export interface FacultyEvaluationGeneratedReportResponse {
   generatedByUserId?: number | null;
   generatedByUsername?: string | null;
   generatedAt: string;
+  printTrackingAvailable?: boolean | null;
+  printedAt?: string | null;
+  printedByUsername?: string | null;
+  printCount?: number | null;
+  annexDPrintedAt?: string | null;
+  annexDPrintedByUsername?: string | null;
+  annexDPrintCount?: number | null;
   items: FacultyEvaluationPrintResponse[];
 }
 
@@ -1147,6 +1195,71 @@ export class AdminService {
         withCredentials: true,
       },
     );
+  }
+
+  getFacultyEvaluationReportPrintTracking(
+    page: number = 0,
+    size: number = 10,
+    filters: FacultyEvaluationReportPrintTrackingFilter = {},
+  ): Observable<PageResponse<FacultyEvaluationReportPrintTrackingResponse>> {
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size);
+
+    if (filters.search?.trim()) {
+      params = params.set('search', filters.search.trim());
+    }
+
+    if (filters.status?.trim() && filters.status !== 'ALL') {
+      params = params.set('status', filters.status.trim());
+    }
+
+    if (filters.printStatus?.trim() && filters.printStatus !== 'ALL') {
+      params = params.set('printStatus', filters.printStatus.trim());
+    }
+
+    if (filters.schoolYear) {
+      params = params.set('schoolYear', filters.schoolYear);
+    }
+
+    if (filters.semester?.trim()) {
+      params = params.set('semester', filters.semester.trim());
+    }
+
+    return this.http.get<PageResponse<FacultyEvaluationReportPrintTrackingResponse>>(
+      `${this.ADMIN_API_URL}/faculty-evaluation-reports/print-tracking`,
+      {
+        params,
+        withCredentials: true,
+      },
+    ).pipe(map((response) => repairSpecialCharacters(response)));
+  }
+
+  markFacultyEvaluationReportsPrinted(
+    reportIds: string[],
+    type: 'REPORT' | 'ANNEX_D',
+  ): Observable<FacultyEvaluationPrintEventResponse> {
+    const uniqueReportIds = [
+      ...new Set(
+        reportIds
+          .map((reportId) => reportId?.trim())
+          .filter((reportId): reportId is string => !!reportId),
+      ),
+    ];
+
+    return this.withCsrfToken((csrf) =>
+      this.http.post<FacultyEvaluationPrintEventResponse>(
+        `${this.ADMIN_API_URL}/faculty-evaluation-reports/print-events`,
+        {
+          reportIds: uniqueReportIds,
+          type,
+        },
+        {
+          headers: this.csrfHeaders(csrf),
+          withCredentials: true,
+        },
+      ),
+    ).pipe(map((response) => repairSpecialCharacters(response)));
   }
 
   updateFaculty(payload: UpdateFacultyRequest): Observable<string> {

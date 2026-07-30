@@ -365,6 +365,7 @@ export class FacultyDataTableComponent implements OnInit {
         }
 
         const printPayload = this.toPrintPayload(report, record);
+        this.trackPreparedPrints([printPayload], mode);
 
         localStorage.setItem(
           'faculty-print-data',
@@ -439,6 +440,7 @@ export class FacultyDataTableComponent implements OnInit {
           return;
         }
 
+        this.trackPreparedPrints(reports, mode);
         localStorage.setItem(
           'faculty-print-data',
           JSON.stringify({ mode, bulk: true, reports }),
@@ -501,6 +503,37 @@ export class FacultyDataTableComponent implements OnInit {
     return isBulk
       ? 'Preparing faculty evaluation reports...'
       : 'Preparing faculty evaluation report...';
+  }
+
+  private trackPreparedPrints(
+    payloads: Array<{
+      report: Partial<FacultyEvaluationGeneratedReportResponse>;
+      items: FacultyEvaluationPrintRecord[];
+    }>,
+    mode: FacultyPrintMode,
+  ): void {
+    const reportIds = payloads
+      .map((payload) => this.safePrintText(payload.report?.reportId))
+      .filter((reportId) => !!reportId);
+
+    if (!reportIds.length) {
+      return;
+    }
+
+    this.adminService
+      .markFacultyEvaluationReportsPrinted(
+        reportIds,
+        mode === 'annex' ? 'ANNEX_D' : 'REPORT',
+      )
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: (error) => {
+          this.toastFacade.showToast(
+            `The report was prepared, but print tracking was not updated. ${extractErrorMessage(error)}`,
+            'error',
+          );
+        },
+      });
   }
 
   private toPrintPayload(
