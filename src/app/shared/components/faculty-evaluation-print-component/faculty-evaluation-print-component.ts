@@ -61,8 +61,12 @@ interface FacultyEvaluationPrintReportPayload {
   items?: FacultyEvaluationPrintRecord[];
 }
 
+export type FacultyEvaluationPrintMode = 'report' | 'annex' | 'report-annex';
+
 export interface FacultyEvaluationPrintPayload extends FacultyEvaluationPrintReportPayload {
   scoreFormat?: PrintScoreFormat;
+  mode?: FacultyEvaluationPrintMode;
+  bulk?: boolean;
   reports?: FacultyEvaluationPrintReportPayload[];
 }
 
@@ -160,6 +164,18 @@ export class FacultyEvaluationPrintComponent implements OnInit {
     setTimeout(() => {
       window.print();
     }, 500);
+  }
+
+  showReport(): boolean {
+    return this.printMode === 'report' || this.printMode === 'report-annex';
+  }
+
+  showAnnex(): boolean {
+    return this.printMode === 'annex' || this.printMode === 'report-annex';
+  }
+
+  suppressAnnexPageNumber(): boolean {
+    return this.printMode === 'annex' && this.isBulkAnnexPrint;
   }
 
   setScoreFormat(format: PrintScoreFormat): void {

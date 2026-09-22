@@ -66,6 +66,11 @@ export class StudentEvaluationListComponent implements OnInit, OnDestroy {
 
     this.destroy$.complete();
   }
+
+  printSection(row: StudentSectionEvaluationDTO): void {
+    this.print(row);
+  }
+
   print(row: StudentSectionEvaluationDTO): void {
     this.selectedRow = row;
 
