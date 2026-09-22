@@ -140,6 +140,15 @@ export const routes: Routes = [
           ).then((m) => m.FacultyEvaluationScoresDataTableComponent),
       },
       {
+        path: 'report-print-tracking',
+        canActivate: [roleGuard],
+        data: { role: ['ROLE_ADMIN', 'ROLE_HR'] },
+        loadComponent: () =>
+          import(
+            '@features/admin/components/faculty-report-print-tracking/faculty-report-print-tracking-component'
+          ).then((m) => m.FacultyReportPrintTrackingComponent),
+      },
+      {
         path: 'user-accounts',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },

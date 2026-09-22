@@ -35,7 +35,7 @@ export const loadFacultiesFailure = createAction(
 
 export const loadUserAccounts = createAction(
   '[Admin] Load User Accounts',
-  props<{ page: number; size: number }>(),
+  props<{ page: number; size: number; search?: string }>(),
 );
 
 export const loadUserAccountsSuccess = createAction(

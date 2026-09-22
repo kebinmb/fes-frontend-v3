@@ -71,7 +71,7 @@
         <button
           type="button"
           class="bulk-print-btn"
-          [disabled]="!!isLoading || isBulkPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
+          [disabled]="!!isLoading || !!isPrintingFacultyId || !!isPrintingAnnexFacultyId || isBulkPrinting || isBulkAnnexPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
           [title]="!selectedLegacyDatabase && !selectedBulkPrintCollege ? 'Select a campus or college before bulk printing.' : 'Prepare faculty evaluation reports for printing.'"
           (click)="printBulk()"
         >
@@ -81,6 +81,20 @@
             [class.bi-hourglass-split]="isBulkPrinting"
           ></i>
           <span>{{ isBulkPrinting ? 'Preparing' : 'Bulk Print' }}</span>
+        </button>
+        <button
+          type="button"
+          class="bulk-print-btn annex-print-btn"
+          [disabled]="!!isLoading || !!isPrintingFacultyId || !!isPrintingAnnexFacultyId || isBulkPrinting || isBulkAnnexPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
+          [title]="!selectedLegacyDatabase && !selectedBulkPrintCollege ? 'Select a campus or college before printing Annex D.' : 'Prepare Annex D forms for printing.'"
+          (click)="printBulk('annex')"
+        >
+          <i
+            class="bi"
+            [class.bi-file-earmark-text]="!isBulkAnnexPrinting"
+            [class.bi-hourglass-split]="isBulkAnnexPrinting"
+          ></i>
+          <span>{{ isBulkAnnexPrinting ? 'Preparing' : 'Bulk Print Annex D' }}</span>
         </button>
         @if (hasActiveFilters()) {
         <button type="button" class="clear-btn" [disabled]="!!isLoading" (click)="clearFilters()">
@@ -147,8 +161,7 @@
                 {{ facultyInitial(faculty) }}
               </div>
               <div class="fw-semibold">
-                {{ faculty.firstname | unicodeText }}
-                {{ faculty.lastname | unicodeText }}
+                {{ facultyName(faculty) | unicodeText }}
               </div>
             </div>
           </td>
@@ -179,7 +192,7 @@
               <button
                 type="button"
                 class="single-print-btn"
-                [disabled]="isPrintingFacultyId === faculty.facultyId"
+                [disabled]="!!isPrintingFacultyId || !!isPrintingAnnexFacultyId"
                 [attr.aria-label]="'Print evaluation report for ' + facultyName(faculty)"
                 (click)="printSingle({
                       facultyEvaluationScoreId: 0,
@@ -194,6 +207,26 @@
                   [class.bi-hourglass-split]="isPrintingFacultyId === faculty.facultyId"></i>
                 <span>
                   {{ isPrintingFacultyId === faculty.facultyId ? 'Preparing' : 'Print' }}
+                </span>
+              </button>
+              <button
+                type="button"
+                class="single-print-btn annex-print-btn"
+                [disabled]="!!isPrintingFacultyId || !!isPrintingAnnexFacultyId"
+                [attr.aria-label]="'Print Annex D for ' + facultyName(faculty)"
+                (click)="printSingle({
+                      facultyEvaluationScoreId: 0,
+                      facultyId: faculty.facultyId,
+                      facultyName: facultyName(faculty),
+                      college: faculty.college,
+                      position: faculty.position,
+                      classCode: '',
+                      overallAverageScore: 0
+                    }, 'annex')">
+                <i class="bi" [class.bi-file-earmark-text]="isPrintingAnnexFacultyId !== faculty.facultyId"
+                  [class.bi-hourglass-split]="isPrintingAnnexFacultyId === faculty.facultyId"></i>
+                <span>
+                  {{ isPrintingAnnexFacultyId === faculty.facultyId ? 'Preparing' : 'Print Annex D' }}
                 </span>
               </button>
             </div>
@@ -265,7 +298,7 @@
         </h2>
 
         <p>
-          Update faculty profile information
+          Update the selected faculty profile and teaching load settings.
         </p>
       </div>
 
@@ -275,10 +308,30 @@
 
     </div>
 
+    <div class="modal-summary">
+      <div class="summary-avatar">
+        {{ facultyInitial(selectedFaculty) }}
+      </div>
+      <div class="summary-content">
+        <strong>
+          {{ facultyName(selectedFaculty) | unicodeText }}
+        </strong>
+        <span>
+          {{ selectedFaculty.position }} · {{ selectedFaculty.college }} ·
+          {{ legacyDatabaseLabel(selectedFaculty.legacyDatabase) }}
+        </span>
+      </div>
+    </div>
+
     <!-- FORM -->
     <form [formGroup]="facultyForm" (ngSubmit)="updateFaculty()" class="modal-form">
 
       <div class="form-grid">
+
+        <div class="form-section-title">
+          <span>Identity</span>
+          <small>Names are used in dashboards, reports, and print documents.</small>
+        </div>
 
         <!-- FACULTY ID -->
         <div class="form-group">
@@ -295,6 +348,7 @@
             [class.is-invalid]="formError('facultyId')"
             [attr.aria-invalid]="!!formError('facultyId')"
           />
+          <small class="field-hint">Faculty ID is locked to prevent accidental record reassignment.</small>
           @if (formError('facultyId')) {
           <small class="field-error">{{ formError('facultyId') }}</small>
           }
@@ -333,6 +387,7 @@
             [class.is-invalid]="formError('middlename')"
             [attr.aria-invalid]="!!formError('middlename')"
           />
+          <small class="field-hint">Optional. You may enter a full middle name or middle initial.</small>
           @if (formError('middlename')) {
           <small class="field-error">{{ formError('middlename') }}</small>
           }
@@ -355,6 +410,11 @@
           @if (formError('lastname')) {
           <small class="field-error">{{ formError('lastname') }}</small>
           }
+        </div>
+
+        <div class="form-section-title">
+          <span>Assignment</span>
+          <small>Review the active profile details before saving.</small>
         </div>
 
         <!-- POSITION -->
@@ -393,6 +453,7 @@
             [class.is-invalid]="formError('loadLimit')"
             [attr.aria-invalid]="!!formError('loadLimit')"
           />
+          <small class="field-hint">Accepted range: 1 to 60 hours.</small>
           @if (formError('loadLimit')) {
           <small class="field-error">{{ formError('loadLimit') }}</small>
           }
@@ -451,11 +512,11 @@
           Cancel
         </button>
 
-        <button type="submit" class="save-btn">
+        <button type="submit" class="save-btn" [disabled]="facultyForm.invalid">
           <i class="bi bi-check-circle-fill"></i>
 
           <span>
-            Update Faculty
+            Save Changes
           </span>
         </button>
 

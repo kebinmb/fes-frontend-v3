@@ -46,8 +46,8 @@ export class AdminDataFacade {
     );
   }
 
-  loadUserAccounts(page: number, size: number) {
-    this.store.dispatch(AdminDataActions.loadUserAccounts({ page, size }));
+  loadUserAccounts(page: number, size: number, search: string = '') {
+    this.store.dispatch(AdminDataActions.loadUserAccounts({ page, size, search }));
   }
 
   loadFacultyEvaluationScores(page: number, size: number) {

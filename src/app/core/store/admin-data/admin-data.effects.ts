@@ -56,9 +56,9 @@ export class AdminEffects {
     this.actions$.pipe(
       ofType(AdminDataActions.loadUserAccounts),
 
-      mergeMap(({ page, size }) =>
+      mergeMap(({ page, size, search }) =>
         this.adminDataService
-          .getUserAccounts(page, size)
+          .getUserAccounts(page, size, search ?? '')
 
           .pipe(
             map((response) =>
@@ -212,6 +212,7 @@ export class AdminEffects {
               AdminDataActions.loadUserAccounts({
                 page: 0,
                 size: 10,
+                search: '',
               }),
             ]),
 
@@ -250,6 +251,7 @@ export class AdminEffects {
               AdminDataActions.loadUserAccounts({
                 page: 0,
                 size: 10,
+                search: '',
               }),
             ]),
 

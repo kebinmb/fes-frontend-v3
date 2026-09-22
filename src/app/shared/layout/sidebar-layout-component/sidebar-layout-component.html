@@ -104,6 +104,19 @@
           </span>
         </a>
 
+        <a
+          class="nav-item"
+          routerLink="/admin-dashboard/report-print-tracking"
+          routerLinkActive="active"
+          (click)="closeSidebar()"
+        >
+          <i class="bi bi-clipboard-check-fill"></i>
+
+          <span>
+            Print Tracking
+          </span>
+        </a>
+
         @if (role === 'ROLE_ADMIN') {
         <a
           class="nav-item"

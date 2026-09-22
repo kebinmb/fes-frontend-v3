@@ -95,6 +95,8 @@ type PreparedReportFailure = {
 
 type PreparedReportResult = PreparedReportSuccess | PreparedReportFailure;
 
+type FacultyPrintMode = 'report' | 'annex';
+
 @Component({
   selector: 'app-faculty-evaluation-scores-data-table-component',
   standalone: true,
@@ -120,7 +122,9 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
   readonly pageIndex = signal(0);
   readonly pageSize = signal(10);
   readonly isBulkPrinting = signal(false);
+  readonly isBulkAnnexPrinting = signal(false);
   readonly printingFacultyId = signal<string | null>(null);
+  readonly printingAnnexFacultyId = signal<string | null>(null);
   readonly selectedFacultyIds = signal<Set<string>>(new Set());
   readonly totalElements = signal(0);
   readonly totalPages = signal(1);
@@ -330,23 +334,23 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
     return rows.length > 0 && rows.every((row) => this.selectedFacultyIds().has(row.facultyId));
   }
 
-  printSingle(row: FacultyEvaluationReadinessRow): void {
-    if (this.printingFacultyId()) {
+  printSingle(row: FacultyEvaluationReadinessRow, mode: FacultyPrintMode = 'report'): void {
+    if (this.printingFacultyId() || this.printingAnnexFacultyId()) {
       return;
     }
 
-    const printWindow = this.openPreparingWindow('Preparing faculty evaluation report...');
+    const printWindow = this.openPreparingWindow(this.preparingMessage(mode, false));
 
     if (!printWindow) {
       return;
     }
 
-    this.printingFacultyId.set(row.facultyId);
+    this.setPrintingFaculty(mode, row.facultyId);
 
     this.preparePrintableReport(row)
       .pipe(
         take(1),
-        finalize(() => this.printingFacultyId.set(null)),
+        finalize(() => this.setPrintingFaculty(mode, null)),
       )
       .subscribe((result) => {
         if ('error' in result) {
@@ -358,14 +362,15 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
           return;
         }
 
-        localStorage.setItem('faculty-print-data', JSON.stringify(result.payload));
+        this.trackPreparedPrints([result.payload], mode);
+        localStorage.setItem('faculty-print-data', JSON.stringify({ mode, ...result.payload }));
         printWindow.location.href = '/print/faculty-evaluation';
         printWindow.focus();
       });
   }
 
-  printBulk(): void {
-    if (this.isBulkPrinting()) {
+  printBulk(mode: FacultyPrintMode = 'report'): void {
+    if (this.isBulkPrinting() || this.isBulkAnnexPrinting()) {
       return;
     }
 
@@ -374,16 +379,16 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
       return;
     }
 
-    const printWindow = this.openPreparingWindow('Preparing faculty evaluation reports...');
+    const printWindow = this.openPreparingWindow(this.preparingMessage(mode, true));
 
     if (!printWindow) {
       return;
     }
 
-    this.isBulkPrinting.set(true);
+    this.setBulkPrinting(mode, true);
 
     if (!this.selectedRows().length) {
-      this.prepareFilteredBulkReports(printWindow);
+      this.prepareFilteredBulkReports(printWindow, mode);
       return;
     }
 
@@ -394,7 +399,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
         mergeMap((row) => this.preparePrintableReport(row), 4),
         toArray(),
         take(1),
-        finalize(() => this.isBulkPrinting.set(false)),
+        finalize(() => this.setBulkPrinting(mode, false)),
       )
       .subscribe((results) => {
         const reports = results
@@ -411,15 +416,16 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
           return;
         }
 
-        localStorage.setItem('faculty-print-data', JSON.stringify({ reports }));
+        localStorage.setItem('faculty-print-data', JSON.stringify({ mode, bulk: true, reports }));
 
         const skippedCount = results.length - reports.length;
         const skippedMessage = skippedCount
           ? ` ${skippedCount} faculty record(s) could not be prepared.`
           : '';
 
+        this.trackPreparedPrints(reports, mode);
         this.toastFacade.showToast(
-          `Prepared ${reports.length} faculty report(s).${skippedMessage}`,
+          `Prepared ${reports.length} ${mode === 'annex' ? 'Annex D form(s)' : 'faculty report(s)'}.${skippedMessage}`,
           'success',
         );
 
@@ -535,7 +541,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
     );
   }
 
-  private prepareFilteredBulkReports(printWindow: Window): void {
+  private prepareFilteredBulkReports(printWindow: Window, mode: FacultyPrintMode): void {
     this.adminService
       .getFacultyEvaluationReadinessFacultyIds(this.buildFilters())
       .pipe(
@@ -561,7 +567,7 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
 
           return of([] as PreparedReportResult[]);
         }),
-        finalize(() => this.isBulkPrinting.set(false)),
+        finalize(() => this.setBulkPrinting(mode, false)),
       )
       .subscribe((results) => {
         const reports = results
@@ -578,15 +584,16 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
           return;
         }
 
-        localStorage.setItem('faculty-print-data', JSON.stringify({ reports }));
+        localStorage.setItem('faculty-print-data', JSON.stringify({ mode, bulk: true, reports }));
 
         const skippedCount = results.length - reports.length;
         const skippedMessage = skippedCount
           ? ` ${skippedCount} faculty record(s) were skipped.`
           : '';
 
+        this.trackPreparedPrints(reports, mode);
         this.toastFacade.showToast(
-          `Prepared ${reports.length} faculty report(s).${skippedMessage}`,
+          `Prepared ${reports.length} ${mode === 'annex' ? 'Annex D form(s)' : 'faculty report(s)'}.${skippedMessage}`,
           'success',
         );
 
@@ -600,8 +607,61 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
       && items.some((item) => this.isSupervisorEvaluation(item));
   }
 
+  private setPrintingFaculty(mode: FacultyPrintMode, facultyId: string | null): void {
+    if (mode === 'annex') {
+      this.printingAnnexFacultyId.set(facultyId);
+    } else {
+      this.printingFacultyId.set(facultyId);
+    }
+  }
+
+  private setBulkPrinting(mode: FacultyPrintMode, isPrinting: boolean): void {
+    if (mode === 'annex') {
+      this.isBulkAnnexPrinting.set(isPrinting);
+    } else {
+      this.isBulkPrinting.set(isPrinting);
+    }
+  }
+
+  private preparingMessage(mode: FacultyPrintMode, isBulk: boolean): string {
+    if (mode === 'annex') {
+      return isBulk
+        ? 'Preparing Annex D forms...'
+        : 'Preparing Annex D form...';
+    }
+
+    return isBulk
+      ? 'Preparing faculty evaluation reports...'
+      : 'Preparing faculty evaluation report...';
+  }
+
   private isPreparedReportSuccess(result: PreparedReportResult): result is PreparedReportSuccess {
     return 'payload' in result;
+  }
+
+  private trackPreparedPrints(payloads: PreparedPrintPayload[], mode: FacultyPrintMode): void {
+    const reportIds = payloads
+      .map((payload) => this.safeText(payload.report?.reportId))
+      .filter((reportId) => !!reportId);
+
+    if (!reportIds.length) {
+      return;
+    }
+
+    this.adminService
+      .markFacultyEvaluationReportsPrinted(
+        reportIds,
+        mode === 'annex' ? 'ANNEX_D' : 'REPORT',
+      )
+      .pipe(take(1), takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        error: (error) => {
+          this.toastFacade.showToast(
+            `The report was prepared, but print tracking was not updated. ${extractErrorMessage(error)}`,
+            'error',
+          );
+        },
+      });
   }
 
   private applyResponse(response: FacultyEvaluationReadinessPageResponse): void {

@@ -13,7 +13,7 @@
         type="button"
         class="secondary-btn"
         (click)="loadDashboard()"
-        [disabled]="isLoading() || isBulkPrinting()"
+        [disabled]="isLoading() || isBulkPrinting() || isBulkAnnexPrinting()"
       >
         @if (isLoading()) {
           <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
@@ -28,7 +28,7 @@
         type="button"
         class="primary-btn"
         (click)="printBulk()"
-        [disabled]="isLoading() || isBulkPrinting() || !totalElements()"
+        [disabled]="isLoading() || isBulkPrinting() || isBulkAnnexPrinting() || !totalElements()"
       >
         <i
           class="bi"
@@ -42,6 +42,27 @@
             Print Selected
           } @else {
             Bulk Print
+          }
+        </span>
+      </button>
+      <button
+        type="button"
+        class="secondary-btn annex-print-btn"
+        (click)="printBulk('annex')"
+        [disabled]="isLoading() || isBulkPrinting() || isBulkAnnexPrinting() || !totalElements()"
+      >
+        <i
+          class="bi"
+          [class.bi-file-earmark-text]="!isBulkAnnexPrinting()"
+          [class.bi-hourglass-split]="isBulkAnnexPrinting()"
+        ></i>
+        <span>
+          @if (isBulkAnnexPrinting()) {
+            Preparing
+          } @else if (selectedCount()) {
+            Print Selected Annex D
+          } @else {
+            Bulk Print Annex D
           }
         </span>
       </button>
@@ -234,7 +255,7 @@
                     type="button"
                     class="row-print-btn"
                     (click)="printSingle(row)"
-                    [disabled]="!!printingFacultyId() || isBulkPrinting()"
+                    [disabled]="!!printingFacultyId() || !!printingAnnexFacultyId() || isBulkPrinting() || isBulkAnnexPrinting()"
                   >
                     <i
                       class="bi"
@@ -243,6 +264,21 @@
                     ></i>
                     <span>
                       {{ printingFacultyId() === row.facultyId ? 'Preparing' : 'Print' }}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    class="row-print-btn annex-print-btn"
+                    (click)="printSingle(row, 'annex')"
+                    [disabled]="!!printingFacultyId() || !!printingAnnexFacultyId() || isBulkPrinting() || isBulkAnnexPrinting()"
+                  >
+                    <i
+                      class="bi"
+                      [class.bi-file-earmark-text]="printingAnnexFacultyId() !== row.facultyId"
+                      [class.bi-hourglass-split]="printingAnnexFacultyId() === row.facultyId"
+                    ></i>
+                    <span>
+                      {{ printingAnnexFacultyId() === row.facultyId ? 'Preparing' : 'Print Annex D' }}
                     </span>
                   </button>
                 </td>
@@ -268,10 +304,19 @@
                 type="button"
                 class="row-print-btn"
                 (click)="printSingle(row)"
-                [disabled]="!!printingFacultyId() || isBulkPrinting()"
+                [disabled]="!!printingFacultyId() || !!printingAnnexFacultyId() || isBulkPrinting() || isBulkAnnexPrinting()"
               >
                 <i class="bi bi-printer"></i>
                 <span>Print</span>
+              </button>
+              <button
+                type="button"
+                class="row-print-btn annex-print-btn"
+                (click)="printSingle(row, 'annex')"
+                [disabled]="!!printingFacultyId() || !!printingAnnexFacultyId() || isBulkPrinting() || isBulkAnnexPrinting()"
+              >
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Print Annex D</span>
               </button>
             </div>
 

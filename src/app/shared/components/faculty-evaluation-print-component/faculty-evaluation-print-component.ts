@@ -102,6 +102,8 @@ export class FacultyEvaluationPrintComponent implements OnInit {
   readonly renderProgress = signal<number>(0);
 
   sections: FacultyEvaluationPrintSection[] = [];
+  printMode: FacultyEvaluationPrintMode = 'report';
+  isBulkAnnexPrint = false;
 
   ngOnInit(): void {
     this.sections = this.readPrintPayload()
@@ -233,8 +235,13 @@ export class FacultyEvaluationPrintComponent implements OnInit {
         return [{ items: parsed }];
       }
 
-      if (Array.isArray(parsed?.reports)) {
-        return parsed.reports;
+      this.printMode = this.normalizePrintMode(parsed?.mode);
+      const reports = Array.isArray(parsed?.reports) ? parsed.reports : null;
+      this.isBulkAnnexPrint =
+        this.printMode === 'annex' && (parsed?.bulk === true || (reports?.length ?? 0) > 1);
+
+      if (reports) {
+        return reports;
       }
 
       return [
@@ -246,6 +253,10 @@ export class FacultyEvaluationPrintComponent implements OnInit {
     } catch {
       return this.data.length ? [{ items: this.data }] : [];
     }
+  }
+
+  private normalizePrintMode(mode: unknown): FacultyEvaluationPrintMode {
+    return mode === 'annex' || mode === 'report-annex' ? mode : 'report';
   }
 
   private buildSection(
@@ -404,13 +415,29 @@ export class FacultyEvaluationPrintComponent implements OnInit {
 
   academicTerm(section: FacultyEvaluationPrintSection): string {
     const semester = this.safeText(section.faculty?.semester, '');
-    const schoolYear = this.safeText(section.faculty?.schoolYear, '');
+    const schoolYear = this.academicYearRange(section.faculty?.schoolYear);
 
     if (!semester && !schoolYear) {
       return '-';
     }
 
     return `${semester || '-'} Semester / ${schoolYear || '-'}`;
+  }
+
+  private academicYearRange(schoolYear: number | string | null | undefined): string {
+    const rawSchoolYear = this.safeText(schoolYear, '');
+
+    if (!rawSchoolYear) {
+      return '';
+    }
+
+    const startYear = Number(rawSchoolYear.match(/\d{4}/)?.[0]);
+
+    if (!Number.isFinite(startYear)) {
+      return rawSchoolYear;
+    }
+
+    return `${startYear} - ${startYear + 1}`;
   }
 
   hasReportVerification(
