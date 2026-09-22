@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
@@ -36,10 +45,12 @@ interface SortState {
   imports: [CommonModule, FormsModule, RouterLink, UnicodeTextPipe],
   templateUrl: './faculty-workload-coverage-component.html',
   styleUrl: './faculty-workload-coverage-component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacultyWorkloadCoverageComponent implements OnInit {
   private readonly adminService = inject(AdminService);
   private readonly toastFacade = inject(ToastFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   coverage = signal<FacultyWorkloadCoverageResponse | null>(null);
   activeTab = signal<CoverageTab>('without');
@@ -149,6 +160,7 @@ export class FacultyWorkloadCoverageComponent implements OnInit {
     this.adminService
       .getFacultyWorkloadCoverage(forceRefresh)
       .pipe(
+        takeUntilDestroyed(this.destroyRef),
         finalize(() => {
           this.isLoading.set(false);
           this.isRefreshing.set(false);

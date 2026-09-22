@@ -1,6 +1,8 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnInit, signal } from '@angular/core';
+import { PrintScoreFormat } from '@app/models';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 import { repairSpecialCharacters } from '@utilities/normalize-text';
+
 
 export interface FacultyEvaluationPrintRecord {
   facultyEvaluationScoreId?: number | null;
@@ -59,7 +61,8 @@ interface FacultyEvaluationPrintReportPayload {
   items?: FacultyEvaluationPrintRecord[];
 }
 
-interface FacultyEvaluationPrintPayload extends FacultyEvaluationPrintReportPayload {
+export interface FacultyEvaluationPrintPayload extends FacultyEvaluationPrintReportPayload {
+  scoreFormat?: PrintScoreFormat;
   reports?: FacultyEvaluationPrintReportPayload[];
 }
 
@@ -80,14 +83,23 @@ interface FacultyEvaluationPrintSection {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-faculty-evaluation-print-component',
   imports: [UnicodeTextPipe],
   templateUrl: './faculty-evaluation-print-component.html',
   styleUrl: './faculty-evaluation-print-component.css',
 })
 export class FacultyEvaluationPrintComponent implements OnInit {
+  private static readonly CHUNK_SIZE = 5;
+
   @Input()
   data: FacultyEvaluationPrintRecord[] = [];
+
+  readonly PrintScoreFormat = PrintScoreFormat;
+  readonly scoreFormat = signal<PrintScoreFormat>(PrintScoreFormat.PERCENTAGE);
+  readonly renderedSections = signal<FacultyEvaluationPrintSection[]>([]);
+  readonly isRendering = signal<boolean>(false);
+  readonly renderProgress = signal<number>(0);
 
   sections: FacultyEvaluationPrintSection[] = [];
 
@@ -100,9 +112,98 @@ export class FacultyEvaluationPrintComponent implements OnInit {
       return;
     }
 
+    if (this.sections.length <= FacultyEvaluationPrintComponent.CHUNK_SIZE) {
+      this.renderedSections.set(this.sections);
+      this.schedulePrint();
+      return;
+    }
+
+    this.renderInChunks();
+  }
+
+  private renderInChunks(): void {
+    this.isRendering.set(true);
+    this.renderProgress.set(0);
+    this.renderedSections.set([]);
+
+    const total = this.sections.length;
+    let currentIndex = 0;
+
+    const renderNextBatch = () => {
+      const nextIndex = Math.min(
+        currentIndex + FacultyEvaluationPrintComponent.CHUNK_SIZE,
+        total,
+      );
+      const chunk = this.sections.slice(0, nextIndex);
+      this.renderedSections.set(chunk);
+      currentIndex = nextIndex;
+
+      const percent = Math.round((currentIndex / total) * 100);
+      this.renderProgress.set(percent);
+
+      if (currentIndex < total) {
+        requestAnimationFrame(() => {
+          setTimeout(renderNextBatch, 16);
+        });
+      } else {
+        this.isRendering.set(false);
+        this.schedulePrint();
+      }
+    };
+
+    renderNextBatch();
+  }
+
+  private schedulePrint(): void {
     setTimeout(() => {
       window.print();
     }, 500);
+  }
+
+  setScoreFormat(format: PrintScoreFormat): void {
+    this.scoreFormat.set(format);
+  }
+
+  triggerPrint(): void {
+    window.print();
+  }
+
+  formatRating(score: number | null | undefined): string {
+    const raw = this.safeNumber(score);
+    if (this.scoreFormat() === PrintScoreFormat.LIKERT) {
+      return (raw / 20).toFixed(2);
+    }
+    return raw.toFixed(2);
+  }
+
+  formatWeightedScore(item: FacultyEvaluationPrintRecord): string {
+    const students = this.safeNumber(item.numberOfStudents);
+    const rating = this.safeNumber(item.setRating);
+    if (this.scoreFormat() === PrintScoreFormat.LIKERT) {
+      return (students * (rating / 20)).toFixed(2);
+    }
+    return (students * rating).toFixed(2);
+  }
+
+  formatTotalWeightedScore(section: FacultyEvaluationPrintSection): string {
+    if (this.scoreFormat() === PrintScoreFormat.LIKERT) {
+      return (section.totalWeightedScore / 20).toFixed(2);
+    }
+    return section.totalWeightedScore.toFixed(2);
+  }
+
+  formatOverallSet(section: FacultyEvaluationPrintSection): string {
+    if (this.scoreFormat() === PrintScoreFormat.LIKERT) {
+      return (section.overallSetRating / 20).toFixed(2);
+    }
+    return section.overallSetRating.toFixed(2);
+  }
+
+  formatOverallSef(section: FacultyEvaluationPrintSection): string {
+    if (this.scoreFormat() === PrintScoreFormat.LIKERT) {
+      return (section.overallSefRating / 20).toFixed(2);
+    }
+    return section.overallSefRating.toFixed(2);
   }
 
   private readPrintPayload(): FacultyEvaluationPrintReportPayload[] {
@@ -117,6 +218,16 @@ export class FacultyEvaluationPrintComponent implements OnInit {
       const parsed = repairSpecialCharacters(
         JSON.parse(storedData),
       ) as FacultyEvaluationPrintPayload | FacultyEvaluationPrintRecord[];
+
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        !Array.isArray(parsed) &&
+        'scoreFormat' in parsed &&
+        parsed.scoreFormat
+      ) {
+        this.scoreFormat.set(parsed.scoreFormat as PrintScoreFormat);
+      }
 
       if (Array.isArray(parsed)) {
         return [{ items: parsed }];

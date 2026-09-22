@@ -1,8 +1,9 @@
-import { Component, inject, Input, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, Input, SimpleChanges } from '@angular/core';
 import { AdminDataFacade } from '../../../core/store/admin-data/admin-data.facade';
 import { AsyncPipe, DatePipe } from '@angular/common';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-student-evaluation-list-print-component',
   imports: [DatePipe],
   templateUrl: './student-evaluation-list-print-component.html',

@@ -17,11 +17,13 @@
     </button>
   </header>
 
-  <div class="term-strip" *ngIf="currentTerm() as term">
+  @if (currentTerm(); as term) {
+  <div class="term-strip">
     <span><i class="bi bi-calendar3"></i> Current term</span>
     <strong>{{ semesterLabel(term.semester) }} / {{ term.schoolYear }}</strong>
     <span class="record-count">{{ totalElements() | number }} classes</span>
   </div>
+  }
 
   <section class="assignment-panel">
     <div class="filter-bar">
@@ -35,14 +37,15 @@
             (ngModelChange)="updateSearch($event)"
             placeholder="Class code, subject, faculty, program"
           />
+          @if (searchTerm()) {
           <button
-            *ngIf="searchTerm()"
             type="button"
             aria-label="Clear search"
             (click)="updateSearch('')"
           >
             <i class="bi bi-x-lg"></i>
           </button>
+          }
         </div>
       </label>
 
@@ -52,9 +55,11 @@
           [ngModel]="legacyDatabase()"
           (ngModelChange)="updateDatabase($event)"
         >
-          <option *ngFor="let option of databaseOptions" [value]="option.value">
+          @for (option of databaseOptions; track option.value) {
+          <option [value]="option.value">
             {{ option.label }}
           </option>
+          }
         </select>
       </label>
 
@@ -82,9 +87,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            *ngFor="let assignment of assignments(); trackBy: trackByClassId"
-          >
+          @for (assignment of assignments(); track assignment.primaryClassId) {
+          <tr>
             <td>
               <strong>{{ assignment.classCode | unicodeText }}</strong>
               <small>Record #{{ assignment.primaryClassId }}</small>
@@ -124,8 +128,10 @@
               </button>
             </td>
           </tr>
+          }
 
-          <tr *ngIf="!isLoading() && assignments().length === 0">
+          @if (!isLoading() && assignments().length === 0) {
+          <tr>
             <td colspan="6">
               <div class="empty-state">
                 <i class="bi bi-journal-x"></i>
@@ -134,20 +140,25 @@
               </div>
             </td>
           </tr>
+          }
         </tbody>
       </table>
 
-      <div class="loading-state" *ngIf="isLoading()">
+      @if (isLoading()) {
+      <div class="loading-state">
         <span class="spinner"></span>
         Loading class assignments
       </div>
+      }
     </div>
 
     <footer class="pagination">
       <label>
         <span>Rows per page</span>
         <select [ngModel]="pageSize()" (ngModelChange)="updatePageSize($event)">
-          <option *ngFor="let size of pageSizes" [ngValue]="size">{{ size }}</option>
+          @for (size of pageSizes; track size) {
+          <option [ngValue]="size">{{ size }}</option>
+          }
         </select>
       </label>
 
@@ -178,9 +189,9 @@
   </section>
 </section>
 
+@if (selectedAssignment(); as assignment) {
 <div
   class="modal-backdrop"
-  *ngIf="selectedAssignment() as assignment"
   (click)="closeReassignment()"
 >
   <section
@@ -242,22 +253,28 @@
           <option value="" disabled>
             {{ isLoadingOptions() ? 'Loading faculty...' : 'Select faculty' }}
           </option>
-          <option *ngFor="let faculty of facultyOptions()" [value]="faculty.facultyId">
+          @for (faculty of facultyOptions(); track faculty.facultyId) {
+          <option [value]="faculty.facultyId">
             {{ faculty.facultyName | unicodeText }} ({{ faculty.facultyId }})
           </option>
+          }
         </select>
       </label>
 
-      <div class="selected-faculty" *ngIf="selectedFaculty() as faculty">
+      @if (selectedFaculty(); as faculty) {
+      <div class="selected-faculty">
         <i class="bi bi-person-check"></i>
         <div>
           <strong>{{ faculty.facultyName | unicodeText }}</strong>
           <span>
             {{ faculty.position || 'Position not specified' }}
-            <ng-container *ngIf="faculty.college"> · {{ faculty.college }}</ng-container>
+            @if (faculty.college) {
+            <ng-container> · {{ faculty.college }}</ng-container>
+            }
           </span>
         </div>
       </div>
+      }
 
       <p class="change-notice">
         <i class="bi bi-info-circle"></i>
@@ -281,10 +298,15 @@
         [disabled]="!canSave()"
         (click)="saveReassignment()"
       >
-        <span class="spinner small" *ngIf="isSaving()"></span>
-        <i class="bi bi-check2" *ngIf="!isSaving()"></i>
-        {{ isSaving() ? 'Saving...' : 'Confirm change' }}
+        @if (isSaving()) {
+        <span class="spinner small"></span>
+        Saving...
+        } @else {
+        <i class="bi bi-check2"></i>
+        Confirm change
+        }
       </button>
     </footer>
   </section>
 </div>
+}

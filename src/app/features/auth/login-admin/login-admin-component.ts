@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthFacade } from '@core/store/auth/auth.facade';
 import { CommonModule } from '@angular/common';
@@ -6,6 +6,7 @@ import { environment } from '@environments/environment';
 import { RouterModule } from '@angular/router';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-login-admin-component',
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './login-admin-component.html',

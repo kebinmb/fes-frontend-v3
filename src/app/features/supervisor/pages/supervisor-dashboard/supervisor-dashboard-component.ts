@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, DestroyRef, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, AfterViewInit, Component, DestroyRef, OnInit, ViewChild, inject } from '@angular/core';
 import { AsyncPipe, CommonModule } from '@angular/common';
 import { Subject, debounceTime, distinctUntilChanged, filter, map, take } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -61,6 +61,7 @@ interface FacultyEvaluationProgress {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-supervisor-dashboard-component',
   standalone: true,
   imports: [

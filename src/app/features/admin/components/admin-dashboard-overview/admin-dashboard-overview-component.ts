@@ -2,11 +2,13 @@ import { CommonModule } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   OnInit,
   computed,
   inject,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import {
@@ -47,6 +49,7 @@ interface DashboardViewModel {
 export class AdminDashboardOverviewComponent implements OnInit {
   private readonly adminService = inject(AdminService);
   private readonly toastFacade = inject(ToastFacade);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly pageSize = 5;
   readonly metricSkeletonItems = [1, 2, 3, 4];
@@ -87,6 +90,7 @@ export class AdminDashboardOverviewComponent implements OnInit {
     this.adminService
       .getDashboard(forceRefresh)
       .pipe(
+        takeUntilDestroyed(this.destroyRef),
         catchError((error) => {
           const message = extractErrorMessage(error);
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
@@ -21,6 +21,8 @@ import * as AdminDataActions from '@core/store/admin-data/admin-data.actions';
   templateUrl: './student-evaluation-list-component.html',
 
   styleUrl: './student-evaluation-list-component.css',
+
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentEvaluationListComponent implements OnInit, OnDestroy {
   private adminFacade = inject(AdminDataFacade);
@@ -64,7 +66,9 @@ export class StudentEvaluationListComponent implements OnInit, OnDestroy {
 
     this.destroy$.complete();
   }
-  printSection(row: StudentSectionEvaluationDTO): void {
+  print(row: StudentSectionEvaluationDTO): void {
+    this.selectedRow = row;
+
     this.adminFacade.loadStudentEvaluationStatus(
       row.programCode,
 
@@ -76,6 +80,8 @@ export class StudentEvaluationListComponent implements OnInit, OnDestroy {
     this.actions$
       .pipe(
         ofType(AdminDataActions.loadStudentEvaluationStatusSuccess),
+
+        takeUntil(this.destroy$),
 
         take(1),
       )

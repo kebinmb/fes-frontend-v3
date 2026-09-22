@@ -2,15 +2,13 @@ import {
   CommonModule
 } from '@angular/common';
 
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   DestroyRef,
   EventEmitter,
   HostListener,
   Input,
   Output,
-  inject
-} from '@angular/core';
+  inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
@@ -21,6 +19,7 @@ import {
 } from '@angular/forms';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-change-password-modal-component',
   standalone: true,
   imports: [

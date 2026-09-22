@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse, HttpEventType } from '@angular/common/http';
-import {
-  ChangeDetectorRef,
+import { ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   DestroyRef,
   ElementRef,
@@ -10,8 +9,7 @@ import {
   OnInit,
   SimpleChanges,
   ViewChild,
-  inject,
-} from '@angular/core';
+  inject, } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FacultyClass, FacultyLoadDTO } from '@core/services/supervisor-data/supervisor-data-service';
 import {
@@ -36,6 +34,7 @@ interface CriteriaGroup {
 }
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-faculty-evidence-upload-component',
   standalone: true,
   imports: [

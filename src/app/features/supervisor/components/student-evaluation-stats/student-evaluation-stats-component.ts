@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   Subject,
@@ -19,6 +19,7 @@ import {
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-student-evaluation-stats-component',
   standalone: true,
   imports: [CommonModule, FormsModule, UnicodeTextPipe],

@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { LATEST_RELEASE_NOTE } from '@core/config/changelog';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-patch-notes-component',
   imports: [CommonModule],
   templateUrl: './patch-notes-component.html',

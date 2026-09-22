@@ -1,9 +1,7 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   inject,
   OnInit,
-  signal,
-} from '@angular/core';
+  signal, } from '@angular/core';
 
 import {
   AsyncPipe,
@@ -27,6 +25,7 @@ import {
 } from '@core/services/admin/admin-service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-user-accounts-data-table-component',
   standalone: true,
   imports: [

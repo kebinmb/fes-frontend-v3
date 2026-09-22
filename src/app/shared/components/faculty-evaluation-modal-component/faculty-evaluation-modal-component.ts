@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import {
   FacultyLoadDTO,
   FacultyClass,
@@ -8,6 +8,7 @@ import { FacultyEvidenceUploadComponent } from '@shared/components/faculty-evide
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-faculty-evaluation-modal-component',
   imports: [CommonModule, FacultyEvidenceUploadComponent, UnicodeTextPipe],
   templateUrl: './faculty-evaluation-modal-component.html',

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AsyncPipe, DatePipe } from '@angular/common';
@@ -11,6 +11,7 @@ import { selectEvaluatorId } from '../../../core/store/auth/auth.selector';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-evaluated-students-component',
 
   standalone: true,

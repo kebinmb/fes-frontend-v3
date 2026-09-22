@@ -1,4 +1,51 @@
-@for (section of sections; track trackPrintSection($index, section)) {
+<div class="print-toolbar no-print">
+  <div class="toolbar-left">
+    <span class="toolbar-label">Score Format:</span>
+    <div class="btn-group" role="group" aria-label="Score Format Selection">
+      <button
+        type="button"
+        class="btn-format"
+        [class.active]="scoreFormat() === PrintScoreFormat.LIKERT"
+        (click)="setScoreFormat(PrintScoreFormat.LIKERT)"
+      >
+        1 to 5 (Likert)
+      </button>
+      <button
+        type="button"
+        class="btn-format"
+        [class.active]="scoreFormat() === PrintScoreFormat.PERCENTAGE"
+        (click)="setScoreFormat(PrintScoreFormat.PERCENTAGE)"
+      >
+        Converted to 100%
+      </button>
+    </div>
+  </div>
+
+  <button type="button" class="btn-print" (click)="triggerPrint()">
+    <i class="bi bi-printer"></i> Print Report
+  </button>
+</div>
+
+@if (isRendering()) {
+  <div class="print-loading-overlay no-print">
+    <div class="print-loading-card">
+      <div class="spinner-border text-primary mb-2" role="status"></div>
+      <p class="mb-1 fw-semibold">Preparing print layout... ({{ renderProgress() }}%)</p>
+      <div class="progress" style="height: 6px;">
+        <div
+          class="progress-bar progress-bar-striped progress-bar-animated"
+          role="progressbar"
+          [style.width.%]="renderProgress()"
+          [attr.aria-valuenow]="renderProgress()"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        ></div>
+      </div>
+    </div>
+  </div>
+}
+
+@for (section of renderedSections(); track trackPrintSection($index, section)) {
 <table class="print-container" role="presentation">
   <tbody class="print-body">
     <tr class="print-content-row">
@@ -72,7 +119,7 @@
               <th>Course Code</th>
               <th>Year / Section</th>
               <th>No. of Students</th>
-              <th>SET Rating</th>
+              <th>SET Rating{{ scoreFormat() === PrintScoreFormat.LIKERT ? ' (1-5)' : '' }}</th>
               <th>Weighted Score</th>
             </tr>
           </thead>
@@ -93,11 +140,11 @@
                 </td>
 
                 <td>
-                  {{ formattedNumber(item.setRating) }}
+                  {{ formatRating(item.setRating) }}
                 </td>
 
                 <td>
-                  {{ weightedScore(item) }}
+                  {{ formatWeightedScore(item) }}
                 </td>
               </tr>
             }
@@ -112,7 +159,7 @@
               <td>-</td>
 
               <td>
-                {{ section.totalWeightedScore.toFixed(2) }}
+                {{ formatTotalWeightedScore(section) }}
               </td>
             </tr>
           </tbody>
@@ -130,7 +177,7 @@
               <th>Seq</th>
               <th>Course Code</th>
               <th>Year / Section</th>
-              <th>SEF Rating</th>
+              <th>SEF Rating{{ scoreFormat() === PrintScoreFormat.LIKERT ? ' (1-5)' : '' }}</th>
             </tr>
           </thead>
 
@@ -146,7 +193,7 @@
                 <td>{{ yearSection(item) }}</td>
 
                 <td>
-                  {{ formattedNumber(item.sefRating) }}
+                  {{ formatRating(item.sefRating) }}
                 </td>
               </tr>
             }
@@ -161,18 +208,18 @@
 
         <div class="summary-wrapper">
           <div class="summary-card">
-            <div class="summary-label">Overall SET Rating</div>
+            <div class="summary-label">Overall SET Rating{{ scoreFormat() === PrintScoreFormat.LIKERT ? ' (1-5)' : '' }}</div>
 
             <div class="summary-value">
-              {{ section.overallSetRating.toFixed(2) }}
+              {{ formatOverallSet(section) }}
             </div>
           </div>
 
           <div class="summary-card">
-            <div class="summary-label">Overall SEF Rating</div>
+            <div class="summary-label">Overall SEF Rating{{ scoreFormat() === PrintScoreFormat.LIKERT ? ' (1-5)' : '' }}</div>
 
             <div class="summary-value">
-              {{ section.overallSefRating.toFixed(2) }}
+              {{ formatOverallSef(section) }}
             </div>
           </div>
         </div>

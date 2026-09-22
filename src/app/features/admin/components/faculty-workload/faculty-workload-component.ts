@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   OnDestroy,
@@ -61,6 +62,7 @@ interface AssignmentWorkloadDraft {
   ],
   templateUrl: './faculty-workload-component.html',
   styleUrl: './faculty-workload-component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   private readonly adminService = inject(AdminService);

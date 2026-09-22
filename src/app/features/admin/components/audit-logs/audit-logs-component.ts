@@ -1,12 +1,14 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import {
+  ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  DestroyRef,
   NgZone,
-  OnDestroy,
   OnInit,
   inject,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import {
   AdminService,
@@ -17,7 +19,6 @@ import {
 import {
   Subject,
   debounceTime,
-  takeUntil,
 } from 'rxjs';
 
 type AuditLogApiResponse =
@@ -49,12 +50,13 @@ type AuditLogRecord = Record<string, unknown>;
   ],
   templateUrl: './audit-logs-component.html',
   styleUrl: './audit-logs-component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AuditLogsComponent implements OnInit, OnDestroy {
+export class AuditLogsComponent implements OnInit {
   private readonly adminService = inject(AdminService);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly zone = inject(NgZone);
-  private readonly destroy$ = new Subject<void>();
+  private readonly destroyRef = inject(DestroyRef);
   private readonly filterChanges$ = new Subject<void>();
   private requestId = 0;
 
@@ -88,16 +90,11 @@ export class AuditLogsComponent implements OnInit, OnDestroy {
     this.filterChanges$
       .pipe(
         debounceTime(350),
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe(() => this.loadLogs(0));
 
     this.loadLogs(0);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   loadLogs(page = this.page): void {
@@ -121,7 +118,7 @@ export class AuditLogsComponent implements OnInit, OnDestroy {
         },
       )
       .pipe(
-        takeUntil(this.destroy$),
+        takeUntilDestroyed(this.destroyRef),
       )
       .subscribe({
         next: (response) => {

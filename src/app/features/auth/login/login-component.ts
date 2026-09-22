@@ -1,9 +1,7 @@
-import {
-  Component,
+import { ChangeDetectionStrategy, Component,
   OnDestroy,
   OnInit,
-  inject,
-} from '@angular/core';
+  inject, } from '@angular/core';
 
 import {
   AsyncPipe,
@@ -30,6 +28,7 @@ import { environment } from '@environments/environment';
 import { AuthFacade } from '@core/store/auth/auth.facade';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-login-component',
   imports: [
     CommonModule,

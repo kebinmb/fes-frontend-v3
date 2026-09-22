@@ -1,5 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnDestroy,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import {
   AdminService,
@@ -18,10 +28,12 @@ import { finalize } from 'rxjs';
   imports: [CommonModule, FormsModule, UnicodeTextPipe],
   templateUrl: './class-assignments-component.html',
   styleUrl: './class-assignments-component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ClassAssignmentsComponent implements OnInit, OnDestroy {
   private readonly adminService = inject(AdminService);
   private readonly toastFacade = inject(ToastFacade);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly facultyOptionsCache = new Map<string, FacultyAssignmentOptionResponse[]>();
   private searchTimer?: ReturnType<typeof setTimeout>;
 
@@ -72,10 +84,13 @@ export class ClassAssignmentsComponent implements OnInit, OnDestroy {
   );
 
   ngOnInit(): void {
-    this.adminService.fetchCurrentSchoolYearAndSemester().subscribe({
-      next: (term) => this.currentTerm.set(term),
-      error: (error) => this.toastFacade.showToast(extractErrorMessage(error), 'error'),
-    });
+    this.adminService
+      .fetchCurrentSchoolYearAndSemester()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (term) => this.currentTerm.set(term),
+        error: (error) => this.toastFacade.showToast(extractErrorMessage(error), 'error'),
+      });
     this.loadAssignments();
   }
 
@@ -95,6 +110,7 @@ export class ClassAssignmentsComponent implements OnInit, OnDestroy {
       this.searchTerm(),
       this.legacyDatabase(),
     ).pipe(
+      takeUntilDestroyed(this.destroyRef),
       finalize(() => {
         this.isLoading.set(false);
         this.isRefreshing.set(false);
@@ -186,6 +202,7 @@ export class ClassAssignmentsComponent implements OnInit, OnDestroy {
       this.selectedFacultyId(),
       assignment.facultyId,
     ).pipe(
+      takeUntilDestroyed(this.destroyRef),
       finalize(() => this.isSaving.set(false)),
     ).subscribe({
       next: (response) => {
@@ -239,6 +256,7 @@ export class ClassAssignmentsComponent implements OnInit, OnDestroy {
 
     this.isLoadingOptions.set(true);
     this.adminService.getClassAssignmentFacultyOptions(legacyDatabase).pipe(
+      takeUntilDestroyed(this.destroyRef),
       finalize(() => this.isLoadingOptions.set(false)),
     ).subscribe({
       next: (options) => {

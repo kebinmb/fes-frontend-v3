@@ -1,8 +1,11 @@
 import {
+  ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   inject,
   OnInit,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import {
   AsyncPipe,
@@ -39,6 +42,8 @@ import { ConfirmationModalComponent }
   templateUrl: './settings-component.html',
 
   styleUrl: './settings-component.css',
+
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsComponent
   implements OnInit {
@@ -46,6 +51,8 @@ export class SettingsComponent
     inject(MigrationFacade);
   private schoolYearFacade =
     inject(SchoolYearAndSemesterFacade);
+  private destroyRef =
+    inject(DestroyRef);
   migrationResponse$ =
     this.migrationFacade.migrationResponse$;
   migrationLoading$ =
@@ -72,7 +79,10 @@ export class SettingsComponent
     this.schoolYearFacade
       .fetchCurrentSchoolYearAndSemester();
     this.schoolYearResponse$
-      .pipe(take(1))
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.destroyRef),
+      )
       .subscribe((response) => {
 
         if (!response) {

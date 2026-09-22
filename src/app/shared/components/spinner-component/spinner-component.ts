@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { SpinnerFacade } from '../../../core/store/spinner/spinner.facade';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-spinner-component',
   imports: [CommonModule],
   templateUrl: './spinner-component.html',

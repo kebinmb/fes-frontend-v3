@@ -1,11 +1,11 @@
-import { Component, computed, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject } from '@angular/core';
 import { StudentDataFacade } from '@core/store/student-data/student-data.facade';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { combineLatest, filter, map, take } from 'rxjs';
 import { AuthFacade } from '@core/store/auth/auth.facade';
 import { SupervisorDataFacade } from '@core/store/supervisor-data/supervisor-data.facade';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { EvaluationDataFacade } from '@core/store/evaluation-data/evaluation.facade';
 import {
@@ -23,6 +23,7 @@ export type UserRole = 'ROLE_STUDENT' | 'ROLE_DEAN' | 'ROLE_ADMIN' | 'ROLE_PROGR
   imports: [CommonModule, ReactiveFormsModule, ConfirmationModalComponent],
   templateUrl: './evaluation-form-component.html',
   styleUrl: './evaluation-form-component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EvaluationFormComponent {
   private studentDataFacade = inject(StudentDataFacade);
@@ -32,6 +33,7 @@ export class EvaluationFormComponent {
   private router = inject(Router);
   private fb = inject(FormBuilder);
   private sessionActivity = inject(SessionActivityService);
+  private destroyRef = inject(DestroyRef);
 
   role$ = this.authFacade.role$;
   evaluatorId$ = this.authFacade.evaluatorId$;
@@ -108,6 +110,7 @@ export class EvaluationFormComponent {
       this.studentDataFacade.studentLoads$,
     ])
       .pipe(
+        takeUntilDestroyed(this.destroyRef),
         filter(([role, evaluatorId]) => !!role && !!evaluatorId),
         take(1)
       )

@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-confirmation-modal-component',
   imports: [CommonModule, UnicodeTextPipe],
   templateUrl: './confirmation-modal-component.html',

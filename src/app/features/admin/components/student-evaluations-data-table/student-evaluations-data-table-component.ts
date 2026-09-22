@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   OnDestroy,
   OnInit,
@@ -10,6 +11,7 @@ import {
   Subject,
   debounceTime,
   distinctUntilChanged,
+  take,
   takeUntil,
 } from 'rxjs';
 
@@ -35,6 +37,7 @@ import { UnicodeTextPipe } from '@shared/pipes/unicode-text.pipe';
     './student-evaluations-data-table-component.html',
   styleUrl:
     './student-evaluations-data-table-component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StudentEvaluationsDataTableComponent
   implements OnInit, OnDestroy {
@@ -112,7 +115,10 @@ export class StudentEvaluationsDataTableComponent
   nextPage(): void {
 
     this.totalPages$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        take(1),
+        takeUntil(this.destroy$),
+      )
       .subscribe((totalPages) => {
 
         if (this.page() + 1 >= totalPages) {

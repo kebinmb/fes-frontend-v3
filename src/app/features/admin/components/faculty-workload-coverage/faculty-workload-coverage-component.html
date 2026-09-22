@@ -22,7 +22,8 @@
     </button>
   </header>
 
-  <div class="summary-grid" *ngIf="coverage() as data; else loadingState">
+  @if (coverage(); as data) {
+  <div class="summary-grid">
     <article class="summary-card">
       <span>Total Active</span>
       <strong>{{ data.totalActiveFaculty }}</strong>
@@ -41,8 +42,16 @@
       <small>Needs workload encoding</small>
     </article>
   </div>
+  } @else {
+  <div class="summary-grid skeleton-grid">
+    <div class="summary-card skeleton"></div>
+    <div class="summary-card skeleton"></div>
+    <div class="summary-card skeleton"></div>
+  </div>
+  }
 
-  <section class="coverage-panel" *ngIf="coverage() as data">
+  @if (coverage(); as data) {
+  <section class="coverage-panel">
     <div class="panel-toolbar">
       <div class="tab-group" role="tablist" aria-label="Workload coverage filter">
         <button
@@ -86,14 +95,15 @@
             placeholder="Faculty, ID, college, position"
           />
         </div>
+        @if (searchTerm()) {
         <button
-          *ngIf="searchTerm()"
           type="button"
           aria-label="Clear search"
           (click)="clearSearch()"
         >
           <i class="bi bi-x-lg"></i>
         </button>
+        }
       </label>
 
       <label class="filter-control">
@@ -103,9 +113,11 @@
           (ngModelChange)="updateCollegeFilter($event)"
         >
           <option value="all">All colleges</option>
-          <option *ngFor="let college of collegeOptions()" [value]="college">
+          @for (college of collegeOptions(); track college) {
+          <option [value]="college">
             {{ college }}
           </option>
+          }
         </select>
       </label>
 
@@ -116,9 +128,11 @@
           (ngModelChange)="updatePositionFilter($event)"
         >
           <option value="all">All positions</option>
-          <option *ngFor="let position of positionOptions()" [value]="position">
+          @for (position of positionOptions(); track position) {
+          <option [value]="position">
             {{ position }}
           </option>
+          }
         </select>
       </label>
 
@@ -153,9 +167,11 @@
             [ngModel]="pageSize()"
             (ngModelChange)="updatePageSize($event)"
           >
-            <option *ngFor="let size of pageSizes" [value]="size">
+            @for (size of pageSizes; track size) {
+            <option [value]="size">
               {{ size }}
             </option>
+            }
           </select>
         </label>
       </div>
@@ -210,7 +226,8 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let row of paginatedRows(); trackBy: trackByFacultyId">
+          @for (row of paginatedRows(); track row.facultyId) {
+          <tr>
             <td data-label="Faculty">
               <strong>{{ row.facultyName | unicodeText }}</strong>
               <span>#{{ row.facultyId }}</span>
@@ -237,17 +254,21 @@
               </a>
             </td>
           </tr>
+          }
         </tbody>
       </table>
 
-      <div class="empty-state" *ngIf="!isLoading() && sortedRows().length === 0">
+      @if (!isLoading() && sortedRows().length === 0) {
+      <div class="empty-state">
         <i class="bi bi-check2-circle"></i>
         <strong>No matching faculty found</strong>
         <span>Try changing the search or switch workload status.</span>
       </div>
+      }
     </div>
 
-    <footer class="pagination-bar" *ngIf="sortedRows().length > 0">
+    @if (sortedRows().length > 0) {
+    <footer class="pagination-bar">
       <span>
         Page {{ pageIndex() + 1 }} of {{ totalPages() }}
       </span>
@@ -261,14 +282,15 @@
           Prev
         </button>
 
+        @for (page of paginationPages(); track page) {
         <button
-          *ngFor="let page of paginationPages()"
           type="button"
           [class.active]="pageIndex() === page"
           (click)="goToPage(page)"
         >
           {{ page + 1 }}
         </button>
+        }
 
         <button
           type="button"
@@ -279,13 +301,7 @@
         </button>
       </div>
     </footer>
+    }
   </section>
-
-  <ng-template #loadingState>
-    <div class="summary-grid skeleton-grid">
-      <div class="summary-card skeleton"></div>
-      <div class="summary-card skeleton"></div>
-      <div class="summary-card skeleton"></div>
-    </div>
-  </ng-template>
+  }
 </section>

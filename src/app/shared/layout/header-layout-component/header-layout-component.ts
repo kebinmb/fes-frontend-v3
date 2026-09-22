@@ -1,8 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AuthFacade } from '../../../core/store/auth/auth.facade';
 import { SidebarService } from '../../../core/services/layout/sidebar/sidebar-service';
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-header-layout-component',
   imports: [],
   templateUrl: './header-layout-component.html',

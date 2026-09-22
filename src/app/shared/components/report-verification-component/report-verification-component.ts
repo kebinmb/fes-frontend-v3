@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import {
   AdminService,
@@ -14,10 +15,12 @@ import { catchError, finalize, of, take } from 'rxjs';
   imports: [CommonModule],
   templateUrl: './report-verification-component.html',
   styleUrl: './report-verification-component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ReportVerificationComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly adminService = inject(AdminService);
+  private readonly destroyRef = inject(DestroyRef);
 
   reportId = '';
   isLoading = true;
@@ -36,6 +39,7 @@ export class ReportVerificationComponent implements OnInit {
     this.adminService
       .verifyFacultyEvaluationReport(this.reportId)
       .pipe(
+        takeUntilDestroyed(this.destroyRef),
         take(1),
         catchError((error) => {
           this.errorMessage = extractErrorMessage(error) || 'Unable to verify this report.';
