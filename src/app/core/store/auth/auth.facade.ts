@@ -11,6 +11,7 @@ import {
   selectRole,
 } from './auth.selector';
 import { selectLoading } from '../spinner/spinner.selector';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -24,6 +25,7 @@ export class AuthFacade {
   accessCodeSent$ = this.store.select(selectAccessCodeSent);
   error$ = this.store.select(selectAuthenticationError);
   college$ = this.store.select(selectCollege);
+
   loginSupervisor(username: string, password: string) {
     this.store.dispatch(
       AuthActions.supervisorLogin({
@@ -32,24 +34,33 @@ export class AuthFacade {
       }),
     );
   }
-  loginAdministrator(username:string, password:string){
+
+  loginAdministrator(username: string, password: string) {
     this.store.dispatch(
       AuthActions.administratorLogin({
-        username:username,
+        username: username,
         password,
       }),
     );
   }
-  loginStudent(studentId:string,accessCode:string){
-    this.store.dispatch(AuthActions.studentLogin({
-      evaluatorId:studentId,
-      accessCode:accessCode
-    }),
-  );
+
+  loginStudent(studentId: string, accessCode: string) {
+    this.store.dispatch(
+      AuthActions.studentLogin({
+        evaluatorId: studentId,
+        accessCode: accessCode,
+      }),
+    );
   }
-  generateStudentAccessCode(evaluatorId: string, password:string) {
+
+  loginWithGoogle(idToken: string) {
+    this.store.dispatch(AuthActions.loginWithGoogle({ idToken }));
+  }
+
+  generateStudentAccessCode(evaluatorId: string, password: string) {
     this.store.dispatch(AuthActions.generateAccessCodeForStudent({ evaluatorId, password }));
   }
+
   logout() {
     this.store.dispatch(AuthActions.logout());
   }
@@ -57,9 +68,8 @@ export class AuthFacade {
   checkLoggedInUserAuthentication() {
     this.store.dispatch(AuthActions.checkLoggedInUserAuthentication());
   }
+
   resetStudentLoginFlow() {
-  this.store.dispatch(
-    AuthActions.resetStudentLoginFlow()
-  );
-}
+    this.store.dispatch(AuthActions.resetStudentLoginFlow());
+  }
 }

@@ -1159,6 +1159,10 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         ? this.isAssignmentDraftDirty(previousDraft)
         : false;
 
+      const optionHours = option.totalHoursPerWeek != null
+        ? this.toNumber(option.totalHoursPerWeek)
+        : null;
+
       return {
         key,
         option,
@@ -1167,7 +1171,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
           ? previousDraft?.totalHoursPerWeek ?? null
           : savedWorkload
           ? savedHours
-          : previousDraft?.totalHoursPerWeek ?? null,
+          : (previousDraft?.totalHoursPerWeek ?? optionHours),
         loadStatus: keepUnsavedInput
           ? previousDraft?.loadStatus ?? 'Regular'
           : savedWorkload

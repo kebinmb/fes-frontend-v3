@@ -754,3 +754,17 @@
     font-size: 2rem;
   }
 }
+
+.google-signin-wrapper {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.google-rendered-btn {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}

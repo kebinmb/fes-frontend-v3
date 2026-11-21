@@ -1,7 +1,13 @@
-import { ChangeDetectionStrategy, Component,
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
   OnDestroy,
   OnInit,
-  inject, } from '@angular/core';
+  inject,
+  signal,
+  ViewChild,
+} from '@angular/core';
 
 import {
   AsyncPipe,
@@ -26,6 +32,7 @@ import {
 import { environment } from '@environments/environment';
 
 import { AuthFacade } from '@core/store/auth/auth.facade';
+import { GoogleAuthService } from '@core/services/auth/google-auth.service';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,8 +49,8 @@ export class LoginComponent
   implements OnInit, OnDestroy {
 
   private authFacade = inject(AuthFacade);
-
   private fb = inject(FormBuilder);
+  private googleAuthService = inject(GoogleAuthService);
 
   private destroy$ = new Subject<void>();
 
@@ -52,6 +59,8 @@ export class LoginComponent
   step = 0;
 
   isCapsLockOn = false;
+
+  readonly googleButtonRendered = signal<boolean>(false);
 
   accessCodeSent$ = this.authFacade.accessCodeSent$;
 
@@ -94,6 +103,24 @@ export class LoginComponent
       ],
     ],
   });
+
+  @ViewChild('googleSignInTarget') set googleSignInTargetRef(element: ElementRef<HTMLElement> | undefined) {
+    if (element?.nativeElement && !this.googleButtonRendered()) {
+      this.googleAuthService
+        .renderSignInButton(element.nativeElement, {
+          width: 320,
+          theme: 'outline',
+          size: 'large',
+          text: 'continue_with',
+        })
+        .then(() => {
+          this.googleButtonRendered.set(true);
+        })
+        .catch(() => {
+          this.googleButtonRendered.set(false);
+        });
+    }
+  }
 
   constructor() {
 
@@ -145,6 +172,14 @@ export class LoginComponent
           .get('accessCode')
           ?.updateValueAndValidity();
       });
+
+    this.googleAuthService.credential$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((idToken) => {
+        if (idToken) {
+          this.authFacade.loginWithGoogle(idToken);
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -167,6 +202,10 @@ export class LoginComponent
     this.studentForm.reset();
 
     this.authFacade.resetStudentLoginFlow();
+
+    if (role === 'supervisor') {
+      this.googleButtonRendered.set(false);
+    }
   }
 
   get supervisorFormControl() {
@@ -244,9 +283,14 @@ export class LoginComponent
   }
 
   loginWithGoogle(): void {
-
-    window.location.href =
-      environment.oauth;
+    this.googleAuthService.promptForIdToken().subscribe({
+      next: (idToken) => {
+        if (idToken) {
+          this.authFacade.loginWithGoogle(idToken);
+        }
+      },
+      error: () => {},
+    });
   }
 
   detectCapsLock(event: KeyboardEvent): void {

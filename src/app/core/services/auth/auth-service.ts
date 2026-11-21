@@ -116,6 +116,28 @@ export class AuthService {
   getCurrentUser(): Observable<CurrentUserResponse> {
     return this.http.get<CurrentUserResponse>(`${this.AUTH_URL}/me`, { withCredentials: true });
   }
+
+  loginWithGoogle(idToken: string): Observable<{
+    message: string;
+    userId: string;
+    role: string;
+    college?: string;
+    program?: string;
+  }> {
+    return this.http.post<{
+      message: string;
+      userId: string;
+      role: string;
+      college?: string;
+      program?: string;
+    }>(
+      `${this.AUTH_URL}/google`,
+      { idToken },
+      {
+        withCredentials: true,
+      }
+    );
+  }
   logout() {
     return this.http.post<{ message: string }>(
       `${this.AUTH_URL}/logout`,

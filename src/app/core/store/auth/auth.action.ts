@@ -85,3 +85,11 @@ export const sessionExpired = createAction('[Session Expired] Session Expired');
 export const resetStudentLoginFlow = createAction(
   '[Auth] Reset Student Login Flow'
 );
+export const loginWithGoogle = createAction(
+  '[Authentication] Login With Google',
+  props<{ idToken: string }>(),
+);
+export const loginWithGoogleFailure = createAction(
+  '[Authentication] Login With Google Failed',
+  props<{ error: string }>(),
+);

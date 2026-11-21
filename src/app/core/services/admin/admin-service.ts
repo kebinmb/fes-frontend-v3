@@ -320,6 +320,12 @@ export interface FacultyWorkloadClassOptionResponse {
   programCode: string;
   yearLevel: string;
   sectionCode: string;
+  lecUnits?: number;
+  labUnits?: number;
+  lecHours?: number;
+  labHours?: number;
+  totalHoursPerWeek?: number;
+  totalTeachingLoad?: number;
 }
 export interface CreateUserAccountRequest {
   username: string;

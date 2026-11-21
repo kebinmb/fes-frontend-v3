@@ -232,6 +232,38 @@ export class AuthEffects {
       ),
     { dispatch: false },
   );
+  loginWithGoogle$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.loginWithGoogle),
+      exhaustMap(({ idToken }) => {
+        this.spinnerFacade.showSpinner();
+        return this.authService.loginWithGoogle(idToken).pipe(
+          map(() => {
+            this.spinnerFacade.hideSpinner();
+            return AuthActions.checkLoggedInUserAuthentication();
+          }),
+          catchError((error) => {
+            this.spinnerFacade.hideSpinner();
+            return of(
+              AuthActions.loginWithGoogleFailure({
+                error: extractErrorMessage(error),
+              }),
+            );
+          }),
+        );
+      }),
+    ),
+  );
+  loginWithGoogleFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.loginWithGoogleFailure),
+        tap(({ error }) => {
+          this.toastFacade.showToast(error, 'error');
+        }),
+      ),
+    { dispatch: false },
+  );
   loginAdministratorFailure$ = createEffect(
     () =>
       this.actions$.pipe(
