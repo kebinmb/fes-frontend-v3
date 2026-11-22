@@ -106,6 +106,7 @@ export class FacultyDataTableComponent implements OnInit {
   searchTerm = '';
   selectedLegacyDatabase = '';
   selectedBulkPrintCollege = '';
+  selectedStatus = '';
   isPrintingFacultyId: string | null = null;
   isPrintingAnnexFacultyId: string | null = null;
   isBulkPrinting = false;
@@ -166,6 +167,7 @@ export class FacultyDataTableComponent implements OnInit {
       this.searchTerm,
       this.selectedLegacyDatabase,
       this.selectedBulkPrintCollege,
+      this.selectedStatus,
     );
   }
   onSearchChange(value: string): void {
@@ -190,6 +192,7 @@ export class FacultyDataTableComponent implements OnInit {
     this.searchTerm = '';
     this.selectedLegacyDatabase = '';
     this.selectedBulkPrintCollege = '';
+    this.selectedStatus = '';
     this.activeTab = 'ALL';
     this.currentPage = 0;
     this.clearTransientFacultyState();
@@ -205,6 +208,13 @@ export class FacultyDataTableComponent implements OnInit {
   onCollegeChange(value: string): void {
     this.selectedBulkPrintCollege = value;
     this.activeTab = value === 'FOR_MIGRATION' ? 'FOR_MIGRATION' : 'ALL';
+    this.currentPage = 0;
+    this.clearTransientFacultyState();
+    this.loadFaculties();
+  }
+
+  onStatusChange(value: string): void {
+    this.selectedStatus = value;
     this.currentPage = 0;
     this.clearTransientFacultyState();
     this.loadFaculties();
@@ -311,11 +321,15 @@ export class FacultyDataTableComponent implements OnInit {
     return !!this.searchTerm.trim()
       || !!this.selectedLegacyDatabase
       || !!this.selectedBulkPrintCollege
+      || !!this.selectedStatus
       || this.activeTab === 'FOR_MIGRATION';
   }
 
   hasListFilters(): boolean {
-    return !!this.searchTerm.trim() || !!this.selectedLegacyDatabase || !!this.selectedBulkPrintCollege;
+    return !!this.searchTerm.trim()
+      || !!this.selectedLegacyDatabase
+      || !!this.selectedBulkPrintCollege
+      || !!this.selectedStatus;
   }
 
   emptyStateTitle(): string {

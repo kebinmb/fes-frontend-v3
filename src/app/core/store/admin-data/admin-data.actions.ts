@@ -21,6 +21,7 @@ export const loadFaculties = createAction(
     search?: string;
     legacyDatabase?: string;
     college?: string;
+    status?: string;
   }>(),
 );
 

@@ -102,6 +102,20 @@
       </option>
       }
     </select>
+    <label class="visually-hidden" for="statusFilter">
+      Filter by status
+    </label>
+    <select
+      id="statusFilter"
+      class="filter-select"
+      [(ngModel)]="selectedStatus"
+      name="statusFilter"
+      (ngModelChange)="onStatusChange($event)"
+    >
+      <option value="">All Statuses</option>
+      <option value="ACTIVE">Active</option>
+      <option value="INACTIVE">Inactive</option>
+    </select>
     <button
       type="button"
       class="bulk-print-btn"
@@ -216,6 +230,8 @@
             {{ legacyDatabaseLabel(faculty.legacyDatabase || faculty.sourceCampus) }}
             @if (faculty.status === 'INACTIVE') {
             <span class="status-badge inactive">Inactive</span>
+            } @else if (faculty.status === 'ACTIVE') {
+            <span class="status-badge active">Active</span>
             }
           </td>
           <td data-label="Actions">
