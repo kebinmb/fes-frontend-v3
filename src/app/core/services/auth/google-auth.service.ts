@@ -62,7 +62,7 @@ export class GoogleAuthService {
       return of(this.cachedClientId);
     }
 
-    return this.http.get<AuthConfigResponse>(`${environment.API_URL}/auth/config`, { withCredentials: true }).pipe(
+    return this.http.get<AuthConfigResponse>(`${environment.API_URL}/auth/config`).pipe(
       map((res) => {
         const id = res?.googleClientId?.trim();
         if (!id) {
@@ -176,33 +176,13 @@ export class GoogleAuthService {
   }
 
   /**
-   * Requests a Google ID Token via Google Identity Services prompt.
+   * Displays the Google Identity Services prompt.
+   * Emits the ID token to `credential$` once the user completes sign-in.
    */
-  promptForIdToken(): Observable<string> {
-    return new Observable<string>((observer) => {
-      this.initializeGsi()
-        .then(() => {
-          const sub = this.credential$.subscribe({
-            next: (token) => {
-              observer.next(token);
-              observer.complete();
-              sub.unsubscribe();
-            },
-            error: (err) => observer.error(err)
-          });
-
-          window.google?.accounts?.id?.prompt((notification) => {
-            if (notification?.isDismissedMoment?.()) {
-              this.ngZone.run(() => {
-                observer.error(new Error('Google Sign-In prompt was dismissed.'));
-                sub.unsubscribe();
-              });
-            }
-          });
-        })
-        .catch((err) => {
-          this.ngZone.run(() => observer.error(err));
-        });
-    });
+  async prompt(): Promise<void> {
+    await this.initializeGsi();
+    if (window.google?.accounts?.id) {
+      window.google.accounts.id.prompt();
+    }
   }
 }

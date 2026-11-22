@@ -115,6 +115,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   isLoadingWorkloads = false;
   isLoadingClasses = false;
   isSaving = false;
+  isAutoPopulating = false;
   deletingWorkloadId: number | null = null;
   workloadPendingDelete: FacultyWorkloadResponse | null = null;
   selectedFacultyWorkloadCount = 0;
@@ -193,6 +194,49 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     this.loadClassOptions();
     this.loadSelectedFacultyTermWorkloads();
     this.loadWorkloads();
+  }
+
+  onAutoPopulateWorkloads(): void {
+    if (this.isAutoPopulating) {
+      return;
+    }
+
+    const schoolYear = this.workloadForm.controls.schoolYear.value ?? undefined;
+    const semester = this.workloadForm.controls.semester.value ?? undefined;
+
+    this.isAutoPopulating = true;
+    this.cdr.markForCheck();
+
+    this.adminService
+      .syncFacultyWorkloads(schoolYear, semester)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.isAutoPopulating = false;
+          const created = response.createdCount ?? 0;
+          const updated = response.updatedCount ?? 0;
+          const msg =
+            created > 0
+              ? `Successfully auto-populated ${created} new workload assignments (${updated} synchronized).`
+              : `Successfully synchronized ${updated} workload assignments.`;
+          this.toastFacade.showToast(msg, 'success');
+          this.invalidateCurrentClassOptionsCache();
+          this.loadWorkloads();
+          if (this.selectedFaculty) {
+            this.loadSelectedFacultyTermWorkloads();
+            this.loadClassOptions();
+          }
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.isAutoPopulating = false;
+          this.toastFacade.showToast(
+            error?.error?.message || 'Failed to auto-populate faculty workloads.',
+            'error',
+          );
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   selectFaculty(faculty: FetchFacultyResponse): void {

@@ -94,14 +94,14 @@ describe('roleGuard', () => {
     expect(router.createUrlTree).toHaveBeenCalledWith(['/login']);
   });
 
-  it('redirects authenticated users with the wrong role to login', async () => {
+  it('redirects authenticated users with the wrong role to forbidden page', async () => {
     authState$.next({
       ...authState$.value,
       role: 'ROLE_STUDENT',
     });
 
     await expect(firstValueFrom(executeGuard({ role: 'ROLE_ADMIN' }))).resolves.toBe(loginTree);
-    expect(router.createUrlTree).toHaveBeenCalledWith(['/login']);
+    expect(router.createUrlTree).toHaveBeenCalledWith(['/forbidden']);
   });
 
   it('redirects HR users away from admin-only children to the faculty list', async () => {

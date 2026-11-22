@@ -33,6 +33,7 @@ import { environment } from '@environments/environment';
 
 import { AuthFacade } from '@core/store/auth/auth.facade';
 import { GoogleAuthService } from '@core/services/auth/google-auth.service';
+import { GoogleSignInButtonComponent } from '@shared/components/google-sign-in-button-component/google-sign-in-button-component';
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -41,6 +42,7 @@ import { GoogleAuthService } from '@core/services/auth/google-auth.service';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    GoogleSignInButtonComponent,
   ],
   templateUrl: './login-component.html',
   styleUrl: './login-component.css',
@@ -59,8 +61,6 @@ export class LoginComponent
   step = 0;
 
   isCapsLockOn = false;
-
-  readonly googleButtonRendered = signal<boolean>(false);
 
   accessCodeSent$ = this.authFacade.accessCodeSent$;
 
@@ -103,24 +103,6 @@ export class LoginComponent
       ],
     ],
   });
-
-  @ViewChild('googleSignInTarget') set googleSignInTargetRef(element: ElementRef<HTMLElement> | undefined) {
-    if (element?.nativeElement && !this.googleButtonRendered()) {
-      this.googleAuthService
-        .renderSignInButton(element.nativeElement, {
-          width: 320,
-          theme: 'outline',
-          size: 'large',
-          text: 'continue_with',
-        })
-        .then(() => {
-          this.googleButtonRendered.set(true);
-        })
-        .catch(() => {
-          this.googleButtonRendered.set(false);
-        });
-    }
-  }
 
   constructor() {
 
@@ -202,10 +184,6 @@ export class LoginComponent
     this.studentForm.reset();
 
     this.authFacade.resetStudentLoginFlow();
-
-    if (role === 'supervisor') {
-      this.googleButtonRendered.set(false);
-    }
   }
 
   get supervisorFormControl() {
@@ -280,17 +258,6 @@ export class LoginComponent
       payload.studentId.trim(),
       payload.accessCode.trim().toUpperCase(),
     );
-  }
-
-  loginWithGoogle(): void {
-    this.googleAuthService.promptForIdToken().subscribe({
-      next: (idToken) => {
-        if (idToken) {
-          this.authFacade.loginWithGoogle(idToken);
-        }
-      },
-      error: () => {},
-    });
   }
 
   detectCapsLock(event: KeyboardEvent): void {

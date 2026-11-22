@@ -24,9 +24,27 @@
         </div>
       </div>
 
-      <div class="status-card">
-        <span>Encoded Assignments</span>
-        <strong>{{ encodedAssignmentDraftCount }} / {{ assignmentDrafts.length || 0 }}</strong>
+      <div class="header-actions">
+        <button
+          type="button"
+          class="btn-auto-populate"
+          [disabled]="isAutoPopulating"
+          (click)="onAutoPopulateWorkloads()"
+          title="Auto-populate faculty workloads and calculate hours and overload status directly from class schedules"
+        >
+          <i
+            class="bi"
+            [class.bi-magic]="!isAutoPopulating"
+            [class.bi-arrow-repeat]="isAutoPopulating"
+            [class.spin]="isAutoPopulating"
+          ></i>
+          <span>{{ isAutoPopulating ? 'Auto-Populating...' : 'Auto-Populate Workloads' }}</span>
+        </button>
+
+        <div class="status-card">
+          <span>Encoded Assignments</span>
+          <strong>{{ encodedAssignmentDraftCount }} / {{ assignmentDrafts.length || 0 }}</strong>
+        </div>
       </div>
     </div>
 

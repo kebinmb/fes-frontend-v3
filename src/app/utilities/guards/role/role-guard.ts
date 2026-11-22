@@ -34,7 +34,7 @@ export const roleGuard: CanActivateFn = (route) => {
         return router.createUrlTree(['/admin-dashboard/faculty-list']);
       }
 
-      return router.createUrlTree(['/login']);
+      return router.createUrlTree(['/forbidden']);
     }),
   );
 };

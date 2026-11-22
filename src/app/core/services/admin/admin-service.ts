@@ -1089,6 +1089,31 @@ export class AdminService {
     );
   }
 
+  syncFacultyWorkloads(
+    schoolYear?: number,
+    semester?: string,
+  ): Observable<{ status: string; message: string; createdCount: number; updatedCount: number }> {
+    let params = new HttpParams();
+    if (schoolYear != null) {
+      params = params.set('schoolYear', schoolYear.toString());
+    }
+    if (semester != null && semester.trim() !== '') {
+      params = params.set('semester', semester);
+    }
+
+    return this.withCsrfToken((csrf) =>
+      this.http.post<{ status: string; message: string; createdCount: number; updatedCount: number }>(
+        `${this.ADMIN_API_URL}/faculty-workloads/sync`,
+        null,
+        {
+          params,
+          headers: this.csrfHeaders(csrf),
+          withCredentials: true,
+        },
+      ),
+    );
+  }
+
   getUserAccounts(
     page: number = 0,
     size: number = 10,

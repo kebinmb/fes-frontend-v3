@@ -8,7 +8,7 @@ import {
   HttpResponse,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { catchError, finalize, map, Observable, of, shareReplay, switchMap, throwError } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 
@@ -19,6 +19,7 @@ import { normalizeUnicode, repairSpecialCharacters } from '../normalize-text';
 
 let isHandlingAuthError = false;
 let csrfToken: string | null = null;
+let activeCsrfRequest$: Observable<string | null> | null = null;
 const SESSION_ACTIVITY_SYNCED_HEADER = 'X-FES-Session-Activity-Synced';
 const CSRF_HEADER = 'X-XSRF-TOKEN';
 let csrfHeaderName = CSRF_HEADER;
@@ -42,7 +43,9 @@ export const authInterceptor: HttpInterceptorFn = (
     req.url.includes('/auth/supervisor/login') ||
     req.url.includes('/auth/administrator/login') ||
     req.url.includes('/auth/access-code/generate') ||
-    req.url.includes('/auth/logout');
+    req.url.includes('/auth/logout') ||
+    req.url.includes('/auth/google') ||
+    req.url.includes('/auth/config');
 
   if (!isAuthRequest && sessionActivity.expireIfIdle()) {
     return throwError(() => new Error('Session expired'));
@@ -129,6 +132,10 @@ export const authInterceptor: HttpInterceptorFn = (
         store.dispatch(
           AuthActions.sessionExpired()
         );
+
+        setTimeout(() => {
+          isHandlingAuthError = false;
+        }, 3000);
       }
 
       if (error?.status === 403) {
@@ -175,9 +182,13 @@ function prepareCsrfRequest<T>(
 }
 
 function refreshCsrfToken(httpBackend: HttpBackend): Observable<string | null> {
+  if (activeCsrfRequest$) {
+    return activeCsrfRequest$;
+  }
+
   const http = new HttpClient(httpBackend);
 
-  return http
+  activeCsrfRequest$ = http
     .get<{ token: string; headerName?: string }>(`${environment.API_URL}/auth/csrf`, {
       withCredentials: true,
     })
@@ -188,7 +199,13 @@ function refreshCsrfToken(httpBackend: HttpBackend): Observable<string | null> {
         return response.token;
       }),
       catchError(() => of(null)),
+      finalize(() => {
+        activeCsrfRequest$ = null;
+      }),
+      shareReplay(1),
     );
+
+  return activeCsrfRequest$;
 }
 
 function requiresCsrf<T>(req: HttpRequest<T>): boolean {

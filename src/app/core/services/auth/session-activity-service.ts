@@ -147,7 +147,9 @@ export class SessionActivityService {
     this.expired = false;
     const storedActivity = this.readLastActivity();
 
-    if (!storedActivity) {
+    // If there is no stored activity, or if the stored activity is already older than IDLE_TIMEOUT_MS,
+    // this is a fresh login; initialize the activity timeline to now.
+    if (!storedActivity || Date.now() - storedActivity >= IDLE_TIMEOUT_MS) {
       this.recordActivity(true);
       return;
     }
@@ -218,7 +220,12 @@ export class SessionActivityService {
 
     const lastActivity = Math.max(this.lastRecordedAt, this.readLastActivity());
 
-    return !lastActivity || Date.now() - lastActivity >= IDLE_TIMEOUT_MS;
+    if (!lastActivity) {
+      this.recordActivity(true);
+      return false;
+    }
+
+    return Date.now() - lastActivity >= IDLE_TIMEOUT_MS;
   }
 
   private clearIdleTimer(): void {

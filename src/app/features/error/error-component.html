@@ -1,0 +1,118 @@
+<main class="error-page" aria-labelledby="errorHeading">
+  <div class="error-container">
+    <div class="error-card">
+      <div class="card-brand-stripe"></div>
+
+      <!-- University Branding Header -->
+      <header class="brand-header">
+        <div class="logo-box">
+          <img
+            src="chmsu-logo.png"
+            alt="Carlos Hilado Memorial State University Logo"
+            class="brand-logo"
+          />
+        </div>
+        <div class="brand-text">
+          <span class="system-tag">Carlos Hilado Memorial State University</span>
+          <h1 class="brand-title">Faculty Evaluation System</h1>
+        </div>
+      </header>
+
+      <!-- Error Graphic & Status Presentation -->
+      <section class="error-body">
+        <div class="status-graphic">
+          <div class="error-code-watermark" aria-hidden="true">
+            {{ errorPreset().code }}
+          </div>
+          <div class="icon-bubble" [ngClass]="errorPreset().iconBgClass">
+            <i class="bi" [ngClass]="errorPreset().icon" aria-hidden="true"></i>
+          </div>
+        </div>
+
+        <div class="badge-pill" [ngClass]="errorPreset().badgeClass">
+          <i class="bi bi-dot" aria-hidden="true"></i>
+          <span>{{ errorPreset().badge }}</span>
+        </div>
+
+        <h2 id="errorHeading" class="error-title">{{ errorPreset().title }}</h2>
+        <p class="error-subtitle">{{ errorPreset().subtitle }}</p>
+
+        <p class="error-description">
+          {{ customMessage() || errorPreset().description }}
+        </p>
+
+        @if (errorPreset().suggestion) {
+          <div class="suggestion-panel">
+            <i class="bi bi-info-circle-fill" aria-hidden="true"></i>
+            <div>
+              <strong>Note:</strong>
+              <span> {{ errorPreset().suggestion }}</span>
+            </div>
+          </div>
+        }
+
+        <!-- Contextual Action Buttons -->
+        <div class="action-buttons">
+          <button
+            type="button"
+            class="btn btn-chmsu-primary"
+            (click)="onPrimaryAction()"
+          >
+            @if (errorCode() === 401) {
+              <i class="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>
+            } @else if (errorCode() === 500 || errorCode() === 503) {
+              <i class="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>
+            } @else {
+              <i class="bi bi-house-door-fill me-1" aria-hidden="true"></i>
+            }
+            {{ primaryButtonLabel() }}
+          </button>
+
+          @if (errorPreset().secondaryActionLabel) {
+            <button
+              type="button"
+              class="btn btn-chmsu-outline"
+              (click)="onSecondaryAction()"
+            >
+              @if (errorCode() === 403) {
+                <i class="bi bi-person-badge me-1" aria-hidden="true"></i>
+              } @else if (errorCode() === 404) {
+                <i class="bi bi-arrow-left me-1" aria-hidden="true"></i>
+              } @else {
+                <i class="bi bi-arrow-return-left me-1" aria-hidden="true"></i>
+              }
+              {{ errorPreset().secondaryActionLabel }}
+            </button>
+          }
+        </div>
+
+        <!-- Technical Diagnostic Details -->
+        <details class="tech-details">
+          <summary>
+            <span>Diagnostic Details</span>
+            <i class="bi bi-chevron-down" aria-hidden="true"></i>
+          </summary>
+          <div class="tech-content">
+            <div class="tech-item">
+              <span class="label">Status Code:</span>
+              <span class="value">{{ errorPreset().code }} ({{ errorPreset().badge }})</span>
+            </div>
+            <div class="tech-item">
+              <span class="label">Path:</span>
+              <span class="value code-snippet">{{ currentUrl() }}</span>
+            </div>
+            <div class="tech-item">
+              <span class="label">Session Role:</span>
+              <span class="value">{{ currentRole() || 'Unauthenticated Guest' }}</span>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- Card Footer -->
+      <footer class="card-footer">
+        <p>Carlos Hilado Memorial State University &bull; MIS &amp; ICT Services</p>
+      </footer>
+    </div>
+  </div>
+</main>

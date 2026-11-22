@@ -345,7 +345,18 @@ export class AuthEffects {
     () =>
       this.actions$.pipe(
         ofType(AuthActions.checkLoggedInUserAuthenticationFailure),
-        filter(() => !this.router.url.includes('/login')),
+        filter(() => {
+          const url = this.router.url;
+          return (
+            !url.includes('/login') &&
+            !url.includes('/admin') &&
+            !url.includes('/verify-report') &&
+            !url.includes('/oauth') &&
+            !url.includes('/unauthorized') &&
+            !url.includes('/forbidden') &&
+            !url.includes('/not-found')
+          );
+        }),
         tap(() => {
           this.toastFacade.showToast(`Authentication failed, contact administrator.`, 'error');
         }),

@@ -6,13 +6,19 @@ import { roleGuard } from '@utilities/guards/role/role-guard';
 export const routes: Routes = [
   {
     path: 'oauth-success',
+    title: 'Authentication Success - CHMSU FES',
     loadComponent: () =>
       import('@shared/components/oauth-success-component/oauth-success-component').then(
         (m) => m.OauthSuccessComponent,
       ),
   },
   {
+    path: 'oauth-failure',
+    redirectTo: 'login',
+  },
+  {
     path: 'verify-report/:reportId',
+    title: 'Report Verification - CHMSU FES',
     loadComponent: () =>
       import('@shared/components/report-verification-component/report-verification-component').then(
         (m) => m.ReportVerificationComponent,
@@ -20,12 +26,14 @@ export const routes: Routes = [
   },
   {
     path: 'login',
+    title: 'Login - CHMSU FES',
     loadComponent: () =>
       import('@features/auth/login/login-component').then((m) => m.LoginComponent),
     canActivate: [guestGuard],
   },
   {
     path: 'admin',
+    title: 'Administrator Login - CHMSU FES',
     loadComponent: () =>
       import('@features/auth/login-admin/login-admin-component').then(
         (m) => m.LoginAdminComponent,
@@ -34,6 +42,7 @@ export const routes: Routes = [
   },
   {
     path: 'student-dashboard',
+    title: 'Student Dashboard - CHMSU FES',
     loadComponent: () =>
       import('@features/student/pages/student-dashboard/student-dashboard-component').then(
         (m) => m.StudentDashboardComponent,
@@ -43,6 +52,7 @@ export const routes: Routes = [
   },
   {
     path: 'supervisor-dashboard',
+    title: 'Supervisor Dashboard - CHMSU FES',
     loadComponent: () =>
       import(
         '@features/supervisor/pages/supervisor-dashboard/supervisor-dashboard-component'
@@ -52,6 +62,7 @@ export const routes: Routes = [
   },
   {
     path: 'evaluation-form',
+    title: 'Faculty Evaluation - CHMSU FES',
     loadComponent: () =>
       import('@features/evaluation/pages/evaluation-form/evaluation-form-component').then(
         (m) => m.EvaluationFormComponent,
@@ -60,6 +71,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin-dashboard',
+    title: 'Admin Dashboard - CHMSU FES',
     loadComponent: () =>
       import('@features/admin/pages/admin-dashboard/admin-dashboard-component').then(
         (m) => m.AdminDashboardComponent,
@@ -69,6 +81,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
+        title: 'Admin Dashboard - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
@@ -78,6 +91,7 @@ export const routes: Routes = [
       },
       {
         path: 'dashboard',
+        title: 'Dashboard Overview - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
@@ -87,6 +101,7 @@ export const routes: Routes = [
       },
       {
         path: 'faculty-list',
+        title: 'Faculty List - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: ['ROLE_ADMIN', 'ROLE_HR'] },
         loadComponent: () =>
@@ -96,6 +111,7 @@ export const routes: Routes = [
       },
       {
         path: 'supervisor-evaluations',
+        title: 'Supervisor Evaluations - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: ['ROLE_ADMIN', 'ROLE_HR'] },
         loadComponent: () =>
@@ -105,6 +121,7 @@ export const routes: Routes = [
       },
       {
         path: 'faculty-workloads',
+        title: 'Faculty Workloads - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
@@ -114,6 +131,7 @@ export const routes: Routes = [
       },
       {
         path: 'faculty-workload-coverage',
+        title: 'Workload Coverage - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
@@ -123,6 +141,7 @@ export const routes: Routes = [
       },
       {
         path: 'class-assignments',
+        title: 'Class Assignments - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
@@ -132,6 +151,7 @@ export const routes: Routes = [
       },
       {
         path: 'evaluation-score-list',
+        title: 'Evaluation Scores - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: ['ROLE_ADMIN', 'ROLE_HR'] },
         loadComponent: () =>
@@ -141,6 +161,7 @@ export const routes: Routes = [
       },
       {
         path: 'report-print-tracking',
+        title: 'Report Print Tracking - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: ['ROLE_ADMIN', 'ROLE_HR'] },
         loadComponent: () =>
@@ -150,6 +171,7 @@ export const routes: Routes = [
       },
       {
         path: 'user-accounts',
+        title: 'User Accounts - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
@@ -159,6 +181,7 @@ export const routes: Routes = [
       },
       {
         path: 'student-evaluations',
+        title: 'Student Evaluations - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
@@ -168,6 +191,7 @@ export const routes: Routes = [
       },
       {
         path: 'student-evaluation-list',
+        title: 'Student Evaluation List - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
@@ -177,6 +201,7 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
+        title: 'Settings - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
@@ -186,6 +211,7 @@ export const routes: Routes = [
       },
       {
         path: 'audit-logs',
+        title: 'Audit Logs - CHMSU FES',
         canActivate: [roleGuard],
         data: { role: 'ROLE_ADMIN' },
         loadComponent: () =>
@@ -197,6 +223,7 @@ export const routes: Routes = [
   },
   {
     path: 'print/faculty-evaluation',
+    title: 'Print Faculty Evaluation - CHMSU FES',
     loadComponent: () =>
       import('@shared/components/faculty-evaluation-print-component/faculty-evaluation-print-component').then(
         (m) => m.FacultyEvaluationPrintComponent,
@@ -206,7 +233,7 @@ export const routes: Routes = [
   },
   {
     path: 'print/student-evaluation',
-
+    title: 'Print Student Evaluation - CHMSU FES',
     loadComponent: () =>
       import(
         '@shared/components/student-evaluation-list-print-component/student-evaluation-list-print-component'
@@ -215,13 +242,69 @@ export const routes: Routes = [
     data: { role: 'ROLE_ADMIN' },
   },
   {
+    path: '401',
+    redirectTo: 'unauthorized',
+    pathMatch: 'full',
+  },
+  {
+    path: 'unauthorized',
+    title: '401 Unauthorized - CHMSU FES',
+    loadComponent: () =>
+      import('@features/error/error-component').then((m) => m.ErrorComponent),
+    data: { code: 401 },
+  },
+  {
+    path: '403',
+    redirectTo: 'forbidden',
+    pathMatch: 'full',
+  },
+  {
+    path: 'forbidden',
+    title: '403 Access Forbidden - CHMSU FES',
+    loadComponent: () =>
+      import('@features/error/error-component').then((m) => m.ErrorComponent),
+    data: { code: 403 },
+  },
+  {
+    path: '404',
+    redirectTo: 'not-found',
+    pathMatch: 'full',
+  },
+  {
+    path: 'not-found',
+    title: '404 Page Not Found - CHMSU FES',
+    loadComponent: () =>
+      import('@features/error/error-component').then((m) => m.ErrorComponent),
+    data: { code: 404 },
+  },
+  {
+    path: '500',
+    redirectTo: 'server-error',
+    pathMatch: 'full',
+  },
+  {
+    path: 'server-error',
+    title: '500 Server Error - CHMSU FES',
+    loadComponent: () =>
+      import('@features/error/error-component').then((m) => m.ErrorComponent),
+    data: { code: 500 },
+  },
+  {
+    path: 'error',
+    title: 'System Error - CHMSU FES',
+    loadComponent: () =>
+      import('@features/error/error-component').then((m) => m.ErrorComponent),
+  },
+  {
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
   },
-
   {
     path: '**',
-    redirectTo: 'login',
+    title: '404 Page Not Found - CHMSU FES',
+    loadComponent: () =>
+      import('@features/error/error-component').then((m) => m.ErrorComponent),
+    data: { code: 404 },
   },
 ];
