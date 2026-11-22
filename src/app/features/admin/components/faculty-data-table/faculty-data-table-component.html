@@ -6,17 +6,19 @@
   <div class="card-topbar"></div>
   <!-- HEADER -->
   <div class="modern-card-header">
-    <div class="header-content">
+    <div class="header-copy">
+      <span class="eyebrow">Faculty Directory</span>
       <h2>
         Faculty List
       </h2>
       <span>
-        Faculty records overview
+        Faculty records overview and academic assignments
       </span>
-      <div class="view-tabs" role="tablist" aria-label="Faculty list views">
+    </div>
+    <div class="header-actions">
+      <div class="tab-group" role="tablist" aria-label="Faculty directory views">
         <button
           type="button"
-          class="tab-btn"
           role="tab"
           [attr.aria-selected]="activeTab === 'ALL'"
           [class.active]="activeTab === 'ALL'"
@@ -27,7 +29,7 @@
         </button>
         <button
           type="button"
-          class="tab-btn migration-tab"
+          class="migration-tab"
           role="tab"
           [attr.aria-selected]="activeTab === 'FOR_MIGRATION'"
           [class.active]="activeTab === 'FOR_MIGRATION'"
@@ -38,102 +40,102 @@
           <span class="tab-badge">Queue</span>
         </button>
       </div>
-      <form class="search-wrapper" role="search" (ngSubmit)="onSearch()">
-        <label class="visually-hidden" for="facultySearch">
-          Search faculty
-        </label>
-        <div class="search-field">
-          <i class="bi bi-search"></i>
-          <input
-            id="facultySearch"
-            type="search"
-            class="search-input"
-            placeholder="Search by name, ID, college..."
-            [(ngModel)]="searchTerm"
-            name="facultySearch"
-            (ngModelChange)="onSearchChange($event)"
-          />
-        </div>
-        <button type="submit" class="edit-btn" [disabled]="!!isLoading">
-          @if (isLoading) {
-          <i class="bi bi-arrow-repeat"></i>
-          }
-          <span>Search</span>
-        </button>
-        <label class="visually-hidden" for="legacyDatabaseFilter">
-          Filter by campus
-        </label>
-        <select
-          id="legacyDatabaseFilter"
-          class="filter-select"
-          [(ngModel)]="selectedLegacyDatabase"
-          name="legacyDatabaseFilter"
-          (ngModelChange)="onLegacyDatabaseChange($event)"
-        >
-          <option value="">All Campuses</option>
-          @for (option of legacyDatabaseOptions; track option.value) {
-          <option [value]="option.value">
-            {{ option.label }}
-          </option>
-          }
-        </select>
-        <label class="visually-hidden" for="bulkPrintCollegeFilter">
-          Filter bulk print by college
-        </label>
-        <select
-          id="bulkPrintCollegeFilter"
-          class="filter-select"
-          [(ngModel)]="selectedBulkPrintCollege"
-          name="bulkPrintCollegeFilter"
-          (ngModelChange)="onCollegeChange($event)"
-        >
-          <option value="">All Colleges</option>
-          @for (college of collegeOptions; track college) {
-          <option [value]="college">
-            {{ college }}
-          </option>
-          }
-        </select>
-        <button
-          type="button"
-          class="bulk-print-btn"
-          [disabled]="!!isLoading || !!isPrintingFacultyId || !!isPrintingAnnexFacultyId || isBulkPrinting || isBulkAnnexPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
-          [title]="!selectedLegacyDatabase && !selectedBulkPrintCollege ? 'Select a campus or college before bulk printing.' : 'Prepare faculty evaluation reports for printing.'"
-          (click)="printBulk()"
-        >
-          <i
-            class="bi"
-            [class.bi-printer-fill]="!isBulkPrinting"
-            [class.bi-hourglass-split]="isBulkPrinting"
-          ></i>
-          <span>{{ isBulkPrinting ? 'Preparing' : 'Bulk Print' }}</span>
-        </button>
-        <button
-          type="button"
-          class="bulk-print-btn annex-print-btn"
-          [disabled]="!!isLoading || !!isPrintingFacultyId || !!isPrintingAnnexFacultyId || isBulkPrinting || isBulkAnnexPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
-          [title]="!selectedLegacyDatabase && !selectedBulkPrintCollege ? 'Select a campus or college before printing Annex D.' : 'Prepare Annex D forms for printing.'"
-          (click)="printBulk('annex')"
-        >
-          <i
-            class="bi"
-            [class.bi-file-earmark-text]="!isBulkAnnexPrinting"
-            [class.bi-hourglass-split]="isBulkAnnexPrinting"
-          ></i>
-          <span>{{ isBulkAnnexPrinting ? 'Preparing' : 'Bulk Print Annex D' }}</span>
-        </button>
-        @if (hasActiveFilters()) {
-        <button type="button" class="clear-btn" [disabled]="!!isLoading" (click)="clearFilters()">
-          Clear
-        </button>
-        }
-      </form>
-    </div>
-    <div class="table-count" aria-label="Total faculty records">
-      <strong>{{ facultiesData?.totalElements ?? 0 }}</strong>
-      <span>records</span>
+      <div class="table-count" aria-label="Total faculty records">
+        <strong>{{ facultiesData?.totalElements ?? 0 }}</strong>
+        <span>records</span>
+      </div>
     </div>
   </div>
+  <form class="search-wrapper" role="search" (ngSubmit)="onSearch()">
+    <label class="visually-hidden" for="facultySearch">
+      Search faculty
+    </label>
+    <div class="search-field">
+      <i class="bi bi-search"></i>
+      <input
+        id="facultySearch"
+        type="search"
+        class="search-input"
+        placeholder="Search by name, ID, college..."
+        [(ngModel)]="searchTerm"
+        name="facultySearch"
+        (ngModelChange)="onSearchChange($event)"
+      />
+    </div>
+    <button type="submit" class="edit-btn" [disabled]="!!isLoading">
+      @if (isLoading) {
+      <i class="bi bi-arrow-repeat"></i>
+      }
+      <span>Search</span>
+    </button>
+    <label class="visually-hidden" for="legacyDatabaseFilter">
+      Filter by campus
+    </label>
+    <select
+      id="legacyDatabaseFilter"
+      class="filter-select"
+      [(ngModel)]="selectedLegacyDatabase"
+      name="legacyDatabaseFilter"
+      (ngModelChange)="onLegacyDatabaseChange($event)"
+    >
+      <option value="">All Campuses</option>
+      @for (option of legacyDatabaseOptions; track option.value) {
+      <option [value]="option.value">
+        {{ option.label }}
+      </option>
+      }
+    </select>
+    <label class="visually-hidden" for="bulkPrintCollegeFilter">
+      Filter bulk print by college
+    </label>
+    <select
+      id="bulkPrintCollegeFilter"
+      class="filter-select"
+      [(ngModel)]="selectedBulkPrintCollege"
+      name="bulkPrintCollegeFilter"
+      (ngModelChange)="onCollegeChange($event)"
+    >
+      <option value="">All Colleges</option>
+      @for (college of collegeOptions; track college) {
+      <option [value]="college">
+        {{ college }}
+      </option>
+      }
+    </select>
+    <button
+      type="button"
+      class="bulk-print-btn"
+      [disabled]="!!isLoading || !!isPrintingFacultyId || !!isPrintingAnnexFacultyId || isBulkPrinting || isBulkAnnexPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
+      [title]="!selectedLegacyDatabase && !selectedBulkPrintCollege ? 'Select a campus or college before bulk printing.' : 'Prepare faculty evaluation reports for printing.'"
+      (click)="printBulk()"
+    >
+      <i
+        class="bi"
+        [class.bi-printer-fill]="!isBulkPrinting"
+        [class.bi-hourglass-split]="isBulkPrinting"
+      ></i>
+      <span>{{ isBulkPrinting ? 'Preparing' : 'Bulk Print' }}</span>
+    </button>
+    <button
+      type="button"
+      class="bulk-print-btn annex-print-btn"
+      [disabled]="!!isLoading || !!isPrintingFacultyId || !!isPrintingAnnexFacultyId || isBulkPrinting || isBulkAnnexPrinting || (!selectedLegacyDatabase && !selectedBulkPrintCollege)"
+      [title]="!selectedLegacyDatabase && !selectedBulkPrintCollege ? 'Select a campus or college before printing Annex D.' : 'Prepare Annex D forms for printing.'"
+      (click)="printBulk('annex')"
+    >
+      <i
+        class="bi"
+        [class.bi-file-earmark-text]="!isBulkAnnexPrinting"
+        [class.bi-hourglass-split]="isBulkAnnexPrinting"
+      ></i>
+      <span>{{ isBulkAnnexPrinting ? 'Preparing' : 'Bulk Print Annex D' }}</span>
+    </button>
+    @if (hasActiveFilters()) {
+    <button type="button" class="clear-btn" [disabled]="!!isLoading" (click)="clearFilters()">
+      Clear
+    </button>
+    }
+  </form>
   @if (loadError) {
   <div class="feedback-banner error-banner" role="alert">
     <div>
@@ -146,11 +148,14 @@
   </div>
   }
   @if (activeTab === 'FOR_MIGRATION') {
-  <div class="migration-notice" role="status">
-    <i class="bi bi-exclamation-triangle-fill"></i>
-    <span>
-      Viewing faculty marked as <strong>FOR_MIGRATION</strong>. Assign their permanent college, status, and campus by clicking <strong>Edit</strong>.
-    </span>
+  <div class="migration-banner" role="status">
+    <div class="migration-banner-icon">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+    </div>
+    <div class="migration-banner-content">
+      <strong>Pending Migration Queue</strong>
+      <span>These faculty records are tagged with <code>FOR_MIGRATION</code>. Click <strong>Edit</strong> on any record to assign their permanent college, status, and campus.</span>
+    </div>
   </div>
   }
   <!-- TABLE -->
@@ -513,6 +518,12 @@
             <option [value]="college">{{ college }}</option>
             }
           </select>
+          @if (facultyForm.get('college')?.value === 'FOR_MIGRATION') {
+          <small class="field-warning">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Currently unassigned (FOR_MIGRATION). Please select an academic college before saving.
+          </small>
+          }
           @if (formError('college')) {
           <small class="field-error">{{ formError('college') }}</small>
           }
@@ -538,6 +549,11 @@
           @if (formError('status')) {
           <small class="field-error">{{ formError('status') }}</small>
           }
+        </div>
+
+        <div class="form-section-title">
+          <span>Campus & Database Source</span>
+          <small>Primary data source mapping for migrated records.</small>
         </div>
 
         <!-- SOURCE CAMPUS -->
