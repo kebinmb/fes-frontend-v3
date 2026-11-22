@@ -110,6 +110,7 @@ export class FacultyDataTableComponent implements OnInit {
   isPrintingAnnexFacultyId: string | null = null;
   isBulkPrinting = false;
   isBulkAnnexPrinting = false;
+  activeTab: 'ALL' | 'FOR_MIGRATION' = 'ALL';
   readonly legacyDatabaseOptions = [
     { label: 'Talisay', value: 'LEGACY_TALISAY' },
     { label: 'Alijis', value: 'LEGACY_ALIJIS' },
@@ -147,6 +148,16 @@ export class FacultyDataTableComponent implements OnInit {
         this.clearTransientFacultyState();
         this.loadFaculties();
       });
+
+    this.updateFacultyMessage$
+      .pipe(
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((msg) => {
+        if (msg) {
+          this.loadFaculties();
+        }
+      });
   }
   loadFaculties(): void {
     this.adminDataFacade.loadFaculties(
@@ -179,6 +190,7 @@ export class FacultyDataTableComponent implements OnInit {
     this.searchTerm = '';
     this.selectedLegacyDatabase = '';
     this.selectedBulkPrintCollege = '';
+    this.activeTab = 'ALL';
     this.currentPage = 0;
     this.clearTransientFacultyState();
     this.loadFaculties();
@@ -192,6 +204,18 @@ export class FacultyDataTableComponent implements OnInit {
 
   onCollegeChange(value: string): void {
     this.selectedBulkPrintCollege = value;
+    this.activeTab = value === 'FOR_MIGRATION' ? 'FOR_MIGRATION' : 'ALL';
+    this.currentPage = 0;
+    this.clearTransientFacultyState();
+    this.loadFaculties();
+  }
+
+  onSelectTab(tab: 'ALL' | 'FOR_MIGRATION'): void {
+    if (this.activeTab === tab) {
+      return;
+    }
+    this.activeTab = tab;
+    this.selectedBulkPrintCollege = tab === 'FOR_MIGRATION' ? 'FOR_MIGRATION' : '';
     this.currentPage = 0;
     this.clearTransientFacultyState();
     this.loadFaculties();
@@ -286,7 +310,8 @@ export class FacultyDataTableComponent implements OnInit {
   hasActiveFilters(): boolean {
     return !!this.searchTerm.trim()
       || !!this.selectedLegacyDatabase
-      || !!this.selectedBulkPrintCollege;
+      || !!this.selectedBulkPrintCollege
+      || this.activeTab === 'FOR_MIGRATION';
   }
 
   hasListFilters(): boolean {

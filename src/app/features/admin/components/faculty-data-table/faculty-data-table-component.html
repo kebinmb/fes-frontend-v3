@@ -13,6 +13,31 @@
       <span>
         Faculty records overview
       </span>
+      <div class="view-tabs" role="tablist" aria-label="Faculty list views">
+        <button
+          type="button"
+          class="tab-btn"
+          role="tab"
+          [attr.aria-selected]="activeTab === 'ALL'"
+          [class.active]="activeTab === 'ALL'"
+          (click)="onSelectTab('ALL')"
+        >
+          <i class="bi bi-people-fill"></i>
+          <span>All Faculty</span>
+        </button>
+        <button
+          type="button"
+          class="tab-btn migration-tab"
+          role="tab"
+          [attr.aria-selected]="activeTab === 'FOR_MIGRATION'"
+          [class.active]="activeTab === 'FOR_MIGRATION'"
+          (click)="onSelectTab('FOR_MIGRATION')"
+        >
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <span>For Migration</span>
+          <span class="tab-badge">Queue</span>
+        </button>
+      </div>
       <form class="search-wrapper" role="search" (ngSubmit)="onSearch()">
         <label class="visually-hidden" for="facultySearch">
           Search faculty
@@ -118,6 +143,14 @@
     <button type="button" class="retry-btn" (click)="retryLoad()">
       Retry
     </button>
+  </div>
+  }
+  @if (activeTab === 'FOR_MIGRATION') {
+  <div class="migration-notice" role="status">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <span>
+      Viewing faculty marked as <strong>FOR_MIGRATION</strong>. Assign their permanent college, status, and campus by clicking <strong>Edit</strong>.
+    </span>
   </div>
   }
   <!-- TABLE -->
