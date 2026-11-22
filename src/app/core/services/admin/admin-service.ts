@@ -26,6 +26,8 @@ export interface FetchFacultyResponse {
   status: string;
   college: string;
   legacyDatabase?: string;
+  sourceCampus?: string;
+  campus?: string;
 }
 
 export interface ClassFacultyAssignmentResponse {
@@ -258,6 +260,8 @@ export interface UpdateFacultyRequest {
   loadLimit: number;
   college: string;
   status: string;
+  sourceCampus?: string;
+  legacyDatabase?: string;
 }
 
 export type FacultyWorkloadSource = 'MANUAL' | 'IMPORTED' | 'SYSTEM';
@@ -861,6 +865,7 @@ export class AdminService {
     size: number = 10,
     search: string = '',
     legacyDatabase: string = '',
+    college: string = '',
   ): Observable<PageResponse<FetchFacultyResponse>> {
     let params = new HttpParams().set('page', page).set('size', size);
 
@@ -870,6 +875,10 @@ export class AdminService {
 
     if (legacyDatabase.trim()) {
       params = params.set('legacyDatabase', legacyDatabase.trim());
+    }
+
+    if (college.trim()) {
+      params = params.set('college', college.trim());
     }
 
     return this.http.get<PageResponse<FetchFacultyResponse>>(`${this.ADMIN_API_URL}/faculties`, {
@@ -1294,7 +1303,7 @@ export class AdminService {
   }
 
   updateFaculty(payload: UpdateFacultyRequest): Observable<string> {
-    const params = new HttpParams()
+    let params = new HttpParams()
       .set('facultyId', payload.facultyId)
       .set('firstname', payload.firstname)
       .set('middlename', payload.middlename ?? '')
@@ -1303,6 +1312,14 @@ export class AdminService {
       .set('loadLimit', payload.loadLimit)
       .set('college', payload.college)
       .set('status', payload.status);
+
+    if (payload.sourceCampus?.trim()) {
+      params = params.set('sourceCampus', payload.sourceCampus.trim());
+    }
+
+    if (payload.legacyDatabase?.trim()) {
+      params = params.set('legacyDatabase', payload.legacyDatabase.trim());
+    }
 
     return this.http.put(
       `${this.ADMIN_API_URL}/update-faculty`,

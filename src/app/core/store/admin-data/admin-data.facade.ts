@@ -35,6 +35,7 @@ export class AdminDataFacade {
     size: number,
     search: string = '',
     legacyDatabase: string = '',
+    college: string = '',
   ): void {
     this.store.dispatch(
       AdminDataActions.loadFaculties({
@@ -42,6 +43,7 @@ export class AdminDataFacade {
         size,
         search,
         legacyDatabase,
+        college,
       }),
     );
   }

@@ -116,7 +116,7 @@ export class FacultyDataTableComponent implements OnInit {
     { label: 'Fortune-Towne', value: 'LEGACY_FT' },
     { label: 'Binalbagan', value: 'LEGACY_BINALBAGAN' },
   ];
-  readonly collegeOptions = ['CAS', 'CIT', 'COED', 'COENG', 'CCS', 'CCJ', 'COF', 'CBMA'];
+  readonly collegeOptions = ['CAS', 'CIT', 'COED', 'COENG', 'CCS', 'CCJ', 'COF', 'CBMA', 'FOR_MIGRATION'];
   readonly statusOptions = ['ACTIVE', 'INACTIVE'];
   currentPage = 0;
   pageSize = 10;
@@ -129,6 +129,8 @@ export class FacultyDataTableComponent implements OnInit {
     loadLimit: [0, [Validators.required, Validators.min(1), Validators.max(60)]],
     college: ['', Validators.required],
     status: ['', Validators.required],
+    sourceCampus: ['', Validators.required],
+    legacyDatabase: ['', Validators.required],
   });
   ngOnInit(): void {
     this.loadFaculties();
@@ -152,6 +154,7 @@ export class FacultyDataTableComponent implements OnInit {
       this.pageSize,
       this.searchTerm,
       this.selectedLegacyDatabase,
+      this.selectedBulkPrintCollege,
     );
   }
   onSearchChange(value: string): void {
@@ -186,6 +189,14 @@ export class FacultyDataTableComponent implements OnInit {
     this.clearTransientFacultyState();
     this.loadFaculties();
   }
+
+  onCollegeChange(value: string): void {
+    this.selectedBulkPrintCollege = value;
+    this.currentPage = 0;
+    this.clearTransientFacultyState();
+    this.loadFaculties();
+  }
+
   onFacultyPageChange(page: number): void {
     if (page < 0) {
       return;
@@ -205,7 +216,19 @@ export class FacultyDataTableComponent implements OnInit {
       loadLimit: Number(faculty.loadLimit),
       college: faculty.college,
       status: faculty.status,
+      sourceCampus: (faculty.sourceCampus as string) ?? faculty.legacyDatabase ?? '',
+      legacyDatabase: faculty.legacyDatabase ?? (faculty.sourceCampus as string) ?? '',
     });
+  }
+  onSourceCampusChange(value: string): void {
+    if (!this.facultyForm.get('legacyDatabase')?.dirty) {
+      this.facultyForm.patchValue({ legacyDatabase: value });
+    }
+  }
+  onLegacyDatabaseFormChange(value: string): void {
+    if (!this.facultyForm.get('sourceCampus')?.dirty) {
+      this.facultyForm.patchValue({ sourceCampus: value });
+    }
   }
   closeEditModal(): void {
     this.clearTransientFacultyState();
@@ -216,7 +239,19 @@ export class FacultyDataTableComponent implements OnInit {
       this.toastFacade.showToast('Please review the highlighted faculty fields.', 'error');
       return;
     }
-    this.adminDataFacade.updateFaculty(this.facultyForm.value);
+    const formValue = this.facultyForm.value;
+    this.adminDataFacade.updateFaculty({
+      facultyId: formValue.facultyId,
+      firstname: formValue.firstname,
+      middlename: formValue.middlename,
+      lastname: formValue.lastname,
+      position: formValue.position,
+      loadLimit: Number(formValue.loadLimit),
+      college: formValue.college,
+      status: formValue.status,
+      sourceCampus: formValue.sourceCampus,
+      legacyDatabase: formValue.legacyDatabase,
+    });
     this.closeEditModal();
   }
 
@@ -255,7 +290,7 @@ export class FacultyDataTableComponent implements OnInit {
   }
 
   hasListFilters(): boolean {
-    return !!this.searchTerm.trim() || !!this.selectedLegacyDatabase;
+    return !!this.searchTerm.trim() || !!this.selectedLegacyDatabase || !!this.selectedBulkPrintCollege;
   }
 
   emptyStateTitle(): string {

@@ -27,9 +27,9 @@ export class AdminEffects {
     this.actions$.pipe(
       ofType(AdminDataActions.loadFaculties),
 
-      switchMap(({ page, size, search, legacyDatabase }) =>
+      switchMap(({ page, size, search, legacyDatabase, college }) =>
         this.adminDataService
-          .getFaculties(page, size, search ?? '', legacyDatabase ?? '')
+          .getFaculties(page, size, search ?? '', legacyDatabase ?? '', college ?? '')
 
           .pipe(
             map((response) =>

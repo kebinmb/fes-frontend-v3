@@ -60,6 +60,7 @@
           class="filter-select"
           [(ngModel)]="selectedBulkPrintCollege"
           name="bulkPrintCollegeFilter"
+          (ngModelChange)="onCollegeChange($event)"
         >
           <option value="">All Colleges</option>
           @for (college of collegeOptions; track college) {
@@ -169,12 +170,15 @@
             {{ faculty.position }}
           </td>
           <td data-label="College">
-            <span class="college-badge">
+            <span class="college-badge" [class.unmapped]="faculty.college === 'FOR_MIGRATION'">
               {{ faculty.college }}
             </span>
           </td>
           <td data-label="Campus">
-            {{ legacyDatabaseLabel(faculty.legacyDatabase) }}
+            {{ legacyDatabaseLabel(faculty.legacyDatabase || faculty.sourceCampus) }}
+            @if (faculty.status === 'INACTIVE') {
+            <span class="status-badge inactive">Inactive</span>
+            }
           </td>
           <td data-label="Actions">
             <div class="action-group">
@@ -500,6 +504,54 @@
           </select>
           @if (formError('status')) {
           <small class="field-error">{{ formError('status') }}</small>
+          }
+        </div>
+
+        <!-- SOURCE CAMPUS -->
+        <div class="form-group">
+          <label for="sourceCampus">
+            Source Campus
+          </label>
+
+          <select
+            id="sourceCampus"
+            formControlName="sourceCampus"
+            (ngModelChange)="onSourceCampusChange($event)"
+            [class.is-invalid]="formError('sourceCampus')"
+            [attr.aria-invalid]="!!formError('sourceCampus')"
+          >
+            <option value="" disabled>Select source campus</option>
+            @for (option of legacyDatabaseOptions; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+          <small class="field-hint">Campus source enumeration (source_campus).</small>
+          @if (formError('sourceCampus')) {
+          <small class="field-error">{{ formError('sourceCampus') }}</small>
+          }
+        </div>
+
+        <!-- LEGACY DATABASE -->
+        <div class="form-group">
+          <label for="legacyDatabase">
+            Legacy Database
+          </label>
+
+          <select
+            id="legacyDatabase"
+            formControlName="legacyDatabase"
+            (ngModelChange)="onLegacyDatabaseFormChange($event)"
+            [class.is-invalid]="formError('legacyDatabase')"
+            [attr.aria-invalid]="!!formError('legacyDatabase')"
+          >
+            <option value="" disabled>Select legacy database</option>
+            @for (option of legacyDatabaseOptions; track option.value) {
+            <option [value]="option.value">{{ option.value }} ({{ option.label }})</option>
+            }
+          </select>
+          <small class="field-hint">Database connection key (legacy_database).</small>
+          @if (formError('legacyDatabase')) {
+          <small class="field-error">{{ formError('legacyDatabase') }}</small>
           }
         </div>
 

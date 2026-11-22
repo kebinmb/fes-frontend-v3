@@ -20,6 +20,7 @@ export const loadFaculties = createAction(
     size: number;
     search?: string;
     legacyDatabase?: string;
+    college?: string;
   }>(),
 );
 
