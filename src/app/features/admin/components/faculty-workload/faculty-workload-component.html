@@ -218,7 +218,8 @@
         <h2>Teaching Assignments</h2>
         <span>
           {{ assignmentDrafts.length }} assignments &middot;
-          {{ encodedAssignmentDraftCount }} encoded for the selected term
+          {{ encodedAssignmentDraftCount }} encoded &middot;
+          <strong class="term-badge">S.Y. {{ selectedSchoolYear }} &middot; {{ selectedSemesterLabel }}</strong>
         </span>
         @if (isLoadingClasses) {
           <small class="loading-badge">
@@ -229,6 +230,37 @@
       </div>
 
       <div class="list-tools">
+        <div class="term-filter-group" aria-label="Filter teaching assignments by academic term">
+          <div class="term-filter-item">
+            <label for="teachingAssignmentSchoolYear" class="visually-hidden">School Year</label>
+            <input
+              id="teachingAssignmentSchoolYear"
+              type="number"
+              min="2000"
+              max="2100"
+              class="term-input"
+              [ngModel]="selectedSchoolYear"
+              (ngModelChange)="onSchoolYearChange($event)"
+              placeholder="School Year"
+              title="Filter assignments by School Year"
+            />
+          </div>
+          <div class="term-filter-item">
+            <label for="teachingAssignmentSemester" class="visually-hidden">Semester</label>
+            <select
+              id="teachingAssignmentSemester"
+              class="term-select"
+              [ngModel]="selectedSemester"
+              (ngModelChange)="onSemesterChange($event)"
+              title="Filter assignments by Semester"
+            >
+              @for (option of semesterOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
         <div class="search-field list-search">
           <i class="bi bi-search"></i>
           <input
@@ -271,7 +303,7 @@
           } @else if (isLoadingClasses && !assignmentDrafts.length) {
             <tr>
               <td colspan="5" class="empty-state" data-empty-title="Loading assignments">
-                Please wait while teaching assignments are loaded.
+                Please wait while teaching assignments are loaded for S.Y. {{ selectedSchoolYear }} &middot; {{ selectedSemesterLabel }}.
               </td>
             </tr>
           } @else if (filteredAssignmentDrafts.length) {
@@ -371,7 +403,7 @@
           } @else {
             <tr>
               <td colspan="5" class="empty-state" data-empty-title="No assignments found">
-                Try a different filter or refresh the selected faculty's assignments.
+                No teaching assignments found for {{ selectedFaculty ? (facultyName(selectedFaculty) | unicodeText) : 'this faculty' }} in S.Y. {{ selectedSchoolYear }} &middot; {{ selectedSemesterLabel }}.
               </td>
             </tr>
           }

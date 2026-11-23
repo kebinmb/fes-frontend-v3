@@ -627,6 +627,34 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     return String(this.effectiveLoadLimit());
   }
 
+  get selectedSchoolYear(): number {
+    return this.workloadForm.controls.schoolYear.value ?? new Date().getFullYear();
+  }
+
+  get selectedSemester(): Semester {
+    return this.workloadForm.controls.semester.value ?? 'FIRST_SEMESTER';
+  }
+
+  get selectedSemesterLabel(): string {
+    const sem = this.selectedSemester;
+    return this.semesterOptions.find((option) => option.value === sem)?.label ?? sem;
+  }
+
+  onSchoolYearChange(year: number | null): void {
+    if (year == null || year === this.workloadForm.controls.schoolYear.value) {
+      return;
+    }
+    this.workloadForm.patchValue({ schoolYear: year });
+  }
+
+  onSemesterChange(semester: Semester | string): void {
+    const normalized = this.normalizeSemester(semester);
+    if (normalized === this.workloadForm.controls.semester.value) {
+      return;
+    }
+    this.workloadForm.patchValue({ semester: normalized });
+  }
+
   get filteredAssignmentDrafts(): AssignmentWorkloadDraft[] {
     const term = this.assignmentDraftSearchTerm.trim().toLowerCase();
 
@@ -796,6 +824,30 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((params) => {
         const facultyId = params.get('facultyId')?.trim();
+        const schoolYearParam = params.get('schoolYear')?.trim();
+        const semesterParam = params.get('semester')?.trim();
+
+        const patch: Partial<{
+          facultyId: string;
+          schoolYear: number;
+          semester: Semester;
+        }> = {};
+
+        if (schoolYearParam && !isNaN(Number(schoolYearParam))) {
+          patch.schoolYear = Number(schoolYearParam);
+        }
+
+        if (semesterParam) {
+          patch.semester = this.normalizeSemester(semesterParam);
+        }
+
+        if (facultyId) {
+          patch.facultyId = facultyId;
+        }
+
+        if (Object.keys(patch).length > 0) {
+          this.workloadForm.patchValue(patch, { emitEvent: false });
+        }
 
         if (!facultyId) {
           return;
@@ -803,7 +855,6 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
         this.facultySearchTerm = facultyId;
         this.workloadSearchTerm = facultyId;
-        this.workloadForm.patchValue({ facultyId });
         this.page = 0;
         this.loadWorkloads();
       });
@@ -873,6 +924,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     }
 
     const requestId = ++this.selectedFacultyTermWorkloadRequestId;
+    this.selectedFacultyTermWorkloads = [];
 
     this.adminService
       .getFacultyWorkloads(0, 500, facultyId, schoolYear, semester)
@@ -1603,10 +1655,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         this.sameSemester(workload.semester, semester),
     );
 
-    if (
-      this.selectedFaculty?.facultyId === facultyId &&
-      selectedFacultySnapshot.length
-    ) {
+    if (this.selectedFaculty?.facultyId === facultyId) {
       return selectedFacultySnapshot;
     }
 
