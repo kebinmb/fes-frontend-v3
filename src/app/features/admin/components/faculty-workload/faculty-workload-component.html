@@ -27,6 +27,16 @@
       <div class="header-actions">
         <button
           type="button"
+          class="btn-manage-subjects"
+          (click)="openSubjectModal()"
+          title="Manage course catalog, lecture/laboratory hours, and units"
+        >
+          <i class="bi bi-book-half"></i>
+          <span>Manage Subjects</span>
+        </button>
+
+        <button
+          type="button"
           class="btn-auto-populate"
           [disabled]="isAutoPopulating"
           (click)="onAutoPopulateWorkloads()"
@@ -271,7 +281,26 @@
                 [class.assignment-row-dirty]="isAssignmentDraftDirty(draft)"
               >
                 <td data-label="Assignment">
-                  <strong>{{ draft.option.courseCode || '-' }}</strong>
+                  <div class="assignment-course-code-wrap">
+                    <strong>{{ draft.option.courseCode || '-' }}</strong>
+                    <span
+                      class="subject-type-badge"
+                      [class.subject-type-lab]="formatSubjectType(draft.option.subjectType) === 'LABORATORY'"
+                      [class.subject-type-lec]="formatSubjectType(draft.option.subjectType) === 'LECTURE'"
+                    >
+                      {{ formatSubjectType(draft.option.subjectType) }}
+                    </span>
+                    @if (draft.option.courseCode) {
+                      <button
+                        type="button"
+                        class="subject-quick-edit-btn"
+                        title="Edit subject hours & units"
+                        (click)="openSubjectEditByCode(draft.option.courseCode)"
+                      >
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                    }
+                  </div>
                   <small>#{{ draft.option.classCode || '-' }}</small>
                   <span class="assignment-status" [class.assignment-status-encoded]="draft.isEncoded">
                     {{ draft.isEncoded ? 'Encoded' : 'Pending' }}
@@ -465,7 +494,26 @@
                   <small>#{{ workload.facultyId }}</small>
                 </td>
                 <td data-label="Course Code">
-                  {{ workload.courseCode || '-' }}
+                  <div class="assignment-course-code-wrap">
+                    <span>{{ workload.courseCode || '-' }}</span>
+                    <span
+                      class="subject-type-badge"
+                      [class.subject-type-lab]="formatSubjectType(workload.subjectType) === 'LABORATORY'"
+                      [class.subject-type-lec]="formatSubjectType(workload.subjectType) === 'LECTURE'"
+                    >
+                      {{ formatSubjectType(workload.subjectType) }}
+                    </span>
+                    @if (workload.courseCode) {
+                      <button
+                        type="button"
+                        class="subject-quick-edit-btn"
+                        title="Edit subject hours & units"
+                        (click)="openSubjectEditByCode(workload.courseCode)"
+                      >
+                        <i class="bi bi-pencil-square"></i>
+                      </button>
+                    }
+                  </div>
                   <small>#{{ workload.classCode || '-' }}</small>
                 </td>
                 <td data-label="Program/Year/Section">
@@ -592,6 +640,301 @@
           </button>
         </div>
       </section>
+    </div>
+  }
+
+  @if (isSubjectModalOpen) {
+    <div
+      class="subject-modal-backdrop"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="subjectCatalogTitle"
+      (click)="closeSubjectModal()"
+    >
+      <div class="subject-modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-topbar"></div>
+
+        <div class="subject-modal-header">
+          <div class="subject-modal-title-group">
+            <div class="subject-modal-badge">
+              <i class="bi bi-book-half"></i>
+            </div>
+            <div>
+              <h3 id="subjectCatalogTitle">Primary Subjects Catalog</h3>
+              <p>Manage course units, lecture hours, and laboratory hours used for workload calculations.</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            class="modal-close-btn"
+            aria-label="Close dialog"
+            (click)="closeSubjectModal()"
+          >
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div class="subject-modal-toolbar">
+          <div class="subject-search-wrapper">
+            <i class="bi bi-search"></i>
+            <input
+              type="search"
+              placeholder="Search by subject code or title..."
+              [ngModel]="subjectSearchTerm"
+              (ngModelChange)="onSubjectSearchChange($event)"
+            />
+          </div>
+          @if (!isSubjectFormOpen) {
+            <div class="subject-toolbar-actions">
+              <button
+                type="button"
+                class="btn-sync-subjects"
+                [disabled]="isSyncingSubjects || isLoadingSubjects"
+                (click)="syncSubjectsFromWorkload()"
+                title="Automatically calculate and populate subject units and hours from active faculty workload records"
+              >
+                <i
+                  class="bi"
+                  [class.bi-arrow-repeat]="!isSyncingSubjects"
+                  [class.bi-arrow-clockwise]="isSyncingSubjects"
+                  [class.spin]="isSyncingSubjects"
+                ></i>
+                <span>{{ isSyncingSubjects ? 'Syncing...' : 'Sync from Workloads' }}</span>
+              </button>
+
+              <button
+                type="button"
+                class="btn-add-subject"
+                (click)="openCreateSubjectForm()"
+              >
+                <i class="bi bi-plus-circle"></i>
+                <span>Add Subject</span>
+              </button>
+            </div>
+          }
+        </div>
+
+        @if (isSubjectFormOpen) {
+          <form class="subject-form-panel" [formGroup]="subjectForm" (ngSubmit)="saveSubject()">
+            <div class="subject-form-header">
+              <strong>{{ isEditingSubject ? 'Edit Subject' : 'Add New Subject' }}</strong>
+              <span class="subject-form-subtext">Set hours and units. Changes immediately recalculate workloads and class assignments.</span>
+            </div>
+
+            <div class="subject-form-grid">
+              <div class="form-group">
+                <label for="subCode">Subject Code <span class="required">*</span></label>
+                <input
+                  id="subCode"
+                  type="text"
+                  formControlName="subjectCode"
+                  placeholder="e.g. IT 101"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group span-2">
+                <label for="subTitle">Descriptive Title <span class="required">*</span></label>
+                <input
+                  id="subTitle"
+                  type="text"
+                  formControlName="descriptiveTitle"
+                  placeholder="e.g. Introduction to Computing"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="subType">Type / Label <span class="required">*</span></label>
+                <select id="subType" formControlName="subjectType" class="form-control">
+                  <option value="LECTURE">LECTURE</option>
+                  <option value="LABORATORY">LABORATORY</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="subLecUnits">Lec Units <span class="required">*</span></label>
+                <input
+                  id="subLecUnits"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  formControlName="lecUnits"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="subLabUnits">Lab Units <span class="required">*</span></label>
+                <input
+                  id="subLabUnits"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  formControlName="labUnits"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="subLecHours">Lec Hours <span class="required">*</span></label>
+                <input
+                  id="subLecHours"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  formControlName="lecHours"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="subLabHours">Lab Hours <span class="required">*</span></label>
+                <input
+                  id="subLabHours"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  formControlName="labHours"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="form-group total-pill-group">
+                <label>Computed Totals</label>
+                <div class="total-pills">
+                  <span class="total-pill">Units: <strong>{{ subjectFormTotalUnits }}</strong></span>
+                  <span class="total-pill">Hours: <strong>{{ subjectFormTotalHours }}</strong></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="subject-form-actions">
+              <button type="button" class="cancel-btn" [disabled]="isSavingSubject" (click)="cancelSubjectForm()">
+                Cancel
+              </button>
+              <button type="submit" class="save-btn" [disabled]="isSavingSubject">
+                @if (isSavingSubject) {
+                  <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+                  Saving...
+                } @else {
+                  <i class="bi bi-check-circle-fill"></i>
+                  {{ isEditingSubject ? 'Update Subject' : 'Save Subject' }}
+                }
+              </button>
+            </div>
+          </form>
+        }
+
+        <div class="subject-table-container">
+          <table class="subject-table">
+            <thead>
+              <tr>
+                <th>Subject Code</th>
+                <th>Descriptive Title</th>
+                <th>Type</th>
+                <th>Lec Units</th>
+                <th>Lab Units</th>
+                <th>Total Units</th>
+                <th>Lec Hours</th>
+                <th>Lab Hours</th>
+                <th>Total Hours</th>
+                <th class="actions-col">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (isLoadingSubjects && !subjects.length) {
+                <tr>
+                  <td colspan="10" class="empty-state">
+                    <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+                    Loading subjects catalog...
+                  </td>
+                </tr>
+              } @else if (subjects.length) {
+                @for (sub of subjects; track sub.primarySubjectId) {
+                  <tr [class.highlight-row]="selectedSubjectId === sub.primarySubjectId">
+                    <td class="font-semibold">{{ sub.subjectCode }}</td>
+                    <td>{{ sub.descriptiveTitle }}</td>
+                    <td class="badge-cell">
+                      <button
+                        type="button"
+                        class="type-pill-btn"
+                        [class.type-pill-lab]="formatSubjectType(sub.subjectType) === 'LABORATORY'"
+                        [class.type-pill-lec]="formatSubjectType(sub.subjectType) === 'LECTURE'"
+                        title="Click to toggle between LECTURE and LABORATORY"
+                        (click)="toggleSubjectType(sub)"
+                      >
+                        {{ formatSubjectType(sub.subjectType) }}
+                      </button>
+                    </td>
+                    <td>{{ sub.lecUnits }}</td>
+                    <td>{{ sub.labUnits }}</td>
+                    <td class="badge-cell"><span class="units-badge">{{ sub.totalUnits }}</span></td>
+                    <td>{{ sub.lecHours }}</td>
+                    <td>{{ sub.labHours }}</td>
+                    <td class="badge-cell"><span class="hours-badge">{{ sub.totalHours }}</span></td>
+                    <td class="actions-col">
+                      <button
+                        type="button"
+                        class="action-btn-mini edit-btn-mini"
+                        title="Edit subject"
+                        (click)="openEditSubjectForm(sub)"
+                      >
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button
+                        type="button"
+                        class="action-btn-mini delete-btn-mini"
+                        title="Delete subject"
+                        [disabled]="deletingSubjectId === sub.primarySubjectId"
+                        (click)="deleteSubject(sub)"
+                      >
+                        @if (deletingSubjectId === sub.primarySubjectId) {
+                          <span class="ui-spinner ui-spinner-inline" aria-hidden="true"></span>
+                        } @else {
+                          <i class="bi bi-trash3"></i>
+                        }
+                      </button>
+                    </td>
+                  </tr>
+                }
+              } @else {
+                <tr>
+                  <td colspan="10" class="empty-state">
+                    No subjects found. Use "Add Subject" to create one.
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="subject-modal-footer">
+          <span class="subject-pagination-info">
+            Showing {{ subjects.length }} of {{ subjectTotalElements }} subjects (Page {{ subjectPage + 1 }} of {{ subjectTotalPages }})
+          </span>
+          <div class="pagination-buttons">
+            <button
+              type="button"
+              class="page-btn"
+              [disabled]="subjectPage === 0 || isLoadingSubjects"
+              (click)="onSubjectPageChange(subjectPage - 1)"
+            >
+              <i class="bi bi-chevron-left"></i>
+              Previous
+            </button>
+            <button
+              type="button"
+              class="page-btn"
+              [disabled]="subjectPage >= subjectTotalPages - 1 || isLoadingSubjects"
+              (click)="onSubjectPageChange(subjectPage + 1)"
+            >
+              Next
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   }
 </section>

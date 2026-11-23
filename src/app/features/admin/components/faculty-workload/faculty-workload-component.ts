@@ -23,7 +23,9 @@ import {
   FacultyWorkloadResponse,
   FacultyWorkloadSource,
   FetchFacultyResponse,
+  PrimarySubjectResponse,
   Semester,
+  UpsertPrimarySubjectRequest,
 } from '@core/services/admin/admin-service';
 import { ToastFacade } from '@core/store/toast/toast.facade';
 import { extractErrorMessage } from '@utilities/extract-error.util';
@@ -126,6 +128,33 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   showFacultySearchResults = false;
   isEncodedHistoryOpen = false;
 
+  // Subject Catalog Management
+  isSubjectModalOpen = false;
+  isSubjectFormOpen = false;
+  isEditingSubject = false;
+  isLoadingSubjects = false;
+  isSavingSubject = false;
+  isSyncingSubjects = false;
+  deletingSubjectId: number | null = null;
+  subjects: PrimarySubjectResponse[] = [];
+  subjectPage = 0;
+  subjectPageSize = 8;
+  subjectTotalElements = 0;
+  subjectTotalPages = 1;
+  subjectSearchTerm = '';
+  private readonly subjectSearch$ = new Subject<string>();
+  selectedSubjectId: number | null = null;
+
+  subjectForm = this.fb.group({
+    subjectCode: ['', [Validators.required, Validators.maxLength(50)]],
+    descriptiveTitle: ['', [Validators.required, Validators.maxLength(150)]],
+    subjectType: ['LECTURE', Validators.required],
+    lecUnits: [0, [Validators.required, Validators.min(0)]],
+    labUnits: [0, [Validators.required, Validators.min(0)]],
+    lecHours: [0, [Validators.required, Validators.min(0)]],
+    labHours: [0, [Validators.required, Validators.min(0)]],
+  });
+
   workloadForm = this.fb.group({
     facultyWorkloadId: [null as number | null],
     facultyId: ['', Validators.required],
@@ -154,7 +183,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     this.initializeWorkloadCalculation();
     this.initializeRouteFacultyFocus();
     this.searchFaculties('');
-    this.loadWorkloads();
+    this.initializeSubjectSearch();
   }
 
   ngOnDestroy(): void {
@@ -676,6 +705,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
             'Using the current year because no active term was loaded.',
             'error',
           );
+          this.loadWorkloads();
         },
       });
   }
@@ -1907,5 +1937,310 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       yearLevel: '',
       sectionCode: '',
     });
+  }
+
+  private initializeSubjectSearch(): void {
+    this.subjectSearch$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$),
+      )
+      .subscribe((term) => {
+        this.subjectSearchTerm = term;
+        this.subjectPage = 0;
+        this.loadSubjects();
+      });
+  }
+
+  openSubjectModal(): void {
+    this.isSubjectModalOpen = true;
+    this.subjectPage = 0;
+    this.subjectSearchTerm = '';
+    this.isSubjectFormOpen = false;
+    this.loadSubjects();
+  }
+
+  closeSubjectModal(): void {
+    this.isSubjectModalOpen = false;
+    this.isSubjectFormOpen = false;
+    this.isEditingSubject = false;
+    this.selectedSubjectId = null;
+    this.subjectForm.reset({
+      subjectCode: '',
+      descriptiveTitle: '',
+      lecUnits: 0,
+      labUnits: 0,
+      lecHours: 0,
+      labHours: 0,
+    });
+  }
+
+  onSubjectSearchChange(term: string): void {
+    this.subjectSearch$.next(term);
+  }
+
+  loadSubjects(): void {
+    this.isLoadingSubjects = true;
+    this.adminService
+      .getSubjects(this.subjectPage, this.subjectPageSize, this.subjectSearchTerm)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isLoadingSubjects = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          this.subjects = res.content || [];
+          this.subjectTotalElements = res.totalElements || 0;
+          this.subjectTotalPages = Math.max(1, res.totalPages || 1);
+        },
+        error: (err) => {
+          if (this.isSessionExpiredError(err)) return;
+          this.toastFacade.showToast(extractErrorMessage(err) || 'Failed to load subjects.', 'error');
+        },
+      });
+  }
+
+  onSubjectPageChange(page: number): void {
+    if (page < 0 || page >= this.subjectTotalPages || page === this.subjectPage) return;
+    this.subjectPage = page;
+    this.loadSubjects();
+  }
+
+  openCreateSubjectForm(): void {
+    this.isEditingSubject = false;
+    this.selectedSubjectId = null;
+    this.subjectForm.reset({
+      subjectCode: '',
+      descriptiveTitle: '',
+      subjectType: 'LECTURE',
+      lecUnits: 0,
+      labUnits: 0,
+      lecHours: 0,
+      labHours: 0,
+    });
+    this.isSubjectFormOpen = true;
+  }
+
+  openEditSubjectForm(subject: PrimarySubjectResponse): void {
+    this.isEditingSubject = true;
+    this.selectedSubjectId = subject.primarySubjectId;
+    this.subjectForm.patchValue({
+      subjectCode: subject.subjectCode,
+      descriptiveTitle: subject.descriptiveTitle,
+      subjectType: subject.subjectType || (subject.labHours && subject.labHours > 0 ? 'LABORATORY' : 'LECTURE'),
+      lecUnits: subject.lecUnits ?? 0,
+      labUnits: subject.labUnits ?? 0,
+      lecHours: subject.lecHours ?? 0,
+      labHours: subject.labHours ?? 0,
+    });
+    this.isSubjectFormOpen = true;
+  }
+
+  openSubjectEditByCode(subjectCode: string): void {
+    if (!subjectCode) return;
+    this.isSubjectModalOpen = true;
+    this.isLoadingSubjects = true;
+    this.adminService
+      .getSubjectByCode(subjectCode.trim())
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isLoadingSubjects = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (subject) => {
+          this.openEditSubjectForm(subject);
+          this.loadSubjects();
+        },
+        error: (err) => {
+          if (this.isSessionExpiredError(err)) return;
+          this.toastFacade.showToast(
+            extractErrorMessage(err) || `Could not find subject "${subjectCode}". Opening catalog instead.`,
+            'info',
+          );
+          this.subjectSearchTerm = subjectCode;
+          this.loadSubjects();
+        },
+      });
+  }
+
+  cancelSubjectForm(): void {
+    this.isSubjectFormOpen = false;
+    this.isEditingSubject = false;
+    this.selectedSubjectId = null;
+    this.subjectForm.reset({
+      subjectCode: '',
+      descriptiveTitle: '',
+      subjectType: 'LECTURE',
+      lecUnits: 0,
+      labUnits: 0,
+      lecHours: 0,
+      labHours: 0,
+    });
+  }
+
+  saveSubject(): void {
+    if (this.subjectForm.invalid) {
+      this.subjectForm.markAllAsTouched();
+      this.toastFacade.showToast('Please check all subject fields.', 'error');
+      return;
+    }
+
+    const raw = this.subjectForm.getRawValue();
+    const payload: UpsertPrimarySubjectRequest = {
+      subjectCode: (raw.subjectCode || '').trim().toUpperCase(),
+      descriptiveTitle: (raw.descriptiveTitle || '').trim(),
+      subjectType: (raw.subjectType || 'LECTURE').trim().toUpperCase(),
+      lecUnits: Number(raw.lecUnits) || 0,
+      labUnits: Number(raw.labUnits) || 0,
+      lecHours: Number(raw.lecHours) || 0,
+      labHours: Number(raw.labHours) || 0,
+    };
+
+    this.isSavingSubject = true;
+    const op$ = this.isEditingSubject && this.selectedSubjectId
+      ? this.adminService.updateSubject(this.selectedSubjectId, payload)
+      : this.adminService.createSubject(payload);
+
+    op$.pipe(
+      takeUntil(this.destroy$),
+      finalize(() => {
+        this.isSavingSubject = false;
+        this.cdr.markForCheck();
+      }),
+    ).subscribe({
+      next: (res) => {
+        this.toastFacade.showToast(
+          `Subject ${res.subjectCode} saved successfully.`,
+          'success',
+        );
+        this.cancelSubjectForm();
+        this.loadSubjects();
+        this.refreshTeachingAssignments();
+      },
+      error: (err) => {
+        if (this.isSessionExpiredError(err)) return;
+        this.toastFacade.showToast(extractErrorMessage(err) || 'Failed to save subject.', 'error');
+      },
+    });
+  }
+
+  deleteSubject(subject: PrimarySubjectResponse): void {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete subject "${subject.subjectCode} - ${subject.descriptiveTitle}"?`,
+    );
+    if (!confirmed) return;
+
+    this.deletingSubjectId = subject.primarySubjectId;
+    this.adminService
+      .deleteSubject(subject.primarySubjectId)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.deletingSubjectId = null;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: () => {
+          this.toastFacade.showToast(`Subject ${subject.subjectCode} deleted successfully.`, 'success');
+          this.loadSubjects();
+          this.refreshTeachingAssignments();
+        },
+        error: (err) => {
+          if (this.isSessionExpiredError(err)) return;
+          this.toastFacade.showToast(extractErrorMessage(err) || 'Failed to delete subject.', 'error');
+        },
+      });
+  }
+
+  get subjectFormTotalUnits(): number {
+    const lec = Number(this.subjectForm.get('lecUnits')?.value) || 0;
+    const lab = Number(this.subjectForm.get('labUnits')?.value) || 0;
+    return Number((lec + lab).toFixed(2));
+  }
+
+  get subjectFormTotalHours(): number {
+    const lec = Number(this.subjectForm.get('lecHours')?.value) || 0;
+    const lab = Number(this.subjectForm.get('labHours')?.value) || 0;
+    return Number((lec + lab).toFixed(2));
+  }
+
+  syncSubjectsFromWorkload(overwrite: boolean = false): void {
+    const confirmMessage = overwrite
+      ? 'Sync all subjects from active faculty workloads? This will recalculate hours and units for all matching subjects.'
+      : 'Auto-sync missing subject hours and units from active faculty workloads?';
+
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+
+    this.isSyncingSubjects = true;
+    this.adminService
+      .syncSubjectsFromWorkload(overwrite)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isSyncingSubjects = false;
+          this.cdr.markForCheck();
+        }),
+      )
+      .subscribe({
+        next: (res) => {
+          this.toastFacade.showToast(
+            res.message || `Successfully synced ${res.updatedCount} subjects.`,
+            'success',
+          );
+          this.loadSubjects();
+          this.refreshTeachingAssignments();
+        },
+        error: (err) => {
+          if (this.isSessionExpiredError(err)) return;
+          this.toastFacade.showToast(extractErrorMessage(err) || 'Failed to sync subjects.', 'error');
+        },
+      });
+  }
+
+  formatSubjectType(type?: string | null): string {
+    if (!type) return 'LECTURE';
+    const upper = type.trim().toUpperCase();
+    if (upper.includes('LAB')) return 'LABORATORY';
+    return 'LECTURE';
+  }
+
+  toggleSubjectType(subject: PrimarySubjectResponse): void {
+    const currentType = this.formatSubjectType(subject.subjectType);
+    const newType = currentType === 'LABORATORY' ? 'LECTURE' : 'LABORATORY';
+
+    const payload: UpsertPrimarySubjectRequest = {
+      subjectCode: subject.subjectCode,
+      descriptiveTitle: subject.descriptiveTitle,
+      subjectType: newType,
+      lecUnits: subject.lecUnits ?? 0,
+      labUnits: subject.labUnits ?? 0,
+      lecHours: subject.lecHours ?? 0,
+      labHours: subject.labHours ?? 0,
+    };
+
+    this.adminService
+      .updateSubject(subject.primarySubjectId, payload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.toastFacade.showToast(`Updated ${subject.subjectCode} to ${newType}.`, 'success');
+          this.loadSubjects();
+          this.refreshTeachingAssignments();
+        },
+        error: (err) => {
+          if (this.isSessionExpiredError(err)) return;
+          this.toastFacade.showToast(extractErrorMessage(err) || 'Failed to update subject type.', 'error');
+        },
+      });
   }
 }

@@ -47,6 +47,31 @@ export interface ClassFacultyAssignmentResponse {
   sourceCampus: string | null;
 }
 
+export interface PrimarySubjectResponse {
+  primarySubjectId: number;
+  subjectCode: string;
+  descriptiveTitle: string;
+  lecUnits: number;
+  labUnits: number;
+  lecHours: number;
+  labHours: number;
+  totalUnits: number;
+  totalHours: number;
+  subjectType?: string;
+  sourceCampus?: string;
+  legacyDatabase?: string;
+}
+
+export interface UpsertPrimarySubjectRequest {
+  subjectCode: string;
+  descriptiveTitle: string;
+  lecUnits: number;
+  labUnits: number;
+  lecHours: number;
+  labHours: number;
+  subjectType?: string;
+}
+
 export interface FacultyAssignmentOptionResponse {
   facultyId: string;
   facultyName: string;
@@ -308,6 +333,7 @@ export interface FacultyWorkloadResponse extends FacultyWorkloadRequest {
   loadStatus: FacultyLoadStatus;
   source: FacultyWorkloadSource;
   remarks: string | null;
+  subjectType?: string | null;
 }
 
 export interface FacultyWorkloadSectionOptionResponse {
@@ -330,6 +356,7 @@ export interface FacultyWorkloadClassOptionResponse {
   labHours?: number;
   totalHoursPerWeek?: number;
   totalTeachingLoad?: number;
+  subjectType?: string;
 }
 export interface CreateUserAccountRequest {
   username: string;
@@ -1661,6 +1688,93 @@ export class AdminService {
     },
   );
 }
+
+  getSubjects(
+    page: number = 0,
+    size: number = 10,
+    search: string = '',
+  ): Observable<PageResponse<PrimarySubjectResponse>> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (search.trim()) {
+      params = params.set('search', search.trim());
+    }
+
+    return this.http.get<PageResponse<PrimarySubjectResponse>>(
+      `${this.ADMIN_API_URL}/subjects`,
+      {
+        params,
+        withCredentials: true,
+      },
+    );
+  }
+
+  getSubjectById(id: number): Observable<PrimarySubjectResponse> {
+    return this.http.get<PrimarySubjectResponse>(
+      `${this.ADMIN_API_URL}/subjects/${id}`,
+      {
+        withCredentials: true,
+      },
+    );
+  }
+
+  getSubjectByCode(code: string): Observable<PrimarySubjectResponse> {
+    const params = new HttpParams().set('subjectCode', code);
+    return this.http.get<PrimarySubjectResponse>(
+      `${this.ADMIN_API_URL}/subjects/by-code`,
+      {
+        params,
+        withCredentials: true,
+      },
+    );
+  }
+
+  createSubject(
+    payload: UpsertPrimarySubjectRequest,
+  ): Observable<PrimarySubjectResponse> {
+    return this.http.post<PrimarySubjectResponse>(
+      `${this.ADMIN_API_URL}/subjects`,
+      payload,
+      {
+        withCredentials: true,
+      },
+    );
+  }
+
+  updateSubject(
+    id: number,
+    payload: UpsertPrimarySubjectRequest,
+  ): Observable<PrimarySubjectResponse> {
+    return this.http.put<PrimarySubjectResponse>(
+      `${this.ADMIN_API_URL}/subjects/${id}`,
+      payload,
+      {
+        withCredentials: true,
+      },
+    );
+  }
+
+  deleteSubject(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(
+      `${this.ADMIN_API_URL}/subjects/${id}`,
+      {
+        withCredentials: true,
+      },
+    );
+  }
+
+  syncSubjectsFromWorkload(
+    overwrite: boolean = false,
+  ): Observable<{ updatedCount: number; message: string }> {
+    const params = new HttpParams().set('overwrite', overwrite.toString());
+    return this.http.post<{ updatedCount: number; message: string }>(
+      `${this.ADMIN_API_URL}/subjects/sync-from-workload`,
+      {},
+      {
+        params,
+        withCredentials: true,
+      },
+    );
+  }
 }
 
 
