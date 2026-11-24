@@ -461,6 +461,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
           this.rebuildAssignmentDrafts();
           this.toastFacade.showToast('Teaching assignment workload saved.', 'success');
           this.loadWorkloads();
+          this.loadSelectedFacultyTermWorkloads();
         },
         error: (error) => {
           this.toastFacade.showToast(extractErrorMessage(error), 'error');
@@ -480,23 +481,31 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     const nextStatus: FacultyLoadStatus =
       this.assignmentDraftStatus(draft) === 'Overload' ? 'Regular' : 'Overload';
     draft.loadStatus = nextStatus;
-    this.scheduleRecalculateWorkload();
-    this.requestViewRefresh();
+    this.assignmentDrafts = this.assignmentDrafts.map((d) =>
+      d.key === draft.key ? { ...d, loadStatus: nextStatus } : d,
+    );
+    this.recalculateWorkload();
+    this.cdr.markForCheck();
   }
 
   onAssignmentDraftLoadStatusChange(
     draft: AssignmentWorkloadDraft,
     isOverload: boolean,
   ): void {
-    draft.loadStatus = isOverload ? 'Overload' : 'Regular';
-    this.scheduleRecalculateWorkload();
-    this.requestViewRefresh();
+    const nextStatus: FacultyLoadStatus = isOverload ? 'Overload' : 'Regular';
+    draft.loadStatus = nextStatus;
+    this.assignmentDrafts = this.assignmentDrafts.map((d) =>
+      d.key === draft.key ? { ...d, loadStatus: nextStatus } : d,
+    );
+    this.recalculateWorkload();
+    this.cdr.markForCheck();
   }
 
   isAssignmentDraftDirty(draft: AssignmentWorkloadDraft): boolean {
     if (!draft.isEncoded) {
       return this.toNumber(draft.totalHoursPerWeek) > 0 ||
-        this.assignmentDraftStatus(draft) === 'Overload';
+        this.assignmentDraftStatus(draft) === 'Overload' ||
+        (draft.savedLoadStatus !== null && this.assignmentDraftStatus(draft) !== this.normalizeLoadStatus(draft.savedLoadStatus));
     }
 
     return this.toNumber(draft.totalHoursPerWeek) !==
@@ -1642,7 +1651,17 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
     const loadLimit = this.effectiveLoadLimit(preparations);
     const totalWorkload = teachingLoad + designationEtu;
-    const overloadHours = Math.max(totalWorkload - loadLimit, 0);
+
+    const explicitOverloadHours = this.assignmentDrafts.length > 0
+      ? this.assignmentDrafts
+          .filter((d) => this.assignmentDraftStatus(d) === 'Overload')
+          .reduce((sum, d) => sum + this.toNumber(d.totalHoursPerWeek), 0)
+      : this.currentFacultyTermWorkloads()
+          .filter((w) => this.statusLabel(w.loadStatus) === 'Overload')
+          .reduce((sum, w) => sum + this.toNumber(w.totalHoursPerWeek), 0);
+
+    const formulaOverloadHours = Math.max(totalWorkload - loadLimit, 0);
+    const overloadHours = Math.max(explicitOverloadHours, formulaOverloadHours);
 
     this.workloadForm.patchValue(
       {
@@ -1831,10 +1850,15 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     const totalTeachingLoad = Math.max(otherDraftsHours + currentHours, savedHours + currentHours);
     const designationEtu = this.toNumber(this.workloadForm.controls.designationEtu.value);
     const totalWorkload = totalTeachingLoad + designationEtu;
-    const overloadHours = Math.max(
-      totalWorkload - this.effectiveLoadLimit(),
-      0,
-    );
+    const loadLimit = this.effectiveLoadLimit();
+
+    const otherOverloadHours = this.assignmentDrafts
+      .filter((d) => d.key !== draft.key && this.assignmentDraftStatus(d) === 'Overload')
+      .reduce((sum, d) => sum + this.toNumber(d.totalHoursPerWeek), 0);
+    const thisOverloadHours = this.assignmentDraftStatus(draft) === 'Overload' ? currentHours : 0;
+    const explicitOverloadHours = otherOverloadHours + thisOverloadHours;
+    const formulaOverloadHours = Math.max(totalWorkload - loadLimit, 0);
+    const overloadHours = Math.max(explicitOverloadHours, formulaOverloadHours);
 
     return {
       totalTeachingLoad,
@@ -1995,14 +2019,12 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   }
 
   classOptionKey(option: FacultyWorkloadClassOptionResponse): string {
-    return [
-      option.classCode,
-      option.courseCode,
-      option.sectionId,
-      option.programCode,
-      option.yearLevel,
-      option.sectionCode,
-    ].join('|');
+    const classCode = option.classCode?.trim().toLowerCase() ?? '';
+    const courseCode = option.courseCode?.trim().toLowerCase() ?? '';
+    const programCode = option.programCode?.trim().toLowerCase() ?? '';
+    const yearLevel = String(option.yearLevel ?? '').trim().toLowerCase();
+    const sectionCode = option.sectionCode?.trim().toLowerCase() ?? '';
+    return [classCode, courseCode, programCode, yearLevel, sectionCode].join('|');
   }
 
   private clearClassSelection(): void {
