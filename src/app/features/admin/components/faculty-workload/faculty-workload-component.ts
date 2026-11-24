@@ -1356,7 +1356,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
 
       const hoursNum = this.toNumber(effectiveHours);
       cumulativeHours += hoursNum;
-      const defaultStatus: FacultyLoadStatus = cumulativeHours > loadLimit ? 'Overload' : 'Regular';
+      const defaultStatus: FacultyLoadStatus = 'Regular';
 
       const effectiveLoadStatus: FacultyLoadStatus = userModified
         ? previousDraft?.loadStatus ?? defaultStatus
