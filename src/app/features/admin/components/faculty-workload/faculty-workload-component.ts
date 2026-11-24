@@ -51,6 +51,7 @@ interface AssignmentWorkloadDraft {
   savedLoadStatus: FacultyLoadStatus | null;
   isEncoded: boolean;
   isSaving: boolean;
+  userModified?: boolean;
 }
 
 @Component({
@@ -481,8 +482,9 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     const nextStatus: FacultyLoadStatus =
       this.assignmentDraftStatus(draft) === 'Overload' ? 'Regular' : 'Overload';
     draft.loadStatus = nextStatus;
+    draft.userModified = true;
     this.assignmentDrafts = this.assignmentDrafts.map((d) =>
-      d.key === draft.key ? { ...d, loadStatus: nextStatus } : d,
+      d.key === draft.key ? { ...d, loadStatus: nextStatus, userModified: true } : d,
     );
     this.recalculateWorkload();
     this.cdr.markForCheck();
@@ -494,24 +496,46 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   ): void {
     const nextStatus: FacultyLoadStatus = isOverload ? 'Overload' : 'Regular';
     draft.loadStatus = nextStatus;
+    draft.userModified = true;
     this.assignmentDrafts = this.assignmentDrafts.map((d) =>
-      d.key === draft.key ? { ...d, loadStatus: nextStatus } : d,
+      d.key === draft.key ? { ...d, loadStatus: nextStatus, userModified: true } : d,
+    );
+    this.recalculateWorkload();
+    this.cdr.markForCheck();
+  }
+
+  onAssignmentDraftHoursChange(
+    draft: AssignmentWorkloadDraft,
+    hours: number | string | null,
+  ): void {
+    const nextHours = this.toNumber(hours);
+    draft.totalHoursPerWeek = nextHours;
+    draft.userModified = true;
+    this.assignmentDrafts = this.assignmentDrafts.map((d) =>
+      d.key === draft.key ? { ...d, totalHoursPerWeek: nextHours, userModified: true } : d,
     );
     this.recalculateWorkload();
     this.cdr.markForCheck();
   }
 
   isAssignmentDraftDirty(draft: AssignmentWorkloadDraft): boolean {
-    if (!draft.isEncoded) {
-      return this.toNumber(draft.totalHoursPerWeek) > 0 ||
-        this.assignmentDraftStatus(draft) === 'Overload' ||
-        (draft.savedLoadStatus !== null && this.assignmentDraftStatus(draft) !== this.normalizeLoadStatus(draft.savedLoadStatus));
+    if (draft.userModified) {
+      return true;
     }
 
-    return this.toNumber(draft.totalHoursPerWeek) !==
+    if (!draft.isEncoded) {
+      return (
+        draft.savedLoadStatus !== null &&
+        this.assignmentDraftStatus(draft) !== this.normalizeLoadStatus(draft.savedLoadStatus)
+      );
+    }
+
+    return (
+      this.toNumber(draft.totalHoursPerWeek) !==
         this.toNumber(draft.savedTotalHoursPerWeek) ||
       this.assignmentDraftStatus(draft) !==
-        this.normalizeLoadStatus(draft.savedLoadStatus);
+        this.normalizeLoadStatus(draft.savedLoadStatus)
+    );
   }
 
   assignmentDraftDataHint(draft: AssignmentWorkloadDraft): string {
@@ -954,7 +978,6 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     }
 
     const requestId = ++this.selectedFacultyTermWorkloadRequestId;
-    this.selectedFacultyTermWorkloads = [];
 
     this.adminService
       .getFacultyWorkloads(0, 500, facultyId, schoolYear, semester)
@@ -1318,15 +1341,14 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       const savedStatus = savedWorkload
         ? this.normalizeLoadStatus(savedWorkload.loadStatus)
         : previousDraft?.savedLoadStatus ?? null;
-      const keepUnsavedInput = previousDraft
-        ? this.isAssignmentDraftDirty(previousDraft)
-        : false;
+
+      const userModified = previousDraft?.userModified === true;
 
       const optionHours = option.totalHoursPerWeek != null
         ? this.toNumber(option.totalHoursPerWeek)
         : null;
 
-      const effectiveHours = keepUnsavedInput
+      const effectiveHours = userModified
         ? previousDraft?.totalHoursPerWeek ?? null
         : savedWorkload
         ? savedHours
@@ -1336,20 +1358,26 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       cumulativeHours += hoursNum;
       const defaultStatus: FacultyLoadStatus = cumulativeHours > loadLimit ? 'Overload' : 'Regular';
 
+      const effectiveLoadStatus: FacultyLoadStatus = userModified
+        ? previousDraft?.loadStatus ?? defaultStatus
+        : savedWorkload
+        ? savedStatus ?? defaultStatus
+        : previousDraft?.loadStatus ?? defaultStatus;
+
       return {
         key,
         option,
-        facultyWorkloadId: savedWorkload?.facultyWorkloadId ?? null,
+        facultyWorkloadId: savedWorkload?.facultyWorkloadId ?? previousDraft?.facultyWorkloadId ?? null,
         totalHoursPerWeek: effectiveHours,
-        loadStatus: keepUnsavedInput
-          ? previousDraft?.loadStatus ?? defaultStatus
-          : savedWorkload
-          ? savedStatus ?? defaultStatus
-          : previousDraft?.loadStatus ?? defaultStatus,
+        loadStatus: effectiveLoadStatus,
         savedTotalHoursPerWeek: savedHours,
         savedLoadStatus: savedStatus,
         isEncoded: Boolean(savedWorkload),
         isSaving: previousDraft?.isSaving ?? false,
+        userModified: userModified && (
+          this.toNumber(effectiveHours) !== this.toNumber(savedHours) ||
+          effectiveLoadStatus !== (savedStatus ?? defaultStatus)
+        ),
       };
     });
   }
@@ -1402,6 +1430,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         savedLoadStatus: this.normalizeLoadStatus(workload.loadStatus),
         isEncoded: true,
         isSaving: false,
+        userModified: false,
       };
     });
 
@@ -1419,6 +1448,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
           savedLoadStatus: this.normalizeLoadStatus(workload.loadStatus),
           isEncoded: true,
           isSaving: false,
+          userModified: false,
         },
         ...this.assignmentDrafts,
       ];

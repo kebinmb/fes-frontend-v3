@@ -351,6 +351,7 @@
                     class="table-input"
                     [name]="'assignmentHours' + draft.key"
                     [(ngModel)]="draft.totalHoursPerWeek"
+                    (ngModelChange)="onAssignmentDraftHoursChange(draft, $event)"
                     [ngModelOptions]="{ standalone: true }"
                   />
                   <small
