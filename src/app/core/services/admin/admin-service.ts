@@ -894,6 +894,7 @@ export class AdminService {
     legacyDatabase: string = '',
     college: string = '',
     status: string = '',
+    excludeCollege: string = '',
   ): Observable<PageResponse<FetchFacultyResponse>> {
     let params = new HttpParams().set('page', page).set('size', size);
 
@@ -911,6 +912,10 @@ export class AdminService {
 
     if (status.trim()) {
       params = params.set('status', status.trim());
+    }
+
+    if (excludeCollege.trim()) {
+      params = params.set('excludeCollege', excludeCollege.trim());
     }
 
     return this.http.get<PageResponse<FetchFacultyResponse>>(`${this.ADMIN_API_URL}/faculties`, {

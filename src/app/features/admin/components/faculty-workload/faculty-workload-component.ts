@@ -765,7 +765,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
           this.isLoadingFaculties = true;
           this.updateFacultySearchVisibility();
 
-          return this.adminService.getFaculties(0, 10, value.trim()).pipe(
+          return this.adminService.getFaculties(0, 10, value.trim(), '', '', '', 'FOR_MIGRATION').pipe(
             catchError((error) => {
               this.toastFacade.showToast(extractErrorMessage(error), 'error');
               return of({ content: [] as FetchFacultyResponse[] });
@@ -781,7 +781,9 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
       )
       .subscribe((response) => {
-        this.facultyResults = response.content ?? [];
+        this.facultyResults = (response.content ?? []).filter(
+          (f) => (f.college ?? '').toUpperCase().trim() !== 'FOR_MIGRATION',
+        );
         this.updateFacultySearchVisibility();
       });
 
@@ -910,7 +912,9 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
             return;
           }
 
-          this.workloads = response.content ?? [];
+          this.workloads = (response.content ?? []).filter(
+            (workload) => (workload.college ?? '').toUpperCase().trim() !== 'FOR_MIGRATION',
+          );
           this.totalElements = response.totalElements ?? 0;
           this.totalPages = Math.max(response.totalPages ?? 1, 1);
           this.syncCommonTermFieldsFromWorkloads();
@@ -952,7 +956,9 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
             return;
           }
 
-          this.selectedFacultyTermWorkloads = response.content ?? [];
+          this.selectedFacultyTermWorkloads = (response.content ?? []).filter(
+            (workload) => (workload.college ?? '').toUpperCase().trim() !== 'FOR_MIGRATION',
+          );
           this.syncCommonTermFieldsFromWorkloads();
           this.recalculateWorkload();
           this.rebuildAssignmentDrafts();
@@ -1106,11 +1112,13 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     }
 
     this.adminService
-      .getFaculties(0, 5, facultyId)
+      .getFaculties(0, 5, facultyId, '', '', '', 'FOR_MIGRATION')
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          const matches = response.content ?? [];
+          const matches = (response.content ?? []).filter(
+            (item) => (item.college ?? '').toUpperCase().trim() !== 'FOR_MIGRATION',
+          );
           const exactMatch = matches.find(
             (faculty) => faculty.facultyId === facultyId,
           );
@@ -1286,6 +1294,9 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
       this.assignmentDrafts.map((draft) => [draft.key, draft]),
     );
 
+    let cumulativeHours = 0;
+    const loadLimit = this.effectiveLoadLimit();
+
     this.assignmentDrafts = assignmentOptions.map((option) => {
       const key = this.classOptionKey(option);
       const previousDraft = previousDrafts.get(key);
@@ -1306,20 +1317,26 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         ? this.toNumber(option.totalHoursPerWeek)
         : null;
 
+      const effectiveHours = keepUnsavedInput
+        ? previousDraft?.totalHoursPerWeek ?? null
+        : savedWorkload
+        ? savedHours
+        : (previousDraft?.totalHoursPerWeek ?? optionHours);
+
+      const hoursNum = this.toNumber(effectiveHours);
+      cumulativeHours += hoursNum;
+      const defaultStatus: FacultyLoadStatus = cumulativeHours > loadLimit ? 'Overload' : 'Regular';
+
       return {
         key,
         option,
         facultyWorkloadId: savedWorkload?.facultyWorkloadId ?? null,
-        totalHoursPerWeek: keepUnsavedInput
-          ? previousDraft?.totalHoursPerWeek ?? null
-          : savedWorkload
-          ? savedHours
-          : (previousDraft?.totalHoursPerWeek ?? optionHours),
+        totalHoursPerWeek: effectiveHours,
         loadStatus: keepUnsavedInput
-          ? previousDraft?.loadStatus ?? 'Regular'
+          ? previousDraft?.loadStatus ?? defaultStatus
           : savedWorkload
-          ? savedStatus ?? 'Regular'
-          : previousDraft?.loadStatus ?? 'Regular',
+          ? savedStatus ?? defaultStatus
+          : previousDraft?.loadStatus ?? defaultStatus,
         savedTotalHoursPerWeek: savedHours,
         savedLoadStatus: savedStatus,
         isEncoded: Boolean(savedWorkload),
@@ -1405,10 +1422,10 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
   ): boolean {
     return (
       this.sameClassCodeOrLegacyValue(workload.classCode, option.classCode) &&
-      workload.courseCode === option.courseCode &&
-      workload.programCode === option.programCode &&
-      workload.yearLevel === option.yearLevel &&
-      workload.sectionCode === option.sectionCode
+      (workload.courseCode?.trim().toLowerCase() ?? '') === (option.courseCode?.trim().toLowerCase() ?? '') &&
+      (workload.programCode?.trim().toLowerCase() ?? '') === (option.programCode?.trim().toLowerCase() ?? '') &&
+      String(workload.yearLevel ?? '').trim() === String(option.yearLevel ?? '').trim() &&
+      (workload.sectionCode?.trim().toLowerCase() ?? '') === (option.sectionCode?.trim().toLowerCase() ?? '')
     );
   }
 
@@ -1610,7 +1627,20 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     const totalHoursPerWeek = this.toNumber(this.workloadForm.controls.totalHoursPerWeek.value);
     const teachingLoad = this.projectedTotalTeachingLoad(totalHoursPerWeek);
     const designationEtu = this.toNumber(this.workloadForm.controls.designationEtu.value);
-    const loadLimit = this.effectiveLoadLimit();
+
+    // Determine preparations count
+    let preparations = this.toNumber(this.workloadForm.controls.numberOfPreparations.value);
+    if (!this.workloadForm.controls.numberOfPreparations.dirty && preparations === 0) {
+      const distinctCourses = new Set(
+        (this.assignmentDrafts.length
+          ? this.assignmentDrafts.map((d) => d.option.courseCode?.trim())
+          : this.currentFacultyTermWorkloads().map((w) => w.courseCode?.trim())
+        ).filter(Boolean),
+      ).size;
+      preparations = Math.max(distinctCourses, 1);
+    }
+
+    const loadLimit = this.effectiveLoadLimit(preparations);
     const totalWorkload = teachingLoad + designationEtu;
     const overloadHours = Math.max(totalWorkload - loadLimit, 0);
 
@@ -1619,6 +1649,7 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
         totalTeachingLoad: teachingLoad,
         totalWorkload,
         overloadHours,
+        numberOfPreparations: preparations,
       },
       { emitEvent: false },
     );
@@ -1788,13 +1819,16 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     overloadHours: number;
   } {
     const currentHours = this.toNumber(draft.totalHoursPerWeek);
+    const otherDraftsHours = this.assignmentDrafts
+      .filter((d) => d.key !== draft.key)
+      .reduce((total, d) => total + this.toNumber(d.totalHoursPerWeek), 0);
     const savedHours = this.currentFacultyTermWorkloads()
       .filter((workload) => !this.workloadMatchesClassOption(workload, draft.option))
       .reduce(
         (total, workload) => total + this.toNumber(workload.totalHoursPerWeek),
         0,
       );
-    const totalTeachingLoad = savedHours + currentHours;
+    const totalTeachingLoad = Math.max(otherDraftsHours + currentHours, savedHours + currentHours);
     const designationEtu = this.toNumber(this.workloadForm.controls.designationEtu.value);
     const totalWorkload = totalTeachingLoad + designationEtu;
     const overloadHours = Math.max(
@@ -1885,57 +1919,34 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     const facultyId = this.workloadForm.controls.facultyId.value;
     const schoolYear = this.workloadForm.controls.schoolYear.value;
     const semester = this.workloadForm.controls.semester.value;
-    const currentWorkloadId = this.workloadForm.controls.facultyWorkloadId.value;
-    const classCode = this.workloadForm.controls.classCode.value;
-    const courseCode = this.workloadForm.controls.courseCode.value;
-    const programCode = this.workloadForm.controls.programCode.value;
-    const yearLevel = this.workloadForm.controls.yearLevel.value;
-    const sectionCode = this.workloadForm.controls.sectionCode.value;
 
     if (!facultyId || !schoolYear || !semester) {
       return currentHoursPerWeek;
     }
 
-    const termWorkloads = this.workloads.filter(
-      (workload) =>
-        workload.facultyId === facultyId &&
-        this.sameSchoolYear(workload.schoolYear, schoolYear) &&
-        this.sameSemester(workload.semester, semester),
-    );
-    const savedAggregate = termWorkloads.length
-      ? Math.max(
-          ...termWorkloads.map((workload) =>
-            this.toNumber(workload.totalTeachingLoad),
-          ),
-        )
-      : 0;
-    const existingCurrentHours = termWorkloads
-      .filter(
-        (workload) =>
-          workload.facultyWorkloadId === currentWorkloadId ||
-          (
-            this.sameClassCodeOrLegacyValue(workload.classCode, classCode) &&
-            workload.courseCode === courseCode &&
-            workload.programCode === programCode &&
-            workload.yearLevel === yearLevel &&
-            workload.sectionCode === sectionCode
-          ),
-      )
-      .reduce(
+    if (this.assignmentDrafts.length > 0) {
+      return this.assignmentDrafts.reduce(
+        (sum, draft) => sum + this.toNumber(draft.totalHoursPerWeek),
+        0,
+      );
+    }
+
+    const termWorkloads = this.currentFacultyTermWorkloads();
+    if (termWorkloads.length > 0) {
+      const sumHours = termWorkloads.reduce(
         (total, workload) => total + this.toNumber(workload.totalHoursPerWeek),
         0,
       );
-
-    if (savedAggregate > 0 || currentWorkloadId) {
-      return Math.max(savedAggregate - existingCurrentHours, 0) + currentHoursPerWeek;
+      if (sumHours > 0) {
+        return sumHours;
+      }
+      return Math.max(
+        ...termWorkloads.map((w) => this.toNumber(w.totalTeachingLoad)),
+        0,
+      );
     }
 
-    const visibleSavedHours = termWorkloads.reduce(
-      (total, workload) => total + this.toNumber(workload.totalHoursPerWeek),
-      0,
-    );
-
-    return visibleSavedHours + currentHoursPerWeek;
+    return currentHoursPerWeek;
   }
 
   private syncSelectedClassOption(): void {
