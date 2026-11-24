@@ -476,6 +476,23 @@ export class FacultyWorkloadComponent implements OnInit, OnDestroy {
     return this.normalizeLoadStatus(draft.loadStatus);
   }
 
+  toggleAssignmentDraftStatus(draft: AssignmentWorkloadDraft): void {
+    const nextStatus: FacultyLoadStatus =
+      this.assignmentDraftStatus(draft) === 'Overload' ? 'Regular' : 'Overload';
+    draft.loadStatus = nextStatus;
+    this.scheduleRecalculateWorkload();
+    this.requestViewRefresh();
+  }
+
+  onAssignmentDraftLoadStatusChange(
+    draft: AssignmentWorkloadDraft,
+    isOverload: boolean,
+  ): void {
+    draft.loadStatus = isOverload ? 'Overload' : 'Regular';
+    this.scheduleRecalculateWorkload();
+    this.requestViewRefresh();
+  }
+
   isAssignmentDraftDirty(draft: AssignmentWorkloadDraft): boolean {
     if (!draft.isEncoded) {
       return this.toNumber(draft.totalHoursPerWeek) > 0 ||

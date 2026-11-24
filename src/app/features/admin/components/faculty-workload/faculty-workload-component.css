@@ -439,6 +439,7 @@
 }
 
 .table-checkbox {
+  position: relative;
   display: inline-flex;
   align-items: center;
   gap: 0.55rem;
@@ -450,6 +451,13 @@
   background: #f0fdf4;
   color: #166534;
   cursor: pointer;
+  user-select: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.table-checkbox:hover {
+  border-color: #86efac;
+  background: #dcfce7;
 }
 
 .table-checkbox-active {
@@ -458,12 +466,21 @@
   color: #c2410c;
 }
 
+.table-checkbox-active:hover {
+  border-color: #fdba74;
+  background: #ffedd5;
+}
+
 .table-checkbox input {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   opacity: 0;
-  pointer-events: none;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  z-index: 1;
 }
 
 .table-checkbox-box {
@@ -477,6 +494,11 @@
   background: #ffffff;
   font-size: 0.85rem;
   line-height: 1;
+  pointer-events: none;
+}
+
+.table-checkbox > span:last-child {
+  pointer-events: none;
 }
 
 .table-checkbox strong,

@@ -364,12 +364,13 @@
                   <label
                     class="table-checkbox"
                     [class.table-checkbox-active]="assignmentDraftStatus(draft) === 'Overload'"
+                    [title]="assignmentDraftStatus(draft) === 'Overload' ? 'Click to change to Regular' : 'Click to change to Overload'"
                   >
                     <input
                       type="checkbox"
                       [name]="'assignmentLoadStatus' + draft.key"
                       [checked]="assignmentDraftStatus(draft) === 'Overload'"
-                      (change)="draft.loadStatus = $any($event.target).checked ? 'Overload' : 'Regular'"
+                      (change)="onAssignmentDraftLoadStatusChange(draft, $any($event.target).checked)"
                     />
                     <span class="table-checkbox-box" aria-hidden="true">
                       @if (assignmentDraftStatus(draft) === 'Overload') {
