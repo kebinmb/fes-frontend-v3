@@ -154,7 +154,7 @@ button:disabled {
 
 .toolbar {
   display: grid;
-  grid-template-columns: minmax(240px, 1.35fr) minmax(150px, 0.65fr) minmax(170px, 0.65fr) auto;
+  grid-template-columns: minmax(220px, 1.25fr) minmax(130px, 0.65fr) minmax(145px, 0.65fr) minmax(115px, 0.45fr) minmax(135px, 0.55fr) auto;
   gap: 0.75rem;
   align-items: end;
   padding: 0.9rem 1rem;

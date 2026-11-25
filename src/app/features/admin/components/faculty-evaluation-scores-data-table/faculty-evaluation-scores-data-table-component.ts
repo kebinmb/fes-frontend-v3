@@ -119,6 +119,10 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
   readonly searchTerm = signal('');
   readonly selectedCollege = signal('');
   readonly selectedCampus = signal('');
+  readonly activeSchoolYear = signal<number | null>(null);
+  readonly activeSemester = signal<string>('');
+  readonly selectedSchoolYear = signal<number | null>(null);
+  readonly selectedSemester = signal<string>('');
   readonly pageIndex = signal(0);
   readonly pageSize = signal(10);
   readonly isBulkPrinting = signal(false);
@@ -142,6 +146,11 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
     { label: 'Alijis', value: 'LEGACY_ALIJIS' },
     { label: 'Fortune-Towne', value: 'LEGACY_FT' },
     { label: 'Binalbagan', value: 'LEGACY_BINALBAGAN' },
+  ];
+  readonly semesterOptions = [
+    { label: '1st Semester', value: '1st' },
+    { label: '2nd Semester', value: '2nd' },
+    { label: 'Summer', value: 'summer' },
   ];
 
   readonly filteredRows = computed(() => this.rows());
@@ -192,7 +201,26 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
       )
       .subscribe(() => this.resetAndLoad());
 
-    this.loadDashboard();
+    this.adminService
+      .fetchCurrentSchoolYearAndSemester()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (term) => {
+          const canonicalSem = this.toCanonicalSemester(term.semester);
+          this.activeSchoolYear.set(term.schoolYear);
+          this.activeSemester.set(canonicalSem);
+          if (this.selectedSchoolYear() === null) {
+            this.selectedSchoolYear.set(term.schoolYear);
+          }
+          if (!this.selectedSemester()) {
+            this.selectedSemester.set(canonicalSem);
+          }
+          this.loadDashboard();
+        },
+        error: () => {
+          this.loadDashboard();
+        },
+      });
   }
 
   loadDashboard(): void {
@@ -258,6 +286,17 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
     this.resetAndLoad();
   }
 
+  updateSchoolYear(value: string | number | null): void {
+    const year = Number(value);
+    this.selectedSchoolYear.set(Number.isFinite(year) && year > 0 ? year : null);
+    this.resetAndLoad();
+  }
+
+  updateSemester(value: string): void {
+    this.selectedSemester.set(value);
+    this.resetAndLoad();
+  }
+
   updatePageSize(value: string | number): void {
     this.pageSize.set(Number(value) || 10);
     this.resetAndLoad();
@@ -279,11 +318,22 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
     this.searchTerm.set('');
     this.selectedCollege.set('');
     this.selectedCampus.set('');
+    this.selectedSchoolYear.set(this.activeSchoolYear());
+    this.selectedSemester.set(this.activeSemester());
     this.resetAndLoad();
   }
 
   hasActiveFilters(): boolean {
-    return Boolean(this.searchTerm().trim() || this.selectedCollege() || this.selectedCampus());
+    const isCustomTerm =
+      (this.activeSchoolYear() !== null && this.selectedSchoolYear() !== this.activeSchoolYear()) ||
+      (this.activeSemester() !== '' && this.selectedSemester() !== this.activeSemester());
+
+    return Boolean(
+      this.searchTerm().trim() ||
+        this.selectedCollege() ||
+        this.selectedCampus() ||
+        isCustomTerm,
+    );
   }
 
   trackByFacultyId(_: number, row: FacultyEvaluationReadinessRow): string {
@@ -526,7 +576,10 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
   }
 
   private preparePrintableReport(row: PrintableFacultyTarget): Observable<PreparedReportResult> {
-    return this.adminService.generateFacultyEvaluationReport(row.facultyId).pipe(
+    const schoolYear = row.schoolYear ?? this.selectedSchoolYear();
+    const semester = row.semester ?? this.selectedSemester();
+
+    return this.adminService.generateFacultyEvaluationReport(row.facultyId, schoolYear, semester).pipe(
       map((report): PreparedReportResult => {
         if (!this.reportHasBothEvaluationTypes(report.items ?? [])) {
           throw new Error('The generated report does not include both student and supervisor evaluations.');
@@ -707,7 +760,20 @@ export class FacultyEvaluationScoresDataTableComponent implements OnInit {
       college: this.selectedCollege(),
       campus: this.selectedCampus(),
       legacyDatabase: this.selectedCampus(),
+      schoolYear: this.selectedSchoolYear(),
+      semester: this.selectedSemester(),
     };
+  }
+
+  private toCanonicalSemester(semester: string | null | undefined): string {
+    const s = String(semester ?? '').trim().toLowerCase();
+    if (s.includes('summer') || s.includes('midyear')) {
+      return 'summer';
+    }
+    if (s.includes('second') || s.includes('2nd') || s === '2') {
+      return '2nd';
+    }
+    return '1st';
   }
 
   private toPrintPayload(

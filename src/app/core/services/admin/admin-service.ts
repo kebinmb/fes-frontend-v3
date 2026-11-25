@@ -158,6 +158,8 @@ export interface FacultyEvaluationReadinessFilter {
   college?: string;
   campus?: string;
   legacyDatabase?: string;
+  schoolYear?: number | null;
+  semester?: string;
 }
 
 export type FacultyEvaluationReportPrintStatusFilter =
@@ -1235,6 +1237,14 @@ export class AdminService {
       params = params.set('legacyDatabase', filters.legacyDatabase.trim());
     }
 
+    if (filters.schoolYear) {
+      params = params.set('schoolYear', filters.schoolYear);
+    }
+
+    if (filters.semester?.trim()) {
+      params = params.set('semester', filters.semester.trim());
+    }
+
     return this.http.get<FacultyEvaluationReadinessPageResponse>(
       `${this.ADMIN_API_URL}/dashboard/faculty-evaluation-readiness`,
       {
@@ -1263,6 +1273,14 @@ export class AdminService {
 
     if (filters.legacyDatabase?.trim()) {
       params = params.set('legacyDatabase', filters.legacyDatabase.trim());
+    }
+
+    if (filters.schoolYear) {
+      params = params.set('schoolYear', filters.schoolYear);
+    }
+
+    if (filters.semester?.trim()) {
+      params = params.set('semester', filters.semester.trim());
     }
 
     return this.http.get<string[]>(
@@ -1387,13 +1405,26 @@ export class AdminService {
 
   generateFacultyEvaluationReport(
     facultyId: string,
+    schoolYear?: number | null,
+    semester?: string | null,
   ): Observable<FacultyEvaluationGeneratedReportResponse> {
+    let params = new HttpParams();
+
+    if (schoolYear) {
+      params = params.set('schoolYear', schoolYear);
+    }
+
+    if (semester?.trim()) {
+      params = params.set('semester', semester.trim());
+    }
+
     return this.withCsrfToken((csrf) =>
       this.http.post<FacultyEvaluationGeneratedReportResponse>(
         `${this.ADMIN_API_URL}/faculty-evaluation-reports/${encodeURIComponent(facultyId)}`,
         {},
         {
           headers: this.csrfHeaders(csrf),
+          params,
           withCredentials: true,
         },
       ),
@@ -1446,6 +1477,14 @@ export class AdminService {
 
     if (filters.legacyDatabase?.trim()) {
       params = params.set('legacyDatabase', filters.legacyDatabase.trim());
+    }
+
+    if (filters.schoolYear) {
+      params = params.set('schoolYear', filters.schoolYear);
+    }
+
+    if (filters.semester?.trim()) {
+      params = params.set('semester', filters.semester.trim());
     }
 
     return this.withCsrfToken((csrf) =>

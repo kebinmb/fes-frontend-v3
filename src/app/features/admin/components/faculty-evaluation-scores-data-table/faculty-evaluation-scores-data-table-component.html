@@ -129,6 +129,27 @@
       </select>
     </label>
 
+    <label>
+      <span>School Year</span>
+      <input
+        type="number"
+        min="2000"
+        max="2100"
+        [ngModel]="selectedSchoolYear()"
+        (ngModelChange)="updateSchoolYear($event)"
+        placeholder="School Year"
+      />
+    </label>
+
+    <label>
+      <span>Semester</span>
+      <select [ngModel]="selectedSemester()" (ngModelChange)="updateSemester($event)">
+        @for (option of semesterOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </label>
+
     <button
       type="button"
       class="clear-btn"

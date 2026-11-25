@@ -46,6 +46,8 @@ export class FacultyReportPrintTrackingComponent implements OnInit {
   readonly searchTerm = signal('');
   readonly selectedStatus = signal<ReportStatusFilter>('VALID');
   readonly selectedPrintStatus = signal<FacultyEvaluationReportPrintStatusFilter>('ALL');
+  readonly activeSchoolYear = signal<number | null>(null);
+  readonly activeSemester = signal<string>('');
   readonly selectedSchoolYear = signal<number | null>(null);
   readonly selectedSemester = signal('');
   readonly pageIndex = signal(0);
@@ -71,7 +73,6 @@ export class FacultyReportPrintTrackingComponent implements OnInit {
     { label: 'Annex D not printed', value: 'ANNEX_D_NOT_PRINTED' },
   ];
   readonly semesterOptions = [
-    { label: 'Active term', value: '' },
     { label: '1st Semester', value: '1st' },
     { label: '2nd Semester', value: '2nd' },
     { label: 'Summer', value: 'summer' },
@@ -99,7 +100,26 @@ export class FacultyReportPrintTrackingComponent implements OnInit {
       )
       .subscribe(() => this.resetAndLoad());
 
-    this.loadDashboard();
+    this.adminService
+      .fetchCurrentSchoolYearAndSemester()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (term) => {
+          const canonicalSem = this.toCanonicalSemester(term.semester);
+          this.activeSchoolYear.set(term.schoolYear);
+          this.activeSemester.set(canonicalSem);
+          if (this.selectedSchoolYear() === null) {
+            this.selectedSchoolYear.set(term.schoolYear);
+          }
+          if (!this.selectedSemester()) {
+            this.selectedSemester.set(canonicalSem);
+          }
+          this.loadDashboard();
+        },
+        error: () => {
+          this.loadDashboard();
+        },
+      });
   }
 
   loadDashboard(): void {
@@ -197,19 +217,33 @@ export class FacultyReportPrintTrackingComponent implements OnInit {
     this.searchTerm.set('');
     this.selectedStatus.set('VALID');
     this.selectedPrintStatus.set('ALL');
-    this.selectedSchoolYear.set(null);
-    this.selectedSemester.set('');
+    this.selectedSchoolYear.set(this.activeSchoolYear());
+    this.selectedSemester.set(this.activeSemester());
     this.resetAndLoad();
   }
 
   hasActiveFilters(): boolean {
+    const isCustomTerm =
+      (this.activeSchoolYear() !== null && this.selectedSchoolYear() !== this.activeSchoolYear()) ||
+      (this.activeSemester() !== '' && this.selectedSemester() !== this.activeSemester());
+
     return Boolean(
       this.searchTerm().trim() ||
-        this.selectedStatus() !== 'ALL' ||
+        this.selectedStatus() !== 'VALID' ||
         this.selectedPrintStatus() !== 'ALL' ||
-        this.selectedSchoolYear() ||
-        this.selectedSemester(),
+        isCustomTerm,
     );
+  }
+
+  private toCanonicalSemester(semester: string | null | undefined): string {
+    const s = String(semester ?? '').trim().toLowerCase();
+    if (s.includes('summer') || s.includes('midyear')) {
+      return 'summer';
+    }
+    if (s.includes('second') || s.includes('2nd') || s === '2') {
+      return '2nd';
+    }
+    return '1st';
   }
 
   trackByReportId(_: number, row: FacultyEvaluationReportPrintTrackingResponse): string {
