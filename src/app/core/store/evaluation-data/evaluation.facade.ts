@@ -3,9 +3,10 @@ import { Store } from '@ngrx/store';
 import { selectRole } from '../auth/auth.selector';
 import {
   DEFAULT_EVALUATION_TEMPLATE,
+  getEvaluationTemplateForRole,
   SubjectEvaluationDTO,
 } from '../../services/evaluation/evaluation-service';
-import { map, of } from 'rxjs';
+import { map } from 'rxjs';
 import { EvaluationContext } from '../supervisor-data/supervisor-data.actions';
 import * as EvaluationDataSelectors from '../../store/evaluation-data/evaluation.selector';
 import * as EvaluationDataActions from '../../store/evaluation-data/evaluation.action';
@@ -15,7 +16,9 @@ import { selectEvaluationLoading } from '../supervisor-data/supervisor-data.sele
 })
 export class EvaluationDataFacade {
   private store = inject(Store);
-  template$ = of(DEFAULT_EVALUATION_TEMPLATE);
+  template$ = this.store
+    .select(selectRole)
+    .pipe(map((role) => getEvaluationTemplateForRole(role)));
   isLoading$ = this.store.select(EvaluationDataSelectors.selectEvaluationLoading);
   hasEvaluated$ = this.store.select(EvaluationDataSelectors.selectHasEvaluated);
   submitting$ = this.store.select(EvaluationDataSelectors.selectSubmitting);

@@ -243,6 +243,64 @@ export const DEFAULT_EVALUATION_TEMPLATE: EvaluationTemplate = {
   ],
   ratingOptions: DEFAULT_RATING_OPTIONS,
 };
+
+export const SUPERVISOR_CRITERIA_LABELS: Record<string, string> = {
+  // Category 1: Management of Teaching and Learning
+  punctuality: 'Comes to class on time.',
+  courseClarity:
+    'Submits updated syllabus, grade sheets, and other required reports on time.',
+  timeManagement:
+    'Maximizes the allocated time/learning hours effectively.',
+  criticalThinkingFacilitation:
+    'Provide appropriate learning activities that facilitate critical thinking and creativity of students.',
+  independentLearningGuidance:
+    'Guides students to learn on their own, reflect on new ideas and experiences, and make decisions in accomplishing given  tasks.',
+  feedbackCommunication:
+    'Communicates constructive feedback to students for their academic growth.',
+
+  // Category 2: Content Knowledge, Pedagogy and Technology
+  subjectKnowledge:
+    'Demonstrates extensive and broad knowledge of the subject/course.',
+  contentSimplification:
+    'Simplifies complex ideas in the lesson for ease of understanding.',
+  realWorldApplication:
+    'Integrates contemporary issues and developments in the discipline and/or daily life activities in the syllabus.',
+  technologyIntegration:
+    'Promotes active learning and student engagement by using appropriate teaching and learning resources including ICT tools and platforms.',
+  assessmentAlignment:
+    'Uses appropriate assessments (projects, exams, quizzes, assignments, etc.) aligned with the learning outcomes.',
+
+  // Category 3: Commitment and Transparency
+  diversityRecognition:
+    'Recognizes and values the unique diversity and individual differences among students.',
+  consultationSupport:
+    'Assists students with their learning challenges during consultation hours.',
+  immediateFeedback:
+    'Provides immediate feedback on student outputs and performance.',
+  transparentGrading:
+    'Provides transparent and clear criteria in rating student'+'s'+'performance.',
+};
+
+export function getEvaluationTemplateForRole(
+  role: string | null | undefined,
+): EvaluationTemplate {
+  const isSupervisor = role === 'ROLE_DEAN' || role === 'ROLE_PROGRAM_CHAIR';
+
+  if (!isSupervisor) {
+    return DEFAULT_EVALUATION_TEMPLATE;
+  }
+
+  return {
+    ...DEFAULT_EVALUATION_TEMPLATE,
+    categories: DEFAULT_EVALUATION_TEMPLATE.categories.map((category) => ({
+      ...category,
+      criteria: category.criteria.map((criterion) => ({
+        ...criterion,
+        label: SUPERVISOR_CRITERIA_LABELS[criterion.name] ?? criterion.label,
+      })),
+    })),
+  };
+}
 export interface EvaluationCheckResponse {
   hasEvaluated: boolean;
   message: string;
@@ -313,4 +371,7 @@ export class EvaluationService {
     return this.http.get<EvaluationCheckResponse>(url, { params, withCredentials: true });
   }
 
+  getTemplateForRole(role: string | null | undefined): EvaluationTemplate {
+    return getEvaluationTemplateForRole(role);
+  }
 }
